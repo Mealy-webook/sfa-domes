@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Checkout · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600&family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<style>
+/* Checkout: review the order from the Days & times section of court-details.html (sessionStorage "sfaOrder"), then pay on PayTabs.
+   server.js re-prices the order and creates the PayTabs payment page; this page never sees a key. Light theme, square corners. */
+:root{
+  color-scheme:light;
+  --brand:var(--color-brand); --brand-600:var(--color-bg-accent-hover); --brand-10:var(--color-bg-accent-subtle);
+  --bg:var(--color-bg-primary); --bg-soft:var(--color-bg-secondary); --line:var(--color-border-primary); --line-strong:var(--color-border-secondary);
+  --ink:var(--color-content-primary); --ink-2:var(--color-content-secondary); --ink-3:var(--color-content-tertiary); --ink-4:var(--color-content-disabled);
+  --danger:var(--color-danger); --warn-bg:var(--color-warning-bg); --warn-ink:var(--color-warning-content);
+  --font-display:var(--type-font);
+  --font-label:var(--type-font);
+  --font-body:var(--type-font);
+  --gutter:clamp(16px,6.67vw,96px);
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg-soft);color:var(--ink);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.inner{max-width:1440px;margin:0 auto;padding-inline:var(--gutter)}
+.lbl{font-family:var(--type-font);font-weight:var(--type-w-label)}
+.sar{display:inline-block;width:.8em;height:.8em;margin-right:3px;background:currentColor;-webkit-mask:url(f/sar.svg) center/contain no-repeat;mask:url(f/sar.svg) center/contain no-repeat}
+
+.bar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.bar .inner{height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.bar-start{display:flex;align-items:center;gap:16px}
+.back{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:1px solid var(--line-strong);background:var(--bg);text-decoration:none;font-size:var(--fs-16);line-height:1;transition:background-color .25s,color .25s,border-color .25s}
+.back svg{width:20px;height:20px;transition:transform .35s var(--ease)}
+.back:hover{background:var(--ink);color:var(--neutral-0);border-color:var(--ink)}
+.back:hover svg{transform:translateX(-3px)}
+.bar-logo img{display:block;height:44px;width:auto}
+.bar-end{justify-self:end;display:flex;gap:8px;align-items:center}
+@media (max-width:560px){.bar .inner{gap:8px}.bar-end{gap:8px}.bar-logo img{height:34px}}
+.back span{display:none}
+
+.page{display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-areas:"head head" "main side";gap:0 clamp(32px,4vw,64px);align-items:start;padding-top:clamp(28px,5vh,56px);padding-bottom:80px}
+/* phones: title, then what you're booking and what it costs, then who it's for, the consents and Pay */
+@media (max-width:1023px){.page{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "side" "main"}}
+.ck-h{grid-area:head}
+.ck-main{grid-area:main;min-width:0}
+/* the right-hand card: heading row, booking, then the payment summary, all in one container */
+.ck-card{padding:0}
+.ck-card .ck-card-head{margin:0;padding:16px 24px;border-bottom:1px solid var(--line)}   /* beats .step-head's 20px bottom margin, so the options get even space above and below */
+.ck-sum{padding:20px;border-top:1px solid var(--line)}
+.ck-sum .total{margin-bottom:0}
+/* the booking card leads with the court photo: name on it, Change in its corner (Ahmed picked option 2) */
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.ck-card .ck-photo{position:relative;display:block;aspect-ratio:16/9;border-bottom:0;overflow:hidden}
+.ck-card .ck-photo img{position:absolute;inset:0;width:100%;height:100%;min-height:0;object-fit:cover}
+.ck-card .ck-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.05) 30%,rgba(9,9,11,.75))}
+.ck-card .ck-photo > div{position:absolute;z-index:1;inset:auto 16px 14px;padding:0;color:var(--neutral-0)}
+.ck-card .ck-photo .eb{font:var(--ts-caption);color:var(--neutral-0)}
+.ck-card .ck-photo strong{font:var(--ts-title-m);text-transform:var(--type-case-title);color:var(--neutral-0)}
+.ck-card .ck-photo small{display:none}
+.ck-days-h{margin:0;padding:16px 24px 0;font:var(--ts-title-s);text-transform:var(--type-case-title)}   /* title over the days and times */
+.ck-card .days{padding:8px 24px 0}
+.ck-card .ck-sum{padding:16px 24px 24px}
+.ck-card .total{margin:0;padding-top:0;border-top:0}
+.ck-card .total strong{font:var(--ts-number-m)}
+/* Booking for sits in the same kind of card; the guest form inside it has no second border */
+.ck-main .ck-who{margin-top:0}
+.ck-h{margin-bottom:clamp(20px,3vh,28px)}   /* the title runs across the top; both columns start under it */
+.ck-who-body{padding:20px}
+.ck-who .guest .panel{border:0;background:none}
+.ck-who .guest .form{padding:20px 0 0}
+/* the booking card in the narrower right column: a smaller photo so the court name has room */
+@media (min-width:1024px){.pay .court{grid-template-columns:112px minmax(0,1fr)}}
+/* stacked (phone/tablet): the summary card sits above the main cards with the same gap they have between them */
+@media (max-width:1023px){.pay{margin-bottom:clamp(28px,4.5vh,44px)}#progMain > .step:first-child{margin-top:0}}
+/* consents + Pay sit straight under Booking for, on the page background (no panel) */
+.confirm{margin-top:clamp(28px,4.5vh,44px)}
+.confirm .btn{display:inline-flex;width:auto;padding:0 32px}   /* Pay hugs its label */
+.doc-link{display:inline;padding:0;border:0;background:none;color:var(--ink);font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.doc-link:hover{color:var(--brand)}
+/* the terms / waiver reader: both documents in one, each under its own heading; "I agree" ticks the one checkbox */
+.doc-sec + .doc-sec{margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
+.doc-sec h3{margin:0 0 12px;font:var(--ts-label-l);color:var(--ink);scroll-margin-top:96px}
+.doc{width:min(640px,calc(100vw - 32px));max-height:min(80vh,720px);padding:0;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.doc::backdrop{background:var(--color-overlay)}
+.doc-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;background:var(--bg);border-bottom:1px solid var(--line)}
+.doc-head h2{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.doc-x{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid var(--line-strong);background:var(--bg);cursor:pointer}
+.doc-x svg{width:18px;height:18px}
+.doc-body{padding:20px;font:var(--ts-body-m);color:var(--ink-2)}
+.doc-body p{margin:0 0 12px}
+.doc-body ul{margin:0;padding-inline-start:20px;display:grid;gap:8px}
+.doc-note{padding:8px 12px;background:var(--warn-bg);color:var(--warn-ink);font:var(--ts-body-s)}
+.doc-foot{position:sticky;bottom:0;padding:16px 20px;background:var(--bg);border-top:1px solid var(--line)}
+/* type as on the court page (option Q): an Oswald title, section headings with an orange bar */
+h1{font:var(--ts-title-l);margin:0;text-transform:var(--type-case-title)}
+.step{margin-top:clamp(28px,4.5vh,44px)}
+.step-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 20px}
+.step-head h2{font:var(--ts-title-s);display:flex;align-items:center;gap:12px;margin:0;text-transform:var(--type-case-title)}
+/* (no bar before section headings on checkout: Ahmed) */
+.step-head a{font-size:var(--fs-14);color:var(--ink-2);text-underline-offset:3px}
+.step-head a:hover{color:var(--brand)}
+.panel{background:var(--bg);border:1px solid var(--line)}
+
+/* order review */
+.court{display:grid;grid-template-columns:180px minmax(0,1fr);border-bottom:1px solid var(--line)}
+.court img{width:100%;height:100%;min-height:120px;object-fit:cover;display:block}
+.court div{padding:16px 20px}
+.court p{margin:0}
+.court .eb{font-size:var(--fs-16);color:var(--brand)}
+.court strong{font:var(--ts-title-m);text-transform:var(--type-case-title);display:block}
+.court small{display:block;margin-top:4px;font-size:var(--fs-14);line-height:18px;color:var(--ink-3)}
+@media (max-width:560px){.court{grid-template-columns:110px minmax(0,1fr)}.court strong{font-size:var(--fs-20)}}
+.days{list-style:none;margin:0;padding:0 20px}
+.days > li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.days > li:last-child{border-bottom:0}
+.days > li > b{font:var(--ts-label-l);text-transform:var(--type-case-label)}
+.days > li > span{font-size:var(--fs-14);font-weight:600;white-space:nowrap}
+.days ul{grid-column:1/-1;list-style:none;margin:0;padding:0;font-size:var(--fs-14);line-height:22px;color:var(--ink-2)}
+.days ul li{display:flex;align-items:center;gap:12px;min-height:32px}
+.days ul li > span:first-child{flex:1;min-width:0}
+.slot-p{font:var(--ts-label-m);color:var(--ink);white-space:nowrap}
+.days ul li:not(:has(.rm-slot)) .slot-p{margin-inline-end:0}
+.rm-slot{flex:none;display:grid;place-items:center;width:32px;height:32px;margin-inline-end:-8px;padding:0;border:0;background:none;color:var(--ink-3);cursor:pointer;transition:color .2s,background-color .2s}
+.rm-slot svg{width:16px;height:16px}
+.rm-slot:hover{color:var(--danger);background:var(--bg-soft)}
+
+/* booking for */
+.who{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ck-who .who{grid-template-columns:repeat(3,minmax(0,1fr))}   /* courts: myself, a child, someone else */
+/* a court booked for one of the account's children: their list opens under the options */
+.kid-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;padding-top:8px}
+.kid-opt{position:relative;display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--line-strong);background:var(--bg);cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.kid-opt:hover{border-color:var(--ink)}
+.kid-opt input{position:absolute;opacity:0;pointer-events:none}
+.kid-opt:has(input:focus-visible){outline:2px solid var(--brand);outline-offset:3px}
+.kid-opt:has(input:checked){border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--color-bg-accent-subtle)}
+.kid-opt .pp-av{flex:none}
+.kid-opt strong{display:block;font:var(--ts-label-l)}
+.kid-opt small{display:block;font:var(--ts-body-s);color:var(--ink-3)}
+#kidErr{display:none;margin:8px 0 0}
+.kids.bad #kidErr{display:block}
+.kids.bad .kid-opt{border-color:var(--danger)}
+.who-opt{position:relative;display:flex;align-items:center;gap:16px;padding:16px 16px;background:var(--bg);border:1px solid var(--line-strong);cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.who-opt:hover{border-color:var(--ink)}
+.who-opt input{position:absolute;opacity:0;pointer-events:none}
+.who-opt:has(input:focus-visible){outline:2px solid var(--brand);outline-offset:3px}
+.who-opt:has(input:checked){border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.who-mark{flex:none;width:22px;height:22px;display:grid;place-items:center;border:1.5px solid var(--line-strong);transition:background-color .2s,border-color .2s}
+.who-mark svg{width:14px;height:14px;opacity:0;transition:opacity .2s}
+.who-opt:has(input:checked) .who-mark{background:var(--brand);border-color:var(--brand)}
+.who-opt:has(input:checked) .who-mark svg{opacity:1}
+.who-opt strong{font:var(--ts-label-l);text-transform:var(--type-case-label);display:block}
+.who-opt small{display:block;font-size:var(--fs-14);line-height:18px;color:var(--ink-3)}
+@media (max-width:640px){.ck-who .who{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:480px){.who{grid-template-columns:minmax(0,1fr)}}
+.guest{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+.guest.on{grid-template-rows:1fr}
+.guest > div{overflow:hidden}
+.guest .panel{margin-top:8px}
+
+/* payer form */
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:20px}
+.form .full{grid-column:1/-1}
+@media (max-width:560px){.form{grid-template-columns:minmax(0,1fr)}}
+.field label{font:var(--ts-label-m);text-transform:var(--type-case-label);display:block;margin-bottom:8px;color:var(--ink-2)}
+.field label span{text-transform:none;letter-spacing:0;font-family:var(--type-font);font-size:var(--fs-12);color:var(--ink-3)}
+.input{display:flex;align-items:center;height:48px;background:var(--bg);border:1px solid var(--line-strong);transition:border-color .2s,box-shadow .2s}
+.input:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.input input{flex:1;min-width:0;height:100%;padding:0 16px;border:0;background:transparent;outline:0;font-size:var(--fs-16)}
+.input .pre{display:grid;place-items:center;height:100%;padding:0 12px;border-right:1px solid var(--line);background:var(--bg-soft);font-size:var(--fs-16);color:var(--ink-2)}
+.field.bad .input{border-color:var(--danger);box-shadow:inset 0 0 0 1px var(--danger)}
+.err{display:none;margin:8px 0 0;font-size:var(--fs-14);line-height:18px;color:var(--danger)}
+.field.bad .err{display:block}
+.agree{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin:0 0 16px}   /* the column is capped, so a long terms line wraps on phones */
+.terms{display:flex;gap:12px;align-items:flex-start;margin:0;font-size:var(--fs-14);line-height:20px;color:var(--ink-2);cursor:pointer;width:max-content;max-width:100%}
+.agree-err{display:none;margin:0;font-size:var(--fs-14);line-height:18px;color:var(--danger)}
+.agree:has(.terms.bad) .agree-err{display:block}
+.terms input{position:absolute;opacity:0;pointer-events:none}
+.terms .box{flex:none;width:22px;height:22px;display:grid;place-items:center;border:1.5px solid var(--line-strong);background:var(--bg);transition:background-color .2s,border-color .2s}
+.terms .box svg{width:14px;height:14px;opacity:0}
+.terms:has(input:checked) .box{background:var(--brand);border-color:var(--brand)}
+.terms:has(input:checked) .box svg{opacity:1}
+.terms:has(input:focus-visible) .box{outline:2px solid var(--brand);outline-offset:2px}
+.terms.bad .box{border-color:var(--danger)}
+
+/* pay box */
+.pay{grid-area:side;position:sticky;top:var(--pay-top,96px);display:flex;flex-direction:column;max-height:calc(100vh - var(--pay-top,96px) - 16px)}
+/* the card never gets taller than the window: photo, title and total stay put, and the list of days scrolls inside it */
+.pay .ck-card{display:flex;flex-direction:column;min-height:0;max-height:100%}
+.pay .ck-card > *{flex:none}
+.pay .ck-card .days{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+/* when the days don't all fit, the scroll bar always shows (not the hide-until-scrolling kind), so it's clear there's more */
+.pay .ck-card .days::-webkit-scrollbar{width:8px}
+.pay .ck-card .days::-webkit-scrollbar-track{background:var(--bg-soft)}
+.pay .ck-card .days::-webkit-scrollbar-thumb{background:var(--ink-4)}
+.pay .ck-card .days::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+@supports not selector(::-webkit-scrollbar){.pay .ck-card .days{scrollbar-width:thin;scrollbar-color:var(--ink-4) var(--bg-soft)}}
+@media (max-width:1023px){.pay{position:static;display:block;max-height:none}.pay .ck-card{display:block;max-height:none}.pay .ck-card .days{overflow:visible}}
+.pay-title{font:var(--ts-label-l);text-transform:var(--type-case-label);margin:0 0 12px;color:var(--ink-2)}
+.rows{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0;font-size:var(--fs-14);line-height:20px}
+.rows dt{color:var(--ink-3)}
+.rows dd{margin:0;text-align:end}
+.total{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:16px 0 16px;padding-top:16px;border-top:1px solid var(--line-strong)}
+.total small{font:var(--ts-label-l);text-transform:var(--type-case-label);color:var(--ink-2)}
+/* the total matches the court page's bottom bar: label face, 22px (Ahmed: 40px Anton was too large) */
+.total strong{font:var(--ts-number-s)}
+.charge{margin:-6px 0 16px;font-size:var(--fs-14);line-height:18px;color:var(--ink-2)}
+.btn{font:var(--ts-label-l);display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:60px;padding:0 24px;background:var(--brand);border:0;color:var(--neutral-0);text-decoration:none;cursor:pointer;transition:background-color .25s;text-transform:var(--type-case-label)}
+.btn:hover:not(:disabled){background:var(--brand-600)}
+.btn:disabled{background:var(--line);color:var(--ink-3);cursor:progress}
+.btn svg{width:20px;height:20px}
+.btn .spin{width:18px;height:18px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.secure{display:flex;gap:8px;align-items:flex-start;margin:16px 0 0;font-size:var(--fs-14);line-height:18px;color:var(--ink-3)}
+.secure svg{flex:none;width:16px;height:16px;margin-top:1px}
+.alert{margin:16px 0 0;padding:12px 16px;font-size:var(--fs-14);line-height:18px;border-left:3px solid var(--danger);background:#FEF2F2;color:#991B1B}
+.alert.warn{border-color:#D97706;background:var(--warn-bg);color:var(--warn-ink)}
+.alert code{font-size:var(--fs-12)}
+
+/* training program checkout (order.kind 'program', from program.html): sessions, add-ons and player in the main column */
+.pk-body{padding:16px 24px 24px}
+.pk-note{margin:0 0 12px;font:var(--ts-body-s);color:var(--ink-2)}
+/* Your sessions, "soonest first" (Ahmed's pick from sessions-options.html, option H): the next three sessions in
+   full, the first one marked; the rest behind "Show all" with a line saying how many and until when */
+.pk-ses-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.pk-ses-head a{font:var(--ts-label-m);color:var(--ink);text-underline-offset:3px}
+/* view only (Ahmed): a plain list with dividers, nothing that reads as a choice: no boxes, no brand ring, neutral numbers */
+.pk-next{list-style:none;margin:-12px 0 0;padding:0}   /* the first row sits under the card heading's divider, so no line of its own */
+.pk-next li{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.pk-next li > span:nth-child(2){display:grid;gap:4px;min-width:0}
+.pk-next b{font:var(--ts-label-l)}
+.pk-next small{font:var(--ts-body-s);color:var(--ink-2)}
+.pk-next bdi{white-space:nowrap}
+.pk-n{display:grid;place-items:center;width:32px;height:32px;font:var(--ts-label-m);color:var(--ink-3)}
+.pk-next em,.ses-dlg-b em{font:var(--ts-label-s);font-style:normal;color:var(--ink-3)}
+.pk-rest{margin:16px 0 0;font:var(--ts-body-s);color:var(--ink-2)}
+.pk-more{display:block;margin-top:8px;padding:0;border:0;background:none;color:var(--color-content-primary);font:var(--ts-label-m);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.pk-save span{color:var(--color-brand)!important;white-space:normal!important}
+.pk-kit{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:4px 16px;align-items:center;padding:16px;border:1px solid var(--line-strong)}
+.pk-kit.on{border:2px solid var(--brand);padding:15px;background:var(--color-bg-accent-subtle)}
+.pk-ic{grid-row:span 2;display:grid;place-items:center;width:64px;aspect-ratio:1;background:var(--bg-soft);color:var(--brand)}
+.pk-ic svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+.pk-kit strong{font:var(--ts-label-l)}
+.pk-kit p{margin:0;font:var(--ts-body-s);color:var(--ink-2)}
+.pk-pr{font:var(--ts-number-s);white-space:nowrap}
+.pk-add{grid-column:3;height:40px;padding:0 16px;border:1px solid var(--ink);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.pk-add[aria-pressed=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
+.pk-opts{grid-column:1/-1;display:grid;gap:12px;padding-top:12px;margin-top:8px;border-top:1px solid var(--line)}
+.pk-lbl{display:block;margin-bottom:8px;font:var(--ts-label-m);color:var(--ink-2)}
+.pk-chips{display:flex;flex-wrap:wrap;gap:8px}
+.pk-chip{height:40px;padding:0 12px;border:1px solid var(--line-strong);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+/* selected = the plan card's style everywhere: 2px brand, tint, ink text */
+.pk-chip[aria-checked=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
+.pk-qty{display:inline-flex;align-items:center;border:1px solid var(--line-strong)}
+.pk-qty button{width:40px;height:40px;border:0;background:none;font:var(--ts-label-l);cursor:pointer}
+.pk-qty button:disabled{opacity:.35;cursor:default}
+.pk-qty output{min-width:32px;text-align:center;font:var(--ts-label-l)}
+.pk-kit .err{grid-column:1/-1}
+.pk-pr small{font:var(--ts-body-s);color:var(--ink-3)}
+/* the kit, per participant: one row each (name + Add), sizes under it once added */
+.pk-people{grid-column:1/-1;display:grid;margin-top:12px;border-top:1px solid var(--line)}
+.pk-person{display:grid;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.pk-person:last-child{border-bottom:0;padding-bottom:0}
+.pk-person-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.pk-person-row strong{font:var(--ts-label-l);min-width:0}
+.pk-person .pk-add{grid-column:auto}
+.pk-person.on .pk-add{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
+.pk-person .err{margin:0}
+.pk-person.bad .err{display:block}
+.pk-empty{margin:12px 0 0}
+/* participants: a list of people to tick, then "Add new participant" (opens a short form in place) */
+.pp-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pp{display:grid;grid-template-columns:40px minmax(0,1fr) 24px;align-items:center;gap:16px;width:100%;padding:12px 16px;border:1px solid var(--line-strong);background:var(--bg);color:var(--ink);font:inherit;text-align:start;cursor:pointer;transition:border-color .2s,background-color .2s}
+.pp:hover:not(:disabled){border-color:var(--ink)}
+.pp[aria-checked=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
+.pp:disabled{cursor:default}
+.pp.no{background:var(--bg-soft)}
+.pp.no .pp-av,.pp.no strong{opacity:.5}
+.pp:disabled:not(.no){opacity:.5}
+.pp-av{display:grid;place-items:center;width:40px;height:40px;background:var(--bg-soft);font:var(--ts-label-m);color:var(--ink-2)}
+.pp[aria-checked=true] .pp-av{background:var(--bg);color:var(--ink)}
+.pp-txt{display:grid;gap:4px;min-width:0}
+.pp-txt strong{font:var(--ts-label-l)}
+.pp-txt small{font:var(--ts-body-s);color:var(--ink-2)}
+.pp.no small{color:var(--ink-3)}
+.pp-box{display:grid;place-items:center;width:24px;height:24px;border:1.5px solid var(--line-strong);background:var(--bg)}
+.pp-box svg{width:16px;height:16px;opacity:0}
+.pp[aria-checked=true] .pp-box{border-color:var(--brand);background:var(--brand);color:var(--neutral-0)}
+.pp[aria-checked=true] .pp-box svg{opacity:1}
+.pp.no .pp-box{visibility:hidden}
+.pp-cap{margin:12px 0 0}
+#ppCard .err#ppErr{margin:12px 0 0}
+/* the add-a-child popup (program checkout): the child form + "Save to My children", ticked by default */
+.kid-dlg{width:min(600px,calc(100vw - 32px));max-height:calc(100vh - 48px);overflow:auto}
+.kid-dlg .kf{border:0;padding:24px}
+.kid-dlg .kf-h{font:var(--ts-title-s);text-transform:var(--type-case-title);padding-inline-end:48px}
+.kid-x{position:absolute;top:16px;inset-inline-end:16px}
+.kf-save{position:relative;display:flex;align-items:flex-start;gap:12px;padding:16px;background:var(--bg-soft);cursor:pointer}
+.kf-save input{position:absolute;opacity:0;pointer-events:none}
+.kf-sbox{display:grid;place-items:center;flex:none;width:22px;height:22px;border:1.5px solid var(--line-strong);background:var(--bg)}
+.kf-sbox svg{width:14px;height:14px;opacity:0}
+.kf-save input:checked + .kf-sbox{background:var(--brand);border-color:var(--brand)}
+.kf-save input:checked + .kf-sbox svg{opacity:1}
+.kf-save input:focus-visible + .kf-sbox{outline:2px solid var(--brand);outline-offset:2px}
+.kf-save strong{display:block;font:var(--ts-label-l)}
+.kf-save small{display:block;margin-top:4px;font:var(--ts-body-s);color:var(--ink-2)}
+@media (max-width:640px){.kid-dlg .kf{padding:16px}}
+#ppCard.bad #ppErr{display:block}
+#ppCard.bad .pp:not(:disabled){border-color:var(--danger)}
+.pp-addbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;padding:0 16px;margin-top:8px;border:1px dashed var(--ink-4);background:none;color:var(--ink);font:var(--ts-label-m);cursor:pointer;transition:border-color .2s}
+.pp-addbtn:hover{border-color:var(--ink)}
+.pp-addbtn svg{width:18px;height:18px}
+.pp-form{display:grid;gap:16px;margin-top:8px;padding:16px;border:1px solid var(--ink);background:var(--bg)}
+.pp-form-h{margin:0;font:var(--ts-label-l)}
+.pp-row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.pp-gender .pk-chip{flex:1;height:48px}
+.pp-save{margin:0}
+.pp-why{margin:0}
+.pp-why.on{display:block}
+.pp-actions{display:flex;align-items:center;gap:16px}
+.pp-ok{background:var(--ink);color:var(--neutral-0)}
+.pp-cancel{padding:0;border:0;background:none;color:var(--ink-2);font:var(--ts-label-m);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+@media (max-width:640px){.ck-card .ck-card-head{padding:16px}.pk-body{padding:16px}.ck-card .days{padding:8px 16px 0}.ck-card .ck-sum{padding:16px}.ck-days-h{padding:16px 16px 0}.pp{padding:12px;gap:12px}.pp-row2{grid-template-columns:minmax(0,1fr)}}
+.pk-kit.bad .err{display:block}
+.pk-kit.bad{border-color:var(--danger)}
+.days li span bdi{white-space:nowrap}
+@media (max-width:640px){.pk-next li{gap:12px}.pk-kit{grid-template-columns:56px minmax(0,1fr)}.pk-ic{width:56px}.pk-kit .pk-pr{grid-column:2}.pk-add{grid-column:1/-1}}
+.ck-main .ck-who[hidden]{display:none}
+.missing{max-width:560px;margin:12vh auto;padding:32px;text-align:center}
+.missing h1{font:var(--ts-title-l);text-transform:var(--type-case-title)}
+.missing p{color:var(--ink-2)}
+.missing .btn{width:auto;display:inline-flex;margin-top:12px}
+/* participants by quantity: the Places stepper, then one row per place; the open place shows its picker */
+.pp-qty{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.pp-qty-t{display:grid;gap:4px}
+.pp-qty-t strong{font:var(--ts-label-l)}
+.pp-qty-t small{font:var(--ts-body-s);color:var(--ink-2)}
+.pp-note{margin:16px 0}
+.pp-places{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pp-place{border:1px solid var(--line-strong);background:var(--bg)}
+.pp-place.empty{border-style:dashed}
+.pp-place.bad{border-color:var(--danger);border-style:solid}
+.pp-place-h{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:16px;min-height:64px;padding:12px 16px}
+.pp-place.empty .pp-place-h{grid-template-columns:64px minmax(0,1fr)}
+.pp-pn{font:var(--ts-label-s);color:var(--ink-3);white-space:nowrap}
+.pp-who{display:grid;grid-template-columns:40px minmax(0,1fr);align-items:center;gap:12px;min-width:0}
+.pp-change{padding:0;border:0;background:none;color:var(--ink);font:var(--ts-label-m);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.pp-choose{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;height:40px;padding:0;border:0;background:none;color:var(--ink);font:var(--ts-label-m);text-align:start;cursor:pointer}
+.pp-choose svg{flex:none;width:18px;height:18px}
+.pp-place.open .pp-choose svg{transform:rotate(180deg)}
+.pp-pick{display:grid;gap:8px;padding:0 16px 16px}
+.pp-dot{width:20px;height:20px;border:2px solid var(--line-strong);border-radius:50%}
+.pp[aria-checked=true] .pp-dot{border:6px solid var(--brand)}
+.pp.no .pp-dot,.pp:disabled .pp-dot{visibility:hidden}
+.pp-pick .pp-addbtn{margin-top:0}
+@media (max-width:640px){.pp-place-h{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;padding:12px}.pp-place-h .pp-pn{grid-column:1/-1}.pp-place.empty .pp-place-h{grid-template-columns:minmax(0,1fr)}.pp-pick{padding:0 12px 12px}}
+/* the kit: its own quantity, then a size row per kit */
+.pk-kq{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.pk-kq .pk-lbl{margin:0}
+.pk-sizes{grid-column:1/-1;display:grid;gap:16px;margin-top:16px}
+.pk-size{display:grid;gap:8px}
+.pk-size .pk-lbl{margin:0}
+.pk-size .err{margin:0}
+.pk-size.bad .err{display:block}
+.pk-size.bad .pk-chip:not([aria-checked=true]){border-color:var(--danger)}
+/* booking for a child: the pane under the two options; the same options as buttons inside a program place */
+.kid-pane{display:grid;gap:12px;padding-top:16px}
+.kids.bad .kd-btn{border-color:var(--danger);box-shadow:inset 0 0 0 1px var(--danger)}
+.kids.bad .kd .err{display:block}
+button.who-opt{width:100%;text-align:start;font:inherit;color:inherit}
+.who-opt[aria-checked=true]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.who-opt[aria-checked=true] .who-mark{background:var(--brand);border-color:var(--brand)}
+.who-opt[aria-checked=true] .who-mark svg{opacity:1}
+button.who-opt:disabled{cursor:not-allowed;border-color:var(--line);background:var(--bg-soft)}
+button.who-opt:disabled strong{opacity:.5}
+button.who-opt:disabled small{color:var(--danger)}
+.pp-pick .who{margin-bottom:4px}
+.pp-note2{margin:0 0 12px;font:var(--ts-body-s);color:var(--ink-2)}
+/* ladies hours: the rule under Booking for; For myself is off for an account that isn't female */
+.lady-note{margin:16px 0 0;padding:12px 16px;border-inline-start:4px solid var(--color-programme-women);background:var(--bg-soft);font:var(--ts-body-s);color:var(--ink-2)}
+.who-opt.off{cursor:not-allowed;border-color:var(--line);background:var(--bg-soft)}
+.who-opt.off strong{opacity:.5}
+.who-opt.off small{color:var(--danger)}
+.alert .doc-link{margin-inline-start:6px;font-weight:600}
+[hidden]{display:none!important}
+/* all sessions popup (from "Show all" on Your sessions) */
+.ses-dlg .doc-head{align-items:flex-start;padding:16px 24px}
+.ses-dlg-t{display:grid;gap:4px}
+.ses-dlg-t p{margin:0;font:var(--ts-body-s);color:var(--ink-2)}
+.ses-dlg-b{display:grid;gap:24px;padding:16px 24px 24px}
+.ses-dlg-b h3{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:0 0 8px;font:var(--ts-label-l)}
+.ses-dlg-b h3 small{font:var(--ts-body-s);color:var(--ink-3)}
+.ses-dlg-b ol{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.ses-dlg-b li{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:16px;padding:8px 0;border-bottom:1px solid var(--line)}
+.ses-dlg-b li b{font:var(--ts-label-m)}
+.ses-dlg-b li > span:last-child{font:var(--ts-body-s);color:var(--ink-2)}
+@media (max-width:640px){.ses-dlg .doc-head{padding:16px}.ses-dlg-b{padding:16px}.ses-dlg-b li{gap:12px}}
+/* hover never hides a selection */
+.pk-chip[aria-checked=true]:hover,.pp[aria-checked=true]:hover:not(:disabled),.pk-add[aria-pressed=true]:hover{border-color:var(--color-brand)}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="inner">
+    <span class="bar-start">
+      <a class="back lbl" aria-label="Edit booking" id="backLink" href="index.html?from=courts#sports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M19 12H5m6-7-7 7 7 7"/></svg><span>Edit booking</span></a>
+      <a class="bar-logo" href="index.html" aria-label="SFA Domes home"><img src="f/domes-logo-orange.svg" alt="SFA Domes" width="77" height="61"></a>
+    </span>
+    <span class="bar-end"><span data-prefs-slot></span><span data-auth-slot></span></span>
+  </div>
+</header>
+
+<main class="inner page" id="page" hidden>
+  <h1 class="ck-h">Checkout</h1>
+
+  <!-- right column: what you're booking, then what it costs -->
+  <aside class="pay" aria-label="Your booking and payment">
+    <!-- one card: the booking (with its Change link), then what it costs -->
+    <section class="panel ck-card" aria-labelledby="revTitle">
+      <div class="court ck-photo"><img id="cImg" src="" alt=""><div><p class="eb lbl" id="cSport"></p><strong id="cName"></strong><small id="cSpecs"></small></div></div>
+      <h2 class="sr-only" id="revTitle">Your booking</h2>
+      <ul class="days" id="days"></ul>
+      <div class="ck-sum">
+        <div class="total"><small>Total</small><strong id="total"></strong></div>
+        <p class="charge" id="charge" hidden></p>
+      </div>
+    </section>
+  </aside>
+
+  <div class="ck-main">
+    <section class="step panel ck-card ck-who" aria-labelledby="whoTitle">
+      <div class="step-head ck-card-head"><h2 id="whoTitle">Booking for</h2></div>
+      <div class="ck-who-body">
+      <div class="who" role="radiogroup" aria-labelledby="whoTitle">
+        <label class="who-opt"><input type="radio" name="who" value="me" checked><span class="who-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="square"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><strong>For myself</strong><small>You're the one playing</small></span></label>
+        <label class="who-opt"><input type="radio" name="who" value="other"><span class="who-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="square"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><strong>Someone else</strong><small>Add the player's details</small></span></label>
+      </div>
+      <p class="lady-note" id="ladyNote" hidden>Ladies hours: every player on this court must be a woman or girl.</p>
+      <div class="guest kids" id="kids"><div><div class="kid-pane" id="kidPane"></div></div></div>
+      <div class="guest" id="guest"><div>
+        <div class="panel form">
+          <div class="field full" id="gfName"><label for="gName">Player's full name</label><div class="input"><input id="gName" type="text" autocomplete="off" placeholder="e.g. Sara Al-Qahtani"></div><p class="err">Enter their full name.</p></div>
+          <div class="field" id="gfPhone"><label for="gPhone">Player's mobile</label><div class="input"><span class="pre">+966</span><input id="gPhone" type="tel" inputmode="numeric" autocomplete="off" placeholder="5X XXX XXXX" maxlength="11"></div><p class="err">Enter a Saudi mobile number starting with 5.</p></div>
+          <div class="field" id="gfEmail"><label for="gEmail">Player's email <span>(optional)</span></label><div class="input"><input id="gEmail" type="email" autocomplete="off" placeholder="name@example.com"></div><p class="err">Check the email address.</p></div>
+        </div>
+      </div></div>
+      </div>
+    </section>
+
+    <div id="progMain" hidden></div>
+
+    <!-- consents and Pay, under Booking for -->
+    <div class="confirm">
+      <div class="agree">
+        <label class="terms" id="fTerms"><input type="checkbox" id="pTerms"><span class="box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="square"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span>I agree to the <button class="doc-link" type="button" data-doc="terms">terms and conditions</button> and the <button class="doc-link" type="button" data-doc="waiver">health waiver</button></span></label>
+        <p class="agree-err" id="agreeErr">Please agree to the terms and conditions and the health waiver.</p>
+      </div>
+      <button class="btn" id="payBtn" type="button"></button>
+      <div id="alert" role="alert"></div>
+    </div>
+  </div>
+</main>
+
+<dialog class="doc" id="docDlg" aria-labelledby="docTitle">
+  <div class="doc-head"><h2 id="docTitle">Terms and health waiver</h2><button class="doc-x" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="doc-body" id="docBody"></div>
+  <div class="doc-foot"><button class="btn" id="docAgree" type="button">I agree</button></div>
+</dialog>
+<template id="doc-terms">
+  <p class="doc-note">Placeholder text: SFA Domes to supply the final terms.</p>
+  <ul>
+    <li>Courts are booked in 1.5-hour slots, up to 3 months ahead.</li>
+    <li>Payment is taken online when you book. Cash isn't accepted.</li>
+    <li>Check in at the front desk a few minutes before your slot.</li>
+    <li>Cleats aren't allowed on the artificial grass fields.</li>
+    <li>Free balls and bibs are provided with every booking.</li>
+    <li>Changes, cancellations and refunds follow SFA Domes' policy (to be confirmed).</li>
+  </ul>
+</template>
+<template id="doc-waiver">
+  <p class="doc-note">Placeholder text: SFA Domes to supply the final waiver.</p>
+  <ul>
+    <li>Everyone playing is fit to take part, or has medical advice that they can.</li>
+    <li>Players take part at their own risk and follow staff and safety instructions.</li>
+    <li>Staff may stop play if it isn't safe.</li>
+    <li>Players under 18 need permission from a parent or guardian.</li>
+  </ul>
+</template>
+
+<div class="missing" id="missing" hidden>
+  <h1>Nothing to check out</h1>
+  <p>Pick a sport, a court and some times first.</p>
+  <a class="btn" href="index.html?from=courts#sports">Choose a sport</a>
+</div>
+
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/kid-pick.js"></script>
+<script src="f/checkout-delight.js" defer></script>
+<script>
+// Terms and health waiver, one agreement: either underlined link opens the reader with both documents (scrolled to the
+// one you tapped); "I agree" ticks the checkbox and closes it
+(() => {
+  const dlg = document.getElementById('docDlg'), P = window.SFA_PREFS, t = s => (P && P.t ? P.t(s) : s);
+  const DOCS = [['terms', 'Terms and conditions'], ['waiver', 'Health waiver']];
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.doc-link'); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    document.getElementById('docTitle').textContent = t('Terms and health waiver');
+    const body = document.getElementById('docBody'); body.replaceChildren();
+    DOCS.forEach(([k, title]) => { const sec = document.createElement('section'); sec.className = 'doc-sec'; sec.id = 'docsec-' + k;
+      const h = document.createElement('h3'); h.textContent = t(title); sec.append(h, document.getElementById('doc-' + k).content.cloneNode(true)); body.append(sec); });
+    dlg.showModal();
+    const target = document.getElementById('docsec-' + b.dataset.doc); dlg.scrollTop = 0; if (b.dataset.doc !== 'terms') target.scrollIntoView({ block: 'start' });
+  });
+  document.getElementById('docAgree').addEventListener('click', () => {
+    const box = document.getElementById('pTerms');
+    if (!box.checked){ box.checked = true; box.dispatchEvent(new Event('change', { bubbles: true })); }
+    box.closest('.terms').classList.remove('bad'); dlg.close();
+  });
+  dlg.querySelector('[data-close]').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });   // a click on the backdrop closes it
+})();
+// The booking card sticks where it starts (under the title), and is never taller than the window from there
+(() => {
+  const pay = document.querySelector('.pay'), root = document.documentElement;
+  const fit = () => {
+    root.style.removeProperty('--pay-top');
+    if (innerWidth < 1024) return;
+    const y = scrollY; scrollTo(0, 0);
+    root.style.setProperty('--pay-top', Math.round(pay.getBoundingClientRect().top) + 'px');
+    scrollTo(0, y);
+  };
+  addEventListener('load', fit); addEventListener('resize', fit);
+  new MutationObserver(fit).observe(document.getElementById('page'), { attributes: true, attributeFilter: ['hidden'] });
+})();
+</script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const P = window.SFA_PREFS, money = P.money, t = P.t;
+  const { SLOT } = window.SFA_SCHEDULE;
+  const fmtSlot = s => `${P.time(s)} – ${P.time(s + SLOT)}`;
+  const fmtDay = k => { const [y, m, d] = k.split('-').map(Number); return P.date(new Date(y, m - 1, d), 'full'); };
+
+  let order = null;
+  try { order = JSON.parse(sessionStorage.getItem('sfaOrder')); } catch (e) {}
+  if (order && order.kind === 'program') return programCheckout(order);
+  const sport = order && window.SFA_SPORTS[order.sport], court = sport && sport.courts[order.court];
+
+  // ---- training program checkout: the plan and start come from program.html; sessions, the Training Kit, the player's
+  //      name and the summary live here. server.js re-checks and re-prices it all (a free trial is confirmed without paying)
+  function programCheckout(order){
+    const p = window.SFA_PROGRAMS[order.program], K = window.SFA_PROGRAM_KIT;
+    if (!p || !order.start || order.time == null){ $('missing').hidden = false; return; }
+    $('page').hidden = false;
+    const sp = window.SFA_SPORTS[p.sport], tx = o => o && (P.lang === 'ar' ? o.ar : o.en);
+    const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+    const range = s => `<bdi>${P.time(s)}</bdi> – <bdi>${P.time(s + p.minutes)}</bdi>`;
+    const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>';
+    const bookUrl = `program.html?p=${encodeURIComponent(order.program)}#book`;
+    $('backLink').href = bookUrl;
+    $('cImg').src = p.img || window.SFA_COURT_IMG(p.sport, sp.courts[p.court || 0]); $('cImg').style.objectPosition = p.focus;
+    document.querySelector('.ck-who').hidden = true;
+    const main = $('progMain'); main.hidden = false;
+    // participants (AC03): each place is you or a child — a saved child (read fresh from the server) or one entered for this
+    // booking only (order.people.added). No other adults (Ahmed). Women-only programs (Ladies hours) list girls only.
+    order.people = order.people || { added: [] };
+    order.people.added = (order.people.added || []).filter(x => x.first != null);
+    // participants as one checklist (Ahmed 2026-11-09, option A of participants-options.html): everyone ticked takes a
+    // place, so places is just the ticked keys ('me', a saved child's id, or 'new-…' for a child added for this booking)
+    order.people.places = (Array.isArray(order.people.places) ? order.people.places : []).filter(Boolean);
+    // add-ons (the Training Kit) come with a subscription only; a free trial is just the session
+    if (!Array.isArray(order.kitSizes)) order.kitSizes = [];
+    if (order.plan === 'trial') order.kitSizes = [];
+    const KD = window.SFA_KIDS;
+    let me = null, kids = [], kidsLoaded = false;
+    const slot = p.slots.find(x => x.time === order.time), maxPick = Math.max(1, Math.min(window.SFA_PROGRAM_MAX_PEOPLE, p.capacity - (slot ? slot.enrolled : 0)));
+    const showKid = c => !p.women || c.gender === 'female';
+    const cands = () => [
+      ...(me ? [{ key: 'me', ref: 'me', name: me.name, dob: me.dob, gender: me.gender, you: true }] : []),
+      ...kids.filter(showKid).map(x => ({ ...x, key: x.id, ref: x.id })),
+      ...order.people.added.filter(showKid).map(x => ({ ...x, ref: null, fresh: true })),
+    ];
+    const why = c => !c.dob || !c.gender ? 'profile' : !c.you && !window.SFA_CHILD_AGE_OK(c.dob, order.start) ? 'child' : window.SFA_PROGRAM_ELIGIBLE(p, c, order.start);
+    const picked = () => order.people.places.map(k => cands().find(x => x.key === k)).filter(c => c && !why(c));
+    const kitsOn = () => order.plan === 'trial' ? [] : order.kitSizes;
+    const heads = () => Math.max(1, picked().length);   // the price shows for one until someone is ticked (Pay still needs one)
+    const save = () => { try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (e) {} };
+    const sessions = () => window.SFA_PROGRAM_SESSIONS(p, order.start, order.plan);
+    const planPrice = window.SFA_PROGRAM_PRICE(p, order.plan), planFull = window.SFA_PROGRAM_FULL_PRICE(p, order.plan);
+    const total = () => heads() * planPrice + kitsOn().length * K.price;
+    // the program's own terms open from "terms and conditions"
+    $('doc-terms').innerHTML = `<ul>${window.SFA_PROGRAM_TERMS.map(x => `<li>${esc(tx(x))}</li>`).join('')}</ul>`;
+    let payLabel = '';
+
+    // summary card: what's booked and what it costs
+    function summary(){
+      const n = sessions().length, plan = t({ trial: 'Free trial', month: 'One month subscription', month2: 'Two-month subscription', month3: 'Three-month subscription' }[order.plan]);
+      $('cSport').textContent = `${t(sp.name)} · ${t('SFA Domes Dammam')}`;
+      $('cName').textContent = tx(p.name);
+      $('cSpecs').textContent = `${t('Ages {a}', { a: `⁦${p.ages}⁩` })} · ${tx(p.level)}`;
+      $('days').innerHTML = `<li><b>${t('Starts')}</b><ul><li><span>${P.date(toDate(order.start), 'full')} · ${range(order.time)}</span></li></ul></li>`
+        + (picked().length ? `<li><b>${t('Participants')}</b><ul><li><span>${picked().map(c => esc(c.name)).join(', ')}</span></li></ul></li>` : '')
+        + `<li><b>${plan}</b><ul><li><span>${t('{n} × {m} min', { n, m: p.minutes })}${heads() > 1 ? ` · ${t('{k} participants', { k: heads() })}` : ''}</span><span class="slot-p">${planPrice ? money(planPrice * heads()) : t('Free of charge')}</span></li>${planFull > planPrice ? `<li class="pk-save"><span>${t('You save {amount} against paying monthly', { amount: money((planFull - planPrice) * heads()) })}</span></li>` : ''}</ul></li>`
+        + (kitsOn().length ? `<li><b>${esc(tx(K.name))}</b><ul><li><span>× ${kitsOn().length}${kitsOn().some(Boolean) ? ` · <bdi>${kitsOn().filter(Boolean).map(esc).join(', ')}</bdi>` : ''}</span><span class="slot-p">${money(K.price * kitsOn().length)}</span></li></ul></li>` : '');
+      $('total').innerHTML = total() ? money(total()) : t('Free of charge');
+      const sar = P.currency === 'SAR'; $('charge').hidden = sar || !total();
+      if (!sar && total()) $('charge').innerHTML = t("You'll be charged {amount} in Saudi riyals.", { amount: `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${total().toLocaleString('en-US')}</span>` });
+      payLabel = `<span>${total() ? t('Pay {total}', { total: money(total()) }) : t('Book free trial')}</span>${ARROW}`;
+      if (!$('payBtn').disabled) $('payBtn').innerHTML = payLabel;
+    }
+    // main column: the sessions, the kit (re-rendered on its own), the player
+    function allSessions(){
+      let dlg = $('sesDlg');
+      if (!dlg){
+        dlg = document.createElement('dialog'); dlg.className = 'doc ses-dlg'; dlg.id = 'sesDlg'; dlg.setAttribute('aria-labelledby', 'sesDlgT');
+        dlg.addEventListener('click', e => { if (e.target === dlg || e.target.closest('[data-close]')) dlg.close(); });
+        document.body.appendChild(dlg);
+      }
+      const list = sessions(), by = {};
+      list.forEach((k, i) => (by[k.slice(0, 7)] = by[k.slice(0, 7)] || []).push([k, i]));
+      dlg.dir = document.documentElement.dir;
+      dlg.innerHTML = `<div class="doc-head"><div class="ses-dlg-t"><h2 id="sesDlgT">${t('Your sessions')}</h2><p>${t('{n} sessions', { n: list.length })} · ${range(order.time)}</p></div><button class="doc-x" type="button" data-close aria-label="${t('Close')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+        <div class="ses-dlg-b">${Object.entries(by).map(([mk, l]) => `<section><h3>${P.date(toDate(mk + '-01'), 'month')}<small>${t('{n} sessions', { n: l.length })}</small></h3>
+          <ol>${l.map(([k, i]) => `<li${i ? '' : ' class="on"'}><span class="pk-n">${i + 1}</span><b>${P.date(toDate(k), { weekday: 'long', day: 'numeric', month: 'long' })}</b>${i ? `<span><bdi>${P.time(order.time)}</bdi></span>` : `<em>${t('First')}</em>`}</li>`).join('')}</ol></section>`).join('')}</div>`;
+      dlg.showModal(); dlg.querySelector('[data-close]').focus();
+    }
+    const SHOW_SESSIONS = false;
+    function cards(){
+      const list = sessions();
+      const top = list.slice(0, 3), rest = list.slice(3), last = list[list.length - 1];
+      const row = (k, i) => `<li${i ? '' : ' class="on"'}><span class="pk-n">${i + 1}</span><span><b>${P.date(toDate(k), { weekday: 'long', day: 'numeric', month: 'long' })}</b><small>${range(order.time)}</small></span>${i ? '' : `<em>${t('First')}</em>`}</li>`;
+      // Your sessions is hidden for now (Ahmed): the summary card still says when it starts and how many sessions. Set
+      // SHOW_SESSIONS to bring the card (soonest first + the all-sessions popup) back.
+      main.innerHTML = (SHOW_SESSIONS ? `<section class="step panel ck-card" aria-labelledby="sesTitle"><div class="step-head ck-card-head pk-ses-head"><h2 id="sesTitle">${t('Your sessions')}</h2><a href="${bookUrl}">${t('Change')}</a></div>
+          <div class="pk-body"><ol class="pk-next" id="pkSes">${top.map(row).join('')}</ol>
+          ${rest.length ? `<p class="pk-rest">${t('+ {n} more sessions until {d}', { n: rest.length, d: P.date(toDate(last), { weekday: 'short', day: 'numeric', month: 'short' }) })}</p><button type="button" class="pk-more" id="pkMore" aria-haspopup="dialog">${t('Show all {n} sessions', { n: list.length })}</button>` : ''}</div></section>` : '') + `
+                <section class="step panel ck-card" id="ppCard" aria-labelledby="ppTitle"><div class="step-head ck-card-head"><h2 id="ppTitle">${t('Participants')}</h2></div><div class="pk-body" id="ppBody"></div></section>
+        ${order.plan === 'trial' ? '' : `<section class="step panel ck-card" aria-labelledby="addTitle"><div class="step-head ck-card-head"><h2 id="addTitle">${t('Add-ons')}</h2></div><div class="pk-body" id="pkKit"></div></section>`}`;
+      ppCard();
+      kitCard();
+    }
+    // ---- participants: tap to pick; anyone who can't take part (age range, women-only, or no date of birth) is shown
+    //      but can't be picked, with the reason. "Add new participant" opens a short form under the list.
+    const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+    const initials = n => String(n).trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+    const ages = `⁦${p.ages}⁩`;
+    const reason = r => r === 'profile' ? t('Add your date of birth and gender in My account') : r === 'child' ? t('Must be 6 to 17 on the start day') : r === 'age' ? t('Ages {a} only', { a: ages }) : r === 'gender' ? t('Women and girls only') : '';
+    function meta(c){
+      const r = why(c); if (r) return reason(r);
+      return [c.you ? t('You') : '', c.you ? '' : t('Born {date}', { date: KD.born(c.dob) }), t('Age {n}', { n: window.SFA_AGE(c.dob, order.start) }), c.fresh ? t('This booking only') : ''].filter(Boolean).join(' · ');
+    }
+    // the add-a-child popup: the same form as My children, plus "Save to My children" (ticked by default, Ahmed)
+    const blank = () => ({ first: '', last: '', dob: '', gender: '' });
+    let form = blank(), formErr = {}, saveKid = true, note = '';
+    const PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+    const XI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+    const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="square" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+    function ppCard(focus){
+      if (!$('ppBody')) return;
+      const on = order.people.places, full = picked().length >= maxPick;
+      const each = planPrice ? t('{amount} each', { amount: money(planPrice) }) : t('Free of charge');
+      $('ppBody').innerHTML = `<p class="pk-note pp-note">${t('Tick everyone taking part. Each one gets their own tickets.')} ${each} · ${t('up to {n}', { n: maxPick })}</p>
+        ${note ? `<p class="pp-note2" role="status">${esc(note)}</p>` : ''}
+        ${!me ? '' : !kidsLoaded ? `<p class="kd-note">${t('Loading your children…')}</p>` : `<ul class="pp-list">${cands().map(c => { const r = why(c), ck = on.includes(c.key) && !r, off = !!r || (!ck && full);
+          return `<li><button type="button" class="pp${r ? ' no' : ''}" role="checkbox" aria-checked="${ck}" data-pick="${esc(c.key)}"${off ? ' disabled' : ''}><span class="pp-av" aria-hidden="true">${esc(initials(c.name))}</span>
+            <span class="pp-txt"><strong>${esc(c.name)}${c.you ? ` (${t('You')})` : ''}</strong><small>${!r && off ? t('Up to {n} people', { n: maxPick }) : meta(c)}</small></span><span class="pp-box" aria-hidden="true">${CHECK}</span></button></li>`; }).join('')}</ul>`}
+        <button type="button" class="pp-addbtn" data-kadd aria-haspopup="dialog"${full ? ' disabled' : ''}>${PLUS}${t('Add a new child')}</button>
+        <p class="err" id="ppErr">${t('Choose at least one participant.')}</p>`;
+      if (focus) $('ppBody').querySelector(focus)?.focus({ preventScroll: true });
+    }
+    const toggle = key => { const on = order.people.places, i = on.indexOf(key);
+      if (i > -1) on.splice(i, 1); else if (picked().length < maxPick) on.push(key);
+      note = ''; save(); ppCard(`[data-pick="${CSS.escape(key)}"]`); kitCard(); summary(); $('ppCard').classList.remove('bad'); };
+    let kdlg = null;
+    function kidDialog(focus){
+      if (!kdlg){
+        kdlg = document.createElement('dialog'); kdlg.className = 'doc kid-dlg'; kdlg.id = 'kidDlg'; kdlg.setAttribute('aria-labelledby', 'pfH'); document.body.appendChild(kdlg);
+        kdlg.addEventListener('click', e => {
+          if (e.target === kdlg || e.target.closest('[data-kx]')) return kdlg.close();
+          if (e.target.closest('[data-kgo]')) return continueKid();
+          const g = e.target.closest('[data-kgen]'); if (g){ KD.read('pf', form); form.gender = g.dataset.kgen; delete formErr.gender; kidDialog(`[data-kgen="${form.gender}"]`); }
+        });
+        kdlg.addEventListener('input', e => { e.target.closest('.field')?.classList.remove('bad'); });
+        kdlg.addEventListener('change', e => { if (e.target.id === 'pfSave') saveKid = e.target.checked; });
+        kdlg.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('#pfForm input[type=text]')){ e.preventDefault(); continueKid(); } });
+        kdlg.addEventListener('close', () => $('ppBody').querySelector('[data-kadd]')?.focus({ preventScroll: true }));
+      }
+      const r = KD.dobRange(order.start);
+      kdlg.dir = document.documentElement.dir;
+      kdlg.innerHTML = `<button type="button" class="doc-x kid-x" data-kx aria-label="${t('Close')}">${XI}</button>` + KD.formHTML('pf', form, formErr, { title: t('Add a new child'), cancel: true, hint: t('Ages 6 to 17 on the start day'), min: r.min, max: r.max })
+        .replace('<div class="kf-acts">', `<label class="kf-save"><input type="checkbox" id="pfSave"${saveKid ? ' checked' : ''}><span class="kf-sbox" aria-hidden="true">${TICK}</span><span><strong>${t('Save to My children')}</strong><small>${t('Next time, just tick them. You can remove them in My account.')}</small></span></label><div class="kf-acts">`);
+      if (!kdlg.open) kdlg.showModal();
+      kdlg.querySelector(focus || '#pffirst')?.focus({ preventScroll: true });
+    }
+    // the popup's Continue: the same checks as My children (6 to 17 on the start day), then this program's own range;
+    // saved to My children when the box is ticked (or matched to one already there), else for this booking only
+    async function continueKid(){
+      KD.read('pf', form); const c = KD.tidy(form), name = window.SFA_FULL_NAME(c); formErr = KD.errors(c, order.start);
+      if (!Object.keys(formErr).length){ const r = window.SFA_PROGRAM_ELIGIBLE(p, c, order.start);
+        if (r === 'age') formErr._ = t("{name} can't join: this program is for ages {a}.", { name, a: ages });
+        if (r === 'gender') formErr._ = t("{name} can't join: this program is for women and girls only.", { name }); }
+      if (Object.keys(formErr).length){ kidDialog('.field.bad input, .field.bad button, .kf-why'); return; }
+      const go = kdlg.querySelector('[data-kgo]'); go.disabled = true;
+      let key;
+      const same = kids.find(x => KD.key(x) === KD.key({ ...c, name }));
+      if (same){ key = same.id; note = t('{name} is already in My children, so we used the saved profile.', { name }); }
+      else if (saveKid){
+        const r = await fetch('/api/auth/participants', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ensure: c }) }).catch(() => null);
+        const d = r ? await r.json().catch(() => ({})) : {};
+        if (!r || r.status === 401){ go.disabled = false; kdlg.close(); window.SFA_AUTH.open({ view: 'login', reason: t('Your session ended. Sign in to save {name}.', { name }) }); return; }
+        if (!r.ok){ formErr = { _: t(d.error || (d.errors && Object.values(d.errors)[0]) || 'Could not save. Try again.') }; kidDialog('.kf-why'); return; }
+        key = d.id; KD.ping(); await loadKids();
+        note = d.existed ? t('{name} is already in My children, so we used the saved profile.', { name }) : t('{name} is saved to My children.', { name });
+      } else {
+        const k = KD.key({ ...c, name }), have = order.people.added.find(x => KD.key(x) === k);
+        key = have ? have.key : 'new-' + Date.now().toString(36);
+        if (!have) order.people.added.push({ key, ...c, name });
+        note = t('{name} was added for this booking only.', { name });
+      }
+      if (!order.people.places.includes(key) && picked().length < maxPick) order.people.places.push(key);
+      form = blank(); formErr = {}; saveKid = true; kdlg.close();
+      save(); ppCard(`[data-pick="${CSS.escape(key)}"]`); kitCard(); summary(); $('ppCard').classList.remove('bad');
+    }
+    // the saved children, fresh: on load, when My account changes them (another tab), and each time the dropdown opens
+    async function loadKids(reopen){
+      const r = await KD.fresh(); if (r.status === 401 || r.failed){ kidsLoaded = true; if (r.failed) note = t("We couldn't load your children. Refresh the page."); ppCard(); return; }
+      const before = kids.map(c => c.id + c.name + c.dob).join(); kids = r.list; kidsLoaded = true;
+      const gone = order.people.places.filter(k => k !== 'me' && !String(k).startsWith('new-') && !kids.some(c => c.id === k));
+      if (gone.length){ order.people.places = order.people.places.filter(k => !gone.includes(k)); note = t('A child was removed from My children, so they are no longer ticked.'); save(); }
+      if (!reopen || before !== kids.map(c => c.id + c.name + c.dob).join()){ ppCard(); kitCard(); summary(); }
+    }
+
+    // ---- add-ons: the Training Kit has its own quantity (not tied to participants); each kit then gets a size
+    function kitCard(){
+      if (!$('pkKit')) return;
+      const n = order.kitSizes.length;
+      $('pkKit').innerHTML = `<p class="pk-note">${t('Optional extras for training.')}</p><div class="pk-kit" id="kitBox"><span class="pk-ic" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M17 6h14l10 6-4 9-5-2v23H16V19l-5 2-4-9z"/><path d="M19 6a5 5 0 0 0 10 0"/></svg></span>
+        <div><strong>${esc(tx(K.name))}</strong><p>${esc(tx(K.items))}</p></div><span class="pk-pr">${money(K.price)} <small>${t('each')}</small></span>
+        <div class="pk-kq"><span class="pk-lbl" id="kitQL">${t('Quantity')}</span><span class="pk-qty" role="group" aria-labelledby="kitQL"><button type="button" data-kq="-1" aria-label="${t('Fewer')}"${n <= 0 ? ' disabled' : ''}>−</button><output aria-live="polite">${n}</output><button type="button" data-kq="1" aria-label="${t('More')}"${n >= 10 ? ' disabled' : ''}>+</button></span></div>
+        ${n ? `<div class="pk-sizes">${order.kitSizes.map((z, i) => `<div class="pk-size" id="kit-${i}"><span class="pk-lbl" id="kitL${i}">${t('Kit {n} size', { n: i + 1 })}</span>
+            <div class="pk-chips" role="radiogroup" aria-labelledby="kitL${i}">${K.sizes.map(x => `<button type="button" class="pk-chip" role="radio" aria-checked="${x === z}" data-size="${esc(x)}" data-for="${i}" dir="ltr">${esc(x)}</button>`).join('')}</div><p class="err">${t('Choose a kit size.')}</p></div>`).join('')}</div>` : ''}</div>`;
+    }
+    main.addEventListener('click', e => {
+      if (e.target.closest('#pkMore')) return allSessions();
+      const pk = e.target.closest('[data-pick]'); if (pk && !pk.disabled) return toggle(pk.dataset.pick);
+      const ad = e.target.closest('[data-kadd]'); if (ad && !ad.disabled){ form = blank(); formErr = {}; saveKid = true; note = ''; return kidDialog(); }
+      const kq = e.target.closest('[data-kq]');
+      if (kq && !kq.disabled){ if (+kq.dataset.kq > 0) order.kitSizes.push(''); else order.kitSizes.pop();
+        save(); kitCard(); summary(); main.querySelector(`[data-kq="${kq.dataset.kq}"]:not(:disabled)`)?.focus(); return; }
+      const sz = e.target.closest('[data-size][data-for]'); if (!sz) return;
+      const i = +sz.dataset.for; order.kitSizes[i] = sz.dataset.size;
+      save(); kitCard(); summary(); main.querySelector(`[data-for="${i}"][data-size="${sz.dataset.size}"]`)?.focus();
+    });
+    addEventListener('storage', e => { if (e.key === 'sfaKidsRev') loadKids(); });
+    cards(); summary();
+    window.SFA_AUTH.me().then(u => { me = u; ppCard(); kitCard(); summary(); if (u) loadKids(); });
+    addEventListener('sfa:auth', e => { me = e.detail; ppCard(); kitCard(); summary(); if (e.detail) loadKids(); });
+    addEventListener('sfa:prefs', () => { $('doc-terms').innerHTML = `<ul>${window.SFA_PROGRAM_TERMS.map(x => `<li>${esc(tx(x))}</li>`).join('')}</ul>`; cards(); summary(); });
+
+    const gate = () => window.SFA_AUTH.require(t('Sign in to book this program.')).then(u => { if (!u) location.href = bookUrl; });
+    gate(); addEventListener('sfa:auth', e => { if (!e.detail) gate(); });
+    $('pTerms').addEventListener('change', () => $('fTerms').classList.remove('bad'));
+    const checks = {
+      ppCard: () => picked().length > 0,
+      kitBox: () => kitsOn().every(Boolean),
+      fTerms: () => $('pTerms').checked,
+    };
+    const alertBox = $('alert');
+    alertBox.addEventListener('click', e => { if (e.target.closest('[data-reload]')) location.reload(); });
+    $('payBtn').addEventListener('click', async () => {
+      const bad = Object.keys(checks).filter(id => !checks[id]());
+      Object.keys(checks).forEach(id => $(id)?.classList.toggle('bad', bad.includes(id)));
+      kitsOn().forEach((z, i) => $('kit-' + i)?.classList.toggle('bad', !z));
+      if (bad.length){ $(bad[0]).scrollIntoView({ block: 'center', behavior: 'smooth' }); $(bad[0]).querySelector('input,button')?.focus({ preventScroll: true }); return; }
+      const btn = $('payBtn'); btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span><span>${t(total() ? 'Opening payment…' : 'One moment…')}</span>`; alertBox.innerHTML = '';
+      try {
+        const r = await fetch('/api/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ terms: true, waiver: true, order: { kind: 'program', program: order.program, plan: order.plan, start: order.start, time: order.time,
+          participants: picked().map(c => c.fresh ? { child: { first: c.first, last: c.last, dob: c.dob, gender: c.gender } } : { ref: c.ref }), kits: kitsOn().slice() } }) });
+        const data = await r.json().catch(() => ({}));
+        if (r.status === 401){ btn.disabled = false; btn.innerHTML = payLabel; return gate(); }
+        if (r.status === 409){ alertBox.innerHTML = `<p class="alert">${esc(t(data.error))}<button type="button" class="doc-link" data-reload>${t('Refresh')}</button></p>`; btn.disabled = false; btn.innerHTML = payLabel; loadKids(); return; }
+        if (!r.ok || !data.redirect_url) throw new Error(t(data.error || 'Could not start the payment. Try again.'));
+        try { sessionStorage.removeItem('sfaOrder'); sessionStorage.setItem('sfaCart', data.cartId); } catch (e) {}
+        location.href = data.redirect_url;
+      } catch (e) {
+        alertBox.innerHTML = `<p class="alert">${esc(e.message === 'Failed to fetch' ? t('Could not reach the server. Is node server.js running?') : e.message)}</p>`;
+        btn.disabled = false; btn.innerHTML = payLabel;
+      }
+    });
+  }
+
+  if (!court || !order.days || !order.days.length){ $('missing').hidden = false; return; }
+  $('page').hidden = false;
+
+  // ---- review (the server re-checks and re-prices all of this)
+  const [name, kind, surface, format, size, price] = court;
+  const slotPrice = price * SLOT / 60;
+  let count = 0, total = 0;
+  const recount = () => { count = order.days.reduce((a, d) => a + d.starts.length, 0); total = slotPrice * count; };
+  recount();
+  // a ladies-hours order (ladies-hours.html) goes back there, and only women and girls can be its players
+  const LADIES = !!order.ladies, LADY_RULE = 'Ladies hours are for women and girls only.';
+  const bookUrl = LADIES ? `ladies-hours.html?sport=${encodeURIComponent(order.sport)}#book` : `court-details.html?sport=${encodeURIComponent(order.sport)}&court=${order.court}#book`;
+  $('backLink').href = bookUrl;   // the back arrow returns to the court page's calendar (the card's Change link was removed)
+  $('cImg').src = window.SFA_COURT_IMG(order.sport, court);
+  let payLabel = '';
+  function review(){
+    $('cSport').textContent = `${t(sport.name)} · ${t(LADIES ? 'Ladies hours' : 'SFA Domes Dammam')}`;
+    $('cName').textContent = t(name);
+    $('cSpecs').textContent = [kind, surface, format, size].filter(Boolean).map(x => t(x)).join(' · ');
+    // each time shows its own price and a remove (×); the last one left can't be removed, so checkout always has something to pay for
+    const x = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+    $('days').innerHTML = order.days.map(d => `<li><b>${fmtDay(d.date)}</b><ul>${d.starts.map(s => `<li><span>${fmtSlot(s)}</span><span class="slot-p">${money(slotPrice)}</span>${count > 1 ? `<button class="rm-slot" type="button" data-date="${d.date}" data-s="${s}" aria-label="${t('Remove {slot}', { slot: `${fmtDay(d.date)} ${fmtSlot(s)}` })}" title="${t('Remove')}">${x}</button>` : ''}</li>`).join('')}</ul></li>`).join('');
+    $('total').innerHTML = money(total);
+    // prices may show in USD or AED; PayTabs always charges SAR, so say what will actually be charged
+    const sar = P.currency === 'SAR';
+    $('charge').hidden = sar;
+    if (!sar) $('charge').innerHTML = t("You'll be charged {amount} in Saudi riyals.", { amount: `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${total.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>` });
+    payLabel = `<span>${t('Pay {total}', { total: money(total) })}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>`;
+    if (!$('payBtn').disabled) $('payBtn').innerHTML = payLabel;
+  }
+  review();
+  // removing a time updates the saved order, so going back to the court page shows the same picks
+  $('days').addEventListener('click', e => {
+    const b = e.target.closest('.rm-slot'); if (!b || count <= 1) return;
+    const day = order.days.find(d => d.date === b.dataset.date); if (!day) return;
+    day.starts = day.starts.filter(s => s !== +b.dataset.s);
+    order.days = order.days.filter(d => d.starts.length);
+    recount();
+    try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (err) {}
+    review();
+  });
+
+  // ---- booking for: For myself or Someone else. "For a child" was removed from court booking at Ahmed's request (2026-11-10);
+  //      its code below stays dormant (no radio has the value 'child'). Earlier notes, stories AC01–AC03: For myself, or For a child. A child is one of the saved children (dropdown, by full
+  //      name and date of birth; anyone not 6–17 on the first booked day is shown but can't be picked), or a new one through
+  //      the form and the "Save this child to your account?" prompt. Courts also keep "Someone else" (name, Saudi mobile,
+  //      optional email; brought back at Ahmed's request, 2026-11-09). Kept in the order so "Edit booking" round trips keep it.
+  const K = window.SFA_KIDS, kids = $('kids'), pane = $('kidPane');
+  const firstDay = () => order.days.map(d => d.date).sort()[0];
+  const who = () => document.querySelector('input[name="who"]:checked').value;
+  const blank = () => ({ first: '', last: '', dob: '', gender: '' });
+  const bf0 = order.bookingFor && order.bookingFor.type === 'child' ? order.bookingFor : null;
+  // ck: pick = saved id | 'once' | null; once = a child for this booking only; form = the form is showing
+  const ck = { pick: bf0 ? (bf0.ref || (bf0.child ? 'once' : null)) : null, once: bf0 && bf0.child ? bf0.child : null, form: false, f: blank(), er: {}, note: '' };
+  let kidList = [], kidsLoaded = false, kidsFailed = false;
+  const kidOff = c => !window.SFA_CHILD_AGE_OK(c.dob, firstDay()) ? t('Must be 6 to 17 on the booking date') : LADIES && c.gender !== 'female' ? t('Ladies hours are for women and girls only') : '';
+  const kidSub = c => `${t('Born {date}', { date: K.born(c.dob) })} · ${t('Age {n}', { n: window.SFA_AGE(c.dob, firstDay()) })}`;
+  const formShown = () => ck.form || (!kidList.length && !ck.once);
+  const bookingFor = () => who() === 'me' ? { type: 'me' } : who() === 'other' ? { type: 'other', name: $('gName').value.trim().replace(/\s+/g, ' '), phone: '+966' + $('gPhone').value.replace(/\D/g, ''), email: $('gEmail').value.trim() } : ck.pick === 'once' ? { type: 'child', child: ck.once } : { type: 'child', ref: ck.pick };
+  const keep = () => { order.bookingFor = bookingFor(); try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (e) {} };
+  function paintKids(focus){
+    if (!kidsLoaded){ pane.innerHTML = `<p class="kd-note">${t('Loading your children…')}</p>`; return; }
+    const options = kidList.map(c => ({ value: c.id, name: c.name, sub: kidSub(c), off: kidOff(c) }));
+    if (ck.once) options.push({ value: 'once', name: window.SFA_FULL_NAME(ck.once), sub: `${t('This booking only')} · ${kidSub(ck.once)}`, off: kidOff(ck.once) });
+    const r = K.dobRange(firstDay());
+    pane.innerHTML = (kidsFailed ? `<p class="alert">${t("We couldn't load your children.")}<button type="button" class="doc-link" data-reload>${t('Refresh')}</button></p>` : '')
+      + (ck.note ? `<p class="kd-note" role="status">${K.esc(ck.note)}</p>` : '')
+      + (formShown() ? K.formHTML('ck', ck.f, ck.er, { title: options.length ? t('Add a new child') : t("Child's details"), cancel: !!options.length, hint: t('Ages 6 to 17 on the booking date'), min: r.min, max: r.max })
+        : K.dropdown({ id: 'kidDd', label: t('Which child?'), value: ck.pick, placeholder: t('Choose a child'), options, add: t('Add a new child'), err: t('Choose which child is playing.') }));
+    if (focus) pane.querySelector(focus)?.focus({ preventScroll: true });
+  }
+  // the saved children, read fresh: on load, when My account changes them in another tab, and each time the dropdown opens
+  async function loadKids(reopen){
+    const r = await K.fresh(); if (r.status === 401) return;
+    const before = kidList.map(c => c.id + c.name + c.dob).join();
+    kidsLoaded = true; kidsFailed = !!r.failed; if (!r.failed) kidList = r.list;
+    if (ck.pick && ck.pick !== 'once' && !kidList.some(c => c.id === ck.pick)){ ck.pick = null; ck.note = t('That child is no longer in My children. Choose again.'); keep(); }
+    if (!reopen || before !== kidList.map(c => c.id + c.name + c.dob).join()){ paintKids(); if (reopen && !formShown()) $('kidDdB')?.click(); }
+  }
+  pane.addEventListener('kd:open', () => loadKids(true));
+  pane.addEventListener('kd:pick', e => {
+    const v = e.detail.value; kids.classList.remove('bad');
+    if (v === '__new'){ ck.form = true; ck.f = blank(); ck.er = {}; ck.note = ''; paintKids('#ckfirst'); return; }
+    ck.pick = v; ck.note = ''; keep(); paintKids('#kidDdB');
+  });
+  async function continueKid(){
+    K.read('ck', ck.f); const c = K.tidy(ck.f); ck.er = K.errors(c, firstDay());
+    if (LADIES && c.gender === 'male' && !ck.er.gender) ck.er.gender = LADY_RULE;
+    if (Object.keys(ck.er).length){ paintKids(); const b = pane.querySelector('.field.bad'); b?.scrollIntoView({ block: 'center', behavior: 'smooth' }); b?.querySelector('input,button')?.focus({ preventScroll: true }); return false; }
+    pane.querySelectorAll('.kf .field.bad').forEach(f => f.classList.remove('bad'));   // the last try's errors go before the prompt shows
+    const go = pane.querySelector('[data-kgo]'); go.disabled = true;
+    const r = await K.settle(c);
+    ck.form = false; ck.er = {}; ck.f = blank();
+    ck.note = r.note || (r.matched ? t('{name} is already in My children, so we used the saved profile.', { name: r.name }) : r.saved ? t('{name} is saved to My children.', { name: r.name }) : '');
+    if (r.ref){ await loadKids(); ck.pick = r.ref; ck.once = null; } else { ck.once = r.child; ck.pick = 'once'; }
+    keep(); paintKids('#kidDdB'); return true;
+  }
+  pane.addEventListener('click', e => {
+    if (e.target.closest('[data-reload]')) return location.reload();
+    const g = e.target.closest('[data-kgen]');
+    if (g){ K.read('ck', ck.f); ck.f.gender = g.dataset.kgen; delete ck.er.gender; paintKids(`[data-kgen="${ck.f.gender}"]`); return; }
+    if (e.target.closest('[data-kx]')){ ck.form = false; ck.er = {}; paintKids('#kidDdB'); return; }
+    if (e.target.closest('[data-kgo]')) continueKid();
+  });
+  pane.addEventListener('input', e => { e.target.closest('.field')?.classList.remove('bad'); });
+  pane.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.closest('.kf input')){ e.preventDefault(); continueKid(); } });
+  addEventListener('storage', e => { if (e.key === 'sfaKidsRev') loadKids(); });
+  // someone else: their name and mobile (and an email if they want the ticket too)
+  const guest = $('guest');
+  const phoneMask = e => { const v = e.target.value.replace(/\D/g, '').replace(/^0/, '').slice(0, 9); e.target.value = [v.slice(0, 2), v.slice(2, 5), v.slice(5)].filter(Boolean).join(' '); };
+  $('gPhone').addEventListener('input', phoneMask);
+  guest.addEventListener('change', keep);
+  const setWho = v => {
+    kids.classList.toggle('on', v === 'child'); kids.classList.remove('bad');
+    kids.querySelectorAll('input,button').forEach(i => i.tabIndex = v === 'child' ? 0 : -1);
+    guest.classList.toggle('on', v === 'other');
+    guest.querySelectorAll('input').forEach(i => i.tabIndex = v === 'other' ? 0 : -1);
+  };
+  document.querySelectorAll('input[name="who"]').forEach(r => r.addEventListener('change', () => {
+    setWho(r.value); keep(); paintKids();
+    if (r.value === 'child') setTimeout(() => pane.querySelector('#kidDdB, #ckfirst')?.focus({ preventScroll: true }), 300);
+    if (r.value === 'other') setTimeout(() => $('gName').focus({ preventScroll: true }), 300);
+  }));
+  if (LADIES){
+    $('ladyNote').hidden = false;
+    // For myself only when the account says female (My account → gender)
+    const meOpt = document.querySelector('input[name="who"][value="me"]');
+    const meCheck = u => { const no = !!u && u.gender !== 'female';
+      meOpt.disabled = no; meOpt.closest('.who-opt').classList.toggle('off', no);
+      meOpt.closest('.who-opt').querySelector('small').textContent = t(no ? LADY_RULE : "You're the one playing");
+      if (no && meOpt.checked){ document.querySelector('input[name="who"][value="other"]').checked = true; setWho('other'); keep(); } };
+    window.SFA_AUTH.me().then(meCheck); addEventListener('sfa:auth', e => meCheck(e.detail));
+  }
+  const of0 = order.bookingFor && order.bookingFor.type === 'other' ? order.bookingFor : null;
+  if (of0){
+    document.querySelector('input[name="who"][value="other"]').checked = true;
+    $('gName').value = of0.name || ''; $('gEmail').value = of0.email || '';
+    $('gPhone').value = (of0.phone || '').replace(/^\+966/, ''); phoneMask({ target: $('gPhone') });
+  }
+  paintKids(); setWho(who());
+  window.SFA_AUTH.me().then(u => u && loadKids()); addEventListener('sfa:auth', e => e.detail && loadKids());
+
+  // ---- the payer is the signed-in account (server.js takes name and email from the session)
+  const gate = () => window.SFA_AUTH.require(t('Sign in to finish your booking.')).then(u => { if (!u) location.href = bookUrl; });
+  gate();
+  addEventListener('sfa:auth', e => { if (!e.detail) gate(); });
+  const checks = {
+    gfName: () => who() !== 'other' || $('gName').value.trim().split(/\s+/).filter(Boolean).length >= 2,
+    gfPhone: () => who() !== 'other' || /^5\d{8}$/.test($('gPhone').value.replace(/\D/g, '')),
+    gfEmail: () => who() !== 'other' || !$('gEmail').value.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('gEmail').value.trim()),
+    fTerms: () => $('pTerms').checked
+  };
+  ['gfName', 'gfPhone', 'gfEmail'].forEach(id => $(id).querySelector('input').addEventListener('input', () => $(id).classList.remove('bad')));
+  $('pTerms').addEventListener('change', () => $('fTerms').classList.remove('bad'));
+
+  const alertBox = $('alert');
+  alertBox.addEventListener('click', e => { if (e.target.closest('[data-reload]')) location.reload(); });
+  const showAlert = (html, warn) => { alertBox.innerHTML = `<p class="alert${warn ? ' warn' : ''}">${html}</p>`; };
+  // (the test-mode notes under Pay were removed at Ahmed's request; the alert area is kept for payment errors)
+  fetch('/api/config').catch(() => showAlert('Payments need the SFA Domes server (<code>node server.js</code>).', true));
+  addEventListener('sfa:prefs', () => { review(); });
+
+  // ---- pay: the server creates the PayTabs payment page and we go there
+  $('payBtn').addEventListener('click', async () => {
+    const bad = Object.keys(checks).filter(id => !checks[id]());
+    Object.keys(checks).forEach(id => $(id).classList.toggle('bad', bad.includes(id)));
+    if (who() === 'child'){
+      // an open form is finished first (its checks, then the save prompt), then payment carries on
+      if (formShown() && !(await continueKid())) return;
+      const c = ck.pick === 'once' ? ck.once : kidList.find(x => x.id === ck.pick);
+      if (!c || kidOff(c)){ kids.classList.add('bad'); kids.scrollIntoView({ block: 'center', behavior: 'smooth' }); $('kidDdB')?.focus({ preventScroll: true }); return; }
+    }
+    if (bad.length){ const f = $(bad[0]).querySelector('input'); f.closest('.field, .terms').scrollIntoView({ block: 'center', behavior: 'smooth' }); f.focus({ preventScroll: true }); return; }
+    order.bookingFor = bookingFor();
+    try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (e) {}
+    const btn = $('payBtn'); btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span><span>${t('Opening payment…')}</span>`; alertBox.innerHTML = '';
+    try {
+      const r = await fetch('/api/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order, terms: true, waiver: true }) });
+      const data = await r.json().catch(() => ({}));
+      if (r.status === 401){ btn.disabled = false; btn.innerHTML = payLabel; return gate(); }
+      if (r.status === 409){ showAlert(`${esc(t(data.error))}<button type="button" class="doc-link" data-reload>${t('Refresh')}</button>`); btn.disabled = false; btn.innerHTML = payLabel; loadKids(); return; }
+      if (!r.ok || !data.redirect_url) throw new Error(t(data.error || 'Could not start the payment. Try again.'));
+      try { sessionStorage.setItem('sfaCart', data.cartId); } catch (e) {}
+      location.href = data.redirect_url;
+    } catch (e) {
+      showAlert(esc(e.message === 'Failed to fetch' ? t('Could not reach the server. Is node server.js running?') : e.message));
+      btn.disabled = false; btn.innerHTML = payLabel;
+    }
+  });
+})();
+</script>
+</body>
+</html>

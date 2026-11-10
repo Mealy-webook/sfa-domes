@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Designs · SFA Domes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<style>
+/* Local index of every page in this prototype: the live booking flow, the design-system pages and the review pages
+   (options that were compared and not picked). Review aid; not linked from the site. */
+*{box-sizing:border-box}
+body{margin:0;background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-m)}
+main{max-width:1200px;margin:0 auto;padding:56px clamp(16px,5vw,64px) 96px}
+h1{margin:0 0 8px;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.lead{margin:0 0 40px;color:var(--color-content-secondary)}
+h2{margin:40px 0 12px;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+h2 small{font:var(--ts-label-m);color:var(--color-content-tertiary);text-transform:none;margin-inline-start:8px}
+ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:8px}
+a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 14px;padding:14px 16px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);color:inherit;text-decoration:none;transition:border-color .2s}
+a:hover{border-color:var(--color-brand)}
+a b{grid-row:span 2;display:grid;place-items:center;width:36px;height:36px;background:var(--color-bg-secondary);font:var(--ts-label-m)}
+.live a b{background:var(--color-brand);color:var(--neutral-0)}
+a strong{font:var(--ts-label-l)}
+a span{font:var(--ts-body-s);color:var(--color-content-tertiary)}
+</style>
+</head>
+<body>
+<main>
+<h1>SFA Domes designs</h1>
+<p class="lead">Every page in this prototype on localhost:4788.</p>
+
+<h2>Live booking flow <small>in the order a player goes through it</small></h2>
+<ol class="live">
+  <li><a href="index.html"><b>1</b><strong>Homepage</strong><span>Rotating scroll badge, white docked nav</span></a></li>
+  <li><a href="courts.html?sport=basketball"><b>2</b><strong>Sports page</strong><span>Text-only hero, equal poster tiles</span></a></li>
+  <li><a href="court-details.html?sport=basketball&amp;court=1"><b>3</b><strong>Court details</strong><span>Photos, info, days &amp; times picker</span></a></li>
+  <li><a href="checkout.html"><b>4</b><strong>Checkout</strong><span>Booking card and payment (needs slots picked on step 3)</span></a></li>
+  <li><a href="result.html?cart=SFA-MW3732TT-91FD"><b>5</b><strong>Booking confirmation</strong><span>Action list: booking card with icon rows and the email it went to, what to do now, and suggestions</span></a></li>
+  <li><a href="result.html?cart=SFA-MVZB1MBI-7533"><b>5b</b><strong>Payment failed</strong><span>The confirmation page's failed state</span></a></li>
+  <li><a href="program.html?p=football-6-8"><b>P1</b><strong>Training program</strong><span>Gallery, free trial or 1–3 month plans, next 3 start days</span></a></li>
+  <li><a href="sessions-options.html"><b>P3</b><strong>Your sessions · options</strong><span>10 layouts (A–J) for the checkout sessions block; each opens live in checkout</span></a></li>
+  <li><a href="profile.html#people"><b>6d</b><strong>My account · participants</strong><span>You and saved children; add or remove</span></a></li>
+  <li><a href="program.html?p=ladies-badminton"><b>P1b</b><strong>Training program · ladies</strong><span>A women-only sample program</span></a></li>
+  <li><a href="result.html?cart=SFA-MW39RE8N-38EB"><b>P2</b><strong>Program confirmation · month</strong><span>12 sessions, kit, paid in test mode</span></a></li>
+  <li><a href="result.html?cart=SFA-MW39RJRN-DE08"><b>P2b</b><strong>Program confirmation · free trial</strong><span>Confirmed with no payment</span></a></li>
+  <li><a href="programs.html"><b>P0</b><strong>Training programs</strong><span>All programs, filter by sport, who it's for, women only</span></a></li>
+  <li><a href="ladies-hours.html"><b>L1</b><strong>Ladies hours</strong><span>Women-only court hours (sample schedule): book a whole court</span></a></li>
+  <li><a href="matches.html"><b>G1</b><strong>Open games</strong><span>Venue-run games (sample): adults join one spot and pay their share</span></a></li>
+  <li><a href="profile.html#tickets"><b>6</b><strong>My account · tickets</strong><span>Next up, upcoming and past tickets</span></a></li>
+  <li><a href="profile.html#saved"><b>6b</b><strong>My account · saved courts</strong><span>Hearted courts</span></a></li>
+  <li><a href="profile.html#account"><b>6c</b><strong>My account · details</strong><span>Name, email, gender, date of birth, sign out</span></a></li>
+</ol>
+
+<h2>Design system</h2>
+<ol>
+  <li><a href="typography.html"><b>Aa</b><strong>Typography</strong><span>Type tokens and text styles</span></a></li>
+  <li><a href="colors.html"><b>●</b><strong>Colour</strong><span>Colour tokens</span></a></li>
+</ol>
+
+<h2>Review pages <small>options compared earlier, not live</small></h2>
+<ol>
+  <li><a href="court-details-a.html?sport=basketball&amp;court=1"><b>A</b><strong>Court details · sticky split</strong><span>Option</span></a></li>
+  <li><a href="court-details-b.html?sport=basketball&amp;court=1"><b>B</b><strong>Court details · tabs</strong><span>Option</span></a></li>
+  <li><a href="court-details-c.html?sport=basketball&amp;court=1"><b>C</b><strong>Court details · booking first</strong><span>Option</span></a></li>
+  <li><a href="court-details-d.html?sport=basketball&amp;court=1"><b>D</b><strong>Court details · app style</strong><span>Option</span></a></li>
+  <li><a href="court-details-e.html?sport=basketball&amp;court=1"><b>E</b><strong>Court details · Playtomic</strong><span>Option</span></a></li>
+  <li><a href="court-details-f.html?sport=basketball&amp;court=1"><b>F1</b><strong>Court details · Airbnb, wide photo</strong><span>Option</span></a></li>
+  <li><a href="court-details-f2.html?sport=basketball&amp;court=1"><b>F2</b><strong>Court details · Airbnb, photo in column</strong><span>Option</span></a></li>
+  <li><a href="court-details-f3.html?sport=basketball&amp;court=1"><b>F3</b><strong>Court details · Airbnb, photo + venue tile</strong><span>Option</span></a></li>
+  <li><a href="court-details-f4.html?sport=basketball&amp;court=1"><b>F4</b><strong>Court details · Airbnb, day strip + pills</strong><span>Option</span></a></li>
+  <li><a href="court-details-f5.html?sport=basketball&amp;court=1"><b>F5</b><strong>Court details · Airbnb, title on photo</strong><span>Option</span></a></li>
+  <li><a href="court-details-f6.html?sport=basketball&amp;court=1"><b>F6</b><strong>Court details · Airbnb, highlight cards</strong><span>Option</span></a></li>
+  <li><a href="court-details-f7.html?sport=basketball&amp;court=1"><b>F7</b><strong>Court details · Airbnb, booking sheet</strong><span>Option</span></a></li>
+  <li><a href="court-details-g.html?sport=basketball&amp;court=1"><b>G</b><strong>Court details · ClassPass</strong><span>Option</span></a></li>
+  <li><a href="court-details-h.html?sport=basketball&amp;court=1"><b>H</b><strong>Court details · Resy</strong><span>Option</span></a></li>
+  <li><a href="court-details-i.html?sport=basketball&amp;court=1"><b>I</b><strong>Court details · Booking.com</strong><span>Option</span></a></li>
+  <li><a href="court-details-j.html?sport=basketball&amp;court=1"><b>J</b><strong>Court details · Fever</strong><span>Option</span></a></li>
+  <li><a href="court-details-k.html?sport=basketball&amp;court=1"><b>K</b><strong>Court details · court grid</strong><span>Option</span></a></li>
+  <li><a href="court-details-l.html?sport=basketball&amp;court=1"><b>L</b><strong>Court details · Apple</strong><span>Option</span></a></li>
+  <li><a href="court-details-m.html?sport=basketball&amp;court=1"><b>M</b><strong>Court details · Calendly</strong><span>Option</span></a></li>
+  <li><a href="court-details-n.html?sport=basketball&amp;court=1"><b>N</b><strong>Court details · MATCHi</strong><span>Option</span></a></li>
+  <li><a href="court-details-o.html?sport=basketball&amp;court=1"><b>O</b><strong>Court details · Bento</strong><span>Option</span></a></li>
+  <li><a href="court-details-p.html?sport=basketball&amp;court=1"><b>P</b><strong>Court details · Editorial</strong><span>Option</span></a></li>
+  <li><a href="court-details-q.html?sport=basketball&amp;court=1"><b>Q</b><strong>Court details · Q</strong><span>Option</span></a></li>
+  <li><a href="court-details-r.html?sport=basketball&amp;court=1"><b>R</b><strong>Court details · Airbnb + Klook</strong><span>Option</span></a></li>
+  <li><a href="court-details-old.html?sport=basketball&amp;court=1"><b>Old</b><strong>Court details · original</strong><span>Before the redesigns</span></a></li>
+  <li><a href="result-options.html"><b>Cf</b><strong>Confirmation page options</strong><span>15 directions (A–O) beside the live page, on real bookings</span></a></li>
+  <li><a href="dob-options.html"><b>Db</b><strong>Date of birth options</strong><span>6 working date-of-birth fields, 6–17 rule</span></a></li>
+  <li><a href="participants-options.html"><b>Pp</b><strong>Participants options</strong><span>5 working ways to choose who takes part in a program</span></a></li>
+  <li><a href="checkout-options.html"><b>Ck</b><strong>Checkout · delight options</strong><span>4 layers on the real checkout (ticket, reassurance, motion, pay bar)</span></a></li>
+  <li><a href="addons-options.html"><b>Ad</b><strong>Add-ons options</strong><span>8 working ways to add the Training Kit, next to today's</span></a></li>
+  <li><a href="footer-options.html"><b>Ft</b><strong>Footer options</strong><span>Footer comparison</span></a></li>
+  <li><a href="scroll-cue-options.html"><b>Sc</b><strong>Scroll indicator options</strong><span>9 options; 2 · Rotating badge is live</span></a></li>
+</ol>
+</main>
+</body>
+</html>

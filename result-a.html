@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option A · Hero pass: a dark full-width band with the court photo says "booked" at a glance, with the key facts and actions in it; the tickets scroll sideways underneath, payment and tips last.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf{max-width:none;padding:var(--nav) 0 clamp(56px,9vh,96px)}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{display:block}
+.a-hero{position:relative;overflow:hidden;background:var(--color-bg-inverse);color:var(--color-content-inverse)}
+.a-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35}
+.a-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,9,11,.92) 30%,rgba(9,9,11,.3))}
+[dir=rtl] .a-hero::after{background:linear-gradient(270deg,rgba(9,9,11,.92) 30%,rgba(9,9,11,.3))}
+.a-in{position:relative;z-index:1;max-width:var(--max);margin:0 auto;padding:clamp(40px,8vh,80px) var(--g);display:grid;gap:24px;animation:up .7s var(--ease) both}
+.a-top{display:flex;align-items:center;gap:16px}
+.a-top .mark{grid-row:auto;width:56px;height:56px}
+.a-in h1{font:var(--ts-display-xl);text-transform:var(--type-case-display)}
+.a-in .cf-sub,.a-in .cf-sub .ref{color:inherit}
+.a-in .cf-sub{opacity:.8}
+.a-facts{display:grid;grid-template-columns:repeat(4,minmax(0,max-content));gap:16px 48px;margin:8px 0 0;padding-top:24px;border-top:1px solid rgba(255,255,255,.2)}
+.a-facts dt{font:var(--ts-label-s);opacity:.7}
+.a-facts dd{margin:4px 0 0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.a-acts{display:flex;flex-wrap:wrap;gap:8px}
+.a-acts .btn,.a-acts .ghost{height:52px}
+.a-acts .ghost{background:transparent;border-color:rgba(255,255,255,.4);color:inherit}
+.a-acts .ghost:hover{background:var(--neutral-0);color:var(--neutral-950);border-color:var(--neutral-0)}
+.a-sec{max-width:var(--max);margin:0 auto;padding:clamp(40px,6vh,64px) var(--g) 0}
+.a-sec-h{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.a-sec-h h2{margin:0;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.a-sec-h .n{margin-inline-start:auto;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.a-nav{display:flex;gap:8px}
+.a-nav button{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);cursor:pointer}
+.a-nav button:disabled{opacity:.35;cursor:default}
+.a-nav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .a-nav svg{scale:-1 1}
+.a-row{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,300px);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;scrollbar-width:thin}
+.a-pass{scroll-snap-align:start;display:grid;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.a-pass-top{display:grid;gap:4px;padding:20px 20px 16px}
+.a-pass-top small{font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.a-day{font:var(--ts-number-m)}
+.a-pass-top b{font:var(--ts-label-l)}
+.a-pass-top span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.a-pass-qr{display:grid;justify-items:center;gap:8px;padding:20px;border-top:2px dashed var(--color-border-secondary)}
+.a-pass-qr .tk-qr{width:160px}
+.a-info{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.a-top{display:grid;justify-items:start;gap:16px}.a-sec-h .n{display:none}.a-sec-h .a-nav{margin-inline-start:auto}.a-facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px}.a-acts{display:grid}.a-info{grid-template-columns:minmax(0,1fr)}.a-in h1{font:var(--ts-display-l)}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option A · Hero pass</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m;
+    return `<section class="a-hero"><img src="${m.D.img}" alt=""><div class="a-in">
+        <div class="a-top"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24">${ICON.check.replace(/<\/?svg[^>]*>/g, '')}</svg></span><p class="cf-sub">${m.ref}</p></div>
+        <h1>${t(m.title)}</h1>
+        <dl class="a-facts"><div><dt>${t('What')}</dt><dd>${esc(m.D.label)}</dd></div><div><dt>${t('When')}</dt><dd>${m.when}</dd></div>
+          <div><dt>${t('For')}</dt><dd>${m.who}</dd></div><div><dt>${t('Sessions')}</dt><dd>${m.count}</dd></div></dl>
+        <div class="a-acts"><a class="btn" href="${acts.tickets}">${t('View my tickets')}${ICON.arrow}</a>
+          <a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Add to calendar')}</a>
+          <a class="ghost" href="${acts.dir}" target="_blank" rel="noopener">${ICON.pin}${t('Get directions')}</a></div>
+      </div></section>
+      <section class="a-sec" aria-labelledby="aTix"><div class="a-sec-h"><h2 id="aTix">${t('Your tickets')}</h2><span class="n">${t('{n} tickets', { n: m.count })}</span>
+        <div class="a-nav"><button type="button" data-go="-1" aria-label="${t('Previous ticket')}"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button><button type="button" data-go="1" aria-label="${t('Next ticket')}"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button></div></div>
+        <div class="a-row" id="aRow">${m.list.map(s => `<article class="a-pass"><div class="a-pass-top"><small>${s.of > 1 ? t('Session {i} of {n}', { i: s.n, n: s.of }) : t('SFA Domes Dammam')}</small>
+          <span class="a-day">${m.date(s, 'short')}</span><b>${m.time(s)}</b><span>${esc(m.D.title)} · ${s.player ? esc(s.player) : m.who}</span></div>
+          <div class="a-pass-qr"><div class="tk-qr" data-qr="${esc(s.id)}" role="img" aria-label="${t('QR code for {ref}', { ref: esc(s.id) })}"></div><span class="tk-ref">${esc(s.id)}</span></div></article>`).join('')}</div></section>
+      <section class="a-sec a-info"><div class="box"><h2>${t(m.b.free ? 'Summary' : 'Payment')}</h2>${m.rows}</div>
+        <div class="box"><h2>${t('Before you play')}</h2><ul class="tips">${m.tips.map(x => `<li>${x}</li>`).join('')}</ul>${acts.more ? `<p style="margin:16px 0 0"><a class="more" href="${acts.more.href}">${acts.more.label}</a></p>` : ''}</div></section>`;
+  },
+  after: () => {
+    const row = document.getElementById('aRow'), [prev, next] = document.querySelectorAll('.a-nav button');
+    const step = () => (row.firstElementChild?.offsetWidth || 280) + 16, rtl = document.dir === 'rtl' ? -1 : 1;
+    const sync = () => { const x = Math.abs(row.scrollLeft); prev.disabled = x < 4; next.disabled = x + row.clientWidth >= row.scrollWidth - 4; };
+    document.querySelectorAll('.a-nav button').forEach(b => b.addEventListener('click', () => row.scrollBy({ left: +b.dataset.go * step() * rtl, behavior: 'smooth' })));
+    row.addEventListener('scroll', sync, { passive: true }); sync();
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

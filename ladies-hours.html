@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ladies hours · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball,woman&display=block">
+<style>
+/* Ladies hours: multipurpose Courts 1 and 2 kept for women and girls at set times (f/courts-data.js SFA_LADIES, a SAMPLE
+   schedule for now). The week at a glance, then book a whole court: sport → day → court and time → checkout, where only
+   women and girls can be the players (checkout.html + server.js check it). Same hero as the sports page; DS tokens only;
+   square corners; 4/8 spacing. */
+:root{color-scheme:light;--nav:90px;--g:clamp(16px,6.67vw,96px);--ease:cubic-bezier(.22,1,.36,1);--max:1440px;--lady:var(--color-programme-women)}
+*{box-sizing:border-box}
+html,body{margin:0}
+html{scroll-padding-bottom:120px}   /* keeps a focused time clear of the summary bar */
+body{background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--color-brand);outline-offset:3px}
+.msi{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
+.mi{display:inline-block;width:20px;height:20px;background:currentColor;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+@keyframes up{from{opacity:0;translate:0 24px}to{opacity:1;translate:0 0}}
+.hero{padding-top:var(--nav)}
+.cap{max-width:var(--max);margin:0 auto;padding:clamp(32px,7vh,72px) var(--g) 0;display:grid;gap:16px;animation:up 1s var(--ease) .1s both}
+.eyebrow{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-label-l)}
+.ico{display:grid;place-items:center;width:32px;height:32px;flex:none;background:var(--lady);color:var(--neutral-0)}
+.ico .msi{font-size:var(--fs-20)}
+h1{margin:0;font:var(--ts-display-xl);text-transform:var(--type-case-display)}
+.sub{margin:0;max-width:56ch;font:var(--ts-body-l);color:var(--color-content-secondary)}
+.sample{justify-self:start;padding:4px 8px;background:var(--color-warning-bg);color:var(--color-warning-content);font:var(--ts-label-s)}
+.sec{max-width:var(--max);margin:0 auto;padding:clamp(40px,7vh,72px) var(--g) 0}
+.sec:last-of-type{padding-bottom:clamp(56px,9vh,96px)}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 24px;padding-bottom:16px;border-bottom:1px solid var(--color-border-secondary)}
+.head h2{margin:0;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.head span{font:var(--ts-label-m);color:var(--color-content-tertiary)}
+
+/* the week */
+.week{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.wd{display:grid;align-content:start;gap:8px;min-height:112px;padding:16px;background:var(--color-bg-secondary)}
+.wd b{font:var(--ts-label-l)}
+.wd span bdi{white-space:nowrap}
+.wd span{display:block;padding:8px;background:var(--color-bg-primary);border-inline-start:3px solid var(--lady);font:var(--ts-label-s)}
+.wd em{font:var(--ts-body-s);font-style:normal;color:var(--color-content-tertiary)}
+.wd.today{outline:2px solid var(--color-content-primary);outline-offset:-2px}
+.wd.today b::after{content:attr(data-today);display:block;margin-top:4px;font:var(--ts-label-s);color:var(--color-content-accent)}
+.where{margin:16px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+
+/* booking */
+.step{display:grid;gap:12px;margin-bottom:32px}
+.step h3{margin:0;display:flex;align-items:center;gap:12px;font:var(--ts-label-l)}
+.step h3 i{display:grid;place-items:center;width:28px;height:28px;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-label-s);font-style:normal}
+.chips,.days{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:-4px;padding:4px}
+.chips::-webkit-scrollbar,.days::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-label-m);cursor:pointer}
+.chip .msi{font-size:var(--fs-20)}
+.chip:hover,.day:hover:not(:disabled){border-color:var(--color-content-primary)}
+.chip[aria-pressed=true]{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.day{flex:none;display:grid;justify-items:start;gap:2px;min-width:96px;padding:12px 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);text-align:start;cursor:pointer}
+.day small{font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.day b{font:var(--ts-label-l)}
+.day span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.day[aria-pressed=true]{border-color:var(--lady);box-shadow:inset 0 0 0 1px var(--lady);background:var(--color-bg-secondary)}
+.day:disabled{cursor:not-allowed;color:var(--color-content-disabled)}
+.day:disabled span{color:var(--color-danger)}
+.courts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.ct{border:1px solid var(--color-border-primary)}
+.ct-h{display:grid;grid-template-columns:72px minmax(0,1fr);gap:16px;align-items:center;padding:16px;border-bottom:1px solid var(--color-border-primary)}
+.ct-h img{width:72px;height:54px;object-fit:cover}
+.ct-h strong{display:block;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.ct-h small{display:block;margin-top:4px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:16px}
+.slot{display:grid;gap:4px;justify-items:center;padding:12px 8px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);cursor:pointer}
+.slot b{font:var(--ts-label-l);text-align:center}
+.slot b bdi{white-space:nowrap}   /* a narrow button wraps only after the dash */
+.slot small{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.slot:hover:not(:disabled){border-color:var(--color-content-primary)}
+.slot[aria-pressed=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle)}
+.slot:disabled{cursor:not-allowed;color:var(--color-content-disabled);background:repeating-linear-gradient(135deg,transparent 0 5px,rgba(9,9,11,.06) 5px 6px),var(--color-bg-secondary);border-color:var(--color-border-primary)}
+.slot:disabled b{text-decoration:line-through}
+.none{margin:0;padding:16px;font:var(--ts-body-s);color:var(--color-content-tertiary)}
+.note{margin:0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+/* the summary bar: shows once a time is picked */
+.bar{position:sticky;bottom:0;z-index:20;margin-top:32px;border-top:1px solid var(--color-border-primary);background:var(--color-bg-primary);box-shadow:0 -8px 24px rgba(9,9,11,.06)}
+.bar[hidden]{display:none}
+.bar-in{max-width:var(--max);margin:0 auto;padding:16px var(--g) calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:24px}
+.bar-t{flex:1;min-width:0;display:grid;gap:4px}
+.bar-t strong{font:var(--ts-label-l)}
+.bar-t span{font:var(--ts-body-s);color:var(--color-content-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-p{font:var(--ts-number-s)}
+.go{display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 24px;border:0;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-l);cursor:pointer}
+.go:hover{background:var(--color-bg-accent-hover)}
+.go svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .go svg{scale:-1 1}
+@media (max-width:1080px){.week{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:760px){.week{grid-template-columns:minmax(0,1fr)}.wd{grid-template-columns:96px minmax(0,1fr);min-height:0;align-items:start}.wd > :not(b){grid-column:2}.courts{grid-template-columns:minmax(0,1fr)}
+  .bar-in{flex-wrap:wrap;gap:12px 16px}.bar-t{flex-basis:calc(100% - 120px)}.go{width:100%;justify-content:center}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main id="page"></main>
+<div data-site-footer></div>
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script>
+(() => {
+  const P = window.SFA_PREFS, t = P.t, S = window.SFA_SPORTS, SCH = window.SFA_SCHEDULE, L = window.SFA_LADIES;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const root = document.getElementById('page'), q = new URLSearchParams(location.search);
+  const SPORTS = window.SFA_LADIES_SPORTS();
+  const pad = n => String(n).padStart(2, '0'), dk = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  // the next 14 days that have ladies hours
+  const DAYS = []; for (let i = 0; DAYS.length < 14 && i < SCH.RANGE_DAYS; i++){ const d = new Date(today); d.setDate(d.getDate() + i); if (window.SFA_LADIES_WINDOWS(dk(d)).length) DAYS.push(dk(d)); }
+  const st = { sport: SPORTS.includes(q.get('sport')) ? q.get('sport') : 'basketball', day: DAYS[0], court: null, picks: new Set(), taken: {}, note: '' };
+  const icon = sp => sp.img ? `<span class="mi" style="--m:url(${sp.img})"></span>` : `<span class="msi">${sp.icon}</span>`;
+  const range = (a, b) => `<bdi>${P.time(a)}</bdi> – <bdi>${P.time(b)}</bdi>`;
+  const now = () => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
+  const slotsOf = (ci, k) => SCH.startsFor(k).filter(s => window.SFA_IS_LADIES(st.sport, ci, k, s) && !(k === dk(today) && s <= now()));   // times already started today aren't shown
+  const isTaken = (ci, k, s) => (st.taken[ci] || new Set()).has(`${k}|${s}`) || window.SFA_IS_BOOKED(st.sport, ci, k, s);
+  const freeCount = k => L.courts.reduce((a, ci) => a + slotsOf(ci, k).filter(s => !isTaken(ci, k, s)).length, 0);
+  const price = ci => S[st.sport].courts[ci][5] * SCH.SLOT / 60;
+  const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>';
+
+  // paid bookings (server.js) for both ladies courts of this sport
+  async function loadTaken(){
+    await Promise.all(L.courts.map(async ci => { try { const r = await fetch(`/api/booked?sport=${encodeURIComponent(st.sport)}&court=${ci}`, { cache: 'no-store' }); st.taken[ci] = new Set(r.ok ? await r.json() : []); } catch (e) { st.taken[ci] = new Set(); } }));
+  }
+
+  function week(){
+    const names = Array.from({ length: 7 }, (_, i) => P.date(new Date(2024, 0, 7 + i), { weekday: 'long' }));
+    return `<ol class="week">${names.map((n, i) => { const w = L.hours[i];
+      return `<li class="wd${i === today.getDay() ? ' today' : ''}"><b data-today="${t('Today')}">${n}</b>${w.length ? w.map(([a, b]) => `<span>${range(a, b)}</span>`).join('') : `<em>${t('No ladies hours')}</em>`}</li>`; }).join('')}</ol>`;
+  }
+  function booking(){
+    const sp = S[st.sport], k = st.day;
+    return `<div class="step"><h3><i>1</i>${t('Sport')}</h3><div class="chips" role="group" aria-label="${t('Sport')}">${SPORTS.map(x => `<button type="button" class="chip" data-sport="${x}" aria-pressed="${x === st.sport}"><span aria-hidden="true">${icon(S[x])}</span>${esc(t(S[x].name))}</button>`).join('')}</div></div>
+      <div class="step"><h3><i>2</i>${t('Day')}</h3><div class="days" role="group" aria-label="${t('Day')}">${DAYS.map(d => { const n = freeCount(d);
+        return `<button type="button" class="day" data-day="${d}" aria-pressed="${d === k}"${n ? '' : ' disabled'}><small>${P.date(toDate(d), { weekday: 'short' })}</small><b>${P.date(toDate(d), { day: 'numeric', month: 'short' })}</b><span>${n ? (n === 1 ? t('1 time free') : t('{n} times free', { n })) : t('Full')}</span></button>`; }).join('')}</div></div>
+      <div class="step"><h3><i>3</i>${t('Court and time')}</h3>${st.note ? `<p class="note" role="status">${esc(st.note)}</p>` : ''}
+        <div class="courts">${L.courts.map(ci => { const c = sp.courts[ci], list = slotsOf(ci, k);
+          return `<section class="ct" aria-labelledby="ct${ci}"><div class="ct-h"><img src="${window.SFA_COURT_IMG(st.sport, c)}" alt=""><div><strong id="ct${ci}">${esc(t(c[0]))}</strong><small>${[c[1], c[3]].filter(Boolean).map(v => esc(t(v))).join(' · ')} · ${P.money(c[5])} ${t('/ hr')}</small></div></div>
+            ${list.length ? `<div class="slots">${list.map(s => { const tk = isTaken(ci, k, s), on = st.court === ci && st.picks.has(s);
+              return `<button type="button" class="slot" data-ct="${ci}" data-s="${s}" aria-pressed="${on}"${tk ? ' disabled' : ''} aria-label="${esc(t(c[0]))} · ${P.time(s)} – ${P.time(s + SCH.SLOT)}${tk ? ' · ' + t('Booked') : ''}"><b>${range(s, s + SCH.SLOT)}</b><small>${tk ? t('Booked') : P.money(price(ci))}</small></button>`; }).join('')}</div>` : `<p class="none">${t('No ladies hours on this court that day.')}</p>`}</section>`; }).join('')}</div></div>`;
+  }
+  function bar(){
+    const b = document.getElementById('bar'); if (!b) return;
+    const n = st.picks.size; b.hidden = !n; if (!n) return;
+    const c = S[st.sport].courts[st.court], list = [...st.picks].sort((x, y) => x - y);
+    b.querySelector('.bar-t').innerHTML = `<strong>${esc(t(S[st.sport].name))} · ${esc(t(c[0]))}</strong><span>${P.date(toDate(st.day), 'full')} · ${list.map(s => P.time(s)).join(', ')}</span>`;
+    b.querySelector('.bar-p').innerHTML = P.money(price(st.court) * n);
+  }
+  function paint(focus){
+    document.title = `${t('Ladies hours')} · SFA Domes`;
+    root.innerHTML = `<section class="hero" aria-labelledby="h1"><div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true"><span class="msi">woman</span></span>${t('SFA Domes Dammam')}</p>
+        <h1 id="h1">${t('Ladies hours')}</h1><p class="sub">${t('Courts 1 and 2 are kept for women and girls at set times every week. Book a whole court for you and your friends, the same way as any court.')}</p>
+        ${L.sample ? `<span class="sample">${t('Sample schedule · the real times are coming')}</span>` : ''}</div></section>
+      <section class="sec" aria-labelledby="wk"><div class="head"><h2 id="wk">${t('Every week')}</h2><span>${t('Courts 1 and 2')}</span></div>${week()}
+        <p class="where">${t('All indoor multipurpose sports: basketball, volleyball, badminton, tennis, netball, futsal, handball, GFX and table tennis.')}</p></section>
+      <section class="sec" id="book" aria-labelledby="bk"><div class="head"><h2 id="bk">${t('Book a court')}</h2><span>${t('1.5 hrs per booking')}</span></div><div id="bookIn">${booking()}</div></section>
+      <div class="bar" id="bar" hidden><div class="bar-in"><div class="bar-t"></div><span class="bar-p"></span><button type="button" class="go" id="go">${t('Continue')}${ARROW}</button></div></div>`;
+    bar(); if (focus) root.querySelector(focus)?.focus({ preventScroll: true });
+  }
+  const repaint = focus => { document.getElementById('bookIn').innerHTML = booking(); bar(); if (focus) root.querySelector(focus)?.focus({ preventScroll: true }); };
+  root.addEventListener('click', async e => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    if (b.dataset.sport){ st.sport = b.dataset.sport; st.picks.clear(); st.court = null; st.note = ''; history.replaceState(null, '', `?sport=${st.sport}`); await loadTaken(); repaint(`[data-sport="${st.sport}"]`); }
+    else if (b.dataset.day){ st.day = b.dataset.day; st.picks.clear(); st.court = null; st.note = ''; repaint(`[data-day="${st.day}"]`); }
+    else if (b.dataset.s){ const ci = +b.dataset.ct, s = +b.dataset.s;
+      // one court per booking: a time on the other court starts again there
+      if (st.court !== null && st.court !== ci){ st.picks.clear(); st.note = t('Switched to {court}. One booking is for one court.', { court: t(S[st.sport].courts[ci][0]) }); } else st.note = '';
+      st.court = ci; st.picks.has(s) ? st.picks.delete(s) : st.picks.add(s); if (!st.picks.size) st.court = null;
+      repaint(`[data-ct="${ci}"][data-s="${s}"]`); }
+    else if (b.id === 'go'){
+      const order = { sport: st.sport, court: st.court, days: [{ date: st.day, starts: [...st.picks].sort((x, y) => x - y) }], ladies: true };
+      try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (err) {}
+      location.href = 'checkout.html';
+    }
+  });
+  // back from checkout: the picks come back
+  try { const o = JSON.parse(sessionStorage.getItem('sfaOrder') || 'null'); if (o && o.ladies && SPORTS.includes(o.sport) && DAYS.includes(o.days[0].date)){ st.sport = o.sport; st.day = o.days[0].date; st.court = o.court; o.days[0].starts.forEach(s => st.picks.add(s)); } } catch (e) {}
+  paint();
+  loadTaken().then(() => repaint());
+  addEventListener('sfa:prefs', () => paint());
+})();
+</script>
+</body>
+</html>

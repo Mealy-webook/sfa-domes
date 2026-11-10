@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="38.25" height="38.25" viewBox="0 0 38.25 38.25" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="Group">
+<g id="bound">
+</g>
+<g id="path1009">
+<use xlink:href="#stroke0_0_400" fill="white"/>
+<mask id="stroke1_0_400" fill="white">
+<use xlink:href="#stroke0_0_400"/>
+</mask>
+<path d="M6.51641 7.26631L16.3001 20.3477L6.45474 30.9836H8.67072L17.2905 21.6715L24.2548 30.9836H31.7954L21.461 17.1665L30.6251 7.26631H28.4091L20.471 15.8422L14.0569 7.26631H6.51641ZM9.77509 8.8984H13.2392L28.5363 29.3515H25.0722L9.77509 8.8984Z" stroke-width="8.56199" stroke="white" mask="url(#stroke1_0_400)"/>
+</g>
+</g>
+<defs>
+<path id="stroke0_0_400" d="M6.51641 7.26631L16.3001 20.3477L6.45474 30.9836H8.67072L17.2905 21.6715L24.2548 30.9836H31.7954L21.461 17.1665L30.6251 7.26631H28.4091L20.471 15.8422L14.0569 7.26631H6.51641ZM9.77509 8.8984H13.2392L28.5363 29.3515H25.0722L9.77509 8.8984Z"/>
+</defs>
+</svg>

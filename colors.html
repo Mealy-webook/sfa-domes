@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Colour · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<style>
+/* Review page: SFA Domes colour in the WBK DS3 structure — 🔒 colour primitives → 🎨 Colour collection (Light / Dark
+   modes) → brand programme and feedback colours. Every swatch reads the real tokens from f/colors.css. */
+:root{--gutter:clamp(16px,6.67vw,96px)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-l);-webkit-font-smoothing:antialiased}
+.in{max-width:1240px;margin:0 auto;padding:0 var(--gutter)}
+code{font:400 12px/18px ui-monospace,Menlo,monospace;color:var(--color-content-secondary)}
+.top{position:sticky;top:0;z-index:5;background:var(--color-bg-primary);border-bottom:1px solid var(--color-border-primary)}
+.top .in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px}
+.top b{font:var(--ts-title-s);font-size:16px;text-transform:var(--type-case-title)}
+.mode{display:inline-flex;border:1px solid var(--color-border-strong)}
+.mode button{height:36px;padding:0 16px;border:0;background:var(--color-bg-primary);color:var(--color-content-primary);cursor:pointer;font:var(--ts-label-s);font-size:14px}
+.mode button[aria-pressed=true]{background:var(--color-bg-inverse);color:var(--color-content-inverse)}
+.head{padding:56px 0 32px;background:var(--neutral-950);color:var(--neutral-0)}
+.head p.k{margin:0 0 10px;color:var(--color-brand)}
+.head h1{margin:0}
+.head p.d{margin:18px 0 0;max-width:66ch;color:var(--neutral-300)}
+.layers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-top:28px}
+.layers a{display:block;padding:14px 16px;background:var(--neutral-900);color:var(--neutral-0);text-decoration:none}
+.layers a small{display:block;color:var(--neutral-400);font-size:13px}
+.layers a:hover{background:var(--neutral-800)}
+.sec{padding-top:56px;scroll-margin-top:72px}
+.sec-h{display:flex;align-items:center;gap:12px;margin:0 0 6px}
+.sec-h::before{content:"";width:5px;height:26px;background:var(--color-brand)}
+.sec-d{margin:0 0 22px;max-width:70ch;color:var(--color-content-secondary)}
+.grp{margin:22px 0 10px;font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.chip{border:1px solid var(--color-border-primary);background:var(--color-bg-primary)}
+.chip i{display:block;height:72px;border-bottom:1px solid var(--color-border-primary)}
+.chip div{padding:10px 12px}
+.chip b{display:block;font:var(--ts-label-s);font-size:14px;line-height:20px;color:var(--color-content-primary)}
+.chip code{display:block}
+/* semantic rows */
+.sem{border-top:1px solid var(--color-border-secondary)}
+.row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) 120px;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--color-border-primary)}
+.row.hd{font:var(--ts-body-s);color:var(--color-content-tertiary)}
+.row b{display:block;font:var(--ts-label-s);font-size:14px;line-height:20px}
+.row .v{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--color-content-secondary)}
+.row .v i{flex:none;width:28px;height:28px;border:1px solid var(--color-border-primary)}
+.row .live{height:40px;border:1px solid var(--color-border-primary)}
+html[data-mode=light] .row .v.l,html[data-mode=dark] .row .v.d{font-weight:500;color:var(--color-content-primary)}
+/* sample */
+.demo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{padding:24px;border:1px solid var(--color-border-primary);background:var(--color-bg-primary);color:var(--color-content-primary)}
+.card p{margin:0}
+.card .t{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.card .s{margin-top:6px;font:var(--ts-body-m);color:var(--color-content-secondary)}
+.card .chips{display:flex;gap:8px;margin:16px 0}
+.card .chips span{display:inline-flex;align-items:center;height:28px;padding:0 10px;background:var(--color-bg-accent-subtle);color:var(--color-content-accent);font:var(--ts-body-s)}
+.card .btn{display:inline-flex;align-items:center;height:52px;padding:0 24px;background:var(--color-bg-accent);color:var(--color-content-on-accent);font:var(--ts-label-l)}
+.card .note{margin-top:14px;padding:10px 12px;background:var(--color-bg-secondary);border:1px solid var(--color-border-primary);font:var(--ts-body-s);color:var(--color-content-tertiary)}
+.foot{margin:64px 0 96px;padding-top:18px;border-top:1px solid var(--color-border-primary);font:var(--ts-body-s);color:var(--color-content-tertiary)}
+@media (max-width:900px){.layers,.demo{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.row .live{display:none}.row.hd span:last-child{display:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="in"><b>SFA Domes · Colour</b><div class="mode" role="group" aria-label="Colour mode"><button type="button" data-mode="light" aria-pressed="true">Light</button><button type="button" data-mode="dark" aria-pressed="false">Dark</button></div></div></div>
+
+<header class="head">
+  <div class="in">
+    <p class="k ts-label-s">Design system · same structure as WBK DS3</p>
+    <h1 class="ts-display-l">Colour</h1>
+    <p class="d ts-body-l">Three layers, each built only from the one before it. Switch the mode at the top: the Colour collection swaps between Light and Dark, and the sample cards follow. The site uses Light for the inner pages and Dark for the homepage.</p>
+    <nav class="layers" aria-label="Layers">
+      <a href="#primitives"><span class="ts-title-s">1 · Primitives</span><small>Locked raw colours</small></a>
+      <a href="#collection"><span class="ts-title-s">2 · Colour</span><small>Light / Dark modes: backgrounds, content, borders</small></a>
+      <a href="#brand"><span class="ts-title-s">3 · Brand &amp; feedback</span><small>Programmes, danger, warning, overlays</small></a>
+    </nav>
+  </div>
+</header>
+
+<main class="in">
+  <section class="sec" id="primitives">
+    <h2 class="sec-h ts-title-s">1 · Colour primitives</h2>
+    <p class="sec-d ts-body-m">The raw values. Pages don't use them for meaning; the Colour collection points at them. The two off-brand oranges the homepage had (#F95C1B, #F95D27) were folded into Orange 500.</p>
+    <div id="prims"></div>
+  </section>
+
+  <section class="sec" id="collection">
+    <h2 class="sec-h ts-title-s">2 · Colour</h2>
+    <p class="sec-d ts-body-m">The semantic layer, with a Light and a Dark mode like DS3's. Names follow DS3: backgrounds, content and borders, each primary → tertiary, plus accent, inverse and states. The highlighted column is the mode in use.</p>
+    <div class="sem" id="sem"></div>
+  </section>
+
+  <section class="sec" id="brand">
+    <h2 class="sec-h ts-title-s">3 · Brand &amp; feedback</h2>
+    <p class="sec-d ts-body-m">The same in both modes.</p>
+    <div class="sw" id="brandSw"></div>
+  </section>
+
+  <section class="sec">
+    <h2 class="sec-h ts-title-s">In use</h2>
+    <p class="sec-d ts-body-m">The same card built only from semantic tokens, in each mode.</p>
+    <div class="demo">
+      <div class="card" data-mode="light"><p class="t">Field F1</p><p class="s">5-a-side field · 5 v 5</p><div class="chips"><span>Indoor</span><span>Free balls and bibs</span></div><span class="btn">Check availability</span><p class="note">Light mode · inner pages</p></div>
+      <div class="card" data-mode="dark"><p class="t">Field F1</p><p class="s">5-a-side field · 5 v 5</p><div class="chips"><span>Indoor</span><span>Free balls and bibs</span></div><span class="btn">Check availability</span><p class="note">Dark mode · homepage</p></div>
+    </div>
+  </section>
+
+  <p class="foot">Tokens: f/colors.css (linked on every page) · pages keep short aliases (--ink, --bg, --line, --brand…) that point at the semantic tokens · structure after WBK DS3.</p>
+</main>
+
+<script>
+(() => {
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const chip = (name, v) => `<div class="chip"><i style="background:var(${v})"></i><div><b>${name}</b><code>${v}</code><code>${css(v)}</code></div></div>`;
+  const PRIM = [
+    ['Brand orange', [['Orange 300', '--orange-300'], ['Orange 500', '--orange-500'], ['Orange 600', '--orange-600']]],
+    ['Neutrals', [['Neutral 0', '--neutral-0'], ['Neutral 100', '--neutral-100'], ['Neutral 200', '--neutral-200'], ['Neutral 300', '--neutral-300'], ['Neutral 400', '--neutral-400'], ['Neutral 500', '--neutral-500'], ['Neutral 600', '--neutral-600'], ['Neutral 800', '--neutral-800'], ['Neutral 900', '--neutral-900'], ['Neutral 950', '--neutral-950'], ['Black', '--black']]],
+    ['Programmes', [['Cyan 500', '--cyan-500'], ['Purple 500', '--purple-500'], ['Yellow 300', '--yellow-300'], ['Pink 600', '--pink-600'], ['Blue 700', '--blue-700'], ['Green 400', '--green-400']]],
+    ['Feedback', [['Red 600', '--red-600'], ['Amber 100', '--amber-100'], ['Amber 800', '--amber-800']]],
+    ['Alpha', [['Black 50%', '--black-a50'], ['White 10%', '--white-a10'], ['White 16%', '--white-a16'], ['Orange 8%', '--orange-a8'], ['Orange 10%', '--orange-a10']]],
+  ];
+  document.getElementById('prims').innerHTML = PRIM.map(([g, list]) => `<p class="grp">${g}</p><div class="sw">${list.map(([n, v]) => chip(n, v)).join('')}</div>`).join('');
+
+  const SEM = [
+    ['Backgrounds', [['Primary', 'bg-primary', 'Neutral 0', 'Neutral 950'], ['Secondary', 'bg-secondary', 'Neutral 100', 'Neutral 900'], ['Tertiary', 'bg-tertiary', 'Neutral 200', 'Neutral 800'], ['Inverse', 'bg-inverse', 'Neutral 950', 'Neutral 0'], ['Accent', 'bg-accent', 'Orange 500', 'Orange 500'], ['Accent / hover', 'bg-accent-hover', 'Orange 600', 'Orange 600'], ['Accent / subtle', 'bg-accent-subtle', 'Orange 8%', 'Orange 10%']]],
+    ['Content', [['Primary', 'content-primary', 'Neutral 950', 'Neutral 0'], ['Secondary', 'content-secondary', 'Neutral 600', 'Neutral 400'], ['Tertiary', 'content-tertiary', 'Neutral 500', 'Neutral 500'], ['Disabled', 'content-disabled', 'Neutral 400', 'Neutral 600'], ['Accent', 'content-accent', 'Orange 500', 'Orange 500'], ['Inverse', 'content-inverse', 'Neutral 0', 'Neutral 950'], ['On accent', 'content-on-accent', 'Neutral 0', 'Neutral 0']]],
+    ['Borders', [['Primary', 'border-primary', 'Neutral 200', 'White 16%'], ['Secondary', 'border-secondary', 'Neutral 300', 'White 10%'], ['Strong', 'border-strong', 'Neutral 950', 'Neutral 0'], ['Accent', 'border-accent', 'Orange 500', 'Orange 500']]],
+  ];
+  const prim = n => '--' + n.toLowerCase().replace(/ (\d+)%$/, '-a$1').replace(/^white-a/, 'white-a').replace(/ /g, '-');
+  const v = (label) => { const t = label.match(/^(\w+) (\d+)%$/) ? `--${label.split(' ')[0].toLowerCase()}-a${parseInt(label.split(' ')[1])}` : prim(label); return `<i style="background:var(${t})"></i>${label}`; };
+  document.getElementById('sem').innerHTML = `<div class="row hd"><span>Variable</span><span>Light</span><span>Dark</span><span>Now</span></div>` +
+    SEM.map(([g, list]) => `<p class="grp">${g}</p>` + list.map(([n, k, l, d]) => `<div class="row"><div><b>${g} / ${n}</b><code>--color-${k}</code></div><div class="v l">${v(l)}</div><div class="v d">${v(d)}</div><div class="live" style="background:var(--color-${k})"></div></div>`).join('')).join('');
+
+  const BR = [['Brand', '--color-brand'], ['Programme · Cyan', '--color-programme-cyan'], ['Programme · Youth', '--color-programme-youth'], ['Programme · Families', '--color-programme-families'], ['Programme · Women', '--color-programme-women'], ['Programme · Elders', '--color-programme-elders'], ['Programme · Pros', '--color-programme-pros'], ['Danger', '--color-danger'], ['Warning / bg', '--color-warning-bg'], ['Warning / content', '--color-warning-content'], ['Overlay', '--color-overlay'], ['Overlay / light', '--color-overlay-light']];
+  document.getElementById('brandSw').innerHTML = BR.map(([n, t]) => chip(n, t)).join('');
+
+  const setMode = m => { document.documentElement.dataset.mode = m; document.querySelectorAll('.mode button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m)); };
+  document.querySelector('.mode').addEventListener('click', e => { const b = e.target.closest('button[data-mode]'); if (b) setMode(b.dataset.mode); });
+  setMode('light');
+})();
+</script>
+</body>
+</html>

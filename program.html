@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Training program · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/court-details.css">
+<link rel="stylesheet" href="f/kl.css">
+<style>
+/* Training program details: the court details layout (f/kl.css) with the program's booking journey where the court
+   calendar sits: 1 plan (free trial, or 1, 2 or 3 months) → 2 start day and time slot → the bottom bar's Book, as on the court
+   page, which goes to checkout. checkout.html shows
+   the sessions, add-ons (Training Kit), player details and the summary, then pays (or confirms a free trial).
+   program.html?p=football-6-8. Design-system tokens only; square corners (radio dots are round, like radios). */
+/* the booking section uses the court page's steps and calendar (f/court-details.css): a plan step above it */
+.v-q .booking > .step + .step{margin-top:clamp(28px,4vh,40px)}
+.pj-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 8px;padding-top:12px}
+/* every card: the dot, title and price share line 1; the description runs the full width under them (line 2), and the
+   content sits at the top, so the gaps are the same in every card even when cards in a row stretch to one height */
+.pj-plan{position:relative;display:grid;grid-template-columns:20px minmax(0,1fr) auto;grid-template-rows:minmax(24px,auto);align-items:center;align-content:start;gap:4px 12px;padding:16px 18px 18px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:inherit;text-align:start;cursor:pointer;transition:border-color .2s,background-color .2s}
+.pj-plan:hover{border-color:var(--color-content-primary)}
+.pj-plan[aria-checked=true]{border:2px solid var(--color-brand);padding:15px 17px 17px;background:var(--color-bg-accent-subtle)}
+.pj-dot{width:20px;height:20px;border:2px solid var(--color-border-strong);border-radius:50%}
+.pj-plan[aria-checked=true] .pj-dot{border:6px solid var(--color-brand)}
+.pj-plan strong{font:var(--ts-label-l)}
+.pj-plan small{grid-column:2/-1;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.pj-plan .pj-pr{grid-row:1;grid-column:3;display:flex;align-items:baseline;height:24px;gap:8px;font:var(--ts-number-s);white-space:nowrap}
+.pj-plan .pj-pr.free{font:var(--ts-label-l)}
+.pj-plan .pj-was{font:var(--ts-body-s);color:var(--color-content-tertiary);text-decoration:line-through}
+.pj-tag{position:absolute;top:-11px;inset-inline-end:14px;padding:2px 8px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-s)}
+@media (max-width:760px){.pj-plans{grid-template-columns:minmax(0,1fr)}}
+
+/* start days: only the days a plan can start on (the next 3 training days), one row of equal tiles; the open day's
+   times fold out under the row, its pointer under that tile */
+.cal-grid[data-days]{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cal-grid[data-days] .day{height:auto;padding:12px 8px;gap:4px}
+.cal-grid[data-days] .day small{font:var(--ts-label-s);text-transform:none}
+.cal-grid[data-days] .day b{font:var(--ts-number-s)}
+.cal-grid[data-days] .day.picked small{color:inherit}
+.cal-grid[data-days] .cal-times{margin:8px 0 0}
+.cal-grid[data-days] .cal-times::before{inset-inline-start:calc((var(--col) + .5) / 3 * 100%)}
+
+/* the program's own sections */
+.pj-list{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.pj-list li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--color-border-primary);font:var(--ts-body-m)}
+.pj-list li::before{content:"";width:8px;height:8px;margin:8px 8px 0;background:var(--color-brand)}
+.pj-terms{counter-reset:t}
+.pj-terms li{counter-increment:t;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.pj-terms li::before{content:counter(t,decimal-leading-zero);width:auto;height:auto;margin:0;background:none;font:var(--ts-label-m);color:var(--color-content-tertiary)}
+#terms:not(.all) .pj-terms li:nth-child(n+6){display:none}
+#stats > div:nth-child(4){grid-column:auto}
+
+/* gallery: a big photo with up to four beside it (layout follows how many there are), Show all photos opens the
+   viewer; phones get a swipeable strip with a counter, and a tap opens the viewer */
+.gal{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;height:clamp(320px,38vw,520px);margin:0 0 28px}
+.gal button.ph{position:relative;display:block;padding:0;border:0;overflow:hidden;background:var(--color-bg-tertiary);cursor:zoom-in}
+.gal button.ph img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease),filter .3s}
+.gal button.ph:hover img{transform:scale(1.04);filter:brightness(.92)}
+.gal .ph:first-child{grid-row:1/-1}
+.gal.n1{grid-template-columns:minmax(0,1fr)}
+.gal.n1,.gal.n2{grid-template-rows:minmax(0,1fr)}
+.gal.n4 .ph:nth-child(2){grid-column:2}
+.gal.n4,.gal.n5{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)}
+.gal.n4 .ph:nth-child(2){grid-column:2/-1}
+.gal-all{position:absolute;inset-inline-end:16px;bottom:16px;z-index:1;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border:1px solid var(--color-content-primary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-label-m);cursor:pointer}
+.gal-all:hover{background:var(--color-content-primary);color:var(--neutral-0)}
+.gal-all svg{width:16px;height:16px;fill:currentColor}
+.gal-count{display:none}
+@media (max-width:760px){
+  .gal{display:flex;gap:0;height:auto;aspect-ratio:4/3;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .gal::-webkit-scrollbar{display:none}
+  .gal button.ph{flex:0 0 100%;scroll-snap-align:start}
+  .gal-all{display:none}
+  .gal-wrap{position:relative}
+  .gal-count{display:block;position:absolute;inset-inline-end:12px;bottom:40px;z-index:1;padding:4px 8px;background:rgba(9,9,11,.7);color:var(--neutral-0);font:var(--ts-label-s)}
+}
+/* the viewer: one photo at a time, arrows and arrow keys, thumbnails underneath */
+.lb{width:100vw;max-width:none;height:100svh;max-height:none;margin:0;padding:0;border:0;background:var(--neutral-950);color:var(--neutral-0)}
+.lb::backdrop{background:var(--neutral-950)}
+.lb-in{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:100%}
+.lb-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px}
+.lb-top span{font:var(--ts-label-m);color:var(--neutral-300)}
+.lb-x{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--white-a16);background:none;color:inherit;cursor:pointer}
+.lb-x svg,.lb-nav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+.lb-stage{position:relative;min-height:0;overflow:hidden}
+.lb-stage img{position:absolute;inset:0;margin:auto;max-width:calc(100% - 144px);max-height:100%}
+.lb-nav{position:absolute;top:50%;translate:0 -50%;display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--white-a16);background:rgba(9,9,11,.5);color:inherit;cursor:pointer}
+.lb-nav:disabled{opacity:.3;cursor:default}
+.lb-prev{inset-inline-start:12px}.lb-next{inset-inline-end:12px}
+[dir=rtl] .lb-nav svg{scale:-1 1}
+.lb-thumbs{display:flex;justify-content:center;gap:8px;padding:16px 20px 20px;overflow-x:auto}
+.lb-thumbs button{flex:none;width:88px;aspect-ratio:4/3;padding:0;border:2px solid transparent;background:none;opacity:.55;cursor:pointer}
+.lb-thumbs button[aria-current=true]{border-color:var(--color-brand);opacity:1}
+.lb-thumbs img{display:block;width:100%;height:100%;object-fit:cover}
+@media (max-width:760px){.lb-stage img{max-width:100%}.lb-nav{display:none}.lb-thumbs button{width:64px}}
+.side-sub{margin:8px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+
+@media (max-width:760px){
+}
+</style>
+</head>
+<body class="v-q" data-go-always>
+<div data-site-nav></div>
+<main>
+<div class="kl">
+  <div class="inner">
+    <nav class="kl-crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="index.html#programs">Training programs</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span id="crumb"></span></nav>
+    <div class="gal" id="gal"></div>
+    <div class="kl-cols">
+      <div class="kl-main">
+        <header class="kl-head about" id="overview" aria-labelledby="progName" style="padding:0;border:0;background:none">
+          <p class="eyebrow lbl" id="eyebrow"></p>
+          <h1 id="progName"></h1>
+          <p class="hero-sub" id="sub"></p>
+          <ul class="kl-badges" id="badges"></ul>
+          <ul class="kl-facts" id="facts"></ul>
+        </header>
+
+        <nav class="kl-tabs" aria-label="Page sections"><div id="klTabs"><a href="#overview">Overview</a><a href="#book">Book</a><a href="#learn">What you'll learn</a><a href="#details">Details</a><a href="#instructions">Instructions</a><a href="#terms">Terms</a><a href="#loc">Location</a></div></nav>
+
+        <!-- booking: the same steps, calendar and time buttons as the court page (f/court-details.css), one pick only -->
+        <section class="booking" id="book" aria-labelledby="planTitle">
+          <section class="step">
+            <div class="step-head"><h2 id="planTitle">Choose a plan</h2></div>
+            <p class="step-note">Try one session for free, or subscribe for one, two or three months.</p>
+            <div class="pj-plans" id="plans" role="radiogroup" aria-labelledby="planTitle"></div>
+          </section>
+          <section class="step">
+            <div class="step-head"><h2 id="dayTitle">Start day and time</h2>
+              <div class="legend" aria-hidden="true"><span><i></i>Free</span><span><i class="pk"></i>Picked</span><span><i class="bk"></i>Full</span></div>
+            </div>
+            <p class="step-note" id="dayNote"></p>
+            <div class="panel cal">
+              <div class="cal-grid" id="calGrid" data-days="3" role="group" aria-labelledby="dayTitle"></div>
+              <div class="cal-key" aria-hidden="true"><span><i class="k-pick"></i>Your start day</span><span><i class="k-act"></i>Open day</span></div>
+            </div>
+          </section>
+        </section>
+
+        <section class="kl-sec" id="learn" aria-labelledby="learnH">
+          <h2 class="kl-h" id="learnH">What you'll learn</h2>
+          <ul class="about-feats" id="learnList"></ul>
+        </section>
+
+        <section class="kl-sec about" id="details" aria-labelledby="aboutH" style="padding-inline:0;padding-bottom:0;border:0;background:none">
+          <h2 class="kl-h" id="aboutH">About</h2>
+          <p class="about-lead" id="aboutLead"></p>
+          <dl class="about-stats" id="stats"></dl>
+        </section>
+
+        <section class="kl-sec" id="instructions" aria-labelledby="insH">
+          <h2 class="kl-h" id="insH">Instructions</h2>
+          <ul class="pj-list" id="insList"></ul>
+        </section>
+
+        <section class="kl-sec kl-faq" id="terms" aria-labelledby="termsH">
+          <h2 class="kl-h" id="termsH">Terms and conditions</h2>
+          <ol class="pj-list pj-terms" id="termsList"></ol>
+          <button class="kl-faq-more" id="termsMore" type="button" aria-expanded="false"></button>
+        </section>
+
+        <section class="kl-sec" id="loc" aria-labelledby="locTitle">
+          <h2 class="kl-h" id="locTitle">Location</h2>
+        <div class="loc-grid">
+          <div class="loc-card">
+            <p class="loc-name">SFA Domes Dammam</p>
+            <p class="loc-city">Dammam, Saudi Arabia</p>
+            <ul class="loc-list">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1"/></svg><a href="tel:+966537448666" dir="ltr">+966 53 744 8666</a></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:Domes.info@sfa.sa">Domes.info@sfa.sa</a></li>
+            </ul>
+            <a class="loc-btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=26.4047835,50.0250094" target="_blank" rel="noopener"><span>Directions</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+          </div>
+          <div class="loc-map" id="locMap">
+            <iframe title="Map showing SFA Domes in Dammam" src="https://www.google.com/maps/embed?origin=mfe&amp;pb=!1m3!2m1!1s26.4047835,50.0250094!6i15" loading="lazy" referrerpolicy="no-referrer-when-downgrade" tabindex="-1"></iframe>
+            <button class="loc-cover" type="button"><span>Click to explore the map</span></button>
+          </div>
+        </div>
+        </section>
+      </div>
+
+      <aside class="kl-side" aria-label="Price">
+        <div class="kl-card">
+          <div class="hero-book">
+            <p class="hero-price"><small>From</small><b id="sidePrice"></b></p>
+            <div class="hero-actions"><button class="share" id="shareBtn" type="button" aria-label="Share" title="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v9h14v-9"/></svg></button><a class="cta" href="#book"><span>Book now</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></a></div>
+          </div>
+          <p class="side-sub" id="sideSub"></p>
+        </div>
+        <p class="kl-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Try one session free before you subscribe.</span></p>
+      </aside>
+    </div>
+
+    <section class="kl-more" id="more" aria-labelledby="moreH">
+      <div class="kl-more-head">
+        <h2 class="kl-h" id="moreH">More training programs</h2>
+        <div class="kl-more-nav"><button class="arrow" id="morePrev" type="button" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button><button class="arrow" id="moreNext" type="button" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button></div>
+      </div>
+      <ul class="kl-more-row" id="moreRow"></ul>
+    </section>
+  </div>
+</div>
+</main>
+
+<div data-site-footer></div>
+
+<dialog class="lb" id="lb" aria-label="Photos"></dialog>
+
+<div class="go" id="go">
+  <div class="inner">
+    <div class="go-pick"><small id="goWhen"></small><strong id="goTotal"></strong></div>
+    <button class="book" id="goBtn" type="button"></button>
+  </div>
+</div>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script>
+(() => {
+  const P = window.SFA_PREFS, t = P.t, S = window.SFA_SPORTS, PR = window.SFA_PROGRAMS;
+  const q = new URLSearchParams(location.search), id = PR[q.get('p')] ? q.get('p') : 'football-6-8', p = PR[id], sp = S[p.sport];
+  const $ = x => document.getElementById(x);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const tx = o => o && (P.lang === 'ar' ? o.ar : o.en);
+  const key = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+  const img = p.img || window.SFA_COURT_IMG(p.sport, sp.courts[p.court || 0]);
+  const ARR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>';
+  // each time keeps its own direction, so Arabic reads "4:30 م – 6:00 م" the right way round
+  const range = t0 => `<bdi>${P.time(t0)}</bdi> – <bdi>${P.time(t0 + p.minutes)}</bdi>`;
+  // Sun, Tue & Thu (weekday names from a known Sunday, so they follow the language)
+  const dayNames = () => { const n = p.days.map(d => P.date(new Date(2026, 10, 1 + d), { weekday: 'short' })); return n.length > 1 ? `${n.slice(0, -1).join(P.lang === 'ar' ? '، ' : ', ')} ${P.lang === 'ar' ? 'و' : '&'} ${n[n.length - 1]}` : n[0]; };
+  const perMonth = p.days.length * 4, left = s => p.capacity - s.enrolled;
+  // age ranges keep their order inside Arabic text (6–8, not 8–6)
+  const ages = a => `\u2066${a}\u2069`;
+  const icon = sp.img ? `<img src="${sp.img}" alt="">` : `<span class="msi">${sp.icon}</span>`;
+
+  // the booking: plan → start day and time; checkout adds the rest
+  // a plan starts on one of the next 3 training days; only those can be opened in the calendar
+  const startDays = window.SFA_PROGRAM_START_DAYS(p);
+  const PLANS = window.SFA_PROGRAM_PLANS, price = plan => window.SFA_PROGRAM_PRICE(p, plan);
+  const st = { plan: 'month', start: null, time: null };
+  // coming back from checkout ("Edit booking"): the plan, day and time you picked are still there
+  let saved = null; try { saved = JSON.parse(sessionStorage.getItem('sfaOrder')); } catch (e) {}
+  if (saved && saved.kind === 'program' && saved.program === id){
+    const sd = saved.start && toDate(saved.start);
+    st.plan = Object.hasOwn(PLANS, saved.plan || '') ? saved.plan : 'month';
+    if (sd && startDays.includes(saved.start)) st.start = saved.start;
+    if (st.start && p.slots.some(s => s.time === saved.time && left(s) > 0)) st.time = saved.time;
+  }
+  const sessions = () => st.start && st.time != null ? window.SFA_PROGRAM_SESSIONS(p, st.start, st.plan) : [];
+
+  // ---- the picker: only the days a plan can start on (Ahmed: no full calendar), as the court page's day buttons; the
+  //      open day's times fold out under the row, and picking a time makes that day the start day.
+  const dayOpen = d => startDays.includes(key(d)) && p.slots.some(s => left(s) > 0);
+  let active = st.start;   // the day whose times are showing
+  if (!active) active = startDays.find(k => dayOpen(toDate(k))) || null;
+  // each time keeps its words together, so a narrow time button wraps only after the dash (as on the court page)
+  const fmtSlot = s => `${P.time(s).replace(/ /g, ' ')} – ${P.time(s + p.minutes).replace(/ /g, ' ')}`;
+  // the plans: a free trial, or 1, 2 or 3 months; the longer ones show what they save against paying month by month
+  // short names keep each card's title and prices on one line (checkout uses the full 'subscription' names)
+  const PLAN_NAMES = { month: 'One month', month2: 'Two months', month3: 'Three months' };
+  function plans(){
+    $('plans').innerHTML = Object.keys(PLANS).map(k => {
+      const on = `type="button" class="pj-plan" role="radio" aria-checked="${st.plan === k}" data-plan="${k}"`;
+      if (k === 'trial') return `<button ${on}><span class="pj-dot"></span><strong>${t('Free trial')}</strong><span class="pj-pr free">${t('Free of charge')}</span><small>${t('One {m}-minute session', { m: p.minutes })}</small></button>`;
+      const full = window.SFA_PROGRAM_FULL_PRICE(p, k), save = full - price(k), weeks = PLANS[k].months * 4;
+      const tag = k === 'month' ? t('Most popular') : t('Save {amount}', { amount: P.money(save) });
+      return `<button ${on}><span class="pj-tag">${tag}</span><span class="pj-dot"></span><strong>${t(PLAN_NAMES[k])}</strong><span class="pj-pr">${save ? `<s class="pj-was"><span class="sr-only">${t('Was')} </span>${P.money(full)}</s>` : ''}${P.money(price(k))}</span><small>${t(weeks > 10 && P.lang === 'ar' ? '{n} sessions over {w} weeks (11+)' : '{n} sessions over {w} weeks', { n: perMonth * PLANS[k].months, w: weeks })}</small></button>`;
+    }).join('');
+  }
+  const dayCell = date => {
+    const k = key(date), cls = ['day', k === key(new Date()) ? 'today' : '', k === st.start ? 'picked' : '', k === active ? 'active' : ''].join(' ');
+    return `<button class="${cls}" type="button" data-k="${k}"${dayOpen(date) ? '' : ' disabled'} aria-expanded="${k === active}" aria-label="${P.date(date, 'long')}"><small>${P.date(date, { weekday: 'short' })}</small><b>${date.getDate()}</b><small>${P.date(date, { month: 'short' })}</small></button>`;
+  };
+  function slotsHTML(k){
+    const btn = s => { const full = left(s) <= 0, on = st.start === k && st.time === s.time;
+      return `<button class="slot${full ? ' booked' : ''}" type="button" data-s="${s.time}" aria-pressed="${on}"${full ? ` disabled aria-label="${fmtSlot(s.time)} · ${t('Full')}"` : ''}>${fmtSlot(s.time)}</button>`; };
+    return `<div class="slots-head"><p class="slots-day">${P.date(toDate(k), 'long')}</p></div><div class="slots">${p.slots.map(btn).join('')}</div>`;
+  }
+  function renderCal(animate){
+    const days = startDays.map(toDate);
+    let html = days.map(dayCell).join('');
+    const at = days.findIndex(d => key(d) === active);
+    if (at > -1) html += `<div class="cal-times${animate ? ' open' : ''}" id="calTimes" role="region" aria-label="${t('Times for {date}', { date: P.date(days[at], 'long') })}" style="--col:${at}">${slotsHTML(active)}</div>`;
+    $('calGrid').innerHTML = html;
+  }
+  // the bottom bar works like the court page's: before a pick it shows the price and jumps to the calendar; once a day
+  // and time are picked it shows them and books (on desktop it only appears then)
+  function goBar(){
+    const when = !!(st.start && st.time != null), list = sessions(), price = st.plan === 'trial' ? t('Free of charge') : P.money(window.SFA_PROGRAM_PRICE(p, st.plan));
+    $('goWhen').textContent = when ? `${P.date(toDate(st.start), 'short')} · ${P.time(st.time)} · ${t('{n} sessions', { n: list.length })}` : t('{name} · pick a start day and time', { name: tx(p.name) });
+    $('goTotal').innerHTML = when ? price : `<small class="go-from">${t('From')}</small> ${P.money(p.month)}`;
+    $('goBtn').innerHTML = `<span>${when ? (st.plan === 'trial' ? t('Book free trial') : t('Book · {total}', { total: price })) : t('Book this program')}</span>`;
+    $('go').classList.add('on'); document.body.classList.toggle('has-picks', when);
+  }
+  function booking(){
+    plans();
+    $('dayNote').textContent = t('Training days are {days}. Start on one of the next 3: pick a day, then a time.', { days: dayNames() });
+    renderCal(false); goBar();
+  }
+
+  function paint(){
+    document.title = `${tx(p.name)} · SFA Domes`;
+    $('crumb').textContent = tx(p.name);
+    gallery();
+    $('eyebrow').innerHTML = `<span class="ico" aria-hidden="true">${icon}</span>${esc(t(sp.name))} · ${t('SFA Domes Dammam')}`;
+    $('progName').textContent = tx(p.name);
+    $('sub').textContent = `${t('Ages {a}', { a: ages(p.ages) })} · ${tx(p.level)} · ${t('{m}-minute sessions', { m: p.minutes })}`;
+    const chk = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+    $('badges').innerHTML = [t('Indoor'), t('Coach-led'), p.women ? t('Women only') : '', t('Free trial available')].filter(Boolean).map(b => `<li>${chk}<span>${b}</span></li>`).join('');
+    $('facts').innerHTML = `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4m8-4v4"/></svg><div><b>${t('Trains {days}', { days: dayNames() })}</b><small>${p.slots.map(s => P.time(s.time)).join(` ${t('or')} `)} · ${t('{m} minutes', { m: p.minutes })}</small></div></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><div><b>${t('{n} sessions a month', { n: perMonth })}</b><small>${t('Start on one of the next 3 training days.')}</small></div></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg><div><a href="#loc">${t('SFA Domes Dammam, Dammam, Saudi Arabia')}</a></div></li>`;
+    $('sidePrice').innerHTML = `${P.money(p.month)} <small>${t('/ month')}</small>`;
+    $('sideSub').textContent = t('{n} sessions a month · free trial available', { n: perMonth });
+    $('learnList').innerHTML = p.learn.map(l => `<li>${chk}<span>${esc(tx(l))}</span></li>`).join('');
+    $('aboutLead').textContent = tx(p.about);
+    $('stats').innerHTML = [[t('Ages'), ages(p.ages)], [t('Level'), tx(p.level)], [t('Training days'), dayNames()], [t('Session length'), t('{m} minutes', { m: p.minutes })], [t('Group size'), t('Up to {n} players', { n: p.capacity })], [t('Coaches'), [...new Set(p.slots.map(s => tx(s.coach)))].join(' · ')]]
+      .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+    $('insList').innerHTML = window.SFA_PROGRAM_INSTRUCTIONS.map(x => `<li>${esc(tx(x))}</li>`).join('');
+    $('termsList').innerHTML = window.SFA_PROGRAM_TERMS.map(x => `<li>${esc(tx(x))}</li>`).join('');
+    termsLabel();
+    $('moreRow').innerHTML = Object.entries(PR).filter(([k]) => k !== id).map(([k, o]) => { const s2 = S[o.sport];
+      return `<li><a class="kl-mc" href="program.html?p=${k}"><span class="kl-mc-img"><img src="${o.img || window.SFA_COURT_IMG(o.sport, s2.courts[o.court || 0])}" alt="" loading="lazy" style="object-position:${o.focus}"></span>` +
+        `<span class="kl-mc-body"><small>${esc(t(s2.name))}</small><b>${esc(tx(o.name))}</b><span>${t('Ages {a}', { a: ages(o.ages) })} · ${esc(tx(o.level))}</span><em><span>${t('From')}</span> ${P.money(o.month)} <span>${t('/ month')}</span></em></span></a></li>`; }).join('');
+    moreArrows();
+    booking();
+  }
+
+  // ---- gallery and viewer
+  const photos = p.photos || [{ src: img, focus: p.focus }];
+  const GRID = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 1h4v4H1zM6 1h4v4H6zM11 1h4v4h-4zM1 6h4v4H1zM6 6h4v4H6zM11 6h4v4h-4zM1 11h4v4H1zM6 11h4v4H6zM11 11h4v4h-4z"/></svg>';
+  function gallery(){
+    const shown = photos.slice(0, 5), name = tx(p.name);
+    $('gal').className = `gal n${shown.length}`;
+    $('gal').innerHTML = shown.map((ph, i) => `<button type="button" class="ph" data-ph="${i}" aria-label="${t('Photo {i} of {n}', { i: i + 1, n: photos.length })}: ${esc(name)}"><img src="${ph.src}" alt="" style="object-position:${ph.focus}" ${i ? 'loading="lazy"' : ''}></button>`).join('')
+      + (photos.length > 1 ? `<button type="button" class="gal-all" data-ph="0">${GRID}${t('Show all {n} photos', { n: photos.length })}</button>` : '');
+    if (!$('galCount')){ const w = document.createElement('div'); w.className = 'gal-wrap'; $('gal').before(w); w.append($('gal')); w.insertAdjacentHTML('beforeend', '<span class="gal-count" id="galCount" aria-hidden="true" dir="ltr"></span>'); }
+    galCount();
+  }
+  const galCount = () => { const g = $('gal'), i = Math.round(Math.abs(g.scrollLeft) / (g.clientWidth || 1)); $('galCount').textContent = `${Math.min(i + 1, photos.length)} / ${photos.length}`; };
+  $('gal').addEventListener('scroll', () => requestAnimationFrame(galCount), { passive: true });
+  let at = 0;
+  const lb = $('lb');
+  function view(i){
+    at = Math.max(0, Math.min(photos.length - 1, i));
+    lb.innerHTML = `<div class="lb-in"><div class="lb-top"><span>${esc(tx(p.name))} · <bdi dir="ltr">${at + 1} / ${photos.length}</bdi></span><button type="button" class="lb-x" data-lb="close" aria-label="${t('Close')}"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="lb-stage"><img src="${photos[at].src}" alt="${t('Photo {i} of {n}', { i: at + 1, n: photos.length })}"><button type="button" class="lb-nav lb-prev" data-lb="-1" aria-label="${t('Previous')}" ${at ? '' : 'disabled'}><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button><button type="button" class="lb-nav lb-next" data-lb="1" aria-label="${t('Next')}" ${at < photos.length - 1 ? '' : 'disabled'}><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button></div>
+      <div class="lb-thumbs">${photos.map((ph, k) => `<button type="button" data-go="${k}" aria-label="${t('Photo {i} of {n}', { i: k + 1, n: photos.length })}" aria-current="${k === at}"><img src="${ph.src}" alt="" style="object-position:${ph.focus}"></button>`).join('')}</div></div>`;
+    lb.dir = document.documentElement.dir;
+    if (!lb.open) lb.showModal();
+  }
+  $('gal').addEventListener('click', e => { const b = e.target.closest('[data-ph]'); if (b) view(+b.dataset.ph); });
+  lb.addEventListener('click', e => { const b = e.target.closest('[data-lb],[data-go]'); if (!b) return; if (b.dataset.lb === 'close') return lb.close(); view(b.dataset.go != null ? +b.dataset.go : at + +b.dataset.lb); });
+  lb.addEventListener('keydown', e => { if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return; const fwd = (e.key === 'ArrowRight') !== (document.documentElement.dir === 'rtl'); view(at + (fwd ? 1 : -1)); });
+  // swipe in the viewer on touch screens
+  let sx = null;
+  lb.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener('touchend', e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 40) view(at + ((dx < 0) !== (document.documentElement.dir === 'rtl') ? 1 : -1)); });
+
+  // ---- booking interactions
+  $('plans').addEventListener('click', e => { const b = e.target.closest('[data-plan]'); if (!b) return; st.plan = b.dataset.plan; plans(); goBar(); $('plans').querySelector(`[data-plan="${st.plan}"]`).focus(); });
+  $('calGrid').addEventListener('click', e => {
+    const day = e.target.closest('.day'), slot = e.target.closest('.slot');
+    if (day && !day.disabled){ active = active === day.dataset.k ? null : day.dataset.k; renderCal(true); return; }   // tapping the open day folds it away
+    if (slot && !slot.disabled){
+      const s = +slot.dataset.s;
+      if (st.start === active && st.time === s){ st.start = null; st.time = null; }   // tapping your pick again clears it
+      else { st.start = active; st.time = s; }
+      renderCal(false); goBar(); $('calGrid').querySelector(`.slot[data-s="${s}"]`)?.focus();
+    }
+  });
+  // checkout picks up the order from sessionStorage, the same way the court pages hand over theirs; participants and kits
+  // already added there is kept if you come back and change the day
+  function toCheckout(){
+    if (!st.start || st.time == null) return;
+    const keep = saved && saved.kind === 'program' && saved.program === id ? saved : {};
+    const order = { kind: 'program', program: id, plan: st.plan, start: st.start, time: st.time, people: keep.people || null, kitSizes: keep.kitSizes || [] };
+    try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (e) {}
+    location.href = 'checkout.html';
+  }
+  // the bottom bar: until a day and time are picked it takes you to the calendar
+  $('goBtn').addEventListener('click', () => { if (st.start && st.time != null) return toCheckout(); $('calGrid').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' }); });
+
+  // ---- terms: the first 5, the rest behind Show all
+  const termsLabel = () => { const all = $('terms').classList.contains('all'); $('termsMore').textContent = all ? t('Show fewer') : t('Show all {n} terms', { n: window.SFA_PROGRAM_TERMS.length }); $('termsMore').setAttribute('aria-expanded', all); };
+  $('termsMore').addEventListener('click', () => { $('terms').classList.toggle('all'); termsLabel(); });
+  // links to #terms open the full list
+  document.addEventListener('click', e => { if (e.target.closest('a[href="#terms"]')){ $('terms').classList.add('all'); termsLabel(); } });
+  // ---- map: a click lets the map take scrolls and drags
+  $('locMap').querySelector('.loc-cover').addEventListener('click', () => { $('locMap').classList.add('live'); $('locMap').querySelector('iframe').tabIndex = 0; });
+  // ---- share
+  $('shareBtn').addEventListener('click', async () => { try { if (navigator.share) await navigator.share({ title: tx(p.name), url: location.href }); else { await navigator.clipboard.writeText(location.href); window.SFA_AUTH.toast(t('Link copied')); } } catch (e) {} });
+  // ---- more programs row: scrolls by most of its width (flipped for right-to-left)
+  const row = $('moreRow'), rtl = () => document.documentElement.dir === 'rtl';
+  const moreArrows = () => { const x = Math.abs(row.scrollLeft), max = row.scrollWidth - row.clientWidth - 2; $('morePrev').disabled = x <= 2; $('moreNext').disabled = x >= max; };
+  const moreBy = d => row.scrollBy({ left: d * row.clientWidth * 0.8 * (rtl() ? -1 : 1), behavior: 'smooth' });
+  $('morePrev').addEventListener('click', () => moreBy(-1)); $('moreNext').addEventListener('click', () => moreBy(1));
+  row.addEventListener('scroll', () => requestAnimationFrame(moreArrows), { passive: true });
+  addEventListener('resize', moreArrows);
+  // ---- tabs follow the scroll
+  const tabs = [...document.querySelectorAll('#klTabs a')], secs = tabs.map(a => document.querySelector(a.getAttribute('href')));
+  let tick = false;
+  const spy = () => {
+    tick = false;
+    const hdr = document.querySelector('.hdr-cn'); document.body.classList.toggle('kl-away', !!hdr && hdr.classList.contains('hq-away'));
+    let on = 0; secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top < 200) on = i; });
+    tabs.forEach((a, i) => a.classList.toggle('on', i === on));
+    document.body.classList.toggle('kl-in-book', tabs[on].getAttribute('href') === '#book');
+  };
+  addEventListener('scroll', () => { if (!tick){ tick = true; requestAnimationFrame(spy); } }, { passive: true });
+
+  paint(); spy();
+  addEventListener('sfa:prefs', () => setTimeout(paint));
+})();
+</script>
+</body>
+</html>

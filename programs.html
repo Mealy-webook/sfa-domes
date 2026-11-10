@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Training programs · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=exercise,fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<style>
+/* Training programs: every program in f/programs-data.js, filtered by sport, by who it's for (yourself, one of your
+   children, or an age) and women-only. Filters live in the URL (?sport=&who=&women=1) so a filtered list can be shared.
+   Same text-only hero and poster tiles as the sports page (courts.html). DS tokens only; square corners. */
+:root{color-scheme:light;--nav:90px;--g:clamp(16px,6.67vw,96px);--ease:cubic-bezier(.22,1,.36,1);--max:1440px}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--color-brand);outline-offset:3px}
+.msi{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
+img{display:block}
+@keyframes up{from{opacity:0;translate:0 24px}to{opacity:1;translate:0 0}}
+.hero{padding-top:var(--nav)}
+.cap{max-width:var(--max);margin:0 auto;padding:clamp(32px,7vh,72px) var(--g) 0;display:grid;gap:16px;animation:up 1s var(--ease) .1s both}
+.eyebrow{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-label-l)}
+.ico{display:grid;place-items:center;width:32px;height:32px;flex:none;background:var(--color-brand);color:var(--neutral-0)}
+.ico .msi{font-size:var(--fs-20)}
+h1{margin:0;font:var(--ts-display-xl);text-transform:var(--type-case-display)}
+.sub{margin:0;max-width:52ch;font:var(--ts-body-l);color:var(--color-content-secondary)}
+
+.list{max-width:var(--max);margin:0 auto;padding:clamp(40px,7vh,72px) var(--g) clamp(56px,9vh,96px)}
+/* filters: sport chips, then who it's for + women only; result count and clear on the right */
+.flt{display:grid;gap:16px;padding-bottom:24px;margin-bottom:24px;border-bottom:1px solid var(--color-border-secondary)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:-4px;padding:4px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-label-m);cursor:pointer;transition:border-color .2s,background-color .2s,color .2s}
+.chip:hover{border-color:var(--color-content-primary)}
+.chip .msi{font-size:var(--fs-20)}
+.mi{display:inline-block;width:20px;height:20px;background:currentColor;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+.sp .mi{width:18px;height:18px;color:var(--color-brand)}
+.chip small{font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.chip[aria-pressed=true]{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.chip[aria-pressed=true] small{color:inherit;opacity:.7}
+.row2{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.who{position:relative;display:flex;align-items:center;height:44px;min-width:260px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary)}
+.who:focus-within{border-color:var(--color-content-primary);box-shadow:inset 0 0 0 1px var(--color-content-primary)}
+.who label{padding-inline-start:16px;font:var(--ts-label-m);color:var(--color-content-secondary);white-space:nowrap}
+.who select{appearance:none;-webkit-appearance:none;flex:1;min-width:0;height:100%;padding:0 40px 0 8px;border:0;background:transparent;outline:0;font:var(--ts-label-m);cursor:pointer}
+[dir=rtl] .who select{padding:0 8px 0 40px}
+.who svg{position:absolute;inset-inline-end:12px;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;pointer-events:none}
+.tog{display:inline-flex;align-items:center;gap:12px;height:44px;padding:0 4px;border:0;background:none;font:var(--ts-label-m);cursor:pointer}
+.tog .box{display:grid;place-items:center;width:22px;height:22px;border:1.5px solid var(--color-border-secondary)}
+.tog .box svg{width:14px;height:14px;opacity:0}
+.tog[aria-checked=true] .box{background:var(--color-brand);border-color:var(--color-brand)}
+.tog[aria-checked=true] .box svg{opacity:1}
+.count{margin-inline-start:auto;display:flex;align-items:center;gap:16px;font:var(--ts-label-m);color:var(--color-content-tertiary)}
+.clear{padding:0;border:0;background:none;color:var(--color-content-primary);font:var(--ts-label-m);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.forwho{margin:0 0 16px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tile{position:relative;display:grid;grid-template-rows:auto 1fr;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);animation:up .7s var(--ease) both;animation-delay:calc(.05s * var(--i,0));transition:border-color .25s}
+.tile:hover{border-color:var(--color-content-primary)}
+.ph{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--color-bg-tertiary)}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.1s var(--ease)}
+.tile:hover .ph img{transform:scale(1.05)}
+.tags{position:absolute;top:12px;inset-inline-start:12px;display:flex;flex-wrap:wrap;gap:4px}
+.tag{padding:4px 8px;background:var(--color-bg-primary);font:var(--ts-label-s)}
+.tag.w{background:var(--color-programme-women);color:var(--neutral-0)}
+.tag.ok{background:var(--color-brand);color:var(--neutral-0)}
+.bd{display:grid;align-content:start;gap:8px;padding:20px}
+.sp{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.sp .msi{font-size:var(--fs-18);color:var(--color-brand)}
+.nm{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.meta{margin:0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.pr{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin-top:8px;padding-top:16px;border-top:1px solid var(--color-border-primary)}
+.pr small{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.pr b{font:var(--ts-number-s)}
+.pr em{margin-inline-start:auto;font:var(--ts-label-s);font-style:normal;color:var(--color-content-accent)}
+.lnk{position:absolute;inset:0;z-index:1}
+.empty{display:grid;justify-items:start;gap:16px;padding:40px;border:1px dashed var(--color-border-secondary)}
+.empty p{margin:0;font:var(--ts-body-l);color:var(--color-content-secondary)}
+.empty button{height:48px;padding:0 20px;border:0;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+@media (max-width:1080px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.grid{grid-template-columns:minmax(0,1fr)}.who{min-width:0;width:100%}.count{margin-inline-start:0;width:100%;justify-content:space-between}.empty{padding:24px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main id="page"></main>
+<div data-site-footer></div>
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script>
+(() => {
+  const P = window.SFA_PREFS, t = P.t, PR = window.SFA_PROGRAMS, S = window.SFA_SPORTS;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const tx = o => o && (P.lang === 'ar' ? o.ar : o.en);
+  const root = document.getElementById('page'), q = new URLSearchParams(location.search);
+  const f = { sport: q.get('sport') || '', who: q.get('who') || '', women: q.get('women') === '1' };
+  let me = null;   // the signed-in account: "who" can be me or one of the children
+  const ids = Object.keys(PR), sports = [...new Set(ids.map(id => PR[id].sport))];
+  const icon = sp => sp.img ? `<span class="mi" style="--m:url(${sp.img})"></span>` : `<span class="msi">${sp.icon}</span>`;
+  const CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="square" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+  const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+  const dayNames = p => p.days.map(d => P.date(new Date(2024, 0, 7 + d), { weekday: 'short' })).join(P.lang === 'ar' ? '، ' : ', ');
+
+  // who: '' anyone · 'me' · 'kid:<id>' · 'age:<n>' (6–17) · 'adult'
+  const people = () => me ? [{ key: 'me', first: me.first || String(me.name).split(' ')[0], dob: me.dob, gender: me.gender, you: true }, ...(me.participants || []).map(c => ({ key: 'kid:' + c.id, first: c.first || c.name.split(' ')[0], dob: c.dob, gender: c.gender }))] : [];
+  const person = () => people().find(x => x.key === f.who);
+  function fits(id){
+    const p = PR[id], start = window.SFA_PROGRAM_START_DAYS(p)[0], r = window.SFA_PROGRAM_AGES(p);
+    if (f.sport && p.sport !== f.sport) return false;
+    if (f.women && !p.women) return false;
+    const x = person();
+    if (x) return x.dob ? !window.SFA_PROGRAM_ELIGIBLE(p, x, start) : true;
+    if (f.who.startsWith('age:')){ const a = +f.who.slice(4); return a >= r.min && a <= r.max; }
+    if (f.who === 'adult') return r.max >= 18;
+    return true;
+  }
+  const sync = () => { const u = new URLSearchParams(); if (f.sport) u.set('sport', f.sport); if (f.who) u.set('who', f.who); if (f.women) u.set('women', '1'); history.replaceState(null, '', u.toString() ? '?' + u : location.pathname); };
+
+  function paint(keep){
+    document.title = `${t('Training programs')} · SFA Domes`;
+    const list = ids.filter(fits), age = x => x.dob ? window.SFA_AGE(x.dob, window.SFA_TODAY()) : null;
+    const opts = [`<option value="">${t('Anyone')}</option>`]
+      .concat(people().length ? [`<optgroup label="${t('Your account')}">${people().map(x => `<option value="${x.key}"${f.who === x.key ? ' selected' : ''}>${esc(x.you ? t('Myself') : x.first)}${age(x) != null ? ` · ${t('Age {n}', { n: age(x) })}` : ''}</option>`).join('')}</optgroup>`] : [])
+      .concat(`<optgroup label="${t('By age')}">${Array.from({ length: 12 }, (_, i) => i + 6).map(a => `<option value="age:${a}"${f.who === 'age:' + a ? ' selected' : ''}>${t('Age {n}', { n: a })}</option>`).join('')}<option value="adult"${f.who === 'adult' ? ' selected' : ''}>${t('Adults (18+)')}</option></optgroup>`);
+    const x = person();
+    const html = `<section class="hero" aria-labelledby="h1"><div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true"><span class="msi">exercise</span></span>${t('SFA Domes Dammam')}</p>
+        <h1 id="h1">${t('Training programs')}</h1><p class="sub">${t('Coach-led programs for children, teens and women. Start on any training day, and try one session free before you subscribe.')}</p></div></section>
+      <section class="list" aria-labelledby="lh"><h2 id="lh" class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">${t('Programs')}</h2>
+        <div class="flt">
+          <div class="chips" role="group" aria-label="${t('Sport')}"><button type="button" class="chip" data-sport="" aria-pressed="${!f.sport}">${t('All sports')}<small>${ids.length}</small></button>${sports.map(k => `<button type="button" class="chip" data-sport="${k}" aria-pressed="${f.sport === k}"><span aria-hidden="true">${icon(S[k])}</span>${esc(t(S[k].name))}<small>${ids.filter(id => PR[id].sport === k).length}</small></button>`).join('')}</div>
+          <div class="row2"><div class="who"><label for="who">${t("Who's it for?")}</label><select id="who">${opts.join('')}</select>${CHEV}</div>
+            <button type="button" class="tog" role="checkbox" aria-checked="${f.women}" id="women"><span class="box" aria-hidden="true">${TICK}</span>${t('Women and girls only')}</button>
+            <div class="count" aria-live="polite"><span>${list.length === 1 ? t('1 program') : t('{n} programs', { n: list.length })}</span>${f.sport || f.who || f.women ? `<button type="button" class="clear" data-clear>${t('Clear filters')}</button>` : ''}</div></div>
+        </div>
+        ${x && x.dob ? `<p class="forwho">${x.you ? t('Programs you can join, from their next start day.') : t('Programs {name} can join, from their next start day.', { name: esc(x.first) })}</p>` : ''}
+        ${list.length ? `<div class="grid">${list.map((id, i) => { const p = PR[id], sp = S[p.sport], img = p.img || window.SFA_COURT_IMG(p.sport, sp.courts[p.court || 0]);
+          return `<article class="tile" style="--i:${keep ? 0 : i}"><div class="ph"><img src="${img}" alt="" loading="lazy" style="object-position:${p.focus || '50% 50%'}"><div class="tags"><span class="tag">${t('Ages {a}', { a: `⁦${p.ages}⁩` })}</span>${p.women ? `<span class="tag w">${t('Women only')}</span>` : ''}${x && x.dob ? `<span class="tag ok">${x.you ? t('You can join') : t('{name} can join', { name: esc(x.first) })}</span>` : ''}</div></div>
+            <div class="bd"><p class="sp"><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))} · ${esc(tx(p.level))}</p><h3 class="nm"><a class="lnk" href="program.html?p=${encodeURIComponent(id)}" aria-label="${esc(tx(p.name))}"></a>${esc(tx(p.name))}</h3>
+              <p class="meta">${dayNames(p)} · ${t('{m} minutes', { m: p.minutes })} · ${t('Up to {n} players', { n: p.capacity })}</p>
+              <p class="pr"><small>${t('From')}</small><b>${P.money(p.month)}</b><small>${t('/ month')}</small><em>${t('Free trial available')}</em></p></div></article>`; }).join('')}</div>`
+          : `<div class="empty"><p>${x ? (x.you ? t('No programs fit you right now.') : t('No programs fit {name} right now.', { name: esc(x.first) })) : t('No programs match these filters.')}</p><button type="button" data-clear>${t('Clear filters')}</button></div>`}
+      </section>`;
+    root.innerHTML = html;
+    if (keep) root.querySelector(keep)?.focus({ preventScroll: true });
+  }
+  root.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.sport !== undefined){ f.sport = b.dataset.sport; sync(); paint(`[data-sport="${f.sport}"]`); }
+    else if (b.id === 'women'){ f.women = !f.women; sync(); paint('#women'); }
+    else if (b.dataset.clear !== undefined){ f.sport = ''; f.who = ''; f.women = false; sync(); paint('[data-sport=""]'); }
+  });
+  root.addEventListener('change', e => { if (e.target.id === 'who'){ f.who = e.target.value; sync(); paint('#who'); } });
+  paint();
+  window.SFA_AUTH.me().then(u => { me = u; paint(); });
+  addEventListener('sfa:auth', e => { me = e.detail; if (!me && (f.who === 'me' || f.who.startsWith('kid:'))) f.who = ''; paint(); });
+  addEventListener('sfa:prefs', () => paint());
+})();
+</script>
+</body>
+</html>

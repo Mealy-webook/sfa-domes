@@ -1,0 +1,60 @@
+/* Shared confirmation styles for the result-a…d review options (copied from result.html; the live page keeps its own copy). */
+:root{color-scheme:light;--nav:90px;--g:clamp(16px,6.67vw,96px);--ease:cubic-bezier(.22,1,.36,1);--max:1440px;--tk-hole:var(--color-bg-secondary)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--color-brand);outline-offset:3px}
+.msi{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
+img{display:block}
+@keyframes up{from{opacity:0;translate:0 20px}to{opacity:1;translate:0 0}}
+
+.cf{max-width:var(--max);margin:0 auto;padding:calc(var(--nav) + clamp(32px,6vh,64px)) var(--g) clamp(56px,9vh,96px)}
+/* head: the state mark, the headline and the booking ref */
+.cf-head{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px 20px;margin-bottom:clamp(28px,5vh,48px);animation:up .7s var(--ease) both}
+.mark{grid-row:span 2;display:grid;place-items:center;width:64px;height:64px;background:var(--color-brand);color:var(--neutral-0)}
+.mark svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:square}
+.mark path{stroke-dasharray:40;stroke-dashoffset:40;animation:draw .5s var(--ease) .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.failed .mark{background:var(--color-danger)}
+.pending .mark{background:var(--color-content-primary)}
+.pending .mark svg{animation:spin 1.4s linear infinite}
+.pending .mark path{stroke-dashoffset:0;animation:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.cf-sub{margin:0;font:var(--ts-body-l);color:var(--color-content-secondary)}
+.cf-sub .ref{font:var(--ts-label-l);color:var(--color-content-primary)}
+.test-tag{display:inline-block;margin-inline-start:8px;padding:2px 8px;background:var(--amber-100);color:var(--amber-800);font:var(--ts-label-m)}
+
+/* body: the tickets beside a summary with the next steps */
+.cf-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:clamp(20px,3vw,40px);align-items:start}
+.cf-tickets{display:grid;gap:16px}
+.cf-tickets .tk{animation:up .7s var(--ease) both;animation-delay:calc(.12s + var(--i,0) * .08s)}
+.cf-tickets.fold .tk:nth-child(n+4){display:none}
+.cf-side{position:sticky;top:calc(var(--nav) + 24px);display:grid;gap:16px;animation:up .7s var(--ease) .2s both}
+.box{background:var(--color-bg-primary);border:1px solid var(--color-border-primary);padding:24px}
+.box h2{margin:0 0 12px;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.rows{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;margin:0;font:var(--ts-body-s)}
+.rows dt{color:var(--color-content-tertiary)}
+.rows dd{margin:0;text-align:end;overflow-wrap:anywhere}
+.rows .total{padding-top:12px;border-top:1px solid var(--color-border-primary);font:var(--ts-label-l)}
+.rows dt.total{margin-inline-end:-16px;padding-inline-end:16px}   /* one unbroken line over the total: the label's border runs across the column gap */
+.rows dd.total{font:var(--ts-number-s)}
+.acts{display:grid;gap:8px}
+.btn,.ghost{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 20px;font:var(--ts-label-l);text-transform:var(--type-case-label);text-decoration:none;cursor:pointer;transition:background-color .25s,color .25s,border-color .25s}
+.btn{height:56px;border:0;background:var(--color-brand);color:var(--neutral-0)}
+.btn:hover{background:var(--color-bg-accent-hover)}
+.ghost{border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary)}
+.ghost:hover{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.btn svg,.ghost svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .btn .fwd{scale:-1 1}
+.more{justify-self:center;margin-top:4px;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.more:hover{color:var(--color-brand)}
+.tips{list-style:none;margin:0;padding:0;display:grid;gap:8px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.tips li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px}
+.tips li::before{content:"";width:8px;height:8px;margin:8px 8px 0;background:var(--color-brand)}
+/* failed / checking: one narrow column */
+.cf.solo .cf-grid{grid-template-columns:minmax(0,560px)}
+@media (max-width:960px){.cf-grid{grid-template-columns:minmax(0,1fr)}.cf-side{position:static}}
+@media (max-width:560px){.cf-head{grid-template-columns:minmax(0,1fr)}.mark{grid-row:auto;width:56px;height:56px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

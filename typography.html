@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Typography · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600&family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<style>
+/* Review page: SFA Domes typography in the WBK DS3 structure — 🔒 size primitives → 🆃 Typography collection
+   (English / Arabic modes) → 🅃 text styles. The samples use the real tokens and .ts-* classes from f/fonts.css. */
+:root{--brand:#FF5A19;--ink:#09090B;--ink-2:#52525B;--ink-3:#71717A;--line:#E4E4E7;--line-strong:#D4D4D8;--bg:#fff;--bg-soft:#F4F4F5;--gutter:clamp(16px,6.67vw,96px)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 15px/24px "Loew Next","Montserrat",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.in{max-width:1240px;margin:0 auto;padding:0 var(--gutter)}
+code{font:400 12px/18px ui-monospace,Menlo,monospace;color:var(--ink-2)}
+.top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top .in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px}
+.top b{font:900 16px/1 "Loew Next",sans-serif;text-transform:uppercase}
+.mode{display:inline-flex;border:1px solid var(--ink)}
+.mode button{height:36px;padding:0 16px;border:0;background:var(--bg);color:var(--ink);cursor:pointer;font:400 14px/1 "Loew Next",sans-serif}
+.mode button[aria-pressed=true]{background:var(--ink);color:#fff}
+.head{padding:56px 0 32px;background:var(--ink);color:#fff}
+.head p.k{margin:0 0 10px;color:var(--brand)}
+.head h1{margin:0}
+.head p.d{margin:18px 0 0;max-width:66ch;color:#D4D4D8}
+.layers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-top:28px}
+.layers a{display:block;padding:14px 16px;background:#18181B;color:#fff;text-decoration:none}
+.layers a small{display:block;color:#A1A1AA;font-size:13px}
+.layers a:hover{background:#27272A}
+.sec{padding-top:56px;scroll-margin-top:72px}
+.sec-h{display:flex;align-items:center;gap:12px;margin:0 0 6px}
+.sec-h::before{content:"";width:4px;height:20px;background:var(--color-border-strong,#09090B)}
+.sec-d{margin:0 0 22px;max-width:70ch;color:var(--ink-2)}
+.coll{margin:0 0 10px;font-size:13px;color:var(--ink-3)}
+/* primitives */
+.sizes{display:flex;flex-wrap:wrap;gap:8px}
+.sizes div{display:grid;gap:6px;min-width:92px;padding:14px;border:1px solid var(--line)}
+.sizes span{font-weight:900;line-height:1}
+.weights{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.weights div{padding:16px;border:1px solid var(--line)}
+.weights p{margin:0 0 8px;font-size:36px;line-height:1}
+.weights div.off{background:var(--bg-soft);color:var(--ink-3)}
+/* collection table */
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
+th{font-size:13px;font-weight:400;color:var(--ink-3)}
+td:first-child{width:28%}
+td b{font-weight:900;text-transform:uppercase}
+td .al{display:block;margin-top:2px}
+tr.on td.en,tr.on td.ar{background:transparent}
+html[data-mode=en] td.en,html[data-mode=ar] td.ar{background:#FFF7ED}
+/* text styles */
+.ts{border-top:1px solid var(--line-strong)}
+.ts-row{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px;align-items:center;padding:20px 0;border-bottom:1px solid var(--line)}
+.ts-row .meta b{display:block;font-weight:900;text-transform:uppercase}
+.ts-row .meta code{display:block;margin-top:6px}
+.ts-row .meta em{display:block;margin-top:4px;font-style:normal;font-size:12px;line-height:18px;color:var(--ink-3)}
+.ts-row .smp{min-width:0;overflow-wrap:anywhere}
+.group{margin:28px 0 0;font-size:13px;color:var(--ink-3)}
+.bar{display:inline-flex;align-items:center;gap:12px}.bar::before{content:"";width:5px;height:26px;background:var(--brand)}
+.btn{display:inline-flex;align-items:center;height:56px;padding:0 28px;background:var(--brand);color:#fff}
+.num i{font-style:normal;color:var(--brand)}
+.eye{color:var(--brand)}
+.mut{color:var(--ink-2)}
+/* demo glyphs */
+.gl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.gl div{padding:18px;border:1px solid var(--line)}
+.gl mark{background:#FED7AA;color:inherit}
+.gl small{display:block;margin-top:8px;color:var(--ink-3)}
+.foot{margin:64px 0 96px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media (max-width:900px){.ts-row{grid-template-columns:minmax(0,1fr);gap:10px}.weights{grid-template-columns:repeat(2,minmax(0,1fr))}.layers{grid-template-columns:minmax(0,1fr)}.gl{grid-template-columns:minmax(0,1fr)}td:first-child{width:auto}}
+</style>
+</head>
+<body>
+<div class="top"><div class="in"><b>SFA Domes · Typography</b><div class="mode" role="group" aria-label="Typography mode"><button type="button" data-mode="en" aria-pressed="true">English</button><button type="button" data-mode="ar" aria-pressed="false">Arabic</button></div></div></div>
+
+<header class="head">
+  <div class="in">
+    <p class="k ts-label-s">Design system · same structure as WBK DS3</p>
+    <h1 class="ts-display-l">Typography</h1>
+    <p class="d ts-body-l">Three layers, each built only from the one before it. Switch the mode at the top: the Typography collection swaps its font and weights, and every text style below follows.</p>
+    <nav class="layers" aria-label="Layers">
+      <a href="#primitives"><span class="ts-title-s">1 · Size primitives</span><small>Locked: font sizes, weights, line heights</small></a>
+      <a href="#collection"><span class="ts-title-s">2 · Typography</span><small>English / Arabic modes: font, weights, case</small></a>
+      <a href="#styles"><span class="ts-title-s">3 · Text styles</span><small>Display, Title, Number, Label, Body</small></a>
+    </nav>
+  </div>
+</header>
+
+<main class="in">
+  <!-- 1 -->
+  <section class="sec" id="primitives">
+    <h2 class="sec-h ts-title-s">1 · Size primitives</h2>
+    <p class="sec-d ts-body-m">The raw values. Nothing on a page uses them directly; the Typography collection and text styles point at them. Collection <code>🔒 Size Primitives</code>.</p>
+    <p class="coll">Font size · <code>--fs-*</code> · one scale, about 1.2× per step from a 16px base, all on a 4px grid</p>
+    <div class="sizes" id="sizes"></div>
+    <p class="coll" style="margin-top:22px">Font weight · <code>--fw-*</code> (Loew Next files loaded: Regular, Medium, Black)</p>
+    <div class="weights">
+      <div><p style="font-weight:400">Aa</p><b class="ts-label-s">Regular · 400</b><br><code>--fw-regular</code></div>
+      <div><p style="font-weight:500">Aa</p><b class="ts-label-s">Medium · 500</b><br><code>--fw-medium</code></div>
+      <div class="off"><p style="font-family:Tajawal,sans-serif;font-weight:700">Aa</p><b class="ts-label-s">Bold · 700</b><br><code>--fw-bold</code> · Arabic mode only</div>
+      <div><p style="font-weight:900">Aa</p><b class="ts-label-s">Black · 900</b><br><code>--fw-black</code></div>
+    </div>
+    <p class="coll" style="margin-top:22px">Line height · <code>--lh-display</code> 1.05 · <code>--lh-title</code> 1.2 · <code>--lh-ui</code> 1.25 · <code>--lh-body</code> 1.5 · <code>--lh-lead</code> 1.6</p>
+  </section>
+
+  <!-- 2 -->
+  <section class="sec" id="collection">
+    <h2 class="sec-h ts-title-s">2 · Typography</h2>
+    <p class="sec-d ts-body-m">The semantic layer, with one mode per language, like DS3's English / Arabic. Collection <code>🆃 Typography</code>. The page switches mode by its language: English by default, Arabic when the site is in Arabic.</p>
+    <table>
+      <thead><tr><th>Variable</th><th>English</th><th>Arabic</th></tr></thead>
+      <tbody>
+        <tr><td><b class="ts-label-s">Font</b><code class="al">--type-font</code></td><td class="en">Loew Next</td><td class="ar">Loew Next Arabic <span class="mut">(Tajawal until the files arrive)</span></td></tr>
+        <tr><td><b class="ts-label-s">Font Weights / Display</b><code class="al">--type-w-display</code></td><td class="en">{Font Weight.Black} 900</td><td class="ar">{Font Weight.Bold} 700</td></tr>
+        <tr><td><b class="ts-label-s">Font Weights / Title</b><code class="al">--type-w-title</code></td><td class="en">{Font Weight.Black} 900</td><td class="ar">{Font Weight.Bold} 700</td></tr>
+        <tr><td><b class="ts-label-s">Font Weights / Label</b><code class="al">--type-w-label</code></td><td class="en">{Font Weight.Medium} 500</td><td class="ar">{Font Weight.Medium} 500</td></tr>
+        <tr><td><b class="ts-label-s">Font Weights / Body</b><code class="al">--type-w-body</code></td><td class="en">{Font Weight.Regular} 400</td><td class="ar">{Font Weight.Regular} 400</td></tr>
+        <tr><td><b class="ts-label-s">Font Weights / Body Bold</b><code class="al">--type-w-body-bold</code></td><td class="en">{Font Weight.Medium} 500</td><td class="ar">{Font Weight.Medium} 500</td></tr>
+        <tr><td><b class="ts-label-s">Case / Display, Title</b><code class="al">--type-case-display, -title</code></td><td class="en">ALL CAPS</td><td class="ar">None (Arabic has no capitals)</td></tr>
+        <tr><td><b class="ts-label-s">Case / Label</b><code class="al">--type-case-label</code></td><td class="en">Sentence case</td><td class="ar">None</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 3 -->
+  <section class="sec" id="styles">
+    <h2 class="sec-h ts-title-s">3 · Text styles</h2>
+    <p class="sec-d ts-body-m">What designs and pages pick from. Each one is a family, weight, size, line height and case taken from the layers above (classes <code>.ts-*</code> in f/fonts.css). Fluid sizes run between a phone and a wide screen.</p>
+    <div class="ts" id="tsList"></div>
+  </section>
+
+  <section class="sec">
+    <h2 class="sec-h ts-title-s">Demo font: missing characters</h2>
+    <p class="sec-d ts-body-m">The Loew Next files are a personal-use demo with letters and numbers only. The highlighted characters come from the fallback font until the licensed files are in.</p>
+    <div class="gl">
+      <div><p class="ts-title-l" style="margin:0">Let<mark>'</mark>s play<mark>!</mark> 9:00 AM <mark>–</mark> 12:00 AM</p><small>Title L</small></div>
+      <div><p class="ts-body-l" style="margin:0">Football <mark>·</mark> SFA Domes Dammam <mark>(</mark>F4 <mark>+</mark> F5<mark>)</mark> <mark>&amp;</mark> 38<mark>%</mark> <mark>©</mark></p><small>Body L</small></div>
+    </div>
+  </section>
+
+  <p class="foot">Tokens and text styles: f/fonts.css · font files: f/fonts/ · structure after WBK DS3 (🔒 Size Primitives → 🆃 Typography with English / Arabic modes → text styles).</p>
+</main>
+
+<script>
+(() => {
+  // font size primitives
+  const SIZES = [12, 14, 16, 18, 20, 24, 28, 32, 40, 48, 56, 64];
+  document.getElementById('sizes').innerHTML = SIZES.map(n => `<div><span style="font-size:${Math.min(n, 48)}px">${n}</span><code>--fs-${n}</code></div>`).join('');
+
+  // text styles: [name, class, spec, where, English sample, Arabic sample, extra class]
+  const G = (t) => ({ group: t });
+  const TS = [
+    G('Display · hero and section openers'),
+    ['Display XL', 'ts-display-xl', 'Display 900 · clamp(40–64) / 1.05 · caps', 'Homepage hero only', 'Sport for everyone, under one dome', 'الرياضة للجميع، تحت قبة واحدة'],
+    ['Display L', 'ts-display-l', 'Display 900 · clamp(32–48) / 1.05 · caps', 'Homepage chapter lines, sports page title', 'Works as hard as you do', 'تعمل بجد مثلك'],
+    ['Display M', 'ts-display-m', 'Display 900 · clamp(28–40) / 1.05 · caps', 'Homepage section titles', 'Domes location', 'موقع الدوم'],
+    G('Title · headings'),
+    ['Title L', 'ts-title-l', 'Title 900 · clamp(24–32) / 1.2 · caps', 'Court name, Checkout, programme rows', 'Field F1', 'ملعب F1'],
+    ['Title M', 'ts-title-m', 'Title 900 · clamp(20–24) / 1.2 · caps', 'Card titles', 'One booking, every sport', 'حجز واحد لكل رياضة'],
+    ['Title S', 'ts-title-s', 'Title 900 · 20 / 1.2 · caps · bar', 'Section headings on the court page and checkout', 'Highlights', 'أبرز المزايا', 'bar'],
+    G('Number · stats, prices, totals'),
+    ['Number L', 'ts-number-l', 'Display 900 · clamp(40–56) / 1', 'Homepage stats', '38<i>%</i>', '38<i>%</i>', 'num'],
+    ['Number M', 'ts-number-m', 'Display 900 · 28 / 1.1', 'Price card, programme stats', '300 SAR', '300 ر.س'],
+    ['Number S', 'ts-number-s', 'Display 900 · 20 / 1.2', 'Booking bar and checkout total', '450 SAR', '450 ر.س'],
+    G('Label · interface text (Medium)'),
+    ['Label L', 'ts-label-l', 'Label 500 · 16 / 1.25 · sentence case', 'Buttons, menu, tabs, footer links', 'Check availability', 'تحقق من التوفر', 'btn'],
+    ['Label M', 'ts-label-m', 'Label 500 · 14 / 1.25 · sentence case', 'Chips, small buttons, field labels, eyebrows', 'Football · SFA Domes Dammam', 'كرة القدم · دوم الرياضة للجميع', 'eye'],
+    ['Label S', 'ts-label-s', 'Label 500 · 12 / 1.25 · sentence case', 'Tags, tiny meta', 'Indoor · Free balls and bibs', 'داخلي · كرات وصدريات مجانية'],
+    G('Body · reading text'),
+    ['Body L', 'ts-body-l', 'Body 400 · 18 / 1.6', 'Lead paragraphs, descriptions', 'Field F1 is part of our 5 indoor football fields. Book a 1.5-hour slot and check in at the front desk.', 'الملعب F1 واحد من 5 ملاعب كرة قدم داخلية. احجز فترة مدتها ساعة ونصف وسجّل وصولك في الاستقبال.'],
+    ['Body L Bold', 'ts-body-l-bold', 'Body Bold 500 · 18 / 1.6', 'FAQ questions, emphasis', 'How long is a booking?', 'ما مدة الحجز؟'],
+    ['Body M', 'ts-body-m', 'Body 400 · 16 / 1.5', 'Default text', 'Pitches, courts, academies and leagues all live in one place.', 'الملاعب والأكاديميات والدوريات في مكان واحد.'],
+    ['Body M Bold', 'ts-body-m-bold', 'Body Bold 500 · 16 / 1.5', 'Emphasis in default text', 'Free balls and bibs with every booking.', 'كرات وصدريات مجانية مع كل حجز.'],
+    ['Body S', 'ts-body-s', 'Body 400 · 14 / 1.5', 'Cards, notes, secondary lines', '5-a-side field · 5 v 5', 'ملعب خماسي · 5 ضد 5', 'mut'],
+    ['Caption', 'ts-caption', 'Body 400 · 12 / 1.4 · the smallest size', 'Hints, copyright', "Tap for every day's hours · © 2026 sportsforall.com", 'اضغط لعرض ساعات كل يوم · © 2026 sportsforall.com', 'mut'],
+  ];
+  const list = document.getElementById('tsList');
+  const paint = mode => {
+    list.innerHTML = TS.map(r => r.group ? `<p class="group">${r.group}</p>` :
+      `<div class="ts-row"><div class="meta"><b class="ts-label-m">${r[0]}</b><code>.${r[1]}</code><code>${r[2]}</code><em>${r[3]}</em></div>` +
+      `<div class="smp"><span class="${r[1]}${r[6] ? ' ' + r[6] : ''}" ${mode === 'ar' ? 'dir="rtl" lang="ar"' : ''}>${mode === 'ar' ? r[5] : r[4]}</span></div></div>`).join('');
+  };
+  // mode switch: English / Arabic (the same switch the site makes with its language)
+  const setMode = mode => {
+    document.documentElement.dataset.mode = mode;
+    document.documentElement.lang = mode === 'ar' ? 'ar' : 'en';
+    document.querySelectorAll('.mode button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode));
+    paint(mode);
+  };
+  document.querySelector('.mode').addEventListener('click', e => { const b = e.target.closest('button[data-mode]'); if (b) setMode(b.dataset.mode); });
+  setMode('en');
+})();
+</script>
+</body>
+</html>

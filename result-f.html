@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option F · Boarding pass: one pass in the middle of the page, like an airline boarding pass: the court big, the fields in a grid, a tear line and one large QR. Several sessions switch the same pass; payment details fold away under it.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,440px);justify-content:center}
+.f-col{display:grid;gap:16px;animation:up .7s var(--ease) both}
+.f-col > *,.f-main > *{min-width:0}   /* the session tabs scroll inside the pass instead of widening it */
+.f-pass{background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.f-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;background:var(--color-brand);color:var(--neutral-0)}
+.f-top b{font:var(--ts-label-l)}
+.f-top span{display:inline-flex;align-items:center;gap:8px;font:var(--ts-label-m)}
+.f-top svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:square}
+.f-main{display:grid;gap:20px;padding:24px}
+.f-main small{display:block;font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.f-court{margin:4px 0 0;font:var(--ts-display-m);text-transform:var(--type-case-display);line-height:1}
+.f-sport{margin:8px 0 0;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.f-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;margin:0}
+.f-fields dd{margin:4px 0 0;font:var(--ts-label-l)}
+.f-cut{position:relative;height:0;border-top:2px dashed var(--color-border-secondary);margin:0 24px}
+.f-cut::before,.f-cut::after{content:"";position:absolute;top:-13px;width:24px;height:24px;border-radius:50%;background:var(--color-bg-secondary);border:1px solid var(--color-border-primary)}
+.f-cut::before{left:-37px;clip-path:inset(0 0 0 12px)}
+.f-cut::after{right:-37px;clip-path:inset(0 12px 0 0)}
+.f-scan{display:grid;justify-items:center;gap:8px;padding:24px}
+.f-scan .tk-qr{width:200px}
+.f-scan small{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.f-scan [hidden]{display:none}
+.f-seg{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.f-seg button{flex:none;min-width:44px;height:40px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-label-m);cursor:pointer}
+.f-seg button[aria-selected=true]{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.f-seg-l{display:flex;justify-content:space-between;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.f-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.f-det{background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.f-det summary{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;font:var(--ts-label-l);cursor:pointer;list-style:none}
+.f-det summary::-webkit-details-marker{display:none}
+.f-det summary::after{content:"+";font:var(--ts-title-s)}
+.f-det[open] summary::after{content:"–"}
+.f-det .rows{padding:0 24px 24px}
+@media (max-width:480px){.f-court{font:var(--ts-display-m)}.f-two{grid-template-columns:minmax(0,1fr)}.f-main,.f-scan{padding:20px}.f-top{padding:16px 20px}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option F · Boarding pass</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m, s0 = m.list[0];
+    const fields = s => `<div><dt><small>${t('Date')}</small></dt><dd>${m.date(s)}</dd></div><div><dt><small>${t('Time')}</small></dt><dd>${m.time(s)}</dd></div>
+      <div><dt><small>${t('For')}</small></dt><dd>${s.player ? esc(s.player) : m.who}</dd></div><div><dt><small>${t('Session')}</small></dt><dd>${t('{i} of {n}', { i: s.n, n: s.of })}</dd></div>`;
+    return `<div class="f-col"><article class="f-pass" aria-label="${t('Your tickets')}">
+        <div class="f-top"><b>${t(m.title)}</b><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>${t(m.b.free ? 'Confirmed' : 'Paid')}</span></div>
+        <div class="f-main"><div><small>${m.prog ? t('Training program') : t('SFA Domes Dammam')}</small><p class="f-court">${esc(m.D.title)}</p><p class="f-sport">${esc(t(m.D.sp.name))} · ${m.ref}</p></div>
+          <dl class="f-fields" id="fFields">${fields(s0)}</dl>
+          ${m.count > 1 ? `<div><div class="f-seg-l"><span>${t('Your tickets')}</span><span id="fN">${t('Ticket {i} of {n}', { i: 1, n: m.count })}</span></div><div class="f-seg" role="tablist" aria-label="${t('Your tickets')}" style="margin-top:8px">${m.list.map((s, i) => `<button type="button" role="tab" data-i="${i}" aria-selected="${!i}" tabindex="${i ? -1 : 0}">${i + 1}</button>`).join('')}</div></div>` : ''}</div>
+        <div class="f-cut" aria-hidden="true"></div>
+        <div class="f-scan">${m.list.map((s, i) => `<div class="tk-qr" data-qr="${esc(s.id)}" role="img" aria-label="${t('QR code for {ref}', { ref: esc(s.id) })}"${i ? ' hidden' : ''}></div>`).join('')}<span class="tk-ref" id="fRef">${esc(s0.id)}</span><small>${t('Show this at reception')}</small></div></article>
+      <a class="btn" href="${acts.tickets}">${t('View my tickets')}${ICON.arrow}</a>
+      <div class="f-two"><a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Add to calendar')}</a><a class="ghost" href="${acts.dir}" target="_blank" rel="noopener">${ICON.pin}${t('Get directions')}</a></div>
+      <details class="f-det"><summary>${t(m.b.free ? 'Summary' : 'Payment details')}</summary>${m.rows}</details>
+      ${acts.more ? `<a class="more" href="${acts.more.href}">${acts.more.label}</a>` : ''}</div>`;
+  },
+  after: m => {
+    const tabs = [...document.querySelectorAll('.f-seg button')], qrs = [...document.querySelectorAll('.f-scan .tk-qr')]; if (!tabs.length) return;
+    const fields = s => `<div><dt><small>${m.t('Date')}</small></dt><dd>${m.date(s)}</dd></div><div><dt><small>${m.t('Time')}</small></dt><dd>${m.time(s)}</dd></div>
+      <div><dt><small>${m.t('For')}</small></dt><dd>${s.player ? m.esc(s.player) : m.who}</dd></div><div><dt><small>${m.t('Session')}</small></dt><dd>${m.t('{i} of {n}', { i: s.n, n: s.of })}</dd></div>`;
+    const go = i => { tabs.forEach((b, j) => { b.setAttribute('aria-selected', i === j); b.tabIndex = i === j ? 0 : -1; }); qrs.forEach((q, j) => q.hidden = i !== j);
+      document.getElementById('fFields').innerHTML = fields(m.list[i]); document.getElementById('fRef').textContent = m.list[i].id; document.getElementById('fN').textContent = m.t('Ticket {i} of {n}', { i: i + 1, n: m.count }); };
+    tabs.forEach((b, i) => { b.addEventListener('click', () => go(i)); b.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key] * (document.dir === 'rtl' ? -1 : 1); if (d){ e.preventDefault(); const k = Math.max(0, Math.min(tabs.length - 1, i + d)); go(k); tabs[k].focus(); } }); });
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

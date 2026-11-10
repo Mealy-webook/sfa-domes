@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option K</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option K · Chat: SFA Domes confirms the booking as a short message thread (typed in one by one): the booking card, the ticket with its QR, the payment, a tip. Quick replies underneath answer back: Add to calendar, Get directions, View my tickets.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,640px);justify-content:center}
+.k-app{display:grid;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);animation:up .7s var(--ease) both;min-width:0}
+.k-hd{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--color-border-primary)}
+.k-av{flex:none;display:grid;place-items:center;width:40px;height:40px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-m)}
+.k-hd b{display:block;font:var(--ts-label-l)}
+.k-hd div span{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.k-log{display:grid;gap:8px;align-content:start;padding:24px 20px;min-height:420px;background:var(--color-bg-secondary)}
+.k-day{justify-self:center;margin-bottom:8px;padding:4px 12px;background:var(--color-bg-primary);font:var(--ts-caption);color:var(--color-content-secondary)}
+.k-m{max-width:min(440px,88%);justify-self:start;display:grid;gap:8px;padding:12px 16px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);font:var(--ts-body-m);animation:pop .4s var(--ease) both;transform-origin:left bottom}
+[dir=rtl] .k-m{transform-origin:right bottom}
+.k-m.me{justify-self:end;background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0);transform-origin:right bottom}
+[dir=rtl] .k-m.me{transform-origin:left bottom}
+.k-m time{justify-self:end;font:var(--ts-caption);color:var(--color-content-tertiary)}
+.k-m.me time{color:rgba(255,255,255,.6)}
+.k-m p{margin:0}
+.k-m .ref{font:var(--ts-label-m)}
+@keyframes pop{from{opacity:0;scale:.92;translate:0 8px}to{opacity:1;scale:1;translate:0 0}}
+.k-card{padding:0;overflow:hidden}
+.k-card img{width:100%;height:160px;object-fit:cover}
+.k-card div{display:grid;gap:4px;padding:12px 16px 0}
+.k-card b{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.k-card span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.k-card time{padding:0 16px 12px}
+.k-tk{justify-items:center;text-align:center}
+.k-tk .tk-qr{width:180px}
+.k-tk small{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.k-pay .rows{min-width:min(320px,60vw)}
+.k-typing{justify-self:start;display:flex;gap:4px;padding:16px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.k-typing i{width:8px;height:8px;background:var(--color-content-tertiary);animation:dot 1s infinite}
+.k-typing i:nth-child(2){animation-delay:.15s}.k-typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{opacity:.3;translate:0 0}30%{opacity:1;translate:0 -4px}}
+.k-qr{display:flex;flex-wrap:wrap;gap:8px;padding:16px 20px;border-top:1px solid var(--color-border-primary)}
+.k-qr a,.k-qr button{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--color-brand);background:var(--color-bg-primary);color:var(--color-brand);font:var(--ts-label-m);text-decoration:none;cursor:pointer;transition:background-color .2s,color .2s}
+.k-qr a:hover,.k-qr button:hover{background:var(--color-brand);color:var(--neutral-0)}
+.k-qr svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+.k-qr .fwd{display:none}
+.k-qr .main{background:var(--color-brand);color:var(--neutral-0)}
+.k-qr .main:hover{background:var(--color-bg-accent-hover)}
+.k-qr[hidden]{display:none}
+.k-more{display:block;margin-top:16px;text-align:center;font:var(--ts-label-m);color:var(--color-content-secondary)}
+@media (max-width:560px){.k-log{padding:16px 12px;min-height:0}.k-qr{padding:12px}.k-m{max-width:92%}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option K · Chat</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, acts, ICON } = m;
+    return `<div class="k-app"><div class="k-hd"><span class="k-av" aria-hidden="true">SFA</span><div><b>${t('SFA Domes Dammam')}</b><span>${t('Bookings')}</span></div></div>
+        <div class="k-log" id="kLog" role="log" aria-live="polite"><span class="k-day">${t('Today')}</span></div>
+        <div class="k-qr" id="kQr" hidden><button type="button" data-k="cal">${ICON.cal}${t('Add to calendar')}</button><button type="button" data-k="dir">${ICON.pin}${t('Get directions')}</button><a class="main" href="${acts.tickets}">${t('View my tickets')}${ICON.arrow}</a></div></div>
+      ${acts.more ? `<a class="k-more" href="${acts.more.href}">${acts.more.label}</a>` : ''}`;
+  },
+  after: async m => {
+    const { t, esc, acts } = m, s0 = m.list[0], log = document.getElementById('kLog'), qr = document.getElementById('kQr'), P = window.SFA_PREFS;
+    const now = () => `<time>${P.time(new Date().getHours() * 60 + new Date().getMinutes())}</time>`;
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches, wait = ms => new Promise(r => setTimeout(r, calm ? 0 : ms));
+    const say = async (html, cls = '', typing = 700) => {
+      if (typing && !calm){ log.insertAdjacentHTML('beforeend', '<div class="k-typing" aria-label="…"><i></i><i></i><i></i></div>'); await wait(typing); log.querySelector('.k-typing')?.remove(); }
+      log.insertAdjacentHTML('beforeend', `<div class="k-m ${cls}">${html}</div>`); window.SFA_TICKETS.paintQR(log); };
+    const me = await window.SFA_AUTH?.me?.().catch(() => null), first = me && me.name ? esc(String(me.name).split(' ')[0]) : '';
+    const page = document.body.dataset.state; const alive = () => document.body.dataset.state === page && document.contains(log);
+    await say(`<p>${first ? t('Hi {name}, your booking is confirmed.', { name: first }) : t('Your booking is confirmed.')}</p><p>${m.ref}</p>${now()}`, '', 400); if (!alive()) return;
+    await say(`<img src="${m.D.img}" alt=""><div><b>${esc(m.D.label)}</b><span>${m.when} · ${m.time(s0)}</span><span>${t('For {name}', { name: m.who })}${m.count > 1 ? ' · ' + m.sessionsTxt : ''}</span></div>${now()}`, 'k-card'); if (!alive()) return;
+    await say(`<p>${t("Here's your ticket. Show it at reception.")}</p><div class="tk-qr" data-qr="${esc(s0.id)}" role="img" aria-label="${t('QR code for {ref}', { ref: esc(s0.id) })}"></div><span class="tk-ref">${esc(s0.id)}</span>
+      ${m.count > 1 ? `<small>${t('{n} more tickets are in My tickets.', { n: m.count - 1 })}</small>` : ''}${now()}`, 'k-tk'); if (!alive()) return;
+    await say(`${m.rows}${now()}`, 'k-pay', 600); if (!alive()) return;
+    await say(`<p>${m.tips[2]}</p>${now()}`, '', 600); if (!alive()) return;
+    qr.hidden = false;
+    // quick replies answer back in the thread, then do the thing
+    qr.addEventListener('click', async e => { const b = e.target.closest('button[data-k]'); if (!b) return;
+      const k = b.dataset.k; b.remove();
+      if (k === 'cal'){ const a = document.createElement('a'); a.href = acts.ics; a.download = acts.icsName; a.click(); }
+      else window.open(acts.dir, '_blank', 'noopener');
+      await say(`<p>${b.textContent}</p>${now()}`, 'me', 0);
+      await say(`<p>${t(k === 'cal' ? 'Your calendar file is downloading: one event per session.' : 'Directions to SFA Domes Dammam are open in a new tab.')}</p>${now()}`, '', 600);
+    });
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

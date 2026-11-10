@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My account · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<style>
+/* My account: the signed-in player's tickets (next one up front with its QR, then upcoming and past sessions; each
+   opens as a full ticket), saved courts and account details. Tabs follow the URL hash (#tickets, #saved, #account), so
+   the account menu and the booking confirmation can link straight to a tab. Tickets come from /api/auth/bookings.
+   Design-system tokens only (f/fonts.css text styles, f/colors.css); square corners. */
+:root{color-scheme:light;--nav:90px;--g:clamp(16px,6.67vw,96px);--ease:cubic-bezier(.22,1,.36,1);--max:1440px;--tk-hole:var(--color-bg-primary)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--color-brand);outline-offset:3px}
+.msi{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
+img{display:block}
+[hidden]{display:none!important}
+@keyframes up{from{opacity:0;translate:0 16px}to{opacity:1;translate:0 0}}
+.in{max-width:var(--max);margin:0 auto;padding-inline:var(--g)}
+
+/* head: who you are, then the tabs */
+.pf-head{padding-top:calc(var(--nav) + clamp(28px,5vh,56px));border-bottom:1px solid var(--color-border-primary)}
+.who{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px 24px;animation:up .7s var(--ease) both}
+.av{grid-row:span 3;display:grid;place-items:center;width:clamp(72px,8vw,96px);aspect-ratio:1;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-number-m)}
+.eye{margin:0;font:var(--ts-label-m);color:var(--color-content-tertiary)}
+h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display);overflow-wrap:anywhere}
+.meta{margin:0;font:var(--ts-body-s);color:var(--color-content-secondary);overflow-wrap:anywhere}
+.tabs{display:flex;gap:4px;margin-top:clamp(24px,4vh,40px);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{position:relative;display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 16px;border:0;background:none;color:var(--color-content-secondary);font:var(--ts-label-l);text-transform:var(--type-case-label);white-space:nowrap;cursor:pointer}
+.tab b{display:inline-grid;place-items:center;min-width:24px;height:22px;padding:0 8px;background:var(--color-bg-secondary);font:var(--ts-label-s);color:var(--color-content-secondary)}
+.tab:hover{color:var(--color-content-primary)}
+.tab[aria-selected=true]{color:var(--color-content-primary)}
+.tab[aria-selected=true] b{background:var(--color-brand);color:var(--neutral-0)}
+.tab::after{content:"";position:absolute;inset-inline:0;bottom:-1px;height:3px;background:var(--color-brand);scale:0 1;transition:scale .35s var(--ease)}
+.tab[aria-selected=true]::after{scale:1 1}
+
+.panel{padding-block:clamp(28px,5vh,48px) clamp(56px,9vh,96px)}
+.sec{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 16px}
+.sec h2{margin:0;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.sec span{font:var(--ts-label-m);color:var(--color-content-tertiary)}
+
+/* tickets: next one up front, then a segmented list */
+.next{margin-bottom:clamp(32px,6vh,56px);animation:up .7s var(--ease) .1s both}
+.next .sec h2::before{content:"";display:inline-block;width:10px;height:10px;margin-inline-end:8px;background:var(--color-brand);vertical-align:2px}
+.when{font:var(--ts-label-m);color:var(--color-brand)!important}
+.seg{display:inline-flex;gap:2px;padding:3px;margin-bottom:16px;background:var(--color-bg-secondary)}
+.seg button{height:40px;padding:0 16px;border:0;background:none;color:var(--color-content-secondary);font:var(--ts-label-m);cursor:pointer}
+/* selected = the plan card's style everywhere: 2px brand, tint, ink text */
+.seg button[aria-pressed=true]{background:var(--color-bg-accent-subtle);color:var(--color-content-primary);box-shadow:inset 0 0 0 2px var(--color-brand)}
+.rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-border-primary)}
+.row{position:relative;display:grid;grid-template-columns:76px 120px minmax(0,1fr) auto;align-items:center;gap:20px;padding:16px 8px;border-bottom:1px solid var(--color-border-primary);animation:up .5s var(--ease) both;animation-delay:calc(var(--i,0) * .04s);transition:background-color .2s}
+.row:hover{background:var(--color-bg-secondary)}
+.row button.open{position:absolute;inset:0;z-index:1;width:100%;padding:0;border:0;background:none;cursor:pointer}
+.day{display:grid;justify-items:center;padding:8px 0;border:1px solid var(--color-border-secondary);text-align:center}
+.day b{font:var(--ts-number-m)}
+.day span,.day small{font:var(--ts-label-s);color:var(--color-content-tertiary);text-transform:uppercase}
+html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
+.thumb{width:120px;aspect-ratio:4/3;overflow:hidden;background:var(--color-bg-tertiary)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.info{display:grid;gap:4px;min-width:0}
+.info strong{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.info span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.end{display:flex;align-items:center;gap:12px}
+.chip{display:inline-flex;align-items:center;height:28px;padding:0 8px;font:var(--ts-label-s);background:var(--color-bg-secondary);color:var(--color-content-secondary)}
+.chip.up{background:var(--color-bg-accent-subtle);color:var(--color-content-accent)}
+.go{display:inline-flex;align-items:center;gap:8px;font:var(--ts-label-m)}
+.go svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square;transition:transform .35s var(--ease)}
+[dir=rtl] .go svg{scale:-1 1}
+.row:hover .go svg{transform:translateX(4px)}
+[dir=rtl] .row:hover .go svg{transform:translateX(-4px)}
+.past .row{opacity:.72}
+/* a program as one row (its tickets open in their own view), with how many sessions are played */
+.prog{display:flex;align-items:center;gap:12px}
+.prog i{position:relative;flex:none;width:120px;height:4px;background:var(--color-bg-tertiary)}
+.prog i::after{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:calc(var(--p) * 100%);background:var(--color-brand)}
+.prog em{font:var(--ts-label-s);font-style:normal;color:var(--color-content-tertiary)}
+.prog.big i{width:200px;height:6px}
+.prog.big em{font:var(--ts-label-m)}
+.pg-back{display:inline-flex;align-items:center;gap:8px;margin-bottom:24px;font:var(--ts-label-m);color:var(--color-content-secondary);text-decoration:none}
+.pg-back:hover{color:var(--color-brand)}
+.pg-back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .pg-back svg{scale:-1 1}
+.in-grp .row{grid-template-columns:76px minmax(0,1fr) auto}
+.in-grp .thumb{display:none}
+.pg-head{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:clamp(20px,3vw,40px);align-items:start;margin-bottom:clamp(32px,6vh,56px);padding-bottom:clamp(24px,4vh,40px);border-bottom:1px solid var(--color-border-primary);animation:up .6s var(--ease) both}
+.pg-ph{aspect-ratio:4/3;overflow:hidden;background:var(--color-bg-tertiary)}
+.pg-ph img{width:100%;height:100%;object-fit:cover}
+.pg-in{display:grid;gap:8px;align-content:start}
+.pg-in h2{margin:0;font:var(--ts-display-m);text-transform:var(--type-case-display)}
+.pg-in .prog{margin-top:8px}
+.pg-note{margin:4px 0 8px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.empty{display:grid;justify-items:start;gap:12px;padding:32px;border:1px dashed var(--color-border-secondary)}
+.empty p{margin:0;font:var(--ts-body-m);color:var(--color-content-secondary)}
+.empty strong{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.btn,.ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 24px;font:var(--ts-label-l);text-transform:var(--type-case-label);text-decoration:none;cursor:pointer;transition:background-color .25s,color .25s,border-color .25s}
+.btn{border:0;background:var(--color-brand);color:var(--neutral-0)}
+.btn:hover{background:var(--color-bg-accent-hover)}
+.ghost{border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary)}
+.ghost:hover{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.btn svg,.ghost svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+
+/* saved courts */
+.saved{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:16px}
+.st{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--neutral-900);color:var(--neutral-0);isolation:isolate}
+.st > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform 1s var(--ease)}
+.st::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(9,9,11,.05) 40%,rgba(9,9,11,.8))}
+.st:hover > img{transform:scale(1.05)}
+.st a{position:absolute;inset:0;z-index:1}
+.st .sfa-fav{position:absolute;top:14px;inset-inline-end:14px;z-index:2}
+.st-b{position:absolute;inset-inline:18px;bottom:16px;display:grid;gap:2px}
+.st-b strong{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.st-b span{font:var(--ts-body-s);color:rgba(255,255,255,.8)}
+
+/* type filter (All / Courts / Training programs / …): square chips, picked = brand, the count of upcoming tickets */
+.types{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 32px}
+.type{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-label-m);cursor:pointer;transition:border-color .2s,background-color .2s}
+.type:hover{border-color:var(--color-content-primary)}
+.type b{font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.type[aria-pressed=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
+.type[aria-pressed=true] b{color:var(--color-content-secondary)}
+
+/* participants */
+.pl-lead{margin:-8px 0 16px;max-width:640px}
+.pl{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px;max-width:760px}
+.pl-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:start;gap:16px;padding:16px;border:1px solid var(--color-border-primary);background:var(--color-bg-primary)}
+.pl-row.confirm{grid-template-columns:minmax(0,1fr) auto;border-color:var(--color-danger)}
+.pl-av{display:grid;place-items:center;width:48px;height:48px;background:var(--color-bg-secondary);font:var(--ts-label-m);color:var(--color-content-secondary)}
+.pl-txt{display:grid;gap:4px;min-width:0}
+.pl-txt strong{font:var(--ts-label-l)}
+.pl-txt strong em{margin-inline-start:8px;padding:2px 8px;background:var(--color-bg-secondary);font:var(--ts-label-s);font-style:normal;color:var(--color-content-secondary)}
+.pl-txt > span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.pl-txt .pl-up{color:var(--color-content-accent)}
+.pl-q{font:var(--ts-body-m)}
+.pl-acts{display:flex;flex-wrap:wrap;gap:8px}
+.pl-row > .pl-acts{align-self:center}
+.btn.sm,.ghost.sm{height:40px;padding:0 16px;font:var(--ts-label-m)}
+.ghost.danger{border-color:var(--color-danger);color:var(--color-danger)}
+.ghost.danger:hover{background:var(--color-danger);border-color:var(--color-danger);color:var(--neutral-0)}
+.pl-add{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:760px;height:48px;padding:0 16px;border:1px dashed var(--color-content-tertiary);background:none;color:var(--color-content-primary);font:var(--ts-label-m);cursor:pointer}
+.pl-add:hover{border-color:var(--color-content-primary)}
+.pl-add svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+.pl-form{display:grid;gap:16px;max-width:760px;padding:24px;border:1px solid var(--color-content-primary);background:var(--color-bg-primary)}
+.pl-form-h{margin:0;font:var(--ts-label-l)}
+.pl-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.pf{display:grid;gap:8px;align-content:start}
+.pl-two .pf:has(> .dobp-pan:not([hidden])){grid-column:1/-1}   /* the open date-of-birth picker takes the full row */
+.pf label,.pf-l{font:var(--ts-label-m);color:var(--color-content-secondary)}
+.pf input{height:48px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-body-m);color:inherit;outline:0}
+.pf input:focus{border-color:var(--color-content-primary);box-shadow:inset 0 0 0 1px var(--color-content-primary)}
+.pf .err{display:none;margin:0;font:var(--ts-body-s);color:var(--color-danger)}
+.pf.bad input,.pf.bad .pl-gen button{border-color:var(--color-danger)}
+.pf.bad .err{display:block}
+.pl-gen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pl-gen button{height:48px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-label-m);cursor:pointer}
+.pl-gen button[aria-checked=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
+
+/* My children / My profile extras */
+.kids-sec{max-width:760px}
+.pf-h{margin:0;font:var(--ts-body-s);color:var(--color-content-tertiary)}
+.pf.bad .pf-h{display:none}
+.pl-ferr{margin:0;font:var(--ts-body-s);color:var(--color-danger)}
+.pl-limit{max-width:760px;margin:0;padding:16px;border:1px dashed var(--color-border-secondary);font:var(--ts-body-s);color:var(--color-content-secondary)}
+.lk{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square;vertical-align:-2px;margin-inline-start:6px;color:var(--color-content-tertiary)}
+.lk-note{display:flex;align-items:center;gap:8px}
+.lk-note .lk{margin:0}
+.pf.locked label{display:flex;align-items:center}
+.pf input:disabled{background:var(--color-bg-secondary);border-color:var(--color-border-primary);color:var(--color-content-secondary);cursor:not-allowed}
+.acct .sec{align-items:center}
+.empty .btn svg,.pl-add svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+
+/* account */
+.acct{display:grid;grid-template-columns:minmax(0,640px);gap:24px}
+.dl{display:grid;grid-template-columns:minmax(120px,200px) minmax(0,1fr);margin:0;border-top:1px solid var(--color-border-primary)}
+.dl dt,.dl dd{padding:16px 0;border-bottom:1px solid var(--color-border-primary)}
+.dl dt{font:var(--ts-label-m);color:var(--color-content-tertiary)}
+.dl dd{margin:0;font:var(--ts-body-m);overflow-wrap:anywhere}
+.out{justify-self:start;color:var(--color-danger)!important}
+.out:hover{background:var(--color-danger)!important;border-color:var(--color-danger)!important;color:var(--neutral-0)!important}
+
+/* a ticket opened full size */
+.dlg{width:min(980px,calc(100vw - 32px));max-height:calc(100svh - 32px);padding:0;border:0;background:var(--color-bg-secondary);color:var(--color-content-primary);--tk-hole:var(--color-bg-secondary)}
+.dlg::backdrop{background:rgba(9,9,11,.6)}
+.dlg[open]{animation:up .4s var(--ease)}
+.dlg-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;background:var(--color-bg-primary);border-bottom:1px solid var(--color-border-primary)}
+.dlg-top h2{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.x{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--color-border-secondary);background:none;cursor:pointer}
+.x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
+.dlg-body{display:grid;gap:16px;padding:20px}
+.dlg-acts{display:flex;flex-wrap:wrap;gap:8px}
+.gate{display:grid;justify-items:center;gap:16px;padding:48px 24px;text-align:center}
+
+@media (max-width:760px){
+  .who{grid-template-columns:minmax(0,1fr)}.av{grid-row:auto}
+  /* phone rows: date | title, time and when-chip stacked | arrow; the ref lives on the ticket itself */
+  .row{grid-template-columns:64px minmax(0,1fr) 24px;align-items:start;gap:8px 16px;padding:16px 0}
+  .row .day{grid-row:1/span 2}
+  .row .end{display:contents}
+  .row .chip{grid-column:2;grid-row:2;justify-self:start}
+  .row .go{grid-column:3;grid-row:1/span 2;align-self:center}
+  .info strong{font:var(--ts-label-l)}
+  .info .ref{display:none}
+  .thumb{display:none}
+  .row.grp .prog i{width:80px}
+  .in-grp .row{grid-template-columns:64px minmax(0,1fr) 24px}
+  .pg-head{grid-template-columns:minmax(0,1fr)}
+  .pg-ph{aspect-ratio:16/9}
+  .pg-in h2{font:var(--ts-title-l)}
+  .go span{display:none}
+  .pl-row{grid-template-columns:48px minmax(0,1fr);}
+  .pl-row > .pl-acts{grid-column:2;align-self:start}
+  .types{flex-wrap:nowrap;overflow-x:auto;margin-inline:calc(var(--g) * -1);padding-inline:var(--g);scrollbar-width:none}
+  .types::-webkit-scrollbar{display:none}
+  .type{flex:none}
+  .pl-row.confirm{grid-template-columns:minmax(0,1fr)}
+  .pl-row.confirm .pl-acts{grid-column:1}
+  .pl-two{grid-template-columns:minmax(0,1fr)}
+  .pl-form{padding:16px}
+  .dl{grid-template-columns:minmax(0,1fr)}.dl dt{padding-bottom:0;border-bottom:0}.dl dd{padding-top:4px}
+  .dlg-acts > *{flex:1 1 100%}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* hover never hides a selection */
+.type[aria-pressed=true]:hover,.pl-gen button[aria-checked=true]:hover{border-color:var(--color-brand)}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main id="page"></main>
+<dialog class="dlg" id="dlg" aria-labelledby="dlgH"></dialog>
+<div data-site-footer></div>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+(() => {
+  const P = window.SFA_PREFS, t = P.t, T = window.SFA_TICKETS, A = window.SFA_AUTH, S = window.SFA_SPORTS;
+  const root = document.getElementById('page'), dlg = document.getElementById('dlg');
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>';
+  const CAL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4m8-4v4"/></svg>';
+  const PIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><path d="M12 11.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>';
+  const TABS = ['tickets', 'saved', 'people', 'account'];
+  let user = null, bookings = [], favs = [], people = [], seg = 'up', kind = 'all', pform = null, removing = null, aform = null;
+  const C = window.SFA_CHILD, LOCK = '<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>';
+  // booking types: courts, training programs, and any other kind the system adds (named from its key until it has a label)
+  const kindOf = b => b.order.kind || 'court';
+  const KINDS = { court: 'Courts', program: 'Training programs' };
+  const kindName = k => t(KINDS[k] || (k[0].toUpperCase() + k.slice(1).replace(/-/g, ' ')));
+
+  const tab = () => { const h = location.hash.slice(1).split('/')[0]; return TABS.includes(h) ? h : 'tickets'; };
+  // a program's tickets open as their own view: #tickets/<booking ref>
+  const groupId = () => { const [h, id] = location.hash.slice(1).split('/'); return h === 'tickets' && id ? decodeURIComponent(id) : null; };
+  const initials = u => String(u.name || '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  // every paid session, with when it ends, split into upcoming and past
+  const all = () => bookings.filter(b => b.status === 'paid').flatMap(b => T.sessions(b).map(s => ({ s, b, endsAt: T.toDate(s.date).getTime() + s.end * 60e3 })));
+  const shown = () => all().filter(x => kind === 'all' || kindOf(x.b) === kind);
+  const upcoming = (l = shown()) => l.filter(x => x.endsAt > Date.now()).sort((a, b) => a.endsAt - b.endsAt);
+  const past = (l = shown()) => l.filter(x => x.endsAt <= Date.now()).sort((a, b) => b.endsAt - a.endsAt);
+  // "Today", "Tomorrow" or "In 5 days" for the next session
+  const when = x => { const d = Math.round((T.toDate(x.s.date) - new Date().setHours(0, 0, 0, 0)) / 864e5); return d <= 0 ? t('Today') : d === 1 ? t('Tomorrow') : t('In {n} days', { n: d }); };
+
+  // programs are grouped: one row per program booking (two programs = two groups); courts stay one row per session
+  const isGroup = b => kindOf(b) === 'program';
+  const endsAt = s => T.toDate(s.date).getTime() + s.end * 60e3;
+  const groupDays = b => T.sessions(b).filter((s, i, a) => a.findIndex(y => y.n === s.n) === i);
+  const hasUp = b => groupDays(b).some(s => endsAt(s) > Date.now());
+  // a sorted list of sessions → list items: { x } for a court session, { g: booking, x } for a program (at its first place)
+  const items = l => { const seen = new Set(), out = []; for (const x of l){ if (!isGroup(x.b)){ out.push({ x }); continue; } if (seen.has(x.b.cartId)) continue; seen.add(x.b.cartId); out.push({ g: x.b, x }); } return out; };
+  const upItems = (l = shown()) => items(upcoming(l));
+  const pastItems = (l = shown()) => items(past(l)).filter(it => !it.g || !hasUp(it.g));
+  const pattern = days => { const wk = [...new Set(days.map(s => T.toDate(s.date).getDay()))].sort((a, b) => a - b), same = days.every(s => s.start === days[0].start);
+    return days.length > 1 && same && wk.length < days.length ? `${wk.map(d => P.date(new Date(2026, 0, 4 + d), { weekday: 'short' })).join(P.lang === 'ar' ? '، ' : ', ')} · <bdi>${P.time(days[0].start)}</bdi> – <bdi>${P.time(days[0].end)}</bdi>` : ''; };
+  function groupRow(b, i, isUp){
+    const days = groupDays(b), next = days.find(s => endsAt(s) > Date.now()), ref = next || days[days.length - 1], D = T.describe(ref, b), d = T.toDate(ref.date);
+    const played = days.filter(s => endsAt(s) <= Date.now()).length, who = T.people(b).map(x => esc(x.name)).join(', ');
+    return `<li class="row grp" style="--i:${i}"><button type="button" class="open" data-group="${esc(b.cartId)}" aria-label="${t('View tickets')}: ${esc(D.label)}"></button>
+      <span class="day" aria-hidden="true"><span>${P.date(d, { weekday: 'short' })}</span><b>${d.getDate()}</b><small>${P.date(d, { month: 'short' })}</small></span>
+      <span class="thumb"><img src="${D.img}" alt="" loading="lazy" style="object-position:${D.program ? D.program.focus : '50% 50%'}"></span>
+      <span class="info"><strong>${esc(D.label)}</strong><span>${days.length === 1 ? t('1 session') : t('{n} sessions', { n: days.length })}${pattern(days) ? ' · ' + pattern(days) : ''}${who ? ` · ${who}` : ''}</span>
+        <span class="prog" aria-label="${t('{p} of {n} sessions played', { p: played, n: days.length })}"><i style="--p:${played / days.length}"></i><em>${t('{p} of {n} played', { p: played, n: days.length })}</em></span></span>
+      <span class="end"><span class="chip${isUp ? ' up' : ''}">${isUp && next ? t('Next · {when}', { when: when({ s: next }) }) : t('Played')}</span><span class="go"><span>${t('View tickets')}</span>${ARROW}</span></span></li>`;
+  }
+  const itemRow = (it, i, isUp) => it.g ? groupRow(it.g, i, isUp) : row(it.x, i, isUp);
+  // the program's own view: its details, then every ticket (upcoming, then played)
+  const sesTitle = x => x.s.of > 1 ? t('Session {i} of {n}', { i: x.s.n, n: x.s.of }) : t('Your session');
+  function groupView(id){
+    const b = bookings.find(x => x.cartId === id && x.status === 'paid');
+    const back = `<a class="pg-back" href="#tickets" data-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>${t('My tickets')}</a>`;
+    if (!b) return back + `<div class="empty"><strong>${t('No booking found')}</strong></div>`;
+    const days = groupDays(b), D = T.describe(days[0], b), list = T.sessions(b).map(s => ({ s, b, endsAt: endsAt(s) }));
+    const up = upcoming(list), pa = past(list), played = days.filter(s => endsAt(s) <= Date.now()).length, slot = D.program && D.program.slots.find(x => x.time === days[0].start);
+    const who = T.people(b).map(x => esc(x.name)).join(', ');
+    return back + `<section class="pg-head"><span class="pg-ph"><img src="${D.img}" alt="" style="object-position:${D.program ? D.program.focus : '50% 50%'}"></span>
+        <div class="pg-in"><p class="eye">${t(b.order.plan === 'trial' ? 'Free trial' : 'Training program')}</p><h2>${esc(D.label)}</h2>
+          <p class="meta">${P.date(T.toDate(days[0].date), 'short')} – ${P.date(T.toDate(days[days.length - 1].date), 'short')}${pattern(days) ? ' · ' + pattern(days) : ''}</p>
+          <p class="meta">${who}${slot ? ` · ${esc(T.tx(slot.coach))}` : ''} · <bdi>${esc(b.cartId)}</bdi></p>
+          <span class="prog big"><i style="--p:${played / days.length}"></i><em>${t('{p} of {n} sessions played', { p: played, n: days.length })}</em></span>
+          <p class="pg-note">${t('Each ticket has its own QR code. It unlocks on the day of the session; show it at reception.')}</p>
+          <div class="dlg-acts"><a class="ghost sm" href="${T.ics(b)}" download="${T.icsName(b)}">${CAL}${t('Add to calendar')}</a><a class="ghost sm" href="${T.DIRECTIONS}" target="_blank" rel="noopener">${PIN}${t('Get directions')}</a><a class="ghost sm" href="result.html?cart=${encodeURIComponent(b.cartId)}">${t('Booking details')}</a></div></div></section>
+      <section aria-labelledby="pgUp"><div class="sec"><h2 id="pgUp">${t('Upcoming')}</h2><span>${up.length}</span></div>
+        ${up.length ? `<ol class="rows in-grp">${up.map((x, i) => row(x, i, true, sesTitle(x))).join('')}</ol>` : `<p class="meta">${t('No upcoming sessions left in this program.')}</p>`}</section>
+      ${pa.length ? `<section aria-labelledby="pgPast" style="margin-top:clamp(32px,6vh,56px)"><div class="sec"><h2 id="pgPast">${t('Played')}</h2><span>${pa.length}</span></div><ol class="rows past in-grp">${pa.map((x, i) => row(x, i, false, sesTitle(x))).join('')}</ol></section>` : ''}`;
+  }
+
+  function row(x, i, isUp, title){
+    const D = T.describe(x.s, x.b), d = T.toDate(x.s.date);
+    return `<li class="row" style="--i:${i}"><button type="button" class="open" data-open="${esc(x.s.id)}" aria-label="${t('View ticket')}: ${esc(D.label)}, ${P.date(d, 'full')}"></button>
+      <span class="day" aria-hidden="true"><span>${P.date(d, { weekday: 'short' })}</span><b>${d.getDate()}</b><small>${P.date(d, { month: 'short' })}</small></span>
+      <span class="thumb"><img src="${D.img}" alt="" loading="lazy" style="object-position:${D.program ? D.program.focus : '50% 50%'}"></span>
+      <span class="info"><strong>${title || esc(D.label)}</strong><span><bdi>${P.time(x.s.start)}</bdi> – <bdi>${P.time(x.s.end)}</bdi>${x.s.player ? ` · ${esc(x.s.player)}` : ''}<span class="ref"> · ${esc(x.s.id)}</span></span></span>
+      <span class="end"><span class="chip${isUp ? ' up' : ''}">${isUp ? when(x) : t('Played')}</span><span class="go"><span>${t('View ticket')}</span>${ARROW}</span></span></li>`;
+  }
+  const empty = (title, line) => `<div class="empty"><strong>${t(title)}</strong><p>${t(line)}</p><a class="btn" href="index.html#sports">${t('Book a court')}${ARROW}</a></div>`;
+
+  // the type filter: only shown once there is more than one type of booking
+  function types(){
+    const ks = [...new Set(all().map(x => kindOf(x.b)))]; if (ks.length < 2) return '';
+    const n = k => upItems(all().filter(x => k === 'all' || kindOf(x.b) === k)).length;
+    return `<div class="types" role="group" aria-label="${t('Booking type')}">${['all', ...ks].map(k => `<button type="button" class="type" data-kind="${k}" aria-pressed="${k === kind}">${k === 'all' ? t('All') : kindName(k)}<b>${n(k)}</b></button>`).join('')}</div>`;
+  }
+  function tickets(){
+    const gid = groupId(); if (gid) return groupView(gid);
+    const upAll = upcoming(), next = upAll[0], up = upItems(), pa = pastItems();
+    const list = seg === 'up' ? up.filter(it => it.g || !next || it.x.s.id !== next.s.id) : pa;
+    return types() + (next ? `<section class="next" aria-labelledby="nextH"><div class="sec"><h2 id="nextH">${t('Next up')}</h2><span class="when">${when(next)}</span></div>${T.ticket(next.s, next.b)}
+        <div class="dlg-acts" style="margin-top:12px"><a class="ghost" href="${T.ics(next.b)}" download="${T.icsName(next.b)}">${CAL}${t('Add to calendar')}</a><a class="ghost" href="${T.DIRECTIONS}" target="_blank" rel="noopener">${PIN}${t('Get directions')}</a></div></section>` : '')
+      + `<section aria-labelledby="listH"><div class="sec"><h2 id="listH">${t('My tickets')}</h2></div>
+        <div class="seg" role="group" aria-label="${t('My tickets')}"><button type="button" data-seg="up" aria-pressed="${seg === 'up'}">${t('Upcoming')} (${up.length})</button><button type="button" data-seg="past" aria-pressed="${seg === 'past'}">${t('Past')} (${pa.length})</button></div>
+        ${list.length ? `<ol class="rows${seg === 'past' ? ' past' : ''}">${list.map((it, i) => itemRow(it, i, seg === 'up')).join('')}</ol>`
+          : seg === 'up' ? (next ? `<p class="meta">${t('That is your only upcoming session.')}</p>` : empty('No upcoming tickets', 'Book a court and your tickets will show up here.'))
+          : `<div class="empty"><strong>${t('No past sessions yet')}</strong><p>${t('Sessions you have played will show up here.')}</p></div>`}</section>`;
+  }
+  function saved(){
+    if (!favs.length) return `<div class="empty"><strong>${t('No saved courts yet')}</strong><p>${t('Tap the heart on a court to save it.')}</p><a class="btn" href="index.html#sports">${t('Browse sports')}${ARROW}</a></div>`;
+    return `<div class="saved">${favs.map(k => { const [sk, ci] = k.split('|'), sp = S[sk], c = sp && sp.courts[+ci]; if (!c) return '';
+      return `<article class="st"><a href="court-details.html?sport=${encodeURIComponent(sk)}&court=${+ci}" aria-label="${esc(t(sp.name))} · ${esc(t(c[0]))}"></a><img src="${window.SFA_COURT_IMG(sk, c)}" alt="" loading="lazy">${A.heart(k)}
+        <div class="st-b"><strong>${esc(t(c[0]))}</strong><span>${esc(t(sp.name))} · ${P.money(c[5])} ${t('/ hr')}</span></div></article>`; }).join('')}</div>`;
+  }
+  // other tabs (checkout's child dropdown, another My account) hear about changes here, and this tab hears theirs
+  const ping = () => { try { localStorage.setItem('sfaKidsRev', String(Date.now())); } catch (e) {} };
+  addEventListener('storage', async e => {
+    if (e.key !== 'sfaKidsRev' || !user) return;
+    const r = await fetch('/api/auth/participants', { credentials: 'same-origin', cache: 'no-store' }).catch(() => null);
+    const d = r && r.ok ? await r.json().catch(() => null) : null; if (!d) return;
+    people = d.participants || []; if (!pform && !removing) paint();
+  });
+  // ---- My children: each saved child (name, gender, date of birth) with Edit and Remove; an empty state with "Add a
+  //      child"; at most SFA_CHILD.LIMIT. Rules come from f/programs-data.js (SFA_CHILD_ERRORS), the same ones server.js runs.
+  const ageOf = dob => window.SFA_AGE(dob, window.SFA_TODAY());
+  const born = dob => P.date(T.toDate(dob), { day: 'numeric', month: 'short', year: 'numeric' });
+  const gname = g => t(g === 'female' ? 'Female' : 'Male');
+  // the dates a child's birthday can fall between today (6 to 17 inclusive)
+  const dobRange = () => { const d = new Date(), k = x => window.SFA_TODAY(x);
+    return { max: k(new Date(d.getFullYear() - C.MIN, d.getMonth(), d.getDate())), min: k(new Date(d.getFullYear() - C.MAX - 1, d.getMonth(), d.getDate() + 1)) }; };
+  function childRow(x){
+    if (pform && pform.mode === 'edit' && pform.id === x.id) return `<li>${childForm()}</li>`;
+    const nUp = upcoming(all()).filter(y => y.s.player && y.s.player.toLowerCase() === x.name.toLowerCase()).length;
+    if (removing === x.id) return `<li class="pl-row confirm"><span class="pl-q">${t('Remove {name}? They will no longer show when you book. Past bookings and tickets keep their name.', { name: esc(x.name) })}</span><span class="pl-acts"><button type="button" class="ghost sm danger" data-rm-yes="${esc(x.id)}">${t('Remove')}</button><button type="button" class="ghost sm" data-rm-no>${t('Keep')}</button></span></li>`;
+    return `<li class="pl-row"><span class="pl-av" aria-hidden="true">${esc(initials(x))}</span><span class="pl-txt"><strong>${esc(x.name)}</strong><span>${[gname(x.gender), t('Born {date}', { date: born(x.dob) }), t('Age {n}', { n: ageOf(x.dob) })].join(' · ')}</span>${nUp ? `<span class="pl-up">${t(nUp === 1 ? '{n} upcoming session' : '{n} upcoming sessions', { n: nUp })}</span>` : ''}</span>
+      <span class="pl-acts"><button type="button" class="ghost sm" data-pedit="${esc(x.id)}">${t('Edit')}</button><button type="button" class="ghost sm" data-rm="${esc(x.id)}">${t('Remove')}</button></span></li>`;
+  }
+  const field = (id, label, value, err, extra = '') => `<div class="pf${err ? ' bad' : ''}" id="${id}F"><label for="${id}">${t(label)}</label><input id="${id}" value="${esc(value)}" ${extra}><p class="err">${t(err || '')}</p></div>`;
+  const genderField = (id, value, err) => `<div class="pf${err ? ' bad' : ''}" id="${id}F"><span class="pf-l" id="${id}L">${t('Gender')}</span><div class="pl-gen" role="radiogroup" aria-labelledby="${id}L">${['female', 'male'].map(g => `<button type="button" role="radio" aria-checked="${value === g}" data-gen="${g}">${gname(g)}</button>`).join('')}</div><p class="err">${t(err || '')}</p></div>`;
+  function childForm(){
+    const f = pform, er = f.errors || {}, r = dobRange(), edit = f.mode === 'edit';
+    return `<div class="pl-form" role="group" aria-labelledby="plfH"><p class="pl-form-h" id="plfH">${edit ? t('Edit {name}', { name: esc(f.was) }) : t('Add a child')}</p>
+      <div class="pl-two">${field('cF', 'First name', f.first, er.first, 'type="text" autocomplete="off"')}${field('cL', 'Last name', f.last, er.last, 'type="text" autocomplete="off"')}</div>
+      <div class="pl-two"><div class="pf${er.dob ? ' bad' : ''}" id="cDF"><label for="cD">${t('Date of birth')}</label><input id="cD" type="date" data-dob min="${r.min}" max="${r.max}" value="${esc(f.dob)}" aria-describedby="cDH"><p class="pf-h" id="cDH">${t('Ages {a} to {b}', { a: C.MIN, b: C.MAX })}</p><p class="err">${t(er.dob || '')}</p></div>
+        ${genderField('cG', f.gender, er.gender)}</div>
+      ${edit ? `<p class="meta">${t('Changes apply to future bookings only.')}</p>` : ''}
+      <p class="err pl-ferr"${er._ ? '' : ' hidden'}>${t(er._ || '')}</p>
+      <div class="pl-acts"><button type="button" class="btn sm" data-psave>${edit ? t('Save changes') : t('Save child')}</button><button type="button" class="ghost sm" data-pcancel>${t('Cancel')}</button></div></div>`;
+  }
+  const PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+  function children(){
+    const n = people.length, full = n >= C.LIMIT, adding = pform && pform.mode === 'add';
+    const head = `<div class="sec"><h2 id="plH">${t('My children')}</h2>${n ? `<span class="meta">${t('{n} of {max}', { n, max: C.LIMIT })}</span>` : ''}</div>`;
+    if (!n && !adding) return `<section class="kids-sec" aria-labelledby="plH">${head}<div class="empty"><strong>${t('No children added yet')}</strong><p>${t('Add your children once, then pick them when you book courts and training programs.')}</p><button type="button" class="btn" data-padd>${PLUS}${t('Add a child')}</button></div></section>`;
+    return `<section class="kids-sec" aria-labelledby="plH">${head}<p class="meta pl-lead">${t('Pick them when you book courts and training programs. Ages {a} to {b}.', { a: C.MIN, b: C.MAX })}</p>
+      ${n ? `<ul class="pl">${people.map(childRow).join('')}</ul>` : ''}
+      ${adding ? childForm() : full ? `<p class="pl-limit">${t("You've reached the limit of {max} children. Remove one to add another.", { max: C.LIMIT })}</p>` : `<button type="button" class="pl-add" data-padd>${PLUS}<span>${t('Add a child')}</span></button>`}</section>`;
+  }
+  // ---- My profile: the details given at sign-up; first and last name, date of birth and gender can change, email and phone are locked
+  const phoneTxt = p => p ? `<bdi dir="ltr">${esc(p.replace(/^\+966(\d{2})(\d{3})(\d{4})$/, '+966 $1 $2 $3'))}</bdi>` : '—';
+  function account(){
+    if (aform){ const f = aform, er = f.errors || {};
+      return `<section class="acct" aria-labelledby="acH"><div class="sec"><h2 id="acH">${t('My profile')}</h2></div><div class="pl-form" role="group" aria-labelledby="acH">
+        <div class="pl-two">${field('aF', 'First name', f.first, er.first, 'type="text" autocomplete="given-name"')}${field('aL', 'Last name', f.last, er.last, 'type="text" autocomplete="family-name"')}</div>
+        <div class="pf locked"><label for="aE">${t('Email')}${LOCK}</label><input id="aE" type="email" value="${esc(user.email)}" disabled aria-describedby="acLk"></div>
+        <div class="pl-two"><div class="pf${er.dob ? ' bad' : ''}" id="aDF"><label for="aD">${t('Date of birth')}</label><input id="aD" type="date" data-dob min="1900-01-01" max="${window.SFA_TODAY()}" value="${esc(f.dob)}"><p class="err">${t(er.dob || '')}</p></div>${genderField('aG', f.gender, er.gender)}</div>
+        <div class="pf locked"><label for="aP">${t('Phone')}${LOCK}</label><input id="aP" type="tel" dir="ltr" value="${esc((user.phone || '').replace(/^\+966(\d{2})(\d{3})(\d{4})$/, '+966 $1 $2 $3'))}" placeholder="—" disabled aria-describedby="acLk"></div>
+        <p class="meta lk-note" id="acLk">${LOCK}${t("Email and phone can't be changed here. Contact us to update them.")}</p>
+        <p class="err pl-ferr"${er._ ? '' : ' hidden'}>${t(er._ || '')}</p>
+        <div class="pl-acts"><button type="button" class="btn sm" data-asave>${t('Save changes')}</button><button type="button" class="ghost sm" data-acancel>${t('Cancel')}</button></div></div></section>`; }
+    const dob = user.dob ? P.date(T.toDate(user.dob), { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+    return `<section class="acct" aria-labelledby="acH"><div class="sec"><h2 id="acH">${t('My profile')}</h2><button type="button" class="ghost sm" data-aedit>${t('Edit')}</button></div>
+      <dl class="dl"><dt>${t('First name')}</dt><dd>${esc(user.first || '—')}</dd><dt>${t('Last name')}</dt><dd>${esc(user.last || '—')}</dd>
+      <dt>${t('Email')}${LOCK}</dt><dd>${esc(user.email)}</dd><dt>${t('Date of birth')}</dt><dd>${dob}</dd>
+      <dt>${t('Gender')}</dt><dd>${user.gender ? gname(user.gender) : '—'}</dd><dt>${t('Phone')}${LOCK}</dt><dd>${phoneTxt(user.phone)}</dd></dl>
+      <p class="meta lk-note">${LOCK}${t("Email and phone can't be changed here. Contact us to update them.")}</p>
+      <button type="button" class="ghost out" data-out>${t('Sign out')}</button></section>`;
+  }
+
+  function paint(){
+    document.title = `${t('My account')} · SFA Domes`;
+    if (!user){
+      root.innerHTML = `<section class="in gate" style="padding-top:calc(var(--nav) + 64px)"><h1>${t('My account')}</h1><p class="meta">${t('Sign in to see your tickets and saved courts.')}</p><button type="button" class="btn" data-signin>${t('Sign in')}</button></section>`;
+      return;
+    }
+    const cur = tab(), nUp = upItems(all()).length;
+    const since = user.since ? t('Member since {date}', { date: P.date(new Date(user.since), 'month') }) : '';
+    root.innerHTML = `<section class="pf-head"><div class="in"><div class="who"><span class="av" aria-hidden="true">${esc(initials(user))}</span>
+        <p class="eye">${t('My account')}</p><h1>${esc(user.name)}</h1><p class="meta">${esc(user.email)}${since ? ' · ' + since : ''}</p></div>
+        <div class="tabs" role="tablist" aria-label="${t('My account')}">${[['tickets', 'My tickets', nUp], ['saved', 'Saved courts', favs.length], ['people', 'My children', people.length], ['account', 'My profile']].map(([k, l, n]) =>
+          `<button type="button" class="tab" role="tab" id="tab-${k}" aria-controls="panel" aria-selected="${k === cur}" data-tab="${k}">${t(l)}${n !== undefined ? `<b>${n}</b>` : ''}</button>`).join('')}</div></div></section>
+      <section class="in panel" id="panel" role="tabpanel" aria-labelledby="tab-${cur}">${cur === 'tickets' ? tickets() : cur === 'saved' ? saved() : cur === 'people' ? children() : account()}</section>`;
+    T.paintQR(root); A.paintFavs?.();
+  }
+
+  function openTicket(id){
+    const x = all().find(y => y.s.id === id); if (!x) return;
+    dlg.innerHTML = `<div class="dlg-top"><h2 id="dlgH">${t('Ticket')}</h2><button type="button" class="x" data-close aria-label="${t('Close')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="dlg-body">${T.ticket(x.s, x.b)}<div class="dlg-acts"><a class="ghost" href="${T.ics(x.b)}" download="${T.icsName(x.b)}">${CAL}${t('Add to calendar')}</a><a class="ghost" href="${T.DIRECTIONS}" target="_blank" rel="noopener">${PIN}${t('Get directions')}</a><a class="ghost" href="result.html?cart=${encodeURIComponent(x.b.cartId)}">${t('Booking details')}</a></div></div>`;
+    dlg.dir = document.documentElement.dir; dlg.showModal(); T.paintQR(dlg);
+  }
+
+  const v = id => (document.getElementById(id) || {}).value || '';
+  // keep what's typed while the form re-renders
+  const keepChild = () => pform && Object.assign(pform, { first: v('cF'), last: v('cL'), dob: v('cD') });
+  const keepAcct = () => aform && Object.assign(aform, { first: v('aF'), last: v('aL'), dob: v('aD') });
+  const firstBad = () => root.querySelector('.pf.bad input, .pf.bad button')?.focus();
+  const post = async (url, body) => { try { const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }); return { ok: r.ok, d: await r.json().catch(() => ({})) }; } catch (e) { return { ok: false, d: { error: 'Could not reach the server. Try again.' } }; } };
+  root.addEventListener('click', async e => {
+    const el = e.target.closest('[data-tab],[data-seg],[data-kind],[data-open],[data-out],[data-signin],[data-padd],[data-pedit],[data-pcancel],[data-psave],[data-gen],[data-rm],[data-rm-yes],[data-rm-no],[data-aedit],[data-acancel],[data-asave],[data-group],[data-back]'); if (!el) return;
+    if (el.dataset.group){ location.hash = '#tickets/' + encodeURIComponent(el.dataset.group); scrollTo({ top: 0 }); return; }
+    if (el.hasAttribute('data-back')){ e.preventDefault(); location.hash = '#tickets'; return; }
+    if (el.dataset.kind){ kind = el.dataset.kind; paint(); root.querySelector(`[data-kind="${kind}"]`)?.focus(); return; }
+    // children
+    if (el.hasAttribute('data-padd')){ removing = null; pform = { mode: 'add', first: '', last: '', dob: '', gender: '' }; paint(); document.getElementById('cF').focus(); return; }
+    if (el.dataset.pedit){ const x = people.find(y => y.id === el.dataset.pedit); if (!x) return; removing = null;
+      pform = { mode: 'edit', id: x.id, was: x.name, first: x.first || '', last: x.last || '', dob: x.dob, gender: x.gender }; paint(); document.getElementById('cF').focus(); return; }
+    if (el.hasAttribute('data-pcancel')){ const id = pform && pform.id; pform = null; paint(); root.querySelector(id ? `[data-pedit="${id}"]` : '[data-padd]')?.focus(); return; }
+    if (el.dataset.gen && el.closest('#cGF')){ keepChild(); pform.gender = el.dataset.gen; if (pform.errors) delete pform.errors.gender; paint(); root.querySelector(`#cGF [data-gen="${pform.gender}"]`).focus(); return; }
+    if (el.hasAttribute('data-psave')){ keepChild();
+      const c = { first: pform.first.trim(), last: pform.last.trim(), dob: pform.dob, gender: pform.gender }, errs = window.SFA_CHILD_ERRORS(c);
+      if (Object.keys(errs).length){ pform.errors = errs; paint(); return firstBad(); }
+      const edit = pform.mode === 'edit', r = await post('/api/auth/participants', edit ? { edit: pform.id, ...c } : { add: c });
+      if (!r.ok){ pform.errors = r.d.errors || { _: r.d.error || 'Something went wrong. Try again.' }; paint(); return firstBad(); }
+      const name = window.SFA_FULL_NAME(c), id = pform.id; people = r.d.participants; pform = null; paint(); ping();
+      A.toast(t(edit ? '{name} updated' : '{name} added', { name })); root.querySelector(id ? `[data-pedit="${id}"]` : '[data-padd]')?.focus(); return; }
+    if (el.dataset.rm){ pform = null; removing = el.dataset.rm; paint(); root.querySelector('[data-rm-no]')?.focus(); return; }
+    if (el.hasAttribute('data-rm-no')){ const id = removing; removing = null; paint(); root.querySelector(`[data-rm="${id}"]`)?.focus(); return; }
+    if (el.dataset.rmYes){ const x = people.find(y => y.id === el.dataset.rmYes), r = await post('/api/auth/participants', { remove: el.dataset.rmYes });
+      if (r.ok){ people = r.d.participants; ping(); } removing = null; paint(); if (r.ok && x) A.toast(t('{name} removed', { name: x.name })); (root.querySelector('[data-padd]') || root.querySelector('#plH'))?.focus?.(); return; }
+    // my profile
+    if (el.hasAttribute('data-aedit')){ aform = { first: user.first || '', last: user.last || '', dob: user.dob || '', gender: user.gender || '' }; paint(); document.getElementById('aF').focus(); return; }
+    if (el.hasAttribute('data-acancel')){ aform = null; paint(); root.querySelector('[data-aedit]')?.focus(); return; }
+    if (el.dataset.gen && el.closest('#aGF')){ keepAcct(); aform.gender = el.dataset.gen; if (aform.errors) delete aform.errors.gender; paint(); root.querySelector(`#aGF [data-gen="${aform.gender}"]`).focus(); return; }
+    if (el.hasAttribute('data-asave')){ keepAcct();
+      const r = await post('/api/auth/profile', { first: aform.first, last: aform.last, dob: aform.dob, gender: aform.gender });
+      if (!r.ok){ aform.errors = r.d.errors || { _: r.d.error || 'Something went wrong. Try again.' }; paint(); return firstBad(); }
+      user = r.d.user; people = user.participants || people; aform = null; paint(); A.toast(t('Profile updated')); root.querySelector('[data-aedit]')?.focus(); return; }
+    if (el.dataset.tab){ pform = null; aform = null; removing = null; history.replaceState(null, '', '#' + el.dataset.tab); paint(); document.getElementById('tab-' + el.dataset.tab)?.focus(); }
+    else if (el.dataset.seg){ seg = el.dataset.seg; paint(); }
+    else if (el.dataset.open) openTicket(el.dataset.open);
+    else if (el.hasAttribute('data-out')) A.signOut();
+    else if (el.hasAttribute('data-signin')) A.open({ view: 'login' });
+  });
+  // arrow keys move between tabs
+  root.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.closest('.pl-form input')){ e.preventDefault(); root.querySelector('[data-psave],[data-asave]')?.click(); } });
+  root.addEventListener('input', e => { const f = e.target.closest('.pf'); if (f) f.classList.remove('bad'); });
+  root.addEventListener('keydown', e => {
+    const b = e.target.closest('.tab'); if (!b || !['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    const i = TABS.indexOf(b.dataset.tab), dir = (e.key === 'ArrowRight') !== (document.documentElement.dir === 'rtl') ? 1 : -1;
+    location.hash = TABS[(i + dir + TABS.length) % TABS.length];
+  });
+  dlg.addEventListener('click', e => { if (e.target === dlg || e.target.closest('[data-close]')) dlg.close(); });
+  addEventListener('hashchange', paint);
+  addEventListener('sfa:prefs', paint);
+
+  async function load(){
+    user = await A.me();
+    if (user){
+      const [b, f] = await Promise.all([fetch('/api/auth/bookings').then(r => r.json()).catch(() => ({})), fetch('/api/auth/favorites').then(r => r.json()).catch(() => ({}))]);
+      bookings = b.bookings || []; favs = f.favorites || []; people = user.participants || [];
+    }
+    paint();
+  }
+  addEventListener('sfa:auth', load);
+  load();
+})();
+</script>
+</body>
+</html>

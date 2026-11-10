@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Court details (R · Airbnb + Klook) · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600&family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/court-details.css">
+<style>
+/* Q · Klook activity page: breadcrumb, a wide photo, then two columns — the title with badges and quick facts
+   (open today, slot length, address) on the left, a sticky "From" price card on the right. Section tabs stick under
+   the bar and follow the scroll. Booking is a package card: court chips, a row of days, priced times, and the total
+   with Book now at the card's foot. Then highlights, details, location and FAQ, all in the left column. */
+.kl{padding-top:calc(90px + 20px);background:var(--bg)}
+.kl-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 16px;font-size:var(--fs-14);color:var(--ink-3)}
+.kl-crumbs a{color:var(--ink);text-decoration:none}
+.kl-crumbs a:hover{color:var(--brand)}
+.kl-crumbs svg{width:14px;height:14px}
+.kl-photo{aspect-ratio:21/8;margin:0 0 28px}
+.kl-cols{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:clamp(24px,3vw,48px);align-items:start}
+.kl-main{min-width:0}
+.kl-head h1{font:var(--ts-title-l);margin:0;text-transform:var(--type-case-title)}
+.kl-head .eyebrow{font-size:var(--fs-16)}
+.kl-badges{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;padding:0;list-style:none}
+.kl-badges li{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;background:var(--color-bg-secondary);color:var(--color-content-secondary);font:var(--ts-body-s)}
+.kl-badges svg{width:14px;height:14px}
+.kl-facts{display:grid;gap:14px;margin:22px 0 0;padding:0;list-style:none}
+.kl-facts li{display:flex;gap:12px;align-items:flex-start;font-size:var(--fs-16);line-height:22px}
+.kl-facts li>svg{flex:none;width:22px;height:22px;margin-top:1px;color:var(--ink)}
+.kl-facts small{font:var(--ts-body-s);display:block;color:var(--ink-3)}
+.kl-facts b{font-weight:600}
+.kl-hours{display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;color:var(--color-content-primary);font:inherit;font-weight:var(--type-w-body-bold);cursor:pointer;text-decoration:underline;text-decoration-color:var(--color-border-secondary);text-underline-offset:4px}
+.kl-hours svg{width:16px;height:16px}
+.kl-hours:hover{text-decoration-color:currentColor}
+html[dir=rtl] .kl-crumbs svg,html[dir=rtl] .kl-hours svg{transform:scaleX(-1)}
+.kl-facts a{color:var(--ink);text-underline-offset:3px}
+.kl-facts a:hover{color:var(--brand)}
+/* section tabs: stick under the site bar (or at the top while the bar is hidden) */
+.kl-tabs{position:sticky;top:90px;z-index:20;margin:28px 0 0;background:var(--bg);border-bottom:1px solid var(--line-strong);transition:top .45s var(--ease)}
+body.kl-away .kl-tabs{top:0}
+.kl-tabs div{display:flex;gap:clamp(16px,2.4vw,32px);overflow-x:auto;scrollbar-width:none}
+.kl-tabs div::-webkit-scrollbar{display:none}
+.kl-tabs a{font:var(--ts-label-m);flex:none;display:flex;align-items:center;height:52px;border-bottom:3px solid transparent;margin-bottom:-1px;color:var(--ink-3);text-decoration:none;text-transform:var(--type-case-label)}
+.kl-tabs a:hover{color:var(--ink)}
+.kl-tabs a.on{color:var(--ink);border-bottom-color:var(--brand)}
+.kl-sec{padding:clamp(36px,6vh,56px) 0 0;scroll-margin-top:150px}
+.kl-h{font:var(--ts-title-s);display:flex;align-items:center;gap:12px;margin:0 0 20px;text-transform:var(--type-case-title)}
+.kl-h::before{content:"";flex:none;width:4px;height:20px;background:var(--color-border-strong)}
+/* package card */
+.kl-courts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.kl-courts a{display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1px solid var(--line-strong);background:var(--bg);color:var(--ink);text-decoration:none;font-size:var(--fs-14);font-weight:600}
+.kl-courts a:hover{border-color:var(--ink)}
+.kl-courts a[aria-current]{border-color:var(--brand);background:var(--brand-50,#FFF1EA);color:var(--brand)}
+.kl-pk{border:1px solid var(--brand);background:var(--bg)}
+.kl-pk-head{display:flex;justify-content:space-between;gap:16px;padding:20px 22px;border-bottom:1px solid var(--line)}
+.kl-pk-head h3{font:var(--ts-label-l);text-transform:var(--type-case-label);margin:0;color:var(--brand)}
+.kl-pk-head p{margin:4px 0 0;font-size:var(--fs-14);color:var(--ink-3)}
+.kl-ticks{display:flex;flex-wrap:wrap;gap:6px 16px;margin:12px 0 0;padding:0;list-style:none;font-size:var(--fs-14);color:var(--ink-2)}
+.kl-ticks li{display:inline-flex;align-items:center;gap:6px}
+.kl-ticks svg{width:15px;height:15px;color:var(--ink)}
+.kl-pk-price{flex:none;margin:0;text-align:end;font-size:var(--fs-14);color:var(--ink-3)}
+.kl-pk-price b{font:var(--ts-number-s);display:block;color:var(--ink)}
+.kl-pk-price b small{font-size:var(--fs-14);font-weight:500;color:var(--ink-3)}
+.kl-pk .booking{padding:20px 22px 8px;scroll-margin-top:150px}
+.kl-pk .step-head{border:0;padding:0;margin:0 0 12px}
+.kl-pk .step-head h2{font:var(--ts-body-m-bold);color:var(--ink-3)}
+.kl-pk .legend,.kl-pk .step-note,.kl-pk .cal-key{display:none}
+.kl-pk .panel{padding:0;border:0}
+.kl-pk .cal-month{font-size:var(--fs-18)}
+.kl-pk .slots-day{font-size:var(--fs-16)}
+.kl-foot .summary{position:static;border:0;border-top:1px solid var(--line);background:var(--bg-soft)}
+.kl-foot .sum-body{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 20px;align-items:center;padding:16px 22px}
+.kl-foot .sum-title,.kl-foot .sum-rows{display:none}
+.kl-foot #sumDays{grid-column:1/-1}
+.kl-foot .sum-empty{margin:0 0 12px;padding:0;border:0;text-align:start}
+.kl-foot .sum-days{max-height:220px;margin-bottom:12px}
+.kl-foot .sum-total{margin:0;padding:0;border:0;justify-content:flex-start;gap:10px}
+.kl-foot .sum-total strong{font-size:var(--fs-32)}
+.kl-foot .book{width:auto;height:52px;font-size:var(--fs-20)}
+/* highlights, details, location */
+.kl .about-feats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.kl .about-feats li{padding:16px;border:1px solid var(--line);font-size:var(--fs-16);line-height:22px;color:var(--ink)}
+.kl .about-feats svg{width:24px;height:24px}
+.kl .about-lead{margin:0 0 20px}
+.kl .about-stats{margin:0}
+.kl .loc-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
+.kl .loc-map{min-height:280px}
+.kl-faq{padding-bottom:clamp(56px,10vh,96px)}
+/* the sticky price card */
+.kl-side{position:sticky;top:160px;display:grid;gap:12px}
+body.kl-away .kl-side{top:72px}
+.kl-card{padding:22px;border:1px solid var(--line-strong);background:var(--bg);box-shadow:0 14px 34px -26px rgba(9,9,11,.45)}
+/* price with the heart and share beside it, then a full-width button */
+.kl-card .hero-book{margin:0;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:16px 8px}
+.kl-card .hero-actions{display:contents}
+.kl-card .hero-actions .cta{grid-column:1/-1;justify-content:center;padding:0 16px}
+/* Q: the price card hides while the Book tab is on */
+body.kl-in-book .kl-card{display:none}
+.kl-note{display:flex;align-items:center;gap:12px;padding:16px 22px;border:1px solid var(--line-strong);font-size:var(--fs-14);font-weight:600}
+.kl-note svg{flex:none;width:20px;height:20px;color:var(--color-content-secondary)}
+@media (max-width:1023px){
+  .kl-cols{grid-template-columns:minmax(0,1fr)}
+  .kl-side{display:none}
+  .kl-photo{aspect-ratio:16/9;margin-inline:calc(var(--gutter) * -1)}
+  .kl{padding-top:calc(90px + 16px)}
+}
+@media (max-width:640px){
+  .kl{padding-top:90px}
+  .kl-crumbs{display:none}
+  .kl-photo{margin-bottom:20px}
+}
+@media (max-width:640px){
+  .kl-pk-head{flex-direction:column}
+  .kl-courts{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter)}
+  .kl-courts::-webkit-scrollbar{display:none}
+  .kl-courts a{flex:none}
+  .kl-pk-price{text-align:start}
+  .kl-pk-head,.kl-pk .booking,.kl-foot .sum-body{padding-inline:16px}
+  .kl .about-feats,.kl .loc-grid{grid-template-columns:minmax(0,1fr)}
+  .kl-foot .sum-total strong{font-size:var(--fs-28)}
+  .kl-foot .book{padding:0 16px;font-size:var(--fs-18)}
+}
+
+/* R · F1 + Q: Q's top and price card; F1's sections, copy and month calendar; bar on the first pick */
+.r-kind{font:var(--ts-title-m);text-transform:var(--type-case-title);margin:0}
+.r-kind + p{margin:4px 0 20px;color:var(--ink-2)}
+.v-r .about-feats{grid-template-columns:minmax(0,1fr);gap:16px}
+.v-r .about-feats li{padding:0;border:0}
+.v-r .about-feats svg{width:26px;height:26px;color:var(--ink)}
+.v-r .about-lead{margin:20px 0 0;max-width:62ch}
+.v-r .booking{padding:clamp(36px,6vh,56px) 0 0;scroll-margin-top:150px}
+.v-r .booking .step-head h2{font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.v-r .booking .step-head h2::before{content:"";display:inline-block;width:5px;height:26px;margin-inline-end:12px;vertical-align:-4px;background:var(--brand)}
+.r-sum{display:none}
+@media (max-width:640px){.v-r .booking .step-head{flex-direction:column;align-items:flex-start;gap:12px}}
+
+/* desktop: the bottom booking bar (as on phones) slides up once a time is picked */
+@media (min-width:1024px){
+  body.v-r .go{display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;transform:translateY(105%);transition:transform .5s var(--ease);background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);box-shadow:0 -12px 32px -24px rgba(9,9,11,.4)}
+  body.v-r .go .inner{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:88px;padding-block:14px}
+  body.v-r .go-pick small{display:block;font-size:var(--fs-14);line-height:18px;color:var(--ink-3)}
+  body.v-r .go-pick strong{font:var(--ts-title-l);text-transform:var(--type-case-title);display:block}
+  body.v-r .go .book{width:auto;height:56px}
+  body.v-r .go.on{transform:none}
+  body.v-r.has-picks .faq{padding-bottom:140px}
+}
+</style>
+</head>
+<body class="v-r">
+<div data-site-nav></div>
+
+<main>
+<div class="kl">
+  <div class="inner">
+    <nav class="kl-crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="courts.html" id="klSportLink"></a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span id="klCrumb"></span></nav>
+    <figure class="about-media kl-photo"><img id="aboutImg" src="" alt=""></figure>
+    <div class="kl-cols">
+      <div class="kl-main">
+        <header class="kl-head about" id="overview" aria-labelledby="courtName" style="padding:0;border:0;background:none">
+          <p class="eyebrow lbl" id="eyebrow"></p>
+          <h1 id="courtName"></h1>
+          <p class="hero-sub" id="heroSub"></p>
+          <ul class="kl-badges"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M4 20V10l8-6 8 6v10"/><path d="M9 20v-6h6v6"/></svg><span>Indoor</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Free balls and bibs</span></li></ul>
+          <ul class="kl-facts">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><div><button class="kl-hours" id="klHours" type="button" aria-haspopup="dialog" aria-controls="hoursPop"><span>Open today</span><span aria-hidden="true">·</span><span id="klHoursTime" dir="ltr"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button><small>Tap for every day's hours</small></div></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M10 2h4M12 14V9"/><circle cx="12" cy="14" r="8"/></svg><div><b>1.5-hour slots</b><small>Book as many days and slots as you like, up to 3 months ahead.</small></div></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg><div><a href="#loc">SFA Domes Dammam, Dammam, Saudi Arabia</a></div></li>
+          </ul>
+        </header>
+
+        <nav class="kl-tabs" aria-label="Page sections"><div id="klTabs"><a href="#overview">Overview</a><a href="#about">About the court</a><a href="#offers">Details</a><a href="#book">Book</a><a href="#loc">Location</a><a href="#faq">FAQ</a></div></nav>
+
+        <section class="kl-sec about" id="about" aria-labelledby="aboutH" style="padding-inline:0;padding-bottom:0;border:0;background:none">
+          <h2 class="kl-h" id="aboutH">About the court</h2>
+          <p class="r-kind">Indoor court in SFA Domes Dammam</p><p>Artificial grass · Adults 5v5/6v6 · Youth 6v6 · 7v7</p>
+          <ul class="about-feats">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M7 3v5a5 5 0 0 0 10 0V3"/><path d="M12 13v8M8 21h8"/></svg><span>Clubhouse washrooms and showers for men and women</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><path d="M10 16V8h3a2.5 2.5 0 0 1 0 5h-3"/></svg><span>250 parking spots</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m6.5 6.5 11 11"/></svg><span>Cleats are not allowed on the artificial grass</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M3 4h18"/><path d="M5 4v16c3-2 4-6 4-16M19 4v16c-3-2-4-6-4-16"/></svg><span>Can be covered by curtains for privacy</span></li>
+          </ul>
+          <p class="about-lead" id="aboutLead"></p>
+        </section>
+
+        <section class="kl-sec" id="offers" aria-labelledby="offersH">
+          <h2 class="kl-h" id="offersH">What this court offers</h2>
+          <dl class="about-stats">
+            <div><dt>Type</dt><dd id="stType"></dd></div>
+            <div><dt>Surface</dt><dd>Artificial grass</dd></div>
+            <div class="st-wide"><dt>Ideal for</dt><dd>Adults 5v5/6v6 · Youth 6v6 · 7v7</dd></div>
+            <div><dt>Setting</dt><dd>Indoor</dd></div>
+            <div class="st-hours" id="stHoursBtn" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="hoursPop"><dt>Open today</dt><dd><span id="stHours" dir="ltr"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></dd></div>
+          </dl>
+        </section>
+
+        <section class="booking" id="book" aria-labelledby="dayTitle">
+        <section class="step">
+          <div class="step-head"><h2 id="dayTitle">Days &amp; times</h2>
+            <div class="legend" aria-hidden="true"><span><i></i>Free</span><span><i class="pk"></i>Picked</span><span><i class="bk"></i>Booked</span></div>
+          </div>
+          <p class="step-note">1.5-hour slots. Tap a day to open its times. Book as many days and slots as you like, up to 3 months ahead.</p>
+          <div class="panel cal">
+            <div class="cal-head">
+              <p class="cal-month" id="calMonth" aria-live="polite"></p>
+              <div class="cal-nav"><button class="arrow" id="calPrev" type="button" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button><button class="arrow" id="calNext" type="button" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button></div>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-key" aria-hidden="true"><span><i class="k-pick"></i>Has times picked</span><span><i class="k-act"></i>Open day</span></div>
+          </div>
+        </section>
+        </section>
+
+        <section class="kl-sec" id="loc" aria-labelledby="locTitle">
+          <h2 class="kl-h" id="locTitle">Where you'll play</h2>
+        <div class="loc-grid">
+          <div class="loc-card">
+            <p class="loc-name">SFA Domes Dammam</p>
+            <p class="loc-city">Dammam, Saudi Arabia</p>
+            <ul class="loc-list">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1"/></svg><a href="tel:+966537448666" dir="ltr">+966 53 744 8666</a></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:Domes.info@sfa.sa">Domes.info@sfa.sa</a></li>
+            </ul>
+            <a class="loc-btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=26.4047835,50.0250094" target="_blank" rel="noopener"><span>Directions</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+          </div>
+          <div class="loc-map" id="locMap">
+            <iframe title="Map showing SFA Domes in Dammam" src="https://www.google.com/maps/embed?origin=mfe&amp;pb=!1m3!2m1!1s26.4047835,50.0250094!6i15" loading="lazy" referrerpolicy="no-referrer-when-downgrade" tabindex="-1"></iframe>
+            <button class="loc-cover" type="button"><span>Click to explore the map</span></button>
+          </div>
+        </div>
+        </section>
+
+        <section class="kl-sec kl-faq" id="faq" aria-labelledby="faqTitle">
+          <h2 class="kl-h" id="faqTitle">Things to know</h2>
+        <div class="faq-list">
+        <details class="faq-item"><summary><span>How long is a booking?</span><i aria-hidden="true"></i></summary><p>Courts are booked in 1.5-hour slots. Pick as many slots and days as you like, up to 3 months ahead.</p></details>
+        <details class="faq-item"><summary><span>Do I need an account to book?</span><i aria-hidden="true"></i></summary><p>Yes. Sign in or create an account when you continue to booking. It only takes a minute, and your details fill in at checkout.</p></details>
+        <details class="faq-item"><summary><span>Can I book for someone else?</span><i aria-hidden="true"></i></summary><p>Yes. At checkout, choose "Someone else" under Booking for and add the player's name and mobile number.</p></details>
+        <details class="faq-item"><summary><span>What should I bring?</span><i aria-hidden="true"></i></summary><p>Sportswear and the right shoes for the court. The clubhouse has washrooms and showers for men and women.</p></details>
+        <details class="faq-item"><summary><span>When should I arrive?</span><i aria-hidden="true"></i></summary><p>Check in at the front desk a few minutes before your slot. You'll be on the court in minutes.</p></details>
+        <details class="faq-item"><summary><span>What are the court hours?</span><i aria-hidden="true"></i></summary><p>Sunday to Wednesday 9 AM to 12 AM, Thursday 9 AM to 1 AM, Friday 8 AM to 1 AM, and Saturday 8 AM to 12 AM.</p></details>
+        <details class="faq-item"><summary><span>Is there parking?</span><i aria-hidden="true"></i></summary><p>Yes, SFA Domes Dammam has 250 parking spots.</p></details>
+        <details class="faq-item"><summary><span>Can I pay by cash?</span><i aria-hidden="true"></i></summary><p>No. All payments must be made upon booking through the SFA App, with the provision of multiple online payment options.</p></details>
+        <details class="faq-item"><summary><span>What are the dimensions of the fields/courts?</span><i aria-hidden="true"></i></summary><p>The dimensions of all courts are set to professional standards. By selecting a court type, the accompanying description can assist you in determining the number of players allowed.</p></details>
+        <details class="faq-item"><summary><span>Do I have to bring my own balls/equipment? Is there equipment that can be rented?</span><i aria-hidden="true"></i></summary><p>Free balls and bibs are provided for each booking.</p></details>
+        <details class="faq-item"><summary><span>Which currency will I pay in?</span><i aria-hidden="true"></i></summary><p>All prices are in Saudi riyals (SAR), and that is what you pay.</p></details>
+        </div>
+        </section>
+      </div>
+
+      <aside class="kl-side" aria-label="Price">
+        <div class="kl-card">
+          <div class="hero-book">
+            <p class="hero-price"><small>From</small><b id="heroPrice"></b></p>
+            <div class="hero-actions"><span id="heroFav"></span><button class="share" id="shareBtn" type="button" aria-label="Share" title="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v9h14v-9"/></svg></button><button class="cta" type="button" data-book><span>Check availability</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></button></div>
+          </div>
+        </div>
+        <p class="kl-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Free balls and bibs with every booking.</span></p>
+      </aside>
+    </div>
+    <div class="r-sum">
+      <aside class="summary" aria-label="Booking summary">
+        <div class="sum-body">
+          <p class="sum-title">Your booking <span id="sumCount"></span></p>
+          <div id="sumDays"></div>
+          <dl class="sum-rows" id="sumRows"></dl>
+          <div class="sum-total"><small>Total</small><strong id="sumTotal"></strong></div>
+          <button class="book" id="bookBtn" type="button" disabled>Pick a time</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+  <div class="hrs-pop" id="hoursPop" role="dialog" aria-modal="true" aria-labelledby="hoursPopTitle" hidden>
+    <div class="hrs-back" data-close></div>
+    <div class="hrs-card">
+      <div class="hrs-head"><h3 id="hoursPopTitle">Court hours</h3><button class="hrs-x" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <dl id="hoursPopList"></dl>
+    </div>
+  </div>
+</main>
+
+<div class="go" id="go">
+  <div class="inner">
+    <div class="go-pick"><small id="goWhen"></small><strong id="goTotal"></strong></div>
+    <button class="book" id="goBtn" type="button" disabled>Pick a time</button>
+  </div>
+</div>
+
+<script src="f/site-nav.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script>
+// R · breadcrumb, the "Open today" fact and the section tabs (as on Q)
+(() => {
+  const S = window.SFA_SPORTS, P = window.SFA_PREFS, t = P.t, q = new URLSearchParams(location.search);
+  const cur = S[q.get('sport')] ? q.get('sport') : 'basketball', courts = S[cur].courts;
+  const ci = Math.min(Math.max(+q.get('court') || 0, 0), courts.length - 1);
+  const $ = id => document.getElementById(id);
+  const paint = () => {
+    $('klSportLink').textContent = t(S[cur].name); $('klSportLink').href = `courts.html?sport=${cur}`;
+    $('klCrumb').textContent = t(courts[ci][0]);
+    $('klHoursTime').textContent = $('stHours').textContent;
+  };
+  $('klHours').addEventListener('click', () => $('stHoursBtn').click());
+  addEventListener('DOMContentLoaded', () => { paint(); addEventListener('sfa:prefs', () => setTimeout(paint)); });
+  // tabs follow the scroll; they (and the price card) move up while the site bar is hidden
+  const tabs = [...document.querySelectorAll('#klTabs a')], secs = tabs.map(a => document.querySelector(a.getAttribute('href')));
+  let tick = false;
+  const spy = () => {
+    tick = false;
+    const hdr = document.querySelector('.hdr-cn'); document.body.classList.toggle('kl-away', !!hdr && hdr.classList.contains('hq-away'));
+    let on = 0; secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top < 200) on = i; });
+    tabs.forEach((a, i) => a.classList.toggle('on', i === on));
+  };
+  addEventListener('scroll', () => { if (!tick){ tick = true; requestAnimationFrame(spy); } }, { passive: true });
+  addEventListener('DOMContentLoaded', spy);
+})();
+</script>
+<script src="f/court-details.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option H</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option H · Calendar: the booked days are marked on a month calendar, so a 12-session program or a multi-day court booking shows its rhythm at a glance; tap a day to see its ticket beside it. Payment and actions sit underneath.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,420px) minmax(0,1fr)}
+.h-cal{display:grid;gap:16px;animation:up .7s var(--ease) .1s both}
+.h-mo{background:var(--color-bg-primary);border:1px solid var(--color-border-primary);padding:20px}
+.h-mo h2{margin:0 0 12px;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.h-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.h-g .wk{display:grid;place-items:center;height:28px;font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.h-g span.d,.h-g button{display:grid;place-items:center;aspect-ratio:1;font:var(--ts-label-m);font-variant-numeric:tabular-nums}
+.h-g span.d{color:var(--color-content-tertiary)}
+.h-g button{position:relative;border:1px solid var(--color-brand);background:var(--color-bg-accent-subtle);cursor:pointer}
+.h-g button i{position:absolute;bottom:3px;width:4px;height:4px;background:var(--color-brand)}
+.h-g button[aria-pressed=true]{background:var(--color-brand);color:var(--neutral-0)}
+.h-g button[aria-pressed=true] i{background:var(--neutral-0)}
+.h-key{display:flex;gap:16px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.h-key span{display:inline-flex;align-items:center;gap:8px}
+.h-key i{width:14px;height:14px;border:1px solid var(--color-brand);background:var(--color-bg-accent-subtle)}
+.h-side{display:grid;gap:16px;align-content:start;animation:up .7s var(--ease) .2s both}
+.h-day{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.h-tix{display:grid;gap:16px}
+.h-bot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1100px){.h-bot{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:960px){body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option H · Calendar</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m, P = window.SFA_PREFS, T = window.SFA_TICKETS;
+    const days = [...new Set(m.list.map(s => s.date))], months = [...new Set(days.map(d => d.slice(0, 7)))];
+    const wk = Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(P.lang === 'ar' ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB', { weekday: 'narrow' }).format(new Date(2024, 0, 7 + i)));
+    const month = mk => { const [y, mo] = mk.split('-').map(Number), first = new Date(y, mo - 1, 1).getDay(), n = new Date(y, mo, 0).getDate();
+      return `<section class="h-mo"><h2>${P.date(new Date(y, mo - 1, 1), 'month')}</h2><div class="h-g">${wk.map(w => `<span class="wk" aria-hidden="true">${w}</span>`).join('')}${'<span></span>'.repeat(first)}${Array.from({ length: n }, (_, i) => { const k = `${mk}-${String(i + 1).padStart(2, '0')}`;
+        return days.includes(k) ? `<button type="button" data-d="${k}" aria-pressed="${k === days[0]}" aria-label="${P.date(T.toDate(k), 'long')}">${i + 1}<i aria-hidden="true"></i></button>` : `<span class="d">${i + 1}</span>`; }).join('')}</div></section>`; };
+    return `<div class="h-cal">${months.map(month).join('')}<p class="h-key"><span><i aria-hidden="true"></i>${t('{n} sessions', { n: m.count })}</span><span>${m.when}</span></p></div>
+      <div class="h-side"><h2 class="h-day" id="hDay"></h2><div class="h-tix" id="hTix"></div>
+        <div class="h-bot"><div class="box"><h2>${t(m.b.free ? 'Summary' : 'Payment')}</h2>${m.rows}</div>
+          <div class="acts"><a class="btn" href="${acts.tickets}">${t('View my tickets')}${ICON.arrow}</a><a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Add to calendar')}</a><a class="ghost" href="${acts.dir}" target="_blank" rel="noopener">${ICON.pin}${t('Get directions')}</a>${acts.more ? `<a class="more" href="${acts.more.href}">${acts.more.label}</a>` : ''}</div></div></div>`;
+  },
+  after: m => {
+    const T = window.SFA_TICKETS, P = window.SFA_PREFS;
+    const show = k => { document.querySelectorAll('.h-g button').forEach(b => b.setAttribute('aria-pressed', b.dataset.d === k));
+      document.getElementById('hDay').textContent = P.date(T.toDate(k), 'long');
+      const box = document.getElementById('hTix'); box.innerHTML = m.list.filter(s => s.date === k).map(s => m.ticket(s)).join(''); T.paintQR(box); };
+    document.querySelectorAll('.h-g button').forEach(b => b.addEventListener('click', () => show(b.dataset.d)));
+    show(m.list[0].date);
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

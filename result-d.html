@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option D · Wallet: app-style: one big ticket at a time with a large QR to scan at the door; a strip of sessions switches between them. On phones the main actions stay in a bar at the bottom.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,1fr) 360px}
+.d-wal{display:grid;gap:16px;animation:up .7s var(--ease) .1s both;min-width:0}
+.d-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.d-chips::-webkit-scrollbar{display:none}
+.d-chip{flex:none;display:grid;gap:2px;min-width:112px;padding:10px 14px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:inherit;text-align:start;cursor:pointer}
+.d-chip b{font:var(--ts-label-m)}
+.d-chip span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.d-chip[aria-selected=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand)}
+.d-pass{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.d-pass[hidden]{display:none}
+.d-ph{position:relative;min-height:340px;background:var(--color-bg-tertiary);overflow:hidden}
+.d-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.d-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.1),rgba(9,9,11,.85))}
+.d-ph-in{position:absolute;inset:auto 0 0;z-index:1;padding:24px;color:var(--neutral-0);display:grid;gap:8px}
+.d-ph-in small{font:var(--ts-label-s);opacity:.8}
+.d-ph-in h2{margin:0;font:var(--ts-title-l);text-transform:var(--type-case-title)}
+.d-ph-in p{margin:0;font:var(--ts-label-l)}
+.d-ph-in span{font:var(--ts-body-s);opacity:.85}
+.d-scan{display:grid;justify-items:center;align-content:center;gap:12px;padding:32px 24px;text-align:center;border-inline-start:2px dashed var(--color-border-secondary)}
+.d-scan .tk-qr{width:min(220px,100%)}
+.d-scan small{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.d-pg{display:flex;align-items:center;justify-content:space-between;gap:8px;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.d-pg button{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);cursor:pointer}
+.d-pg button:disabled{opacity:.35;cursor:default}
+.d-pg svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .d-pg svg{scale:-1 1}
+.d-bar{display:none}
+@media (max-width:960px){body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){
+  .d-pass{grid-template-columns:minmax(0,1fr)}.d-ph{min-height:200px}
+  .d-scan{border-inline-start:0;border-top:2px dashed var(--color-border-secondary)}
+  .cf-side .acts{display:none}
+  .d-bar{position:fixed;inset:auto 0 0;z-index:40;display:grid;grid-template-columns:minmax(0,1fr) 56px 56px;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--color-bg-primary);border-top:1px solid var(--color-border-primary)}
+  .d-bar .ghost{padding:0;height:56px}
+  body[data-state=paid] .cf{padding-bottom:120px}
+  body[data-state=paid] .opt-tag{bottom:96px}
+}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option D · Wallet</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m;
+    return `<div class="d-wal">
+        <div class="d-chips" role="tablist" aria-label="${t('Your tickets')}">${m.list.map((s, i) => `<button type="button" class="d-chip" role="tab" id="dt${i}" aria-controls="dp${i}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}"><b>${m.date(s, 'short')}</b><span>${m.time(s)}</span></button>`).join('')}</div>
+        ${m.list.map((s, i) => `<article class="d-pass" role="tabpanel" id="dp${i}" aria-labelledby="dt${i}"${i ? ' hidden' : ''}>
+          <div class="d-ph"><img src="${m.D.img}" alt=""><div class="d-ph-in"><small>${s.of > 1 ? t('Session {i} of {n}', { i: s.n, n: s.of }) : t('SFA Domes Dammam')}</small><h2>${esc(m.D.title)}</h2><p>${m.date(s)}<br>${m.time(s)}</p><span>${t('For {name}', { name: s.player ? esc(s.player) : m.who })}</span></div></div>
+          <div class="d-scan"><div class="tk-qr" data-qr="${esc(s.id)}" role="img" aria-label="${t('QR code for {ref}', { ref: esc(s.id) })}"></div><span class="tk-ref">${esc(s.id)}</span><small>${t('Show this at reception')}</small></div></article>`).join('')}
+        <div class="d-pg"><button type="button" data-go="-1" aria-label="${t('Previous ticket')}"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button><span id="dN"></span><button type="button" data-go="1" aria-label="${t('Next ticket')}"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button></div>
+      </div>
+      <aside class="cf-side"><div class="box"><h2>${t(m.b.free ? 'Summary' : 'Payment')}</h2>${m.rows}</div>
+        <div class="acts"><a class="btn" href="${acts.tickets}">${t('View my tickets')}${ICON.arrow}</a><a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Add to calendar')}</a><a class="ghost" href="${acts.dir}" target="_blank" rel="noopener">${ICON.pin}${t('Get directions')}</a>${acts.more ? `<a class="more" href="${acts.more.href}">${acts.more.label}</a>` : ''}</div>
+        <div class="box"><h2>${t('Before you play')}</h2><ul class="tips">${m.tips.map(x => `<li>${x}</li>`).join('')}</ul></div></aside>
+      <div class="d-bar"><a class="btn" href="${acts.tickets}">${t('View my tickets')}</a><a class="ghost" href="${acts.ics}" download="${acts.icsName}" aria-label="${t('Add to calendar')}">${ICON.cal}</a><a class="ghost" href="${acts.dir}" target="_blank" rel="noopener" aria-label="${t('Get directions')}">${ICON.pin}</a></div>`;
+  },
+  after: m => {
+    const tabs = [...document.querySelectorAll('.d-chip')], n = tabs.length, [prev, next] = document.querySelectorAll('.d-pg button');
+    let cur = 0;
+    const go = i => { cur = Math.max(0, Math.min(n - 1, i));
+      tabs.forEach((b, j) => { b.setAttribute('aria-selected', j === cur); b.tabIndex = j === cur ? 0 : -1; document.getElementById('dp' + j).hidden = j !== cur; });
+      tabs[cur].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      document.getElementById('dN').textContent = m.t('Ticket {i} of {n}', { i: cur + 1, n }); prev.disabled = cur === 0; next.disabled = cur === n - 1; };
+    tabs.forEach((b, j) => { b.addEventListener('click', () => go(j)); b.addEventListener('keydown', e => {
+      const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key] * (document.dir === 'rtl' ? -1 : 1); if (d){ e.preventDefault(); go(cur + d); tabs[cur].focus(); } }); });
+    [prev, next].forEach(b => b.addEventListener('click', () => go(cur + +b.dataset.go)));
+    go(0);
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

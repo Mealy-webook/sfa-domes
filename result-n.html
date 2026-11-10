@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option N</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option N · Next session (benchmark: Open, Headspace): the page leads with the session that comes next (Today / Tomorrow / In n days, date, time, where, who) beside "What happens next" in three numbered steps (My tickets, QR on the day, arrive early). Repeating bookings get their schedule week by week, then payment and a "keep playing" band with the next booking.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. No QR codes, directions or cancellation rule on this page. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{display:block}
+.n-wrap{display:grid;gap:clamp(40px,6vh,64px)}
+.n-top{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(20px,3vw,40px);align-items:start}
+.n-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.n-head i{display:grid;place-items:center;width:40px;height:40px;background:var(--color-brand);color:var(--neutral-0)}
+.n-head svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:square}
+.n-head .ref{font:var(--ts-label-m);color:var(--color-content-primary)}
+.n-l{display:grid;gap:20px;animation:up .6s var(--ease) both}
+.n-l h1{font:var(--ts-display-xl);text-transform:var(--type-case-display)}
+.n-next{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.n-ph{position:relative;min-height:100%}
+.n-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.n-in{display:grid;gap:12px;padding:24px}
+.n-in small{font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.n-rel{justify-self:start;padding:4px 10px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-m)}
+.n-rel.later{background:var(--color-content-primary)}
+.n-date{font:var(--ts-display-m);text-transform:var(--type-case-display)}
+.n-time{font:var(--ts-title-s)}
+.n-in dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;margin:8px 0 0;padding-top:16px;border-top:1px solid var(--color-border-primary);font:var(--ts-body-s)}
+.n-in dt{color:var(--color-content-tertiary)}
+.n-in dd{margin:0;font:var(--ts-label-m);overflow-wrap:anywhere}
+.n-acts{display:flex;flex-wrap:wrap;gap:8px}
+.n-acts .ghost{height:56px}
+.n-steps{padding:28px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);animation:up .6s var(--ease) .1s both}
+.n-steps h2,.n-h{margin:0 0 20px;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.n-steps ol{list-style:none;margin:0;padding:0;display:grid;counter-reset:s}
+.n-steps li{position:relative;display:grid;grid-template-columns:40px minmax(0,1fr);gap:16px;padding-bottom:24px}
+.n-steps li:last-child{padding-bottom:0}
+.n-steps li::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:40px;height:40px;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-label-m);position:relative;z-index:1}
+.n-steps li:not(:last-child)::after{content:"";position:absolute;inset-block:40px 0;inset-inline-start:19px;width:2px;background:var(--color-border-primary)}
+.n-steps b{display:block;padding-top:8px;font:var(--ts-label-l)}
+.n-steps span{display:block;margin-top:4px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.n-sch-h{display:flex;align-items:baseline;gap:16px;margin-bottom:16px}
+.n-sch-h .n-h{margin:0}
+.n-sch-h span{margin-inline-start:auto;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.n-weeks{display:grid;gap:8px}
+.n-week{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:center;padding:16px 20px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.n-week > small{font:var(--ts-label-m);color:var(--color-content-secondary)}
+.n-week ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.n-week li{display:grid;gap:2px;min-width:132px;padding:10px 14px;background:var(--color-bg-secondary)}
+.n-week li b{font:var(--ts-label-m)}
+.n-week li span{font:var(--ts-caption);color:var(--color-content-secondary)}
+.n-week li.past{opacity:.5}
+.n-week li.next{background:var(--color-brand);color:var(--neutral-0)}
+.n-week li.next span{color:inherit;opacity:.85}
+.n-bot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:stretch}
+.n-band{display:grid;align-content:space-between;gap:24px;padding:28px;background:var(--color-bg-inverse);color:var(--color-content-inverse);text-decoration:none;transition:background-color .25s}
+.n-band:hover{background:var(--color-brand)}
+.n-band small{font:var(--ts-label-s);opacity:.7}
+.n-band strong{display:flex;align-items:center;justify-content:space-between;gap:16px;font:var(--ts-title-l);text-transform:var(--type-case-title)}
+.n-band svg{width:32px;height:32px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .n-band svg{scale:-1 1}
+@media (max-width:1100px){.n-top{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.n-l h1{font:var(--ts-display-l)}.n-next{grid-template-columns:minmax(0,1fr)}.n-ph{min-height:160px}.n-acts{display:grid}.n-week{grid-template-columns:minmax(0,1fr);gap:8px;padding:16px}.n-week li{min-width:0;flex:1 1 30%}.n-bot{grid-template-columns:minmax(0,1fr)}.n-steps{padding:20px}.n-date{font:var(--ts-title-l)}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option N · Next session</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m, P = window.SFA_PREFS, T = window.SFA_TICKETS, n = m.days.length, s0 = m.days[0];
+    const now = new Date(), key = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`, todayK = key(now);
+    const next = m.days.find(s => s.date >= todayK) || s0, gap = Math.round((T.toDate(next.date) - T.toDate(todayK)) / 864e5);
+    const rel = gap === 0 ? t('Today') : gap === 1 ? t('Tomorrow') : t('In {n} days', { n: gap });
+    const many = T.people(m.b).length > 1;
+    // the schedule, week by week (weeks start on Sunday)
+    const sun = d => { const x = T.toDate(d); x.setDate(x.getDate() - x.getDay()); return key(x); };
+    const weeks = []; m.days.forEach(s => { const k = sun(s.date); let w = weeks.find(x => x.k === k); if (!w) weeks.push(w = { k, list: [] }); w.list.push(s); });
+    const steps = [
+      [t('Open My tickets on {day}', { day: P.date(T.toDate(next.date), 'short') }), t(n > 1 || many ? 'Every session has its own ticket, saved in your profile.' : 'Your ticket is saved in your profile.')],
+      [t('Show the QR code at reception'), t('It works only on the day of the session.')],
+      [t('Arrive by {time}', { time: `<bdi>${P.time(next.start - m.early)}</bdi>` }), m.tips[2]]
+    ];
+    return `<div class="n-wrap">
+      <section class="n-top">
+        <div class="n-l"><div class="n-head"><i>${ICON.check}</i>${m.ref}</div>
+          <h1>${t(m.title)}</h1>
+          <article class="n-next"><div class="n-ph"><img src="${m.D.img}" alt=""></div>
+            <div class="n-in"><small>${t(n > 1 ? 'Next session' : 'Your session')}${n > 1 ? ` · ${t('Session {i} of {n}', { i: next.n, n })}` : ''}</small>
+              <span class="n-rel${gap > 1 ? ' later' : ''}">${rel}</span>
+              <span class="n-date">${P.date(T.toDate(next.date), 'short')}</span><span class="n-time">${m.time(next)}</span>
+              <dl><dt>${t('What')}</dt><dd>${esc(m.D.label)}</dd><dt>${t('Where')}</dt><dd>${m.place}</dd><dt>${t(m.prog ? (many ? 'Participants' : 'Participant') : 'Booked for')}</dt><dd>${m.who}</dd>${m.coach ? `<dt>${t('Coach')}</dt><dd>${esc(m.coach)}</dd>` : ''}</dl></div></article>
+          <div class="n-acts"><a class="btn" href="${acts.tickets}">${t('View my tickets')}${ICON.arrow}</a><a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Add to calendar')}</a></div></div>
+        <aside class="n-steps"><h2>${t('What happens next')}</h2><ol>${steps.map(([b, s]) => `<li><div><b>${b}</b><span>${s}</span></div></li>`).join('')}</ol></aside>
+      </section>
+      ${n > 1 ? `<section><div class="n-sch-h"><h2 class="n-h">${t('Your schedule')}</h2><span>${m.pattern || t('{n} sessions', { n })}</span></div>
+        <div class="n-weeks">${weeks.map((w, i) => `<div class="n-week"><small>${t('Week {n}', { n: i + 1 })}</small><ol>${w.list.map(s => `<li class="${s === next ? 'next' : s.date < todayK ? 'past' : ''}"><b>${P.date(T.toDate(s.date), 'short')}</b><span>${m.pattern ? t('Session {n}', { n: s.n }) : m.time(s)}</span></li>`).join('')}</ol></div>`).join('')}</div></section>` : ''}
+      <section class="n-bot"><div class="box"><h2>${t(m.b.free ? 'Summary' : 'Payment')}</h2>${m.rows}</div>
+        ${acts.more ? `<a class="n-band" href="${acts.more.href}"><small>${t('Keep playing')}</small><strong>${acts.more.label}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></strong></a>` : ''}</section>
+    </div>`;
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

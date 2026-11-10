@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Test payment · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600&family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<style>
+/* Test mode stand-in for the payment gateway (server.js sends Pay here unless PAYMENT_MODE=paytabs).
+   No card fields and no money: the tester picks how the payment ends, and result.html shows it. Light theme, square corners. */
+:root{
+  color-scheme:light;
+  --brand:#FF5A19; --brand-600:#E85217;
+  --bg:#FFFFFF; --bg-soft:#F4F4F5; --line:#E4E4E7; --line-strong:#D4D4D8;
+  --ink:#09090B; --ink-2:#52525B; --ink-3:#71717A;
+  --ok:#16A34A; --ok-600:#15803D; --danger:#DC2626;
+  --test-bg:#FEF3C7; --test-ink:#92400E; --test-line:#F59E0B;
+  --font-display:"Anton","Oswald","Arial Narrow",Impact,sans-serif;
+  --font-label:"Tusker Grotesk","Oswald","Arial Narrow",sans-serif;
+  --font-body:"Montserrat","Tajawal",system-ui,sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{min-height:100svh;background:var(--bg-soft);color:var(--ink);font:400 15px/24px var(--font-body);-webkit-font-smoothing:antialiased}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.sar{display:inline-block;width:.8em;height:.8em;margin-right:3px;background:currentColor;-webkit-mask:url(f/sar.svg) center/contain no-repeat;mask:url(f/sar.svg) center/contain no-repeat}
+
+.tp-prefs{position:fixed;top:56px;inset-inline-end:16px;z-index:5}
+.ribbon{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 16px;background:var(--test-bg);border-bottom:1px solid var(--test-line);color:var(--test-ink);font-family:var(--font-label);font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;text-align:center}
+.ribbon svg{flex:none;width:18px;height:18px}
+
+.card{width:min(100% - 32px,480px);margin:clamp(24px,7vh,72px) auto;background:var(--bg);border:1px solid var(--line);animation:in .5s var(--ease)}
+@keyframes in{from{opacity:0;transform:translateY(14px)}}
+.head{display:flex;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid var(--line)}
+.head img{height:40px;width:auto;display:block}
+.head p{margin:0;font-size:13px;line-height:18px;color:var(--ink-3)}
+.head strong{display:block;font-family:var(--font-label);font-weight:600;font-size:18px;color:var(--ink);text-transform:uppercase}
+.body{padding:24px}
+.amount{margin:0;font-family:var(--font-display);font-weight:400;font-size:56px;line-height:1}
+.desc{margin:8px 0 0;font-size:14px;line-height:20px;color:var(--ink-2)}
+.rows{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:20px 0 0;padding:16px 0 0;border-top:1px solid var(--line);font-size:14px;line-height:20px}
+.rows dt{color:var(--ink-3)}
+.rows dd{margin:0;text-align:end;word-break:break-all}
+.note{margin:20px 0;padding:12px 14px;background:var(--test-bg);border-left:3px solid var(--test-line);font-size:13px;line-height:18px;color:var(--test-ink)}
+.actions{display:grid;gap:8px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;height:56px;border:0;cursor:pointer;font-family:var(--font-label);font-weight:600;font-size:19px;text-transform:uppercase;transition:background-color .25s,color .25s,border-color .25s}
+.btn svg{width:20px;height:20px}
+.approve{background:var(--ok);color:#fff}
+.approve:hover{background:var(--ok-600)}
+.decline{background:var(--bg);color:var(--danger);border:1px solid var(--danger)}
+.decline:hover{background:var(--danger);color:#fff}
+.cancel{height:48px;background:none;color:var(--ink-2);font-size:16px;text-decoration:underline;text-underline-offset:3px}
+.cancel:hover{color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:progress}
+.err{margin:12px 0 0;font-size:14px;color:var(--danger)}
+</style>
+</head>
+<body>
+<div class="tp-prefs"><span data-prefs-slot></span></div>
+<div class="ribbon" role="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 10v5M12 18v.01"/></svg>Test mode · no real payment</div>
+
+<main class="card" id="card">
+  <div class="head"><img src="f/domes-logo-orange.svg" alt="" width="77" height="61"><div><p>Paying</p><strong>SFA Domes Dammam</strong></div></div>
+  <div class="body">
+    <p class="amount" id="amount">…</p>
+    <p class="desc" id="desc"></p>
+    <dl class="rows" id="rows"></dl>
+    <p class="note">This stands in for the payment gateway while the site runs in test mode. No card is needed and nothing is charged. Choose how this payment ends.</p>
+    <div class="actions">
+      <button class="btn approve" type="button" data-o="approve"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Approve payment</button>
+      <button class="btn decline" type="button" data-o="decline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>Decline payment</button>
+      <button class="btn cancel" type="button" data-o="cancel">Cancel and go back</button>
+    </div>
+    <p class="err" id="err" role="alert" hidden></p>
+  </div>
+</main>
+
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const cart = new URLSearchParams(location.search).get('cart');
+  const buttons = [...document.querySelectorAll('.actions .btn')];
+  const fail = msg => { $('err').textContent = msg; $('err').hidden = false; };
+
+  fetch('/api/booking?cart=' + encodeURIComponent(cart || '')).then(r => r.json().then(b => ({ ok: r.ok, b }))).then(({ ok, b }) => {
+    if (!ok) throw new Error(b.error || 'Payment not found.');
+    if (b.status !== 'pending') { location.replace('result.html?cart=' + encodeURIComponent(cart)); return; }
+    const sport = window.SFA_SPORTS[b.order.sport], court = sport && sport.courts[b.order.court];
+    const slots = b.order.days.reduce((a, d) => a + d.starts.length, 0);
+    const P = window.SFA_PREFS;
+    $('amount').innerHTML = `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${(+b.amount).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>`;
+    const prog = b.order.kind === 'program' && window.SFA_PROGRAMS[b.order.program], tx = o => o && (P.lang === 'ar' ? o.ar : o.en);
+    $('desc').textContent = prog
+      ? `${tx(prog.name)} · ${P.t({ trial: 'Free trial', month: 'One month', month2: 'Two months', month3: 'Three months' }[b.order.plan] || 'One month')}${(b.order.participants || []).length > 1 ? ` × ${b.order.participants.length}` : ''}${b.order.kit ? ` · ${tx(window.SFA_PROGRAM_KIT.name)} × ${b.order.kit.qty}` : ''}`
+      : `${sport ? P.t(sport.name) : ''} · ${court ? P.t(court[0]) : ''} · ${P.t('{n} × 1.5 hr', { n: slots })}`;
+    $('rows').innerHTML = `<dt>Order</dt><dd>${esc(b.cartId)}</dd><dt>Test ref</dt><dd>${esc(b.tranRef)}</dd>`;
+  }).catch(e => { fail(e.message); buttons.forEach(x => x.disabled = true); });
+  addEventListener('sfa:prefs', () => location.reload());   // a static page: simplest to redraw from scratch
+
+  buttons.forEach(btn => btn.addEventListener('click', async () => {
+    buttons.forEach(x => x.disabled = true);
+    try {
+      const r = await fetch('/api/test-pay', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ cart, outcome: btn.dataset.o }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || 'Something went wrong.');
+      location.href = d.redirect_url;
+    } catch (e) { fail(e.message); buttons.forEach(x => x.disabled = false); }
+  }));
+})();
+</script>
+</body>
+</html>

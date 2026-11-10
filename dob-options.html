@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Date of birth · options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<style>
+/* Review page: options for the "Date of birth" field (Add a new child, My children, sign-up). Each option is a working
+   field with the real rule: a child must be 6 to 17 on the booking date (today here). The value it produces is the same
+   YYYY-MM-DD the site stores. DS tokens, square corners, 4/8 spacing; inputs match checkout's .field / .input. */
+:root{--ink:var(--color-content-primary);--ink-2:var(--color-content-secondary);--ink-3:var(--color-content-tertiary);--ink-4:var(--color-content-disabled);--line:var(--color-border-primary);--line-strong:var(--color-border-secondary);--bg:var(--color-bg-primary);--bg-soft:var(--color-bg-secondary);--brand:var(--color-brand);--brand-10:var(--color-bg-accent-subtle);--danger:var(--color-danger);--ease:cubic-bezier(.22,1,.36,1)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg-soft);color:var(--ink);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+main{max-width:880px;margin:0 auto;padding:56px 16px 96px}
+h1{margin:0 0 8px;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.lead{margin:0 0 24px;color:var(--ink-2)}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:40px}
+.ctl span{font:var(--ts-label-m);color:var(--ink-2);margin-inline-end:8px}
+.ctl button{height:40px;padding:0 16px;border:1px solid var(--line-strong);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.ctl button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--neutral-0)}
+.opt{margin:0 0 48px}
+.opt-h{display:flex;align-items:center;gap:12px;margin:0 0 4px}
+.opt-h b{display:grid;place-items:center;flex:none;min-width:32px;height:32px;padding:0 8px;background:var(--brand);color:var(--neutral-0);font:var(--ts-label-m)}
+.opt-h.cur b{background:var(--ink)}
+.opt-h strong{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.opt > p{margin:0 0 16px 44px;font:var(--ts-body-s);color:var(--ink-2)}
+[dir=rtl] .opt > p{margin:0 44px 16px 0}
+/* the demo: the field as it sits in the Add a new child form (half of the form's two-column row on desktop) */
+.demo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;padding:16px;border:1px solid var(--ink);background:var(--bg)}
+.demo .field{margin:0;min-width:0}
+.out{align-self:end;margin:0;padding:12px 16px;background:var(--bg-soft);font:var(--ts-body-s);color:var(--ink-2)}
+.out b{font:var(--ts-label-m);color:var(--ink)}
+@media (max-width:640px){.demo{grid-template-columns:minmax(0,1fr);padding:12px}}
+
+.field label,.field .lbl{display:block;margin-bottom:8px;font:var(--ts-label-m);color:var(--ink-2)}
+.input{display:flex;align-items:center;height:48px;background:var(--bg);border:1px solid var(--line-strong);transition:border-color .2s,box-shadow .2s}
+.input:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.input input,.input select{flex:1;min-width:0;height:100%;padding:0 16px;border:0;background:transparent;outline:0;font-size:var(--fs-16)}
+.hint{margin:8px 0 0;font:var(--ts-body-s);color:var(--ink-3)}
+.err{display:none;margin:8px 0 0;font:var(--ts-body-s);color:var(--danger)}
+.field.bad .input,.field.bad .seg,.field.bad .pickbtn{border-color:var(--danger);box-shadow:inset 0 0 0 1px var(--danger)}
+.field.bad .err{display:block}
+.field.bad .hint{display:none}
+.chev{flex:none;width:20px;height:20px;margin-inline-end:12px;fill:none;stroke:var(--ink-2);stroke-width:2;pointer-events:none}
+.ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .flip{scale:-1 1}
+
+/* B · selects */
+.sel3{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr) minmax(0,1fr);gap:8px}
+.sel3 .input{position:relative}
+.sel3 select{appearance:none;-webkit-appearance:none;padding:0 32px 0 12px;cursor:pointer}
+[dir=rtl] .sel3 select{padding:0 12px 0 32px}
+.sel3 .chev{position:absolute;inset-inline-end:0}
+.sel3 select:invalid,.sel3 select.ph{color:var(--ink-3)}
+
+/* C · three boxes */
+.seg{display:flex;align-items:center;height:48px;border:1px solid var(--line-strong);background:var(--bg);transition:border-color .2s,box-shadow .2s;direction:ltr}
+.seg:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.seg input{width:2.6ch;height:100%;padding:0;border:0;background:transparent;outline:0;text-align:center;font-size:var(--fs-16);font-variant-numeric:tabular-nums}
+.seg input:first-child{margin-inline-start:16px}
+.seg input.y{width:4.6ch}
+.seg input::placeholder{color:var(--ink-3)}
+.seg input:focus{background:var(--brand-10)}
+.seg i{font-style:normal;color:var(--ink-3);padding:0 4px}
+.seg .ico{margin-inline:auto 16px;color:var(--ink-3)}
+
+/* D · masked text + calendar, and E · year → month → day: in-flow panels (no clipping inside forms) */
+.cal-btn{display:grid;place-items:center;width:48px;height:100%;border:0;border-inline-start:1px solid var(--line);background:none;cursor:pointer;color:var(--ink-2)}
+.cal-btn[aria-expanded=true]{background:var(--ink);color:var(--neutral-0)}
+.panel{margin-top:8px;border:1px solid var(--ink);background:var(--bg);padding:12px}
+.panel[hidden]{display:none}
+.p-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.p-head .ttl{flex:1;height:40px;border:1px solid var(--line-strong);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.p-head .ttl[aria-expanded=true]{border-color:var(--ink)}
+.nav{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--line-strong);background:var(--bg);cursor:pointer}
+.nav:disabled{opacity:.35;cursor:default}
+.grid{display:grid;gap:4px}
+.grid.d7{grid-template-columns:repeat(7,minmax(0,1fr))}
+.grid.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.grid .wk{display:grid;place-items:center;height:28px;font:var(--ts-label-s);color:var(--ink-3)}
+.grid button{height:40px;border:1px solid transparent;background:var(--bg-soft);font:var(--ts-label-m);cursor:pointer;font-variant-numeric:tabular-nums}
+.grid button:hover:not(:disabled){border-color:var(--ink)}
+.grid button:disabled{background:none;color:var(--ink-4);cursor:default;text-decoration:line-through}
+.grid button[aria-pressed=true]{background:var(--brand);color:var(--neutral-0)}
+.grid .blank{height:40px}
+.pickbtn{display:flex;align-items:center;gap:12px;width:100%;height:48px;padding:0 16px;border:1px solid var(--line-strong);background:var(--bg);text-align:start;cursor:pointer;font-size:var(--fs-16)}
+.pickbtn[aria-expanded=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.pickbtn span{flex:1;min-width:0}
+.pickbtn .ph{color:var(--ink-3)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-bottom:12px}
+.steps button{height:40px;border:0;border-bottom:2px solid var(--line);background:none;font:var(--ts-label-m);color:var(--ink-3);cursor:pointer}
+.steps button[aria-selected=true]{border-color:var(--brand);color:var(--ink)}
+.steps button:disabled{cursor:default}
+.steps small{display:block;font:var(--ts-caption);color:var(--ink-2)}
+
+/* F · wheels */
+.wheels{position:relative;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr) minmax(0,1fr);gap:8px;direction:ltr}
+[dir=rtl] .wheels{direction:rtl}
+.wheels::before{content:"";position:absolute;inset-inline:0;top:80px;height:40px;background:var(--brand-10);border-block:1px solid var(--brand);pointer-events:none}
+.wheel{position:relative;height:200px;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);outline-offset:-2px}
+.wheel::-webkit-scrollbar{display:none}
+.wheel ol{list-style:none;margin:0;padding:80px 0}
+.wheel li{height:40px;display:grid;place-items:center;scroll-snap-align:center;font:var(--ts-label-l);color:var(--ink-3);cursor:pointer;font-variant-numeric:tabular-nums}
+.wheel li.on{color:var(--ink)}
+.wheel li.no{color:var(--ink-4);text-decoration:line-through}
+.w-acts{display:flex;justify-content:flex-end;gap:16px;align-items:center;margin-top:12px}
+.done{height:44px;padding:0 20px;border:0;background:var(--ink);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+.w-age{margin-inline-end:auto;font:var(--ts-body-s);color:var(--ink-2)}
+</style>
+</head>
+<body>
+<main>
+<h1>Date of birth</h1>
+<p class="lead">Six ways to enter a child's date of birth. Each one is working: it allows only ages 6 to 17 on the booking date (today here), shows the error the site shows, and gives the value the site saves. Try them on a phone too.</p>
+<div class="ctl" role="group" aria-label="Language"><span>Language</span><button type="button" data-lang="en">English</button><button type="button" data-lang="ar">العربية</button></div>
+<div id="opts"></div>
+</main>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script>
+(() => {
+  const P = window.SFA_PREFS, t = (s, p) => P.t(s, p), C = window.SFA_CHILD;
+  const pad = n => String(n).padStart(2, '0'), ymd = (y, m, d) => `${y}-${pad(m)}-${pad(d)}`;
+  const daysIn = (y, m) => new Date(y, m, 0).getDate();
+  const TODAY = window.SFA_TODAY(), [TY, TM, TD] = TODAY.split('-').map(Number);
+  // born on or before MAX (6 today) and after the day they'd turn 18: MIN = today − 18 years + 1 day
+  const MAXD = ymd(TY - C.MIN, TM, Math.min(TD, daysIn(TY - C.MIN, TM)));
+  const minDate = new Date(TY - C.MAX - 1, TM - 1, TD + 1), MIND = ymd(minDate.getFullYear(), minDate.getMonth() + 1, minDate.getDate());
+  const Y0 = +MIND.slice(0, 4), Y1 = +MAXD.slice(0, 4);
+  const inRange = k => k >= MIND && k <= MAXD;
+  const loc = () => P.lang === 'ar' ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB';
+  const months = (style = 'long') => Array.from({ length: 12 }, (_, i) => new Intl.DateTimeFormat(loc(), { month: style }).format(new Date(2020, i, 1)));
+  const nice = k => new Intl.DateTimeFormat(loc(), { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(...k.split('-').map((v, i) => i === 1 ? v - 1 : +v)));
+  const valid = (y, m, d) => y >= 1900 && m >= 1 && m <= 12 && d >= 1 && d <= daysIn(y, m);
+  const CHEV = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  const CAL = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4m8-4v4"/></svg>';
+  const L = '<svg class="ico flip" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>', R = '<svg class="ico flip" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
+
+  // every option: a field (label, control, hint, error) + a readout of what the site would save
+  const OPTS = [
+    { id: 'a', cur: true, name: 'Browser date input (now)', why: "What the site uses today. Quick on phones (the system wheel or calendar), but it looks different in every browser, can't be styled to the design system, and on desktop it starts at today, far from a child's birth year." },
+    { id: 'b', name: 'Day, month, year menus', why: 'Three menus. Familiar and reliable on every device; the year menu lists only the years that can be valid (newest first), and the day menu follows the month. Months are named, so 03/04 is never misread.' },
+    { id: 'c', name: 'Typed DD / MM / YYYY', why: 'Three number boxes that move on as you type, Backspace goes back, and a pasted date fills all three. Fastest for parents who know the date by heart. Always left to right, also in Arabic.' },
+    { id: 'd', name: 'Typed, with a calendar', why: 'One field that formats as you type, plus a calendar button. The calendar opens on a valid year, and its title switches to a year grid so nobody pages back month by month.' },
+    { id: 'e', name: 'Year, then month, then day', why: 'Tap the field and pick in three steps: the 12 valid years, then the month, then the day. Out-of-range dates are crossed out, and it shows their age on the booking date as you go.' },
+    { id: 'f', name: 'Scroll wheels', why: 'App-style wheels for day, month and year, opened from the field with a Done button. Natural on phones (swipe or arrow keys); dates out of range are crossed out.' }
+  ];
+  const age = k => window.SFA_AGE(k, TODAY);
+  const W = {};   // widget renderers: (o, set) → html, then wire(el, set)
+
+  W.a = { html: o => `<div class="input"><input id="${o}i" type="date" min="${MIND}" max="${MAXD}" aria-describedby="${o}h"></div>`,
+    wire: (el, set) => el.querySelector('input').addEventListener('change', e => set(e.target.value || '')) };
+
+  W.b = { html: o => { const ms = months();
+      return `<div class="sel3" role="group" aria-labelledby="${o}l" aria-describedby="${o}h">
+        <div class="input"><select id="${o}d" aria-label="${t('Day')}" class="ph"><option value="">${t('Day')}</option>${Array.from({ length: 31 }, (_, i) => `<option>${i + 1}</option>`).join('')}</select>${CHEV}</div>
+        <div class="input"><select id="${o}m" aria-label="${t('Month')}" class="ph"><option value="">${t('Month')}</option>${ms.map((n, i) => `<option value="${i + 1}">${n}</option>`).join('')}</select>${CHEV}</div>
+        <div class="input"><select id="${o}y" aria-label="${t('Year')}" class="ph"><option value="">${t('Year')}</option>${Array.from({ length: Y1 - Y0 + 1 }, (_, i) => `<option>${Y1 - i}</option>`).join('')}</select>${CHEV}</div></div>`; },
+    wire: (el, set) => { const [d, m, y] = el.querySelectorAll('select');
+      const go = () => { [d, m, y].forEach(s => s.classList.toggle('ph', !s.value));
+        const n = y.value && m.value ? daysIn(+y.value, +m.value) : 31;
+        [...d.options].forEach((op, i) => { if (i) op.disabled = i > n; });
+        if (+d.value > n) d.value = '';
+        set(d.value && m.value && y.value ? ymd(y.value, m.value, d.value) : '', !(d.value && m.value && y.value)); };
+      [d, m, y].forEach(s => s.addEventListener('change', go)); } };
+
+  W.c = { html: o => `<div class="seg" role="group" aria-labelledby="${o}l" aria-describedby="${o}h"><input inputmode="numeric" maxlength="2" placeholder="DD" aria-label="${t('Day')}" autocomplete="bday-day"><i>/</i><input inputmode="numeric" maxlength="2" placeholder="MM" aria-label="${t('Month')}" autocomplete="bday-month"><i>/</i><input class="y" inputmode="numeric" maxlength="4" placeholder="YYYY" aria-label="${t('Year')}" autocomplete="bday-year">${CAL}</div>`,
+    wire: (el, set) => { const ins = [...el.querySelectorAll('input')], len = [2, 2, 4];
+      const go = () => { const [d, m, y] = ins.map(i => +i.value);
+        if (ins.every((i, k) => i.value.length === len[k])) set(valid(y, m, d) ? ymd(y, m, d) : 'bad'); else set('', true); };
+      ins.forEach((inp, k) => {
+        inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '');
+          if (k < 2 && inp.value.length === 1 && +inp.value > (k ? 1 : 3)) inp.value = '0' + inp.value;   // "5" in the day box means 05
+          if (inp.value.length === len[k] && ins[k + 1]) ins[k + 1].focus(); go(); });
+        inp.addEventListener('keydown', e => { if (e.key === 'Backspace' && !inp.value && ins[k - 1]){ e.preventDefault(); ins[k - 1].focus(); ins[k - 1].value = ins[k - 1].value.slice(0, -1); go(); }
+          if (e.key === '/' || e.key === '.' || e.key === '-'){ e.preventDefault(); if (inp.value.length === 1) inp.value = '0' + inp.value; ins[k + 1]?.focus(); go(); } });
+        inp.addEventListener('paste', e => { const s = (e.clipboardData.getData('text') || '').trim(); let p = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+          p = p ? [p[3], p[2], p[1]] : (s.match(/^(\d{1,2})\D(\d{1,2})\D(\d{4})$/) || []).slice(1);
+          if (p.length === 3){ e.preventDefault(); ins.forEach((i, j) => i.value = j < 2 ? pad(p[j]) : p[j]); ins[2].focus(); go(); } });
+      }); } };
+
+  // a month calendar (D) and the year/month/day grids (E) share these
+  const dayGrid = (y, m, sel, pick) => { const first = (new Date(y, m - 1, 1).getDay() + 6) % 7, n = daysIn(y, m);
+    const wk = Array.from({ length: 7 }, (_, i) => new Intl.DateTimeFormat(loc(), { weekday: 'narrow' }).format(new Date(2024, 0, 1 + i)));
+    return `<div class="grid d7">${wk.map(w => `<span class="wk" aria-hidden="true">${w}</span>`).join('')}${'<span class="blank"></span>'.repeat(first)}${Array.from({ length: n }, (_, i) => { const k = ymd(y, m, i + 1);
+      return `<button type="button" data-${pick}="${k}"${inRange(k) ? '' : ' disabled'} aria-pressed="${k === sel}" aria-label="${nice(k)}">${i + 1}</button>`; }).join('')}</div>`; };
+
+  W.d = { html: o => `<div class="input"><input id="${o}i" inputmode="numeric" placeholder="DD / MM / YYYY" maxlength="14" aria-describedby="${o}h" autocomplete="bday" dir="ltr"><button type="button" class="cal-btn" aria-expanded="false" aria-controls="${o}p" aria-label="${t('Open calendar')}">${CAL}</button></div><div class="panel" id="${o}p" hidden></div>`,
+    wire: (el, set) => { const inp = el.querySelector('input'), btn = el.querySelector('.cal-btn'), pan = el.querySelector('.panel');
+      let vy = Y1 - 3, vm = 1, view = 'days', cur = '';
+      const fill = k => { const [y, m, d] = k.split('-'); inp.value = `${d} / ${m} / ${y}`; };
+      const paint = () => {
+        const ms = months('short');
+        pan.innerHTML = `<div class="p-head"><button type="button" class="nav" data-step="-1" aria-label="${t('Previous month')}"${view === 'years' ? ' hidden' : ''}>${L}</button><button type="button" class="ttl" aria-expanded="${view === 'years'}">${months()[vm - 1]} ${vy}</button><button type="button" class="nav" data-step="1" aria-label="${t('Next month')}"${view === 'years' ? ' hidden' : ''}>${R}</button></div>`
+          + (view === 'years' ? `<div class="grid c4">${Array.from({ length: Y1 - Y0 + 1 }, (_, i) => `<button type="button" data-yr="${Y0 + i}" aria-pressed="${Y0 + i === vy}">${Y0 + i}</button>`).join('')}</div>` : dayGrid(vy, vm, cur, 'dk'));
+        const [pv, nx] = pan.querySelectorAll('.nav'); if (pv){ pv.disabled = ymd(vy, vm, 1) <= MIND.slice(0, 8) + '01'; nx.disabled = ymd(vy, vm, 1) >= MAXD.slice(0, 8) + '01'; } };
+      const open = on => { pan.hidden = !on; btn.setAttribute('aria-expanded', on); if (on){ if (cur && cur !== 'bad'){ [vy, vm] = cur.split('-').map(Number); } view = 'days'; paint(); } };
+      btn.addEventListener('click', () => open(pan.hidden));
+      pan.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+        if (b.classList.contains('ttl')){ view = view === 'years' ? 'days' : 'years'; paint(); return; }
+        if (b.dataset.yr){ vy = +b.dataset.yr; view = 'days'; paint(); return; }
+        if (b.dataset.step){ const d = new Date(vy, vm - 1 + +b.dataset.step, 1); vy = d.getFullYear(); vm = d.getMonth() + 1; paint(); return; }
+        if (b.dataset.dk){ cur = b.dataset.dk; fill(cur); set(cur); open(false); inp.focus(); } });
+      inp.addEventListener('input', () => { const v = inp.value.replace(/\D/g, '').slice(0, 8);
+        inp.value = [v.slice(0, 2), v.slice(2, 4), v.slice(4)].filter(Boolean).join(' / ');
+        if (v.length === 8){ const d = +v.slice(0, 2), m = +v.slice(2, 4), y = +v.slice(4); cur = valid(y, m, d) ? ymd(y, m, d) : 'bad'; set(cur); } else { cur = ''; set('', true); } });
+      el.addEventListener('keydown', e => { if (e.key === 'Escape' && !pan.hidden){ open(false); btn.focus(); } }); } };
+
+  W.e = { html: o => `<button type="button" class="pickbtn" id="${o}b" aria-expanded="false" aria-controls="${o}p" aria-describedby="${o}h"><span class="ph">${t('Choose date of birth')}</span>${CAL}</button><div class="panel" id="${o}p" hidden></div>`,
+    wire: (el, set) => { const btn = el.querySelector('.pickbtn'), pan = el.querySelector('.panel');
+      let step = 0, y = 0, m = 0, cur = '';
+      const ms = () => months();
+      const paint = () => {
+        const tabs = [[t('Year'), y || ''], [t('Month'), m ? ms()[m - 1] : ''], [t('Day'), cur ? +cur.slice(8) : '']];
+        let body;
+        if (step === 0) body = `<div class="grid c4">${Array.from({ length: Y1 - Y0 + 1 }, (_, i) => Y1 - i).map(v => `<button type="button" data-y="${v}" aria-pressed="${v === y}">${v}</button>`).join('')}</div>`;
+        else if (step === 1) body = `<div class="grid c3">${ms().map((n, i) => { const okM = ymd(y, i + 1, daysIn(y, i + 1)) >= MIND && ymd(y, i + 1, 1) <= MAXD;
+          return `<button type="button" data-m="${i + 1}"${okM ? '' : ' disabled'} aria-pressed="${i + 1 === m}">${n}</button>`; }).join('')}</div>`;
+        else body = dayGrid(y, m, cur, 'dd');
+        pan.innerHTML = `<div class="steps" role="tablist">${tabs.map(([n, v], i) => `<button type="button" role="tab" data-go="${i}" aria-selected="${i === step}"${i > (y ? (m ? 2 : 1) : 0) ? ' disabled' : ''}>${n}<small>${v || '–'}</small></button>`).join('')}</div>${body}`; };
+      const open = on => { pan.hidden = !on; btn.setAttribute('aria-expanded', on); if (on){ step = y ? (m ? 2 : 1) : 0; paint(); } };
+      btn.addEventListener('click', () => open(pan.hidden));
+      pan.addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.disabled) return;
+        if (b.dataset.go){ step = +b.dataset.go; paint(); return; }
+        if (b.dataset.y){ y = +b.dataset.y; if (m && !(ymd(y, m, daysIn(y, m)) >= MIND && ymd(y, m, 1) <= MAXD)) m = 0; cur = ''; set('', true); step = 1; paint(); return; }
+        if (b.dataset.m){ m = +b.dataset.m; cur = ''; set('', true); step = 2; paint(); return; }
+        if (b.dataset.dd){ cur = b.dataset.dd; btn.querySelector('span').className = ''; btn.querySelector('span').textContent = nice(cur); set(cur); open(false); btn.focus(); } });
+      el.addEventListener('keydown', e => { if (e.key === 'Escape' && !pan.hidden){ open(false); btn.focus(); } }); } };
+
+  W.f = { html: o => `<button type="button" class="pickbtn" aria-expanded="false" aria-controls="${o}p" aria-describedby="${o}h"><span class="ph">${t('Choose date of birth')}</span>${CHEV}</button>
+      <div class="panel" id="${o}p" hidden><div class="wheels">
+        <div class="wheel" tabindex="0" role="listbox" aria-label="${t('Day')}" data-k="d"><ol>${Array.from({ length: 31 }, (_, i) => `<li data-v="${i + 1}">${i + 1}</li>`).join('')}</ol></div>
+        <div class="wheel" tabindex="0" role="listbox" aria-label="${t('Month')}" data-k="m"><ol>${months().map((n, i) => `<li data-v="${i + 1}">${n}</li>`).join('')}</ol></div>
+        <div class="wheel" tabindex="0" role="listbox" aria-label="${t('Year')}" data-k="y"><ol>${Array.from({ length: Y1 - Y0 + 1 }, (_, i) => `<li data-v="${Y0 + i}">${Y0 + i}</li>`).join('')}</ol></div>
+      </div><div class="w-acts"><span class="w-age" aria-live="polite"></span><button type="button" class="done">${t('Done')}</button></div></div>`,
+    wire: (el, set) => { const btn = el.querySelector('.pickbtn'), pan = el.querySelector('.panel'), wh = [...el.querySelectorAll('.wheel')], ageEl = el.querySelector('.w-age'), done = el.querySelector('.done');
+      const v = { d: 1, m: 1, y: Y1 - 3 };
+      const idx = w => Math.round(w.scrollTop / 40);
+      const seek = (w, i, smooth) => w.scrollTo({ top: i * 40, behavior: smooth ? 'smooth' : 'auto' });
+      const valOf = () => { const n = daysIn(v.y, v.m); return ymd(v.y, v.m, Math.min(v.d, n)); };
+      const mark = () => { const n = daysIn(v.y, v.m);
+        wh.forEach(w => { const k = w.dataset.k, li = [...w.querySelectorAll('li')];
+          li.forEach((x, i) => { x.classList.toggle('on', +x.dataset.v === v[k]); x.setAttribute('aria-selected', +x.dataset.v === v[k]); x.setAttribute('role', 'option');
+            x.classList.toggle('no', k === 'd' ? i + 1 > n || !inRange(ymd(v.y, v.m, i + 1)) : k === 'm' ? !(ymd(v.y, i + 1, daysIn(v.y, i + 1)) >= MIND && ymd(v.y, i + 1, 1) <= MAXD) : false); }); });
+        const k = valOf(); ageEl.textContent = inRange(k) ? t('Age {n} on the booking date', { n: age(k) }) : t('Must be 6 to 17 on the booking date'); done.disabled = !inRange(k); };
+      let tmr; wh.forEach(w => {
+        w.addEventListener('scroll', () => { clearTimeout(tmr); tmr = setTimeout(() => { wh.forEach(x => { const li = x.querySelectorAll('li')[idx(x)]; if (li) v[x.dataset.k] = +li.dataset.v; }); mark(); }, 90); }, { passive: true });
+        w.addEventListener('click', e => { const li = e.target.closest('li'); if (li) seek(w, [...w.querySelectorAll('li')].indexOf(li), true); });
+        w.addEventListener('keydown', e => { const d = { ArrowDown: 1, ArrowUp: -1 }[e.key]; if (d){ e.preventDefault(); seek(w, Math.max(0, idx(w) + d), true); } });
+      });
+      const open = on => { pan.hidden = !on; btn.setAttribute('aria-expanded', on);
+        if (on){ requestAnimationFrame(() => { wh.forEach(w => seek(w, [...w.querySelectorAll('li')].findIndex(x => +x.dataset.v === v[w.dataset.k]))); mark(); }); } };
+      btn.addEventListener('click', () => open(pan.hidden));
+      done.addEventListener('click', () => { const k = valOf(); btn.querySelector('span').className = ''; btn.querySelector('span').textContent = nice(k); set(k); open(false); btn.focus(); });
+      el.addEventListener('keydown', e => { if (e.key === 'Escape' && !pan.hidden){ open(false); btn.focus(); } }); } };
+
+  function paint(){
+    document.documentElement.lang = P.lang; document.documentElement.dir = P.lang === 'ar' ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === P.lang));
+    const box = document.getElementById('opts');
+    box.innerHTML = OPTS.map(o => `<section class="opt" id="opt-${o.id}"><div class="opt-h${o.cur ? ' cur' : ''}"><b>${o.cur ? 'Now' : o.id.toUpperCase()}</b><strong>${o.name}</strong></div><p>${o.why}</p>
+      <div class="demo"><div class="field" id="${o.id}F"><span class="lbl" id="${o.id}l"><label for="${o.id}i">${t('Date of birth')}</label></span>${W[o.id].html(o.id)}
+        <p class="hint" id="${o.id}h">${t('Ages 6 to 17 on the booking date')}</p><p class="err" id="${o.id}e"></p></div>
+        <p class="out" id="${o.id}o">${t('Saves')}: <b>–</b></p></div></section>`).join('');
+    OPTS.forEach(o => {
+      const f = document.getElementById(o.id + 'F'), out = document.getElementById(o.id + 'o'), err = document.getElementById(o.id + 'e');
+      const set = (k, partial) => {
+        const bad = k === 'bad' ? t('Enter a real date.') : k && !inRange(k) ? t('Must be 6 to 17 on the booking date') : '';
+        f.classList.toggle('bad', !!bad); err.textContent = bad;
+        out.innerHTML = `${t('Saves')}: <b>${k && !bad ? `${k}</b> · ${t('Age {n} on the booking date', { n: age(k) })}` : '–</b>'}`;
+      };
+      W[o.id].wire(f, set);
+    });
+  }
+  document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => { P.setLang ? P.setLang(b.dataset.lang) : (localStorage.setItem('sfaLang', b.dataset.lang), location.reload()); }));
+  addEventListener('sfa:prefs', paint);
+  paint();
+})();
+</script>
+</body>
+</html>

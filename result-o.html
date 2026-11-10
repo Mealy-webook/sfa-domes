@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option O</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option O · Action list (benchmark: Viator, Eventbrite): a photo card with a personal "You're all set, Sara", what, when and where, then the page is a list of what to do now: View my tickets, Add to calendar, See your sessions and Booking details (both open in place) and the next booking. Beside it, "More at SFA Domes" suggests what to book next.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. No QR codes, directions or cancellation rule on this page. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{display:block}
+.o-wrap{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:clamp(20px,3vw,40px);align-items:start}
+.o-main{display:grid;gap:16px;min-width:0}
+.o-hero{display:grid;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);animation:up .6s var(--ease) both}
+.o-ok{justify-self:start;display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-m)}
+.o-ok svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:square}
+.o-in{display:grid;align-content:center;gap:20px;padding:clamp(24px,3vw,40px)}
+.o-in h1{font:var(--ts-display-m);text-transform:var(--type-case-display)}
+.o-in > p{margin:0;font:var(--ts-body-m);color:var(--color-content-secondary)}
+.o-in > .o-mail{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;align-items:start;margin-top:-12px;font:var(--ts-body-s)}
+.o-in > .o-mail[hidden]{display:none}
+.o-mail svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+.o-mail b{font-weight:500;color:var(--color-content-primary);overflow-wrap:anywhere}
+.o-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;margin:4px 0 0}
+.o-facts > div{display:grid;grid-template-columns:40px minmax(0,1fr);column-gap:16px;align-items:center}
+.o-fic{display:grid;place-items:center;width:40px;height:40px;background:var(--color-bg-secondary)}
+.o-fic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter}
+.o-facts dt{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}   /* labels for screen readers only: the icon says what each row is */
+.o-facts dd{margin:0;font:var(--ts-label-l);overflow-wrap:anywhere}
+.o-facts dd small{display:block;margin-top:2px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.o-refrow{grid-column:1/-1;grid-template-columns:40px max-content auto!important;justify-content:start}   /* the ref spans the row; Copy sits right after it */
+.o-refrow dd bdi{white-space:nowrap}
+.o-refrow dd bdi{font:var(--ts-label-l)}
+.o-copy{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-label-m);cursor:pointer;transition:background-color .2s,color .2s,border-color .2s}
+.o-copy:hover{border-color:var(--color-content-primary)}
+.o-copy svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+.o-copy.done{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.o-list{list-style:none;margin:0;padding:0;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);animation:up .6s var(--ease) .1s both}
+.o-list > li + li{border-top:1px solid var(--color-border-primary)}
+.o-row{width:100%;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:16px;align-items:center;padding:16px 20px;border:0;background:none;color:inherit;font:inherit;text-align:start;text-decoration:none;cursor:pointer;transition:background-color .2s}
+.o-row:hover{background:var(--color-bg-secondary)}
+.o-ic{display:grid;place-items:center;width:48px;height:48px;background:var(--color-bg-secondary)}
+.o-row.lead .o-ic{background:var(--color-brand);color:var(--neutral-0)}
+.o-ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+.o-row b{display:block;font:var(--ts-label-l)}
+.o-row small{display:block;margin-top:2px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.o-go{width:10px;height:10px;margin-inline-end:6px;border-top:2px solid currentColor;border-right:2px solid currentColor;rotate:45deg}
+[dir=rtl] .o-go{rotate:-135deg}
+.o-row[aria-expanded] .o-go,[dir=rtl] .o-row[aria-expanded] .o-go{rotate:135deg;transition:rotate .2s}
+.o-row[aria-expanded=true] .o-go,[dir=rtl] .o-row[aria-expanded=true] .o-go{rotate:-45deg}
+.o-pan{padding:0 20px 20px 84px}
+[dir=rtl] .o-pan{padding:0 84px 20px 20px}
+.o-pan[hidden]{display:none}
+.o-dates{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px}
+.o-dates li{display:grid;gap:2px;padding:10px 12px;background:var(--color-bg-secondary)}
+.o-dates small{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.o-dates b{font:var(--ts-label-m)}
+.o-dates span{font:var(--ts-caption);color:var(--color-content-secondary)}
+.o-side{position:sticky;top:calc(var(--nav) + 24px);display:grid;gap:8px;animation:up .6s var(--ease) .15s both}
+.o-side h2{margin:0 0 8px;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.o-rec{display:grid;grid-template-columns:112px minmax(0,1fr);background:var(--color-bg-primary);border:1px solid var(--color-border-primary);text-decoration:none;transition:border-color .2s}
+.o-rec:hover{border-color:var(--color-brand)}
+.o-rec img{width:112px;height:112px;object-fit:cover}
+.o-rec div{display:grid;align-content:center;gap:4px;padding:12px 16px}
+.o-rec small{font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.o-rec b{font:var(--ts-label-l)}
+.o-rec span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+@media (max-width:1100px){.o-wrap{grid-template-columns:minmax(0,1fr)}.o-side{position:static}}
+@media (max-width:760px){.o-facts{grid-template-columns:minmax(0,1fr);gap:16px}.o-refrow{grid-template-columns:40px minmax(0,1fr) auto!important}.o-refrow dd bdi{font:var(--ts-label-m)}.o-copy{width:40px;padding:0;justify-content:center}.o-copy span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.o-in h1{font:var(--ts-title-l)}.o-row{grid-template-columns:40px minmax(0,1fr) auto;gap:12px;padding:14px 16px}.o-ic{width:40px;height:40px}.o-pan,[dir=rtl] .o-pan{padding:0 16px 16px}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option O · Action list</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m, P = window.SFA_PREFS, T = window.SFA_TICKETS, n = m.days.length, s0 = m.days[0];
+    const now = new Date(), todayK = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const many = T.people(m.b).length > 1, tickets = m.list.length;
+    const LIST = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1"/></svg>';
+    const RCPT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg>';
+    const PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+    const HASH = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h15M4 15h15M10 3 8 21M16 3l-2 18"/></svg>', COPY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9z"/><path d="M5 15H4V4h11v1"/></svg>';
+    const TAG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><path d="M7.5 8.5h.01"/></svg>', USER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"/></svg>';
+    // the facts: [icon, label, value, second line]
+    const facts = [
+      [TAG, t('What'), m.prog ? esc(m.D.label) : esc(t(m.sport?.name || '')) + (m.game ? ` · ${t('Open game')}` : m.ladies ? ` · ${t('Ladies hours')}` : ''), m.prog ? t('{n} sessions', { n }) + (m.coach ? ` · ${esc(m.coach)}` : '') : m.game ? `${t(m.b.order.level)} · ${t(m.b.order.format)}` : n > 1 ? t('{n} sessions', { n }) : ''],
+      [ICON.cal, t('When'), n === 1 ? m.date(s0) : m.when, n === 1 ? m.time(s0) : m.pattern],
+      [ICON.pin, t('Where'), m.place, m.prog ? '' : esc(t(m.court?.[0] || ''))],
+      [USER, t(m.prog ? (many ? 'Participants' : 'Participant') : 'Booked for'), m.who, m.by ? t('Booked by {name}', { name: m.by }) : '']
+    ];
+    // what to book next: other kinds of booking (and, for a program, other programs)
+    const PR = window.SFA_PROGRAMS, recs = [];
+    if (m.prog) Object.entries(PR).filter(([id]) => id !== m.b.order.program).slice(0, 2).forEach(([id, p]) => recs.push([`program.html?p=${encodeURIComponent(id)}`, p.img || window.SFA_COURT_IMG(p.sport, window.SFA_SPORTS[p.sport].courts[p.court || 0]), t('Training program'), T.tx(p.name), t('Ages {a}', { a: p.ages })]));
+    else recs.push(['programs.html', 'f/sports-photos/basketball.jpg', t('Coached'), t('Training programs'), t('Monthly programs for kids and adults')]);
+    if (!m.game) recs.push(['matches.html', 'f/courts/football.jpg', t('Play with others'), t('Open games'), t('Join a game, pay for your spot')]);
+    if (!m.ladies) recs.push(['ladies-hours.html', 'f/sports-photos/volleyball.jpg', t('Women only'), t('Ladies hours'), t('Courts set aside for women each week')]);
+    const row = (tag, attrs, ic, b, s, lead) => `<${tag} class="o-row${lead ? ' lead' : ''}" ${attrs}><span class="o-ic">${ic}</span><span><b>${b}</b><small>${s}</small></span><span class="o-go" aria-hidden="true"></span></${tag}>`;
+    return `<div class="o-wrap"><div class="o-main">
+      <section class="o-hero">
+        <div class="o-in"><span class="o-ok">${ICON.check}${t('Booking confirmed')}</span><h1>${t("You're all set")}<span id="oName"></span></h1>
+          <p>${t(m.b.free ? 'Your free trial is booked.' : "You're booked and paid.")}</p>
+          <p class="o-mail" id="oMail" hidden></p>
+          <dl class="o-facts">${facts.map(([ic, k, v, sub]) => `<div><span class="o-fic">${ic}</span><dt>${k}</dt><dd>${v}${sub ? `<small>${sub}</small>` : ''}</dd></div>`).join('')}
+            <div class="o-refrow"><span class="o-fic">${HASH}</span><dt>${t('Booking ref')}</dt><dd><bdi id="oRef">${esc(m.b.cartId)}</bdi></dd>
+              <button type="button" class="o-copy" id="oCopy" aria-label="${t('Copy booking ref')}">${COPY}<span>${t('Copy')}</span></button></div></dl></div></section>
+      <ul class="o-list">
+        <li>${row('a', `href="${acts.tickets}"`, ICON.qr, t('View my tickets'), t(tickets > 1 ? '{n} tickets · each QR works on its session day' : 'Your QR code works on the session day', { n: tickets }), 1)}</li>
+        <li>${row('a', `href="${acts.ics}" download="${acts.icsName}"`, ICON.cal, t('Add to calendar'), t(n > 1 ? 'All {n} sessions in one file' : 'Get a reminder before you play', { n }))}</li>
+        ${n > 1 ? `<li>${row('button', 'type="button" aria-expanded="false" aria-controls="oDates"', LIST, t('See your sessions'), m.pattern || t('{n} sessions', { n }))}
+          <div class="o-pan" id="oDates" hidden><ol class="o-dates">${m.days.map(s => `<li><small>${t('Session {n}', { n: s.n })}${s.date === todayK ? ' · ' + t('Today') : ''}</small><b>${m.date(s, 'short')}</b><span>${m.time(s)}</span></li>`).join('')}</ol></div></li>` : ''}
+        <li>${row('button', 'type="button" aria-expanded="false" aria-controls="oPay"', RCPT, t('Booking details'), m.b.free ? t('Free of charge') : t('Paid {amount}', { amount: m.money(m.b.amount) }))}
+          <div class="o-pan" id="oPay" hidden>${m.rows}</div></li>
+        ${acts.more ? `<li>${row('a', `href="${acts.more.href}"`, PLUS, acts.more.label, t('Keep playing at SFA Domes'))}</li>` : ''}
+      </ul></div>
+      <aside class="o-side"><h2>${t('More at SFA Domes')}</h2>${recs.slice(0, 3).map(([h, img, k, b, s]) => `<a class="o-rec" href="${h}"><img src="${img}" alt="" loading="lazy"><div><small>${k}</small><b>${esc(b)}</b><span>${s}</span></div></a>`).join('')}</aside></div>`;
+  },
+  after: async () => {
+    const cp = document.getElementById('oCopy');
+    cp?.addEventListener('click', async () => { const P = window.SFA_PREFS, ref = document.getElementById('oRef').textContent;
+      try { await navigator.clipboard.writeText(ref); } catch (e) { const r = document.createRange(); r.selectNodeContents(document.getElementById('oRef')); getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy'); getSelection().removeAllRanges(); }
+      cp.classList.add('done'); cp.querySelector('span').textContent = P.t('Copied'); clearTimeout(cp._t); cp._t = setTimeout(() => { cp.classList.remove('done'); cp.querySelector('span').textContent = P.t('Copy'); }, 2000); });
+    document.querySelectorAll('.o-row[aria-expanded]').forEach(b => b.addEventListener('click', () => { const open = b.getAttribute('aria-expanded') !== 'true'; b.setAttribute('aria-expanded', open); document.getElementById(b.getAttribute('aria-controls')).hidden = !open; }));
+    const u = await window.SFA_AUTH?.me?.().catch(() => null), first = u && (u.first || u.name || '').split(/\s+/)[0], el = document.getElementById('oName');
+    if (first && el) el.textContent = (window.SFA_PREFS.lang === 'ar' ? '، ' : ', ') + first;
+    // the confirmation email goes to the signed-in account's address
+    const mail = document.getElementById('oMail'), email = u && u.email;
+    if (mail && email){ const P = window.SFA_PREFS, e = String(email).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+      mail.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/></svg><span>' + P.t('A confirmation email has been sent to {email}', { email: `<b><bdi>${e}</bdi></b>` }) + '</span>'; mail.hidden = false; }
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

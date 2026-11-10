@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option I · Stories: the confirmation plays as four full-height stories (booked → when and where → your ticket → get ready), with bars that fill once, auto-advance, tap a side to move and hold to pause. Payment folds away beside it.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,440px) minmax(0,360px);justify-content:center}
+.i-wrap{display:grid;gap:12px;animation:up .7s var(--ease) both;min-width:0}
+.i-st{position:relative;height:min(720px,calc(100svh - var(--nav) - 140px));min-height:560px;background:var(--neutral-950,#09090b);color:var(--neutral-0);overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.i-bars{position:absolute;inset:12px 12px auto;z-index:3;display:flex;gap:4px}
+.i-bars span{flex:1;height:4px;background:rgba(255,255,255,.3);overflow:hidden}
+.i-bars i{display:block;height:100%;width:100%;background:var(--neutral-0);transform:scaleX(0);transform-origin:left}
+[dir=rtl] .i-bars i{transform-origin:right}
+.i-bars .done i{transform:scaleX(1)}
+.i-bars .on i{animation:fill var(--dur,5s) linear forwards}
+.i-st.hold .i-bars .on i{animation-play-state:paused}
+@keyframes fill{to{transform:scaleX(1)}}
+.i-st.light{color:var(--color-content-primary)}
+.i-st.light .i-bars span{background:rgba(9,9,11,.12)}
+.i-st.light .i-bars i{background:var(--color-content-primary)}
+.i-top{position:absolute;inset:28px 12px auto;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:8px;font:var(--ts-label-s)}
+.i-top b{display:inline-flex;align-items:center;gap:8px}
+.i-top b::before{content:"";width:24px;height:24px;background:var(--color-brand) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='square'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/16px no-repeat}
+.i-top button{display:grid;place-items:center;width:32px;height:32px;border:0;background:transparent;color:inherit;cursor:pointer}
+.i-top svg{width:18px;height:18px;fill:currentColor}
+.i-sl{position:absolute;inset:0;isolation:isolate;display:grid;align-content:end;gap:16px;padding:88px 24px 32px;opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s}
+.i-sl.on{opacity:1;visibility:visible;transition:opacity .35s}
+.i-sl > *{translate:0 16px;opacity:0;transition:translate .6s var(--ease),opacity .6s}
+.i-sl.on > *{translate:0 0;opacity:1}
+.i-sl.on > :nth-child(2){transition-delay:.08s}.i-sl.on > :nth-child(3){transition-delay:.16s}.i-sl.on > :nth-child(4){transition-delay:.24s}.i-sl.on > :nth-child(5){transition-delay:.32s}
+.i-bg{position:absolute!important;inset:0;width:100%;height:100%;object-fit:cover;opacity:1!important;translate:none!important;z-index:-2}
+.i-sl::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(9,9,11,.7) 0%,rgba(9,9,11,.1) 22%,rgba(9,9,11,.1) 40%,rgba(9,9,11,.92) 100%)}
+.i-sl.plain::before{background:none}
+.i-eye{margin:0;font:var(--ts-label-m);opacity:.8}
+.i-big{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display);line-height:1}
+.i-big em{font-style:normal;color:var(--color-brand)}
+.i-p{margin:0;font:var(--ts-body-l);opacity:.9}
+.i-p .ref,.i-sl .ref{font:var(--ts-label-m)}
+.i-facts{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 20px;margin:0;padding-top:16px;border-top:1px solid rgba(255,255,255,.2)}
+.i-facts dt{font:var(--ts-label-s);opacity:.7}
+.i-facts dd{margin:0;font:var(--ts-label-l);overflow-wrap:anywhere}
+.i-days{display:flex;flex-wrap:wrap;gap:4px}
+.i-days span{padding:4px 8px;background:rgba(255,255,255,.14);font:var(--ts-label-s)}
+/* the ticket story is light, so the QR reads like the real thing */
+.i-sl.tk-sl{background:var(--color-bg-primary);color:var(--color-content-primary);align-content:center;justify-items:center;text-align:center}
+.i-sl.tk-sl::before{background:none}
+.i-sl.tk-sl .tk-qr{width:min(240px,64vw)}
+.i-sl.tk-sl small{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.i-sl.tk-sl .i-eye{color:var(--color-content-secondary);opacity:1}
+.i-sl.tk-sl h2{margin:0;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.i-sl .tips{color:rgba(255,255,255,.85)}
+.i-sl .acts{position:relative;z-index:4}
+.i-sl .ghost{background:transparent;border-color:rgba(255,255,255,.4);color:var(--neutral-0)}
+.i-sl .ghost:hover{background:var(--neutral-0);color:var(--color-content-primary)}
+.i-sl .more{color:rgba(255,255,255,.8)}
+.i-pg{display:flex;align-items:center;justify-content:space-between;gap:8px;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.i-pg button{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-label-m);cursor:pointer}
+.i-pg button:disabled{opacity:.35;cursor:default}
+.i-pg svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .i-pg svg{scale:-1 1}
+.i-side{display:grid;gap:16px;align-content:start;animation:up .7s var(--ease) .15s both}
+.i-det{background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.i-det summary{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 24px;font:var(--ts-label-l);cursor:pointer;list-style:none}
+.i-det summary::-webkit-details-marker{display:none}
+.i-det summary span{font:var(--ts-number-s)}
+.i-det .rows{padding:0 24px 24px}
+@media (max-width:960px){body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,440px)}}
+@media (max-width:560px){body[data-state=paid] .cf{padding-top:calc(var(--nav) + 16px)}.i-st{min-height:0;height:calc(100svh - var(--nav) - 96px)}.i-big{font:var(--ts-display-m)}.i-sl{padding:80px 20px 24px}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option I · Stories</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m, s0 = m.list[0], P = window.SFA_PREFS, T = window.SFA_TICKETS;
+    const day = P.date(T.toDate(s0.date), { weekday: 'short', day: 'numeric', month: 'short' });
+    const days = [...new Set(m.list.map(s => s.date))];
+    const slides = [
+      `<section class="i-sl" aria-label="${t(m.title)}"><img class="i-bg" src="${m.D.img}" alt=""><p class="i-eye">${t('SFA Domes Dammam')}</p><h2 class="i-big">${t(m.title)}</h2><p class="i-p">${esc(m.D.label)}</p><p class="i-p">${m.ref}</p></section>`,
+      `<section class="i-sl" aria-label="${t('When')}"><img class="i-bg" src="${m.D.img}" alt=""><p class="i-eye">${t('See you on')}</p><h2 class="i-big"><em>${day}</em></h2>
+        <dl class="i-facts"><dt>${t('Time')}</dt><dd>${m.time(s0)}</dd><dt>${t(m.prog ? 'Program' : 'Court')}</dt><dd>${esc(m.D.label)}</dd><dt>${t('For')}</dt><dd>${m.who}</dd>
+        ${m.count > 1 ? `<dt>${t('Sessions')}</dt><dd><div class="i-days">${days.slice(0, 6).map(d => `<span>${P.date(T.toDate(d), 'short')}</span>`).join('')}${days.length > 6 ? `<span>${t('+{n} more', { n: days.length - 6 })}</span>` : ''}</div></dd>` : ''}</dl></section>`,
+      `<section class="i-sl tk-sl" aria-label="${t('Your ticket')}"><p class="i-eye">${s0.of > 1 ? t('Session {i} of {n}', { i: s0.n, n: s0.of }) : t('Your ticket')}</p><h2>${m.date(s0)} · ${m.time(s0)}</h2>
+        <div class="tk-qr" data-qr="${esc(s0.id)}" role="img" aria-label="${t('QR code for {ref}', { ref: esc(s0.id) })}"></div><span class="tk-ref">${esc(s0.id)}${s0.player ? ' · ' + esc(s0.player) : ''}</span>
+        <small>${t('Show this at reception')}${m.count > 1 ? ' · ' + t('{n} more tickets are in My tickets.', { n: m.count - 1 }) : ''}</small></section>`,
+      `<section class="i-sl" aria-label="${t('Get ready')}"><img class="i-bg" src="${m.D.img}" alt=""><h2 class="i-big">${t('Get ready')}</h2><ul class="tips">${m.tips.slice(1).map(x => `<li>${x}</li>`).join('')}</ul>
+        <div class="acts"><a class="btn" href="${acts.tickets}">${t('View my tickets')}${ICON.arrow}</a><a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Add to calendar')}</a><a class="ghost" href="${acts.dir}" target="_blank" rel="noopener">${ICON.pin}${t('Get directions')}</a></div></section>`
+    ];
+    return `<div class="i-wrap"><div class="i-st" id="iSt" aria-roledescription="${t('Stories')}">
+        <div class="i-bars" aria-hidden="true">${slides.map(() => '<span><i></i></span>').join('')}</div>
+        <div class="i-top"><b>${t('Booking confirmed')}</b><button type="button" id="iHold" aria-label="${t('Pause')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg></button></div>
+        ${slides.join('')}</div>
+        <div class="i-pg"><button type="button" id="iPrev"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>${t('Previous')}</button><span id="iN" aria-live="polite"></span><button type="button" id="iNext">${t('Next')}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div></div>
+      <aside class="i-side"><details class="i-det"><summary>${t(m.b.free ? 'Summary' : 'Payment details')}<span>${m.b.free ? t('Free of charge') : m.money(m.b.amount)}</span></summary>${m.rows}</details>
+        <div class="box"><h2>${t('Before you play')}</h2><ul class="tips">${m.tips.map(x => `<li>${x}</li>`).join('')}</ul></div>
+        ${acts.more ? `<a class="more" href="${acts.more.href}">${acts.more.label}</a>` : ''}</aside>`;
+  },
+  after: m => {
+    const st = document.getElementById('iSt'), sl = [...st.querySelectorAll('.i-sl')], bars = [...st.querySelectorAll('.i-bars span')], n = sl.length;
+    const prev = document.getElementById('iPrev'), next = document.getElementById('iNext'), hold = document.getElementById('iHold');
+    const DUR = 5000; let cur = 0, timer = 0, left = DUR, since = 0, paused = false;
+    const tick = () => { clearTimeout(timer); if (paused || cur === n - 1) return; since = Date.now(); timer = setTimeout(() => go(cur + 1), left); };
+    function go(i){ cur = Math.max(0, Math.min(n - 1, i)); left = DUR;
+      sl.forEach((s, j) => { s.classList.toggle('on', j === cur); s.inert = j !== cur; }); st.classList.toggle('light', sl[cur].classList.contains('tk-sl'));
+      bars.forEach((b, j) => { b.className = j < cur ? 'done' : ''; });
+      void bars[cur].offsetWidth; bars[cur].className = cur === n - 1 ? 'done' : 'on';   // the last bar stays full: the story stops on Get ready
+      prev.disabled = cur === 0; next.disabled = cur === n - 1;
+      document.getElementById('iN').textContent = m.t('{i} of {n}', { i: cur + 1, n }); tick(); }
+    const setHold = h => { if (h === paused) return; paused = h; st.classList.toggle('hold', h);
+      if (h){ clearTimeout(timer); left -= Date.now() - since; } else tick();
+      hold.setAttribute('aria-label', m.t(h ? 'Play' : 'Pause')); hold.innerHTML = h ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg>'; };
+    // tap a side to move (the start side goes back), hold anywhere to pause; links and buttons inside work as normal
+    let down = 0, held = false;
+    st.addEventListener('pointerdown', e => { if (e.target.closest('a,button')) return; down = Date.now(); held = false; setTimeout(() => { if (down){ held = true; setHold(true); } }, 220); });
+    st.addEventListener('pointerup', e => { if (!down) return; down = 0; if (held){ setHold(false); return; }
+      const r = st.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, back = document.dir === 'rtl' ? x > .67 : x < .33; go(cur + (back ? -1 : 1)); });
+    st.addEventListener('pointerleave', () => { if (down && held){ down = 0; setHold(false); } down = 0; });
+    hold.addEventListener('click', () => setHold(!paused));
+    prev.addEventListener('click', () => go(cur - 1)); next.addEventListener('click', () => go(cur + 1));
+    st.tabIndex = 0; st.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key]; if (d){ e.preventDefault(); go(cur + d * (document.dir === 'rtl' ? -1 : 1)); } if (e.key === ' '){ e.preventDefault(); setHold(!paused); } });
+    document.addEventListener('visibilitychange', () => setHold(document.hidden));
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) paused = true;
+    go(0);
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

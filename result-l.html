@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option L</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option L · Map: the page opens on a full-width map of SFA Domes Dammam with the booking card on it (booked, what, when, for, directions). Underneath: how arrival works in three steps, the tickets, then payment.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf{max-width:none;padding:var(--nav) 0 clamp(56px,9vh,96px)}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{display:block}
+.l-map{position:relative;height:clamp(520px,72vh,720px);background:var(--color-bg-tertiary);overflow:hidden}
+.l-map iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:grayscale(.6) contrast(1.05)}
+.l-card{position:absolute;z-index:1;inset-block-start:clamp(24px,5vh,56px);inset-inline-start:var(--g);width:min(420px,calc(100% - 32px));display:grid;gap:16px;padding:28px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);box-shadow:0 24px 48px -16px rgba(9,9,11,.35);animation:up .7s var(--ease) both}
+.l-ok{display:flex;align-items:center;gap:12px;font:var(--ts-label-m);color:var(--color-brand)}
+.l-ok::before{content:"";width:32px;height:32px;background:var(--color-brand) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='square'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/20px no-repeat}
+.l-card h1{font:var(--ts-display-m);text-transform:var(--type-case-display)}
+.l-card .rows{font:var(--ts-body-m)}
+.l-card .rows dd{font:var(--ts-label-l)}
+.l-card .acts{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.l-card .acts .btn{grid-column:1/-1}
+.l-card .ghost{height:48px}
+.l-card .cf-sub{font:var(--ts-body-s)}
+.l-pin{position:absolute;z-index:1;left:50%;top:50%;translate:-50% -100%;display:grid;justify-items:center;pointer-events:none}
+.l-pin b{padding:8px 12px;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-label-s);white-space:nowrap}
+.l-pin i{width:2px;height:16px;background:var(--color-content-primary)}
+.l-in{max-width:var(--max);margin:0 auto;padding:clamp(40px,6vh,64px) var(--g) 0;display:grid;gap:clamp(40px,6vh,64px)}
+.l-h{margin:0 0 20px;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.l-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;counter-reset:s}
+.l-steps li{display:grid;gap:8px;align-content:start;padding:24px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.l-steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font:var(--ts-number-s);color:var(--color-brand)}
+.l-steps b{font:var(--ts-label-l)}
+.l-steps span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.l-two{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:clamp(20px,3vw,40px);align-items:start}
+.l-tix{display:grid;gap:16px}
+.l-tix.fold .tk:nth-child(n+3){display:none}
+@media (max-width:960px){.l-two{grid-template-columns:minmax(0,1fr)}.l-steps{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){
+  .l-map{height:auto;display:grid;background:none;overflow:visible}
+  .l-map iframe,.l-pin{position:relative;inset:auto;left:auto;top:auto;translate:none}
+  .l-map iframe{height:260px;order:-1}
+  .l-pin{display:none}
+  .l-card{position:relative;inset:auto;width:auto;margin:-40px 16px 0;box-shadow:0 16px 32px -16px rgba(9,9,11,.35);padding:20px}
+  .l-card h1{font:var(--ts-title-l)}
+  .l-card .ghost{padding:0 12px;white-space:nowrap}
+}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option L · Map</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m, s0 = m.list[0], P = window.SFA_PREFS;
+    const map = `https://www.google.com/maps?q=26.4047835,50.0250094&z=15&hl=${P.lang === 'ar' ? 'ar' : 'en'}&output=embed`;
+    const early = m.prog ? 15 : 10;
+    return `<section class="l-map"><iframe src="${map}" title="${t('Map of SFA Domes Dammam')}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="l-card"><span class="l-ok">${t('Booking confirmed')}</span><h1>${t(m.title)}</h1>
+          <dl class="rows"><dt>${t(m.prog ? 'Program' : 'Court')}</dt><dd>${esc(m.D.label)}</dd><dt>${t('When')}</dt><dd>${m.date(s0)}<br>${m.time(s0)}</dd><dt>${t('For')}</dt><dd>${m.who}</dd>${m.count > 1 ? `<dt>${t('Sessions')}</dt><dd>${m.sessionsTxt}</dd>` : ''}</dl>
+          <p class="cf-sub">${m.ref}</p>
+          <div class="acts"><a class="btn" href="${acts.dir}" target="_blank" rel="noopener">${ICON.pin}${t('Get directions')}</a><a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Calendar')}</a><a class="ghost" href="${acts.tickets}">${ICON.qr}${t('My tickets')}</a></div></div></section>
+      <div class="l-in">
+        <section><h2 class="l-h">${t('When you arrive')}</h2><ol class="l-steps">
+          <li><b>${t('Arrive by {time}', { time: `<bdi>${P.time(s0.start - early)}</bdi>` })}</b><span>${m.tips[2]}</span></li>
+          <li><b>${t('Check in at reception')}</b><span>${m.tips[1]}</span></li>
+          <li><b>${t('Head to {place}', { place: esc(m.D.title) })}</b><span>${t('Your session starts at {time}.', { time: `<bdi>${P.time(s0.start)}</bdi>` })}</span></li></ol></section>
+        <div class="l-two"><section><h2 class="l-h">${t(m.count > 1 ? '{n} tickets' : 'Your ticket', { n: m.count })}</h2>
+            <div class="l-tix${m.count > 2 ? ' fold' : ''}" id="lTix">${m.list.map(s => m.ticket(s)).join('')}
+            ${m.count > 2 ? `<button type="button" class="ghost" id="lMore">${t('Show all {n} tickets', { n: m.count })}</button>` : ''}</div></section>
+          <aside class="cf-side"><div class="box"><h2>${t(m.b.free ? 'Summary' : 'Payment')}</h2>${m.rows}</div>${acts.more ? `<a class="more" href="${acts.more.href}">${acts.more.label}</a>` : ''}</aside></div>
+      </div>`;
+  },
+  after: () => document.getElementById('lMore')?.addEventListener('click', e => { document.getElementById('lTix').classList.remove('fold'); e.currentTarget.remove(); })
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

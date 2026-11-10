@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Confirmation page · options</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<style>
+/* Review page: whole-page directions for the booking confirmation (result.html). Each option is a live page on real
+   bookings: a court booked for a child (3 sessions over 2 days) and a program month. Square corners, DS tokens. */
+*{box-sizing:border-box}
+body{margin:0;background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+main{max-width:960px;margin:0 auto;padding:56px 16px 96px}
+h1{margin:0 0 8px;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.lead{margin:0 0 40px;color:var(--color-content-secondary)}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+li{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:8px 16px;padding:20px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+li > b{display:grid;place-items:center;width:40px;height:40px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-m)}
+li.cur > b{background:var(--color-content-primary)}
+li strong{display:block;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+li p{margin:4px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.go{display:flex;flex-wrap:wrap;gap:8px}
+.go a{display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1px solid var(--color-border-secondary);color:inherit;font:var(--ts-label-m);text-decoration:none;white-space:nowrap}
+.go a:first-child{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.go a:hover{border-color:var(--color-brand)}
+.go a:first-child:hover{background:var(--color-brand)}
+@media (max-width:640px){li{grid-template-columns:40px minmax(0,1fr)}.go{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<main>
+<h1>Confirmation page</h1>
+<p class="lead">Fifteen whole-page directions for the booking confirmation, next to the live one. Every option works with real bookings: open a court booked for Yousef (3 sessions over 2 days) or a program month (12 sessions). Each page is responsive and switches to Arabic like the live one.</p>
+<h2 style="margin:0 0 8px;font:var(--ts-title-m);text-transform:var(--type-case-title)">Redesign from the benchmark · 10 Nov</h2>
+<p class="lead" style="margin-bottom:24px">Three new directions built on the confirmation benchmark. None shows QR codes or directions on the page (they live in My tickets), each says the QR works on the session day, and each offers the next booking. No cancellation rule yet.</p>
+<ol style="margin-bottom:56px">
+  <li><b>M</b><div><strong>Booking card</strong><p>Like Time2book and Cal.com: one calm column with a single card (what, when as a weekly pattern, who, coach, where, paid). All dates and payment fold away. View my tickets leads, then book more and calendar.</p></div>
+    <div class="go"><a href="result-m.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-m.html?cart=SFA-MW8UUVFQ-A018">Program</a><a href="result-m.html?cart=SFA-MW39RJRN-DE08">Trial</a><a href="result-m.html?cart=SFA-MW8WSJUN-1301">Game</a></div></li>
+  <li><b>N</b><div><strong>Next session</strong><p>Like Open and Headspace: leads with the session that comes next (Today / Tomorrow / In n days) beside "What happens next" in three steps. Then the schedule week by week, payment and a "keep playing" band.</p></div>
+    <div class="go"><a href="result-n.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-n.html?cart=SFA-MW8UUVFQ-A018">Program</a><a href="result-n.html?cart=SFA-MW39RJRN-DE08">Trial</a><a href="result-n.html?cart=SFA-MW8WSJUN-1301">Game</a></div></li>
+  <li><b>O</b><div><strong>Action list · live</strong><p>Like Viator and Eventbrite: a photo card with "You're all set, Sara", then a list of what to do now (tickets, calendar, sessions and booking details open in place, book more), with "More at SFA Domes" suggestions beside it.</p></div>
+    <div class="go"><a href="result-o.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-o.html?cart=SFA-MW8UUVFQ-A018">Program</a><a href="result-o.html?cart=SFA-MW39RJRN-DE08">Trial</a><a href="result-o.html?cart=SFA-MW8WSJUN-1301">Game</a></div></li>
+</ol>
+<h2 style="margin:0 0 16px;font:var(--ts-title-m);text-transform:var(--type-case-title)">Earlier directions</h2>
+<ol>
+  <li class="cur"><b>Now</b><div><strong>Live now: Action list (O)</strong><p>Picked on 10 Nov. A card with "You're all set", the confirmation email address and the booking as icon rows (what, when, where, who, booking ref with Copy), then a list of what to do now (tickets, calendar, sessions, booking details, book more) and "More at SFA Domes" beside it. No photo, QR codes or directions on the page.</p></div>
+    <div class="go"><a href="result.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>A</b><div><strong>Previous live: Hero pass</strong><p>Live 10 Nov until O was picked: the dark photo band, passes with QR for courts, the sessions list for programs.</p></div>
+    <div class="go"><a href="result-hero.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-hero.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>v1</b><div><strong>Previous live layout</strong><p>Headline, then the full tickets beside a sticky payment summary, actions and tips. Kept for comparison.</p></div>
+    <div class="go"><a href="result-v1.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-v1.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>A</b><div><strong>Hero pass</strong><p>A dark full-width band with the court photo: You're booked, what · when · for · sessions, and the three actions. Compact passes scroll sideways underneath; payment and tips last.</p></div>
+    <div class="go"><a href="result-a.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-a.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>B</b><div><strong>Receipt</strong><p>One calm centred column like a receipt: what you booked, each session as a line with its QR folded away (first one open), payment, then one main action.</p></div>
+    <div class="go"><a href="result-b.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-b.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>C</b><div><strong>Next steps</strong><p>Reads as what happens next: booking confirmed, add to calendar, plan your trip, show your ticket. The tickets sit in the last step; payment stays beside it.</p></div>
+    <div class="go"><a href="result-c.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-c.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>D</b><div><strong>Wallet</strong><p>App style: one big ticket at a time with a large QR for the door, a strip of sessions to switch. On phones the actions stay in a bar at the bottom.</p></div>
+    <div class="go"><a href="result-d.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-d.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>E</b><div><strong>Split screen</strong><p>Half the screen is the court photo with the headline and the essentials, pinned while the other half scrolls through compact tickets (QR beside each), actions, payment and tips.</p></div>
+    <div class="go"><a href="result-e.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-e.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>F</b><div><strong>Boarding pass</strong><p>One pass in the middle, like an airline boarding pass: the court big, date, time, who and session in a grid, a tear line and one large QR. Numbered tabs switch between sessions; payment details fold away under it.</p></div>
+    <div class="go"><a href="result-f.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-f.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>G</b><div><strong>Editorial</strong><p>Big type says when to come ("See you Thu 12 Nov"), then every session as one table row with its QR a tap away. Keeps a 12-session program short; payment, tips and actions share the bottom.</p></div>
+    <div class="go"><a href="result-g.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-g.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>H</b><div><strong>Calendar</strong><p>The booked days are marked on a month calendar, so a program's or multi-day booking's rhythm shows at a glance. Tap a day to see its ticket beside it.</p></div>
+    <div class="go"><a href="result-h.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-h.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>I</b><div><strong>Stories</strong><p>Plays like a phone story: You're booked → when and where → your ticket (big QR) → get ready. Bars fill once and move on by themselves; tap a side to go back or forward, hold to pause. Payment folds away beside it.</p></div>
+    <div class="go"><a href="result-i.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-i.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>J</b><div><strong>Bento</strong><p>Everything at a glance as a grid of tiles: the court photo with You're booked, the date and time big, who it's for, the first QR, every session day, actions, payment and tips.</p></div>
+    <div class="go"><a href="result-j.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-j.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>K</b><div><strong>Chat</strong><p>SFA Domes confirms it as a short message thread, typed in one message at a time: the booking card, the ticket with its QR, the payment, a tip. Quick replies answer back: Add to calendar, Get directions, View my tickets.</p></div>
+    <div class="go"><a href="result-k.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-k.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+  <li><b>L</b><div><strong>Map</strong><p>Opens on a map of SFA Domes Dammam with the booking card on it and Get directions first. Underneath: arriving in three steps (arrive by, check in, head to the court), then the tickets and payment.</p></div>
+    <div class="go"><a href="result-l.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-l.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
+</ol>
+<h2 style="margin:56px 0 8px;font:var(--ts-title-m);text-transform:var(--type-case-title)">Delight on the live page</h2>
+<p class="lead" style="margin-bottom:24px">Four layers on top of the previous layout (result-v1.html), so you can see the moment itself. Reload the page to see an animation again.</p>
+<ol>
+  <li><b>A</b><div><strong>Celebrate</strong><p>A burst of square confetti from the check mark (brand and programme colours), the mark pulses and the headline rises in.</p></div>
+    <div class="go"><a href="result-v1.html?cart=SFA-MW8UUVFH-45E3&amp;cx=a">Court</a><a href="result-v1.html?cart=SFA-MW8UUVFQ-A018&amp;cx=a">Program</a></div></li>
+  <li><b>B</b><div><strong>Ticket reveal</strong><p>The tickets print in one by one, each QR scans in with a moving line, and a PAID stamp lands on the first stub.</p></div>
+    <div class="go"><a href="result-v1.html?cart=SFA-MW8UUVFH-45E3&amp;cx=b">Court</a><a href="result-v1.html?cart=SFA-MW8UUVFQ-A018&amp;cx=b">Program</a></div></li>
+  <li><b>C</b><div><strong>Countdown + share</strong><p>A live countdown to the first session, and "Share with your team" (the phone's share sheet, or a copied message on desktop).</p></div>
+    <div class="go"><a href="result-v1.html?cart=SFA-MW8UUVFH-45E3&amp;cx=c">Court</a><a href="result-v1.html?cart=SFA-MW8UUVFQ-A018&amp;cx=c">Program</a></div></li>
+  <li><b>D</b><div><strong>Personal</strong><p>The headline greets by name ("Yousef is all set"), the booking at a glance as chips, and what to bring for that sport.</p></div>
+    <div class="go"><a href="result-v1.html?cart=SFA-MW8UUVFH-45E3&amp;cx=d">Court</a><a href="result-v1.html?cart=SFA-MW8UUVFQ-A018&amp;cx=d">Program</a></div></li>
+</ol>
+</main>
+</body>
+</html>

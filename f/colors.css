@@ -1,0 +1,51 @@
+/* SFA DS colour, laid out like WBK DS3: 1) locked colour primitives, 2) a semantic Colour collection with Light and
+   Dark modes (backgrounds / content / borders, each primary–secondary–tertiary, plus accent, inverse and states),
+   3) brand programme and feedback colours. Light is the default; a [data-mode=dark] scope switches the semantic
+   layer (the homepage sets it on <html>). Pages keep short local aliases (--ink, --bg, --line…) that point here.
+   See colors.html. */
+:root{
+  /* 🔒 Colour primitives · brand orange */
+  --orange-300:#FFB18F; --orange-500:#FF5A19; --orange-600:#E85217;
+  /* 🔒 Colour primitives · neutrals (zinc) */
+  --neutral-0:#FFFFFF; --neutral-100:#F4F4F5; --neutral-200:#E4E4E7; --neutral-300:#D4D4D8; --neutral-400:#A1A1AA;
+  --neutral-500:#71717A; --neutral-600:#52525B; --neutral-800:#27272A; --neutral-900:#18181B; --neutral-950:#09090B;
+  --black:#000000;
+  /* 🔒 Colour primitives · programmes */
+  --cyan-500:#3CC3DC; --purple-500:#7452AA; --yellow-300:#EBEB6E; --pink-600:#B9286E; --blue-700:#323CB9; --green-400:#23D782;
+  /* 🔒 Colour primitives · feedback */
+  --red-600:#DC2626; --amber-100:#FEF3C7; --amber-800:#92400E;
+  /* 🔒 Colour primitives · alpha */
+  --black-a50:rgba(0,0,0,.5); --white-a10:rgba(255,255,255,.1); --white-a16:rgba(255,255,255,.16); --orange-a8:rgba(255,90,25,.08); --orange-a10:rgba(255,90,25,.1);
+
+  /* 🅱 Brand · programme colours (same in both modes) */
+  --color-brand:var(--orange-500);
+  --color-programme-cyan:var(--cyan-500); --color-programme-youth:var(--purple-500); --color-programme-families:var(--yellow-300);
+  --color-programme-women:var(--pink-600); --color-programme-elders:var(--blue-700); --color-programme-pros:var(--green-400);
+  /* 🅵 Feedback (same in both modes) */
+  --color-danger:var(--red-600); --color-warning-bg:var(--amber-100); --color-warning-content:var(--amber-800);
+  /* Overlays */
+  --color-overlay:var(--black-a50); --color-overlay-light:var(--white-a10);
+}
+
+/* 🎨 Colour · Light mode (default) */
+:root,[data-mode=light]{
+  --color-bg-primary:var(--neutral-0);      --color-bg-secondary:var(--neutral-100);   --color-bg-tertiary:var(--neutral-200);
+  --color-bg-inverse:var(--neutral-950);
+  --color-bg-accent:var(--orange-500);      --color-bg-accent-hover:var(--orange-600); --color-bg-accent-subtle:var(--orange-a8);
+  --color-content-primary:var(--neutral-950); --color-content-secondary:var(--neutral-600); --color-content-tertiary:var(--neutral-500);
+  --color-content-disabled:var(--neutral-400); --color-content-accent:var(--orange-500); --color-content-inverse:var(--neutral-0);
+  --color-content-on-accent:var(--neutral-0);
+  --color-border-primary:var(--neutral-200); --color-border-secondary:var(--neutral-300); --color-border-strong:var(--neutral-950);
+  --color-border-accent:var(--orange-500);
+}
+/* 🎨 Colour · Dark mode */
+[data-mode=dark]{
+  --color-bg-primary:var(--neutral-950);    --color-bg-secondary:var(--neutral-900);   --color-bg-tertiary:var(--neutral-800);
+  --color-bg-inverse:var(--neutral-0);
+  --color-bg-accent:var(--orange-500);      --color-bg-accent-hover:var(--orange-600); --color-bg-accent-subtle:var(--orange-a10);
+  --color-content-primary:var(--neutral-0); --color-content-secondary:var(--neutral-400); --color-content-tertiary:var(--neutral-500);
+  --color-content-disabled:var(--neutral-600); --color-content-accent:var(--orange-500); --color-content-inverse:var(--neutral-950);
+  --color-content-on-accent:var(--neutral-0);
+  --color-border-primary:var(--white-a16); --color-border-secondary:var(--white-a10); --color-border-strong:var(--neutral-0);
+  --color-border-accent:var(--orange-500);
+}

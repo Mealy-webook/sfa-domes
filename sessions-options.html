@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your sessions · options</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/sessions-views.css">
+<style>
+/* Review page: options for checkout's "Your sessions" block (training programs). The layouts come from
+   f/sessions-views.js, the same file checkout.html?sv=… uses, with real data (6–8 Football, Sun/Tue/Thu 4:30 PM).
+   Spacing on the 4/8 grid; the card head and body share one 24px inner edge, as in checkout. */
+*{box-sizing:border-box}
+:root{--ink:var(--color-content-primary);--ink-2:var(--color-content-secondary);--ink-3:var(--color-content-tertiary);--line:var(--color-border-primary);--line-strong:var(--color-border-secondary);--bg:var(--color-bg-primary);--bg-soft:var(--color-bg-secondary);--brand:var(--color-brand);--brand-10:var(--color-bg-accent-subtle)}
+body{margin:0;background:var(--bg-soft);color:var(--ink);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+main{max-width:880px;margin:0 auto;padding:56px 16px 96px}
+h1{margin:0 0 8px;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.lead{margin:0 0 24px;color:var(--ink-2)}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:24px}
+.ctl span{font:var(--ts-label-m);color:var(--ink-2);margin-inline-end:8px}
+.ctl button{height:40px;padding:0 16px;border:1px solid var(--line-strong);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.ctl button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--neutral-0)}
+.jump{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:48px}
+.jump a{display:grid;place-items:center;min-width:40px;height:40px;padding:0 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:var(--ts-label-m);text-decoration:none}
+.jump a:hover{border-color:var(--ink)}
+.jump a.new{border-color:var(--brand)}
+.sep{display:flex;align-items:center;gap:16px;margin:0 0 32px;font:var(--ts-label-m);color:var(--ink-2)}
+.sep::after{content:"";flex:1;border-top:1px solid var(--line-strong)}
+.opt{margin:0 0 56px;scroll-margin-top:24px}
+.opt-h{display:flex;align-items:center;gap:12px;margin:0 0 4px}
+.opt-h b{display:grid;place-items:center;flex:none;width:32px;height:32px;background:var(--brand);color:var(--neutral-0);font:var(--ts-label-m)}
+.opt-h strong{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.opt-h small{padding:4px 8px;background:var(--brand-10);font:var(--ts-label-s);color:var(--color-content-accent)}
+.opt-h small.picked{background:var(--brand);color:var(--neutral-0)}
+.opt-h .live{margin-inline-start:auto;display:inline-flex;align-items:center;flex:none;height:40px;padding:0 16px;background:var(--ink);color:var(--neutral-0);font:var(--ts-label-m);text-decoration:none}
+.opt-h .live:hover{background:var(--brand)}
+.opt > p{margin:0 0 16px 44px;font:var(--ts-body-s);color:var(--ink-2)}
+
+/* the checkout card, as on checkout.html */
+.card{background:var(--bg);border:1px solid var(--line)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.card-h h2{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.card-h a{font:var(--ts-label-m);color:var(--ink);text-underline-offset:3px}
+.body{padding:16px 24px 24px}
+.pk-note{margin:0 0 16px;font:var(--ts-body-s);color:var(--ink-2)}
+@media (max-width:640px){.card-h{padding:16px}.body{padding:16px}.opt > p{margin-inline-start:0}.opt-h{flex-wrap:wrap}.opt-h .live{margin-inline-start:44px}}
+</style>
+</head>
+<body>
+<main>
+<h1>Your sessions</h1>
+<p class="lead"><b>Picked: H · Soonest first</b> (now in checkout, with Show all opening every session in a popup). Ten options for the sessions block in program checkout, with real 6–8 Football dates (Sun, Tue and Thu, 4:30 PM). Switch the plan to see how each copes with 1, 12 and 36 sessions. The other nine stay here for reference.</p>
+<div class="ctl" role="group" aria-label="Plan"><span>Plan</span><button type="button" data-plan="trial">Free trial</button><button type="button" data-plan="month" aria-pressed="true">1 month</button><button type="button" data-plan="month3">3 months</button></div>
+<nav class="jump" id="jump" aria-label="Jump to option"></nav>
+<div id="opts"></div>
+</main>
+<script src="f/programs-data.js"></script>
+<script src="f/sessions-views.js"></script>
+<script>
+(() => {
+  const V = window.SFA_SESSION_VIEWS, p = window.SFA_PROGRAMS['football-6-8'], START = window.SFA_PROGRAM_START_DAYS(p)[0], TIME = 990, NEW = 'fghij';
+  const t = (s, x) => x ? s.replace(/\{(\w+)\}/g, (m, k) => x[k] ?? m) : s;
+  const date = (d, o) => o === 'month' ? d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : d.toLocaleDateString('en-GB', o);
+  const timeFmt = m => { const h = Math.floor(m / 60) % 24, mm = m % 60; return `${(h + 11) % 12 + 1}:${String(mm).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`; };
+  let plan = 'month';
+  document.getElementById('jump').innerHTML = V.list.map(([k, name]) => `<a href="#opt-${k}"${NEW.includes(k) ? ' class="new"' : ''} title="${name}">${k.toUpperCase()}</a>`).join('');
+  function render(){
+    const list = window.SFA_PROGRAM_SESSIONS(p, START, plan), ctx = { list, p, time: TIME, t, date, timeFmt, locale: 'en-GB', lang: 'en' };
+    document.getElementById('opts').innerHTML = V.list.map(([k, name, why]) => (k === 'f' ? '<p class="sep">New options</p>' : '') + `<section class="opt" id="opt-${k}"><div class="opt-h"><b>${k.toUpperCase()}</b><strong>${name}</strong>${k === 'h' ? '<small class="picked">Picked · now in checkout</small>' : NEW.includes(k) ? '<small>New</small>' : ''}${k === 'h' ? '<a class="live" href="checkout.html" data-live>Open checkout</a>' : ''}</div><p>${why}</p>
+      <div class="card sv sv-${k}"><div class="card-h"><h2>Your sessions</h2><a href="#" onclick="return false">Change</a></div><div class="body">${V.render(k, ctx)}</div></div></section>`).join('');
+  }
+  document.querySelector('.ctl').addEventListener('click', e => { const b = e.target.closest('[data-plan]'); if (!b) return; plan = b.dataset.plan; document.querySelectorAll('[data-plan]').forEach(x => x.setAttribute('aria-pressed', x === b)); render(); });
+  document.getElementById('opts').addEventListener('click', e => {
+    // See it live: the real checkout with this plan (keeps an order you already started for this program)
+    if (e.target.closest('[data-live]')){
+      let o = null; try { o = JSON.parse(sessionStorage.getItem('sfaOrder')); } catch (x) {}
+      const days = window.SFA_PROGRAM_START_DAYS(p);
+      if (!o || o.kind !== 'program' || o.program !== 'football-6-8' || !days.includes(o.start)) o = { kind: 'program', program: 'football-6-8', start: days[0], time: p.slots.find(s => s.enrolled < p.capacity).time, people: { picked: ['kid-yousef'], added: [], kits: {} } };
+      o.plan = plan; if (plan === 'trial') o.people.kits = {};
+      try { sessionStorage.setItem('sfaOrder', JSON.stringify(o)); } catch (x) {}
+      return;
+    }
+    // Show all / Show fewer
+    const b = e.target.closest('[data-svmore]'); if (!b) return;
+    const items = [...b.closest('.body').querySelectorAll('[data-fold]')], open = items.some(x => x.hidden);
+    items.forEach(x => x.hidden = !open); b.textContent = open ? 'Show fewer' : b.dataset.label;
+  });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option J</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option J · Bento: everything at a glance as a grid of tiles: the court photo with "You're booked", the date and time big, who it's for, the first QR, every session day, actions, payment and tips. 4 columns on desktop, 2 on phones.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{display:block}
+.j-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;grid-template-areas:"hero hero date time" "hero hero qr who" "ses ses qr act" "pay pay tips cta"}
+.j-t{position:relative;min-width:0;display:grid;align-content:space-between;gap:16px;padding:24px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);animation:up .7s var(--ease) both;animation-delay:calc(var(--i,0) * .05s)}
+.j-t > small{font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.j-hero{grid-area:hero;min-height:360px;align-content:end;overflow:hidden;background:var(--neutral-950,#09090b);color:var(--neutral-0);border:0}
+.j-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.j-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.05) 20%,rgba(9,9,11,.88))}
+.j-hero > div{position:relative;z-index:1;display:grid;gap:12px}
+.j-ok{display:grid;place-items:center;width:48px;height:48px;background:var(--color-brand)}
+.j-ok svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:square}
+.j-hero h1{font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.j-hero p{margin:0;font:var(--ts-label-l)}
+.j-hero .ref{font:var(--ts-label-m);opacity:.8}
+.j-date{grid-area:date}.j-time{grid-area:time}.j-who{grid-area:who}.j-qr{grid-area:qr}.j-ses{grid-area:ses}.j-act{grid-area:act}.j-pay{grid-area:pay}.j-tips{grid-area:tips}.j-cta{grid-area:cta}
+.j-num{display:block;font:var(--ts-display-xl);line-height:1}
+.j-date b,.j-time b{display:block;margin-top:8px;font:var(--ts-label-l)}
+.j-mo{display:block;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.j-time .j-num{font:var(--ts-display-m)}
+.j-who strong{display:block;font:var(--ts-title-m);text-transform:var(--type-case-title);overflow-wrap:anywhere}
+.j-who span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.j-qr{justify-items:center;text-align:center;align-content:center}
+.j-qr .tk-qr{width:min(200px,100%)}
+.j-qr small{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.j-qr a{font:var(--ts-label-m);color:var(--color-content-secondary)}
+.j-qr a:hover{color:var(--color-brand)}
+.j-ses ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:4px}
+.j-ses li{display:grid;gap:2px;padding:8px 12px;background:var(--color-bg-secondary)}
+.j-ses li b{font:var(--ts-label-m)}
+.j-ses li span{font:var(--ts-caption);color:var(--color-content-secondary)}
+.j-ses li.x{place-content:center;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.j-act{align-content:start;gap:8px}
+.j-act .ghost{height:48px}
+.j-pay .rows{font:var(--ts-body-s)}
+.j-tips .tips{gap:12px}
+.j-cta{background:var(--color-brand);color:var(--neutral-0);border-color:var(--color-brand);text-decoration:none;transition:background-color .25s}
+.j-cta:hover{background:var(--color-bg-accent-hover)}
+.j-cta strong{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.j-cta svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .j-cta svg{scale:-1 1}
+.j-cta span{font:var(--ts-body-s);opacity:.85}
+.j-more{display:block;margin-top:16px;text-align:center;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.j-more:hover{color:var(--color-brand)}
+@media (max-width:1100px){.j-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"hero hero" "date time" "who qr" "act qr" "ses ses" "cta cta" "pay pay" "tips tips"}}
+@media (max-width:560px){.j-grid{grid-template-areas:"hero hero" "date time" "who who" "qr qr" "ses ses" "act act" "cta cta" "pay pay" "tips tips"}.j-hero{min-height:300px}.j-hero h1{font:var(--ts-display-m)}.j-t{padding:20px}.j-num{font:var(--ts-display-l)}.j-mo{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.j-time .j-num{font:var(--ts-title-l)}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option J · Bento</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m, s0 = m.list[0], P = window.SFA_PREFS, T = window.SFA_TICKETS, d0 = T.toDate(s0.date);
+    const days = [...new Set(m.list.map(s => s.date))], MAX = 7;
+    const perDay = d => m.list.filter(s => s.date === d && (!s.player || s.player === s0.player));
+    let i = 0; const tile = (cls, html, tag = 'div', attrs = '') => `<${tag} class="j-t ${cls}" style="--i:${i++}"${attrs}>${html}</${tag}>`;
+    return `<div class="j-grid">
+      ${tile('j-hero', `<img src="${m.D.img}" alt=""><div><span class="j-ok" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><h1>${t(m.title)}</h1><p>${esc(m.D.label)}</p><p>${m.ref}</p></div>`)}
+      ${tile('j-date', `<small>${t('Date')}</small><div><span class="j-num">${P.date(d0, { day: 'numeric' })}</span><b>${P.date(d0, { weekday: 'long' })}</b><span class="j-mo">${P.date(d0, { month: 'long', year: 'numeric' })}</span></div>`)}
+      ${tile('j-time', `<small>${t('Time')}</small><div><span class="j-num"><bdi>${P.time(s0.start)}</bdi></span><b>${t('Until {time}', { time: `<bdi>${P.time(s0.end)}</bdi>` })}</b></div>`)}
+      ${tile('j-who', `<small>${t(m.prog ? (T.people(m.b).length > 1 ? 'Participants' : 'Participant') : 'Booked for')}</small><div><strong>${m.who}</strong>${m.by ? `<span>${t('Booked by')} ${m.by}</span>` : ''}</div>`)}
+      ${tile('j-qr', `<small>${s0.of > 1 ? t('Session {i} of {n}', { i: s0.n, n: s0.of }) : t('Your ticket')}</small><div class="tk-qr" data-qr="${esc(s0.id)}" role="img" aria-label="${t('QR code for {ref}', { ref: esc(s0.id) })}"></div><span class="tk-ref">${esc(s0.id)}</span><small>${t('Show this at reception')}</small>${m.count > 1 ? `<a href="${acts.tickets}">${t('All {n} tickets', { n: m.count })}</a>` : ''}`)}
+      ${tile('j-ses', `<small>${m.count > 1 ? t('{n} sessions', { n: s0.of }) : t('Session')}</small><ol>${days.slice(0, MAX).map(d => `<li><b>${P.date(T.toDate(d), 'short')}</b><span>${perDay(d).map(s => `<bdi>${P.time(s.start)}</bdi>`).join(', ')}</span></li>`).join('')}${days.length > MAX ? `<li class="x">${t('+{n} more', { n: days.length - MAX })}</li>` : ''}</ol>`)}
+      ${tile('j-act', `<a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Add to calendar')}</a><a class="ghost" href="${acts.dir}" target="_blank" rel="noopener">${ICON.pin}${t('Get directions')}</a>`)}
+      ${tile('j-pay', `<small>${t(m.b.free ? 'Summary' : 'Payment')}</small>${m.rows}`)}
+      ${tile('j-tips', `<small>${t('Before you play')}</small><ul class="tips">${m.tips.slice(1).map(x => `<li>${x}</li>`).join('')}</ul>`)}
+      ${tile('j-cta', `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg><div><strong>${t('View my tickets')}</strong><br><span>${t('Your tickets are saved in your profile, under My tickets.')}</span></div>`, 'a', ` href="${acts.tickets}"`)}
+    </div>${acts.more ? `<a class="j-more" href="${acts.more.href}">${acts.more.label}</a>` : ''}`;
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

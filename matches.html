@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Open games · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,groups,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<style>
+/* Open games ("Book a match"): games SFA Domes runs (f/games-data.js, a SAMPLE schedule for now). Adults (18+) join one
+   spot for themselves and pay their share; server.js checks age, spots left and that you haven't joined already.
+   Filter by sport, level and day; Join opens a short window that goes straight to payment. Same hero as the sports page;
+   DS tokens only; square corners; 4/8 spacing. */
+:root{color-scheme:light;--nav:90px;--g:clamp(16px,6.67vw,96px);--ease:cubic-bezier(.22,1,.36,1);--max:1440px}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--color-brand);outline-offset:3px}
+.msi{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
+.mi{display:inline-block;width:20px;height:20px;background:currentColor;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+@keyframes up{from{opacity:0;translate:0 24px}to{opacity:1;translate:0 0}}
+.hero{padding-top:var(--nav)}
+.cap{max-width:var(--max);margin:0 auto;padding:clamp(32px,7vh,72px) var(--g) 0;display:grid;gap:16px;animation:up 1s var(--ease) .1s both}
+.eyebrow{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-label-l)}
+.ico{display:grid;place-items:center;width:32px;height:32px;flex:none;background:var(--color-brand);color:var(--neutral-0)}
+.ico .msi{font-size:var(--fs-20)}
+h1{margin:0;font:var(--ts-display-xl);text-transform:var(--type-case-display)}
+.sub{margin:0;max-width:56ch;font:var(--ts-body-l);color:var(--color-content-secondary)}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.facts span{padding:8px 12px;background:var(--color-bg-secondary);font:var(--ts-label-m)}
+.sample{padding:8px 12px;background:var(--color-warning-bg)!important;color:var(--color-warning-content)}
+.sec{max-width:var(--max);margin:0 auto;padding:clamp(40px,7vh,72px) var(--g) clamp(56px,9vh,96px)}
+.flt{display:grid;gap:12px;padding-bottom:24px;margin-bottom:24px;border-bottom:1px solid var(--color-border-secondary)}
+.chips,.days{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:-4px;padding:4px}
+.chips::-webkit-scrollbar,.days::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-label-m);cursor:pointer}
+.chip .msi{font-size:var(--fs-20)}
+.chip:hover,.day:hover{border-color:var(--color-content-primary)}
+.chip[aria-pressed=true]{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.chips.lv .chip{height:40px}
+.day{flex:none;display:grid;justify-items:start;gap:2px;min-width:96px;padding:12px 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);text-align:start;cursor:pointer}
+.day small{font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.day b{font:var(--ts-label-l)}
+.day span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.day[aria-pressed=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle)}
+.day.none span{color:var(--color-content-tertiary)}
+.lh{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 16px}
+.lh h2{margin:0;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.lh span{font:var(--ts-label-m);color:var(--color-content-tertiary)}
+.games{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.gm{display:grid;grid-template-columns:112px minmax(0,1.4fr) minmax(0,1fr) auto;align-items:center;gap:24px;padding:20px 24px;border:1px solid var(--color-border-primary);background:var(--color-bg-primary);animation:up .6s var(--ease) both;animation-delay:calc(.04s * var(--i,0))}
+.gm.mine{border-color:var(--color-brand)}
+.tm b{display:block;font:var(--ts-number-s)}
+.tm small{font:var(--ts-body-s);color:var(--color-content-tertiary)}
+.wh{display:grid;gap:4px;min-width:0}
+.wh strong{display:flex;align-items:center;gap:8px;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.wh strong .msi,.wh strong .mi{color:var(--color-brand)}
+.wh > span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.lvl{justify-self:start;margin-top:4px;padding:2px 8px;font:var(--ts-label-s);background:var(--color-bg-secondary)}
+.sp{display:grid;gap:8px}
+.sp-t{display:flex;justify-content:space-between;gap:8px;font:var(--ts-label-m)}
+.sp-t small{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.sp-bar{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:2px}
+.sp-bar i{height:8px;background:var(--color-bg-tertiary)}
+.sp-bar i.on{background:var(--color-content-primary)}
+.sp-bar i.me{background:var(--color-brand)}
+.full .sp-t{color:var(--color-danger)}
+.act{display:grid;justify-items:end;gap:12px;min-width:136px}
+.pr{display:grid;justify-items:end;gap:2px}
+.pr b{font:var(--ts-number-s)}
+.pr small{font:var(--ts-body-s);color:var(--color-content-tertiary)}
+.join{min-width:136px}
+.join{height:44px;padding:0 20px;border:0;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+.join:hover{background:var(--color-bg-accent-hover)}
+.join:disabled{background:var(--color-bg-tertiary);color:var(--color-content-disabled);cursor:not-allowed}
+.join.in{background:none;border:1px solid var(--color-brand);color:var(--color-content-accent)}
+.empty{display:grid;justify-items:start;gap:16px;padding:40px;border:1px dashed var(--color-border-secondary)}
+.empty p{margin:0;font:var(--ts-body-l);color:var(--color-content-secondary)}
+.empty button{height:48px;padding:0 20px;border:0;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+/* join window */
+dialog{width:min(520px,calc(100vw - 32px));max-height:calc(100vh - 64px);padding:0;border:0;background:var(--color-bg-primary);color:var(--color-content-primary)}
+dialog::backdrop{background:rgba(9,9,11,.55)}
+.dh{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-bottom:1px solid var(--color-border-primary)}
+.dh h2{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.x{display:grid;place-items:center;width:40px;height:40px;border:0;background:none;cursor:pointer}
+.x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+.db{display:grid;gap:16px;padding:24px}
+.rows{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;margin:0;font:var(--ts-body-s)}
+.rows dt{color:var(--color-content-tertiary)}
+.rows dd{margin:0;text-align:end}
+.rows .total{padding-top:12px;border-top:1px solid var(--color-border-primary);font:var(--ts-label-l)}
+.rows dt.total{margin-inline-end:-16px;padding-inline-end:16px}
+.who{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--color-bg-secondary);font:var(--ts-body-s)}
+.who b{display:grid;place-items:center;flex:none;width:40px;height:40px;background:var(--color-bg-primary);font:var(--ts-label-m)}
+.who strong{display:block;font:var(--ts-label-l)}
+.warn{margin:0;padding:12px 16px;border-inline-start:4px solid var(--color-danger);background:var(--color-bg-secondary);font:var(--ts-body-s)}
+.warn a{font-weight:600}
+.terms{display:flex;align-items:flex-start;gap:12px;font:var(--ts-body-s);cursor:pointer}
+.terms input{position:absolute;opacity:0}
+.terms .box{display:grid;place-items:center;flex:none;width:22px;height:22px;border:1.5px solid var(--color-border-secondary)}
+.terms .box svg{width:14px;height:14px;opacity:0}
+.terms input:checked + .box{background:var(--color-brand);border-color:var(--color-brand)}
+.terms input:checked + .box svg{opacity:1}
+.terms input:focus-visible + .box{outline:2px solid var(--color-brand);outline-offset:2px}
+.terms.bad .box{border-color:var(--color-danger)}
+.err{margin:0;font:var(--ts-body-s);color:var(--color-danger)}
+.err:empty{display:none}
+.pay{display:flex;align-items:center;justify-content:center;gap:8px;height:56px;border:0;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-l);cursor:pointer}
+.pay:disabled{background:var(--color-bg-tertiary);color:var(--color-content-disabled);cursor:not-allowed}
+@media (max-width:960px){.gm{grid-template-columns:88px minmax(0,1fr) auto;gap:16px}.sp{grid-column:2/-1;grid-row:2}}
+@media (max-width:560px){.gm{grid-template-columns:minmax(0,1fr);padding:16px;gap:12px}.tm{display:flex;align-items:baseline;gap:8px}.sp{grid-column:auto;grid-row:auto}
+  .act{display:flex;align-items:center;justify-content:space-between;gap:16px;min-width:0;padding-top:12px;border-top:1px solid var(--color-border-primary)}.pr{justify-items:start}.empty{padding:24px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main id="page"></main>
+<div data-site-footer></div>
+<dialog id="dlg" aria-labelledby="dlgT"></dialog>
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/games-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script>
+(() => {
+  const P = window.SFA_PREFS, t = P.t, S = window.SFA_SPORTS, GS = window.SFA_GAME_SPORTS, SLOT = window.SFA_SCHEDULE.SLOT;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const root = document.getElementById('page'), dlg = document.getElementById('dlg'), q = new URLSearchParams(location.search);
+  const DAYS = window.SFA_GAME_DAYS(14), TODAY = DAYS[0];
+  const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+  const nowMin = () => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
+  const upcoming = d => window.SFA_GAMES_ON(d).filter(g => d !== TODAY || g.start > nowMin());
+  const f = { sport: GS[q.get('sport')] ? q.get('sport') : '', level: q.get('level') || '', day: DAYS.includes(q.get('day')) ? q.get('day') : '' };
+  let online = {}, me = null, open = null;
+  const icon = sp => sp.img ? `<span class="mi" style="--m:url(${sp.img})"></span>` : `<span class="msi">${sp.icon}</span>`;
+  const X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="square" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+  const fits = g => (!f.sport || g.sport === f.sport) && (!f.level || g.level === f.level);
+  const taken = g => g.base + ((online[g.id] || {}).taken || 0), mine = g => !!(online[g.id] || {}).mine;
+  // the first day with a matching game opens unless one was picked
+  const firstDay = () => DAYS.find(d => upcoming(d).some(fits)) || TODAY;
+  async function loadOnline(){ try { const r = await fetch('/api/games?days=' + DAYS.join(','), { cache: 'no-store' }); online = r.ok ? await r.json() : {}; } catch (e) { online = {}; } }
+  const sync = () => { const u = new URLSearchParams(); if (f.sport) u.set('sport', f.sport); if (f.level) u.set('level', f.level); if (f.day) u.set('day', f.day); history.replaceState(null, '', u.toString() ? '?' + u : location.pathname); };
+
+  function gameRow(g, i){
+    const sp = S[g.sport], c = sp.courts[g.court], n = taken(g), left = g.spots - n, my = mine(g);
+    return `<li class="gm${left <= 0 && !my ? ' full' : ''}${my ? ' mine' : ''}" style="--i:${i}">
+      <div class="tm"><b>${P.time(g.start)}</b><small>${t('to {time}', { time: P.time(g.start + SLOT) })}</small></div>
+      <div class="wh"><strong><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}</strong><span>${esc(t(c[0]))} · ${esc(t(g.format))}</span><span class="lvl">${t(g.level)}</span></div>
+      <div class="sp"><div class="sp-t"><span>${my ? t("You're in") : left <= 0 ? t('Full') : left === 1 ? t('1 spot left') : t('{n} spots left', { n: left })}</span><small>${t('{a} of {b} players', { a: n, b: g.spots })}</small></div>
+        <div class="sp-bar" style="--n:${g.spots}" aria-hidden="true">${Array.from({ length: g.spots }, (_, k) => `<i class="${k < n ? (my && k === n - 1 ? 'me' : 'on') : ''}"></i>`).join('')}</div></div>
+      <div class="act"><span class="pr"><b>${P.money(g.price)}</b><small>${t('per player')}</small></span>
+        <button type="button" class="join${my ? ' in' : ''}" data-join="${esc(g.id)}"${left <= 0 || my ? ' disabled' : ''}>${my ? t('Joined') : left <= 0 ? t('Full') : t('Join game')}</button></div></li>`;
+  }
+  function paint(focus){
+    document.title = `${t('Open games')} · SFA Domes`;
+    const day = f.day || firstDay(), list = upcoming(day).filter(fits);
+    root.innerHTML = `<section class="hero" aria-labelledby="h1"><div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true"><span class="msi">groups</span></span>${t('SFA Domes Dammam')}</p>
+        <h1 id="h1">${t('Open games')}</h1><p class="sub">${t('Join a game we run: turn up, play with others at your level, and pay for your own spot only. No team needed.')}</p>
+        <div class="facts"><span>${t('Adults (18+)')}</span><span>${t('One spot per person')}</span><span>${t('Bibs and balls provided')}</span><span class="sample">${t('Sample games · the real schedule is coming')}</span></div></div></section>
+      <section class="sec" aria-labelledby="lh">
+        <div class="flt">
+          <div class="chips" role="group" aria-label="${t('Sport')}"><button type="button" class="chip" data-sport="" aria-pressed="${!f.sport}">${t('All sports')}</button>${Object.keys(GS).map(k => `<button type="button" class="chip" data-sport="${k}" aria-pressed="${f.sport === k}"><span aria-hidden="true">${icon(S[k])}</span>${esc(t(S[k].name))}</button>`).join('')}</div>
+          <div class="chips lv" role="group" aria-label="${t('Level')}"><button type="button" class="chip" data-level="" aria-pressed="${!f.level}">${t('Any level')}</button>${['Beginner', 'Intermediate', 'Advanced'].map(l => `<button type="button" class="chip" data-level="${l}" aria-pressed="${f.level === l}">${t(l)}</button>`).join('')}</div>
+          <div class="days" role="group" aria-label="${t('Day')}">${DAYS.map(d => { const n = upcoming(d).filter(fits).length;
+            return `<button type="button" class="day${n ? '' : ' none'}" data-day="${d}" aria-pressed="${d === day}"><small>${d === TODAY ? t('Today') : P.date(toDate(d), { weekday: 'short' })}</small><b>${P.date(toDate(d), { day: 'numeric', month: 'short' })}</b><span>${n ? (n === 1 ? t('1 game') : t('{n} games', { n })) : t('No games')}</span></button>`; }).join('')}</div>
+        </div>
+        <div class="lh"><h2 id="lh">${P.date(toDate(day), 'long')}</h2><span>${list.length === 1 ? t('1 game') : t('{n} games', { n: list.length })}</span></div>
+        ${list.length ? `<ol class="games">${list.map(gameRow).join('')}</ol>` : `<div class="empty"><p>${t('No games match on this day. Try another day, or clear the filters.')}</p>${f.sport || f.level ? `<button type="button" data-clear>${t('Clear filters')}</button>` : ''}</div>`}
+      </section>`;
+    if (focus) root.querySelector(focus)?.focus({ preventScroll: true });
+  }
+
+  // ---- join: who (the signed-in adult), what it costs, terms, then payment
+  function dialogHTML(g, err = ''){
+    const sp = S[g.sport], c = sp.courts[g.court], age = me && me.dob ? window.SFA_AGE(me.dob, g.date) : null;
+    const block = !me ? '' : !me.dob ? t('Add your date of birth in My account to join a game.') : age < 18 ? t('Open games are for adults (18+).') : '';
+    const ini = me ? String(me.name).split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() : '';
+    return `<div class="dh"><h2 id="dlgT">${t('Join game')}</h2><button type="button" class="x" data-close aria-label="${t('Close')}">${X}</button></div>
+      <div class="db"><dl class="rows"><dt>${t('Game')}</dt><dd>${esc(t(sp.name))} · ${t(g.level)}</dd><dt>${t('When')}</dt><dd>${P.date(toDate(g.date), 'full')} · <bdi>${P.time(g.start)}</bdi> – <bdi>${P.time(g.start + SLOT)}</bdi></dd>
+          <dt>${t('Where')}</dt><dd>${esc(t(c[0]))} · ${esc(t(g.format))}</dd><dt class="total">${t('Your spot')}</dt><dd class="total">${P.money(g.price)}</dd></dl>
+        ${me ? `<div class="who"><b aria-hidden="true">${esc(ini)}</b><span><strong>${esc(me.name)}</strong>${t('One spot, for you. Open games are for adults (18+).')}</span></div>` : ''}
+        ${block ? `<p class="warn">${block}${!me.dob ? ` <a href="profile.html#account">${t('Open My account')}</a>` : ''}</p>` : ''}
+        <label class="terms" id="jTerms"><input type="checkbox" id="jT"><span class="box" aria-hidden="true">${TICK}</span><span>${t('I agree to the terms and conditions and the health waiver.')}</span></label>
+        <p class="err" id="jErr" role="alert">${esc(err)}</p>
+        <button type="button" class="pay" id="jPay"${block ? ' disabled' : ''}>${t('Pay {total}', { total: P.money(g.price) })}</button></div>`;
+  }
+  async function join(id){
+    const g = window.SFA_GAME(id); if (!g) return;
+    me = await window.SFA_AUTH.me();
+    if (!me){ window.SFA_AUTH.open({ view: 'login', reason: t('Sign in to join a game.') }); return; }
+    open = g; dlg.dir = document.documentElement.dir; dlg.innerHTML = dialogHTML(g); dlg.showModal(); dlg.querySelector('#jT').focus();
+  }
+  dlg.addEventListener('click', async e => {
+    if (e.target === dlg || e.target.closest('[data-close]')) return dlg.close();
+    if (!e.target.closest('#jPay')) return;
+    const box = dlg.querySelector('#jTerms'), btn = dlg.querySelector('#jPay'), err = dlg.querySelector('#jErr');
+    if (!dlg.querySelector('#jT').checked){ box.classList.add('bad'); err.textContent = t('Accept the terms to continue'); return; }
+    btn.disabled = true; btn.textContent = t('Opening payment…'); err.textContent = '';
+    try {
+      const r = await fetch('/api/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order: { kind: 'game', game: open.id }, terms: true, waiver: true }) });
+      const d = await r.json().catch(() => ({}));
+      if (r.status === 401){ dlg.close(); window.SFA_AUTH.open({ view: 'login', reason: t('Sign in to join a game.') }); return; }
+      if (!r.ok || !d.redirect_url){ err.textContent = t(d.error || 'Could not start the payment. Try again.'); btn.disabled = false; btn.innerHTML = t('Pay {total}', { total: P.money(open.price) }); if (r.status === 409){ await loadOnline(); paint(); } return; }
+      location.href = d.redirect_url;
+    } catch (x) { err.textContent = t('Could not reach the server. Is node server.js running?'); btn.disabled = false; btn.innerHTML = t('Pay {total}', { total: P.money(open.price) }); }
+  });
+  dlg.addEventListener('change', e => { if (e.target.id === 'jT'){ dlg.querySelector('#jTerms').classList.remove('bad'); dlg.querySelector('#jErr').textContent = ''; } });
+
+  root.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    if (b.dataset.sport !== undefined){ f.sport = b.dataset.sport; sync(); paint(`.chip[data-sport="${f.sport}"]`); }
+    else if (b.dataset.level !== undefined){ f.level = b.dataset.level; sync(); paint(`.chip[data-level="${f.level}"]`); }
+    else if (b.dataset.day){ f.day = b.dataset.day; sync(); paint(`[data-day="${f.day}"]`); }
+    else if (b.dataset.clear !== undefined){ f.sport = ''; f.level = ''; sync(); paint('.chip[data-sport=""]'); }
+    else if (b.dataset.join) join(b.dataset.join);
+  });
+  paint();
+  loadOnline().then(() => paint());
+  addEventListener('sfa:auth', async e => { me = e.detail; await loadOnline(); paint(); });
+  addEventListener('sfa:prefs', () => paint());
+})();
+</script>
+</body>
+</html>

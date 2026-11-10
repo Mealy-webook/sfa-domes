@@ -1,0 +1,187 @@
+/* Court details page layout ("Q · Klook activity" style), moved out of court-details.html so the training program
+   page (program.html) shares it. Loaded after f/court-details.css. */
+/* Q · Klook activity page: breadcrumb, a wide photo, then two columns — the title with badges and quick facts
+   (open today, slot length, address) on the left, a sticky "From" price card on the right. Section tabs stick under
+   the bar and follow the scroll. Booking is a package card: court chips, a row of days, priced times, and the total
+   with Book now at the card's foot. Then highlights, details, location and FAQ, all in the left column. */
+.kl{padding-top:calc(90px + 20px);background:var(--bg)}
+.kl-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;font-size:var(--fs-14);color:var(--ink-3)}
+.kl-crumbs a{color:var(--ink);text-decoration:none}
+.kl-crumbs a:hover{color:var(--brand)}
+.kl-crumbs svg{width:14px;height:14px}
+.kl-photo{aspect-ratio:21/8;margin:0 0 28px}
+.kl-cols{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:clamp(24px,3vw,48px);align-items:start}
+.kl-main{min-width:0}
+.kl-head h1{font:var(--ts-title-l);margin:0;text-transform:var(--type-case-title)}
+.kl-head .eyebrow{font-size:var(--fs-16)}
+.kl-badges{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0;padding:0;list-style:none}
+.kl-badges li{display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 8px;background:var(--color-bg-secondary);color:var(--color-content-secondary);font:var(--ts-body-s)}
+.kl-badges svg{width:14px;height:14px}
+.kl-facts{display:grid;gap:16px;margin:24px 0 0;padding:0;list-style:none}
+.kl-facts li{display:flex;gap:12px;align-items:flex-start;font-size:var(--fs-16);line-height:22px}
+.kl-facts li>svg{flex:none;width:22px;height:22px;margin-top:1px;color:var(--ink)}
+.kl-facts small{font:var(--ts-body-s);display:block;color:var(--ink-3)}
+.kl-facts b{font-weight:600}
+.kl-hours{display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;color:var(--color-content-primary);font:inherit;font-weight:var(--type-w-body-bold);cursor:pointer;text-decoration:underline;text-decoration-color:var(--color-border-secondary);text-underline-offset:4px}
+.kl-hours svg{width:16px;height:16px}
+.kl-hours:hover{text-decoration-color:currentColor}
+html[dir=rtl] .kl-crumbs svg,html[dir=rtl] .kl-hours svg{transform:scaleX(-1)}
+.kl-facts a{color:var(--ink);text-underline-offset:3px}
+.kl-facts a:hover{color:var(--brand)}
+/* section tabs: stick under the site bar (or at the top while the bar is hidden) */
+.kl-tabs{position:sticky;top:90px;z-index:20;margin:28px 0 0;background:var(--bg);border-bottom:1px solid var(--line-strong);transition:top .45s var(--ease)}
+body.kl-away .kl-tabs{top:0}
+.kl-tabs div{display:flex;gap:clamp(16px,2.4vw,32px);overflow-x:auto;scrollbar-width:none}
+.kl-tabs div::-webkit-scrollbar{display:none}
+.kl-tabs a{font:var(--ts-label-m);flex:none;display:flex;align-items:center;height:52px;border-bottom:3px solid transparent;margin-bottom:-1px;color:var(--ink-3);text-decoration:none;text-transform:var(--type-case-label)}
+.kl-tabs a:hover{color:var(--ink)}
+.kl-tabs a.on{color:var(--ink);border-bottom-color:var(--brand)}
+.kl-sec{padding:clamp(36px,6vh,56px) 0 0;scroll-margin-top:150px}
+.kl-h{font:var(--ts-title-s);display:flex;align-items:center;gap:12px;margin:0 0 20px;text-transform:var(--type-case-title)}
+.kl-h::before{content:"";flex:none;width:4px;height:20px;background:var(--color-brand)}
+/* package card */
+.kl-courts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.kl-courts a{display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1px solid var(--line-strong);background:var(--bg);color:var(--ink);text-decoration:none;font-size:var(--fs-14);font-weight:600}
+.kl-courts a:hover{border-color:var(--ink)}
+.kl-courts a[aria-current]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
+.kl-pk{border:1px solid var(--brand);background:var(--bg)}
+.kl-pk-head{display:flex;justify-content:space-between;gap:16px;padding:20px 24px;border-bottom:1px solid var(--line)}
+.kl-pk-head h3{font:var(--ts-label-l);text-transform:var(--type-case-label);margin:0;color:var(--brand)}
+.kl-pk-head p{margin:4px 0 0;font-size:var(--fs-14);color:var(--ink-3)}
+.kl-ticks{display:flex;flex-wrap:wrap;gap:8px 16px;margin:12px 0 0;padding:0;list-style:none;font-size:var(--fs-14);color:var(--ink-2)}
+.kl-ticks li{display:inline-flex;align-items:center;gap:8px}
+.kl-ticks svg{width:15px;height:15px;color:var(--ink)}
+.kl-pk-price{flex:none;margin:0;text-align:end;font-size:var(--fs-14);color:var(--ink-3)}
+.kl-pk-price b{font:var(--ts-number-s);display:block;color:var(--ink)}
+.kl-pk-price b small{font-size:var(--fs-14);font-weight:500;color:var(--ink-3)}
+.kl-pk .booking{padding:20px 24px 8px;scroll-margin-top:150px}
+.kl-pk .step-head{border:0;padding:0;margin:0 0 12px}
+.kl-pk .step-head h2{font:var(--ts-body-m-bold);color:var(--ink-3)}
+.kl-pk .legend,.kl-pk .step-note,.kl-pk .cal-key{display:none}
+.kl-pk .panel{padding:0;border:0}
+.kl-pk .cal-month{font-size:var(--fs-18)}
+.kl-pk .slots-day{font-size:var(--fs-16)}
+.kl-foot .summary{position:static;border:0;border-top:1px solid var(--line);background:var(--bg-soft)}
+.kl-foot .sum-body{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 20px;align-items:center;padding:16px 24px}
+.kl-foot .sum-title,.kl-foot .sum-rows{display:none}
+.kl-foot #sumDays{grid-column:1/-1}
+.kl-foot .sum-empty{margin:0 0 12px;padding:0;border:0;text-align:start}
+.kl-foot .sum-days{max-height:220px;margin-bottom:12px}
+.kl-foot .sum-total{margin:0;padding:0;border:0;justify-content:flex-start;gap:8px}
+.kl-foot .sum-total strong{font-size:var(--fs-32)}
+.kl-foot .book{width:auto;height:52px;font-size:var(--fs-20)}
+/* highlights, details, location */
+.kl .about-feats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kl .about-feats li{padding:16px;border:1px solid var(--line);font-size:var(--fs-16);line-height:22px;color:var(--ink)}
+.kl .about-feats svg{width:24px;height:24px}
+.kl .about-lead{margin:0 0 20px}
+.kl .about-stats{margin:0}
+.kl .loc-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
+.kl .loc-map{min-height:280px}
+.kl-faq{padding-bottom:clamp(56px,10vh,96px)}
+/* the sticky price card */
+.kl-side{position:sticky;top:160px;display:grid;gap:12px}
+body.kl-away .kl-side{top:72px}
+.kl-card{padding:24px;border:1px solid var(--line-strong);background:var(--bg);box-shadow:0 14px 34px -26px rgba(9,9,11,.45)}
+/* price with the heart and share beside it, then a full-width button */
+.kl-card .hero-book{margin:0;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:16px 8px}
+.kl-card .hero-actions{display:contents}
+.kl-card .hero-actions .cta{grid-column:1/-1;justify-content:center;padding:0 16px}
+/* Q: the price card hides while the Book tab is on */
+body.kl-in-book .kl-card{display:none}
+.kl-note{display:flex;align-items:center;gap:12px;margin:16px 0;padding:16px 24px;border:1px solid var(--line-strong);font-size:var(--fs-14);font-weight:600}
+.kl-note svg{flex:none;width:20px;height:20px;color:var(--color-content-secondary)}
+@media (max-width:1023px){
+  .kl-cols{grid-template-columns:minmax(0,1fr)}
+  .kl-side{display:none}
+  .kl-photo{aspect-ratio:16/9;margin-inline:calc(var(--gutter) * -1)}
+  .kl{padding-top:calc(90px + 16px)}
+}
+@media (max-width:640px){
+  .kl{padding-top:90px}
+  .kl-crumbs{display:none}
+  .kl-photo{margin-bottom:20px}
+}
+@media (max-width:640px){
+  .kl-pk-head{flex-direction:column}
+  .kl-courts{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter)}
+  .kl-courts::-webkit-scrollbar{display:none}
+  .kl-courts a{flex:none}
+  .kl-pk-price{text-align:start}
+  .kl-pk-head,.kl-pk .booking,.kl-foot .sum-body{padding-inline:16px}
+  .kl .about-feats,.kl .loc-grid{grid-template-columns:minmax(0,1fr)}
+  .kl-foot .sum-total strong{font-size:var(--fs-28)}
+  .kl-foot .book{padding:0 16px;font-size:var(--fs-18)}
+}
+
+/* Q's booking is F1's month calendar under a "Days & times" heading, with Q's original foot under it: picks, total and
+   Book. As on the original Q, phones keep the bottom bar from the start ("From" price) and desktop has none. */
+.v-q .booking{padding:clamp(36px,6vh,56px) 0 0;scroll-margin-top:150px}
+.v-q .booking .step-head h2{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.v-q .booking .step-head h2::before{content:"";display:inline-block;width:4px;height:20px;margin-inline-end:12px;vertical-align:-3px;background:var(--color-brand)}
+/* Details: no Open today box (it's in the quick facts at the top); Setting takes the full last row */
+.v-q .about-stats .st-hours{display:none}
+.v-q .about-stats > div:nth-child(4){grid-column:1/-1}
+/* bottom bar: a smaller total, in the label face (Ahmed: the Anton 28px total was too large) */
+body.v-q .go .go-pick strong{font:var(--ts-number-s)}
+body.v-q .go .go-pick strong small{font-size:var(--fs-14);font-weight:400;text-transform:none;color:var(--ink-3)}
+/* once a time is picked the bottom bar carries the total and Book, so the Check availability card steps aside */
+body.v-q.has-picks .kl-card{display:none}
+/* Location (Ahmed picked option 1): a tall map with the venue card over its bottom corner; phones stack the card under the map */
+.v-q #loc .loc-grid{position:relative;display:block;height:440px}
+.v-q #loc .loc-map{position:absolute;inset:0;min-height:0}
+.v-q #loc .loc-cover{justify-content:flex-end;padding-inline-end:16px}
+.v-q #loc .loc-card{position:absolute;z-index:2;inset-inline-start:20px;bottom:20px;width:min(340px,calc(100% - 40px));box-shadow:0 18px 40px -20px rgba(9,9,11,.45)}
+.v-q #loc .loc-name{font:var(--ts-label-l);text-transform:var(--type-case-label)}
+.v-q #loc .loc-list{margin-bottom:20px}
+@media (max-width:640px){
+  .v-q #loc .loc-grid{display:flex;flex-direction:column;gap:0;height:auto}
+  .v-q #loc .loc-map{position:relative;order:-1;height:260px}
+  .v-q #loc .loc-cover{justify-content:center;padding-inline-end:0}
+  .v-q #loc .loc-card{position:relative;inset:auto;width:auto;border-top:0;box-shadow:none}
+}
+/* the summary under the calendar is gone (Ahmed): booking runs from the bottom bar; the markup stays for the shared script */
+.q-foot{display:none}
+@media (max-width:640px){.v-q .booking .step-head{flex-direction:column;align-items:flex-start;gap:12px}}
+/* FAQ: 5 questions, the rest behind Show all */
+.v-q .kl-faq:not(.all) .faq-item:nth-child(n+6){display:none}
+.kl-faq-more{font:var(--ts-label-m);display:inline-flex;align-items:center;height:48px;margin-top:20px;padding:0 20px;border:1px solid var(--ink);background:var(--bg);color:var(--ink);cursor:pointer;transition:background-color .25s,color .25s;text-transform:var(--type-case-label)}
+.kl-faq-more:hover{background:var(--ink);color:var(--neutral-0)}
+/* You might also like: a scrolling row of court cards under both columns */
+.v-q .kl-faq{padding-bottom:0}
+.v-q .kl-cols{padding-bottom:clamp(40px,7vh,64px)}
+.kl-more{padding:clamp(40px,7vh,64px) 0 clamp(56px,10vh,96px);border-top:1px solid var(--line)}
+.kl-more-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.kl-more-head .kl-h{margin:0}
+.kl-more-nav{display:flex;gap:8px}
+html[dir=rtl] .kl-more-nav svg{transform:scaleX(-1)}
+.kl-more-row{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 3 * 16px) / 4);gap:16px;margin:0;padding:0 0 4px;list-style:none;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.kl-more-row::-webkit-scrollbar{display:none}
+.kl-more-row li{scroll-snap-align:start;min-width:0}
+.kl-mc{display:flex;flex-direction:column;height:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-decoration:none;transition:border-color .25s,box-shadow .25s}
+.kl-mc:hover{border-color:var(--line-strong);box-shadow:0 14px 34px -26px rgba(9,9,11,.45)}
+.kl-mc-img{display:block;aspect-ratio:4/3;overflow:hidden;background:var(--bg-soft)}
+.kl-mc-img img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.kl-mc:hover .kl-mc-img img{transform:scale(1.04)}
+.kl-mc-body{display:flex;flex-direction:column;gap:4px;flex:1;padding:16px 16px 16px}
+.kl-mc-body small{font:var(--ts-body-s);color:var(--color-content-tertiary)}
+.kl-mc-body b{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.kl-mc-body > span{font:var(--ts-body-s);color:var(--ink-3)}
+.kl-mc-body em{font:var(--ts-label-l);text-transform:var(--type-case-label);margin-top:auto;padding-top:8px;font-style:normal}
+.kl-mc-body em span{font-size:var(--fs-14);font-weight:500;color:var(--ink-3)}
+.kl-mc-body .sar{width:.75em;height:.75em}
+@media (max-width:1023px){.kl-more-row{grid-auto-columns:calc((100% - 16px) / 2.3)}}
+@media (max-width:640px){.kl-more-nav{display:none}.kl-more-row{grid-auto-columns:72%;margin-inline:calc(var(--gutter) * -1);padding-inline:var(--gutter);scroll-padding-inline:var(--gutter)}}
+/* desktop: the bottom summary bar waits for the first pick (phones show it from the start, with the From price) */
+@media (min-width:1024px){body.v-q:not(.has-picks) .go.on{transform:translateY(105%)}}
+
+/* desktop: the bottom booking bar (as on phones) slides up once a time is picked */
+@media (min-width:1024px){
+  body.v-q .go{display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;transform:translateY(105%);transition:transform .5s var(--ease);background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);box-shadow:0 -12px 32px -24px rgba(9,9,11,.4)}
+  body.v-q .go .inner{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:88px;padding-block:16px}
+  body.v-q .go-pick small{display:block;font-size:var(--fs-14);line-height:18px;color:var(--ink-3)}
+  body.v-q .go-pick strong{font:var(--ts-title-l);text-transform:var(--type-case-title);display:block}
+  body.v-q .go .book{width:auto;height:56px}
+  body.v-q .go.on{transform:none}
+  body.v-q.has-picks .faq{padding-bottom:140px}
+}

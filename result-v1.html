@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · previous layout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<style>
+/* PREVIOUS live layout (before Hero pass went live on 2026-11-10), kept for comparison and for the delight layers (?cx=a…d).
+   Booking confirmation. PayTabs sends the payer back here (via server.js /paytabs/return, which checks the payment with
+   PayTabs first): result.html?cart=SFA-… shows paid (the tickets, with a QR each, and what to do next), failed, or
+   still checking. Design-system tokens only (f/fonts.css text styles, f/colors.css); square corners. */
+:root{color-scheme:light;--nav:90px;--g:clamp(16px,6.67vw,96px);--ease:cubic-bezier(.22,1,.36,1);--max:1440px;--tk-hole:var(--color-bg-secondary)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--color-brand);outline-offset:3px}
+.msi{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
+img{display:block}
+@keyframes up{from{opacity:0;translate:0 20px}to{opacity:1;translate:0 0}}
+
+.cf{max-width:var(--max);margin:0 auto;padding:calc(var(--nav) + clamp(32px,6vh,64px)) var(--g) clamp(56px,9vh,96px)}
+/* head: the state mark, the headline and the booking ref */
+.cf-head{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px 20px;margin-bottom:clamp(28px,5vh,48px);animation:up .7s var(--ease) both}
+.mark{grid-row:span 2;display:grid;place-items:center;width:64px;height:64px;background:var(--color-brand);color:var(--neutral-0)}
+.mark svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:square}
+.mark path{stroke-dasharray:40;stroke-dashoffset:40;animation:draw .5s var(--ease) .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.failed .mark{background:var(--color-danger)}
+.pending .mark{background:var(--color-content-primary)}
+.pending .mark svg{animation:spin 1.4s linear infinite}
+.pending .mark path{stroke-dashoffset:0;animation:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.cf-sub{margin:0;font:var(--ts-body-l);color:var(--color-content-secondary)}
+.cf-sub .ref{font:var(--ts-label-l);color:var(--color-content-primary)}
+.test-tag{display:inline-block;margin-inline-start:8px;padding:2px 8px;background:var(--amber-100);color:var(--amber-800);font:var(--ts-label-m)}
+
+/* body: the tickets beside a summary with the next steps */
+.cf-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:clamp(20px,3vw,40px);align-items:start}
+.cf-tickets{display:grid;gap:16px}
+.cf-tickets .tk{animation:up .7s var(--ease) both;animation-delay:calc(.12s + var(--i,0) * .08s)}
+.cf-tickets.fold .tk:nth-child(n+4){display:none}
+.cf-side{position:sticky;top:calc(var(--nav) + 24px);display:grid;gap:16px;animation:up .7s var(--ease) .2s both}
+.box{background:var(--color-bg-primary);border:1px solid var(--color-border-primary);padding:24px}
+.box h2{margin:0 0 12px;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.rows{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;margin:0;font:var(--ts-body-s)}
+.rows dt{color:var(--color-content-tertiary)}
+.rows dd{margin:0;text-align:end;overflow-wrap:anywhere}
+.rows .total{padding-top:12px;border-top:1px solid var(--color-border-primary);font:var(--ts-label-l)}
+.rows dt.total{margin-inline-end:-16px;padding-inline-end:16px}   /* one unbroken line over the total: the label's border runs across the column gap */
+.rows dd.total{font:var(--ts-number-s)}
+.acts{display:grid;gap:8px}
+.btn,.ghost{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 20px;font:var(--ts-label-l);text-transform:var(--type-case-label);text-decoration:none;cursor:pointer;transition:background-color .25s,color .25s,border-color .25s}
+.btn{height:56px;border:0;background:var(--color-brand);color:var(--neutral-0)}
+.btn:hover{background:var(--color-bg-accent-hover)}
+.ghost{border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary)}
+.ghost:hover{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.btn svg,.ghost svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .btn .fwd{scale:-1 1}
+.more{justify-self:center;margin-top:4px;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.more:hover{color:var(--color-brand)}
+.tips{list-style:none;margin:0;padding:0;display:grid;gap:8px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.tips li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px}
+.tips li::before{content:"";width:8px;height:8px;margin:8px 8px 0;background:var(--color-brand)}
+/* failed / checking: one narrow column */
+.cf.solo .cf-grid{grid-template-columns:minmax(0,560px)}
+@media (max-width:960px){.cf-grid{grid-template-columns:minmax(0,1fr)}.cf-side{position:static}}
+@media (max-width:560px){.cf-head{grid-template-columns:minmax(0,1fr)}.mark{grid-row:auto;width:56px;height:56px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script src="f/result-delight.js" defer></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const P = window.SFA_PREFS, t = P.t, T = window.SFA_TICKETS;
+  // what was actually charged is always SAR, whatever the display currency
+  const money = n => `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${(+n).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>`;
+  const ICONS = { paid: '<path d="m5 12.5 4.5 4.5L19 7.5"/>', failed: '<path d="M6 6l12 12M18 6 6 18"/>', pending: '<path d="M12 3a9 9 0 1 0 9 9"/>' };
+  const ARROW = '<svg class="fwd" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>';
+  const CAL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4m8-4v4"/></svg>';
+  const PIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><path d="M12 11.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>';
+
+  const cart = new URLSearchParams(location.search).get('cart');
+  let tries = 0;
+  function show(state, title, sub, body = ''){
+    $('cf').className = 'cf ' + state + (state === 'paid' ? '' : ' solo'); $('markIcon').innerHTML = ICONS[state];
+    $('title').textContent = t(title); $('sub').innerHTML = sub; $('body').innerHTML = body;
+  }
+  const home = `<div class="acts"><a class="btn" href="index.html">${t('Back to home')}</a></div>`;
+  async function load(){
+    if (!cart) return show('failed', 'No booking found', t('This link is missing its booking reference.'), home);
+    let b;
+    try { const r = await fetch('/api/booking?cart=' + encodeURIComponent(cart)); b = await r.json(); if (!r.ok) throw new Error(b.error); }
+    catch (e) { return show('failed', 'No booking found', esc(t(e.message || 'We could not load this booking.')), home); }
+
+    const sport = window.SFA_SPORTS[b.order.sport], court = sport && sport.courts[b.order.court];
+    const list = T.sessions(b), bf = b.order.bookingFor || { type: 'me' };
+    const ref = `<span class="ref">${t('Booking ref {ref}', { ref: esc(b.cartId) })}</span>` + (b.test ? `<span class="test-tag">${t('Test payment · nothing was charged')}</span>` : '');
+    const prog = b.order.kind === 'program' && window.SFA_PROGRAMS[b.order.program], kit = b.order.kit, K = window.SFA_PROGRAM_KIT, game = b.order.kind === 'game';
+    // booked for a child (AC04): the guardian is shown as the booker; they accepted the waiver for the child
+    const w = b.order.waiver, by = w && w.guardian ? `<dt>${t('Booked by')}</dt><dd>${esc(w.acceptedBy)} · ${t('Guardian')}</dd>` : '';
+    const rows = `<dl class="rows">` + (prog
+      ? `<dt>${t('Program')}</dt><dd>${esc(T.tx(prog.name))}</dd><dt>${t('Plan')}</dt><dd>${t({ trial: 'Free trial', month: 'One month', month2: 'Two months', month3: 'Three months' }[b.order.plan] || 'One month')}</dd>
+        <dt>${t(T.people(b).length > 1 ? 'Participants' : 'Participant')}</dt><dd>${T.people(b).map(x => esc(x.name)).join('<br>')}</dd>${by}<dt>${t('Sessions')}</dt><dd>${t('{n} × {m} min', { n: list[0] ? list[0].of : 0, m: prog.minutes })}</dd>
+        ${kit ? `<dt>${esc(T.tx(K.name))}</dt><dd>× ${kit.qty}${kit.sizes ? ` · <bdi>${kit.sizes.map(esc).join(', ')}</bdi>` : ''}</dd>` : ''}`
+      : `<dt>${t('Court')}</dt><dd>${esc(t(sport?.name || ''))} · ${esc(t(court?.[0] || ''))}</dd>
+      ${game ? `<dt>${t('Open game')}</dt><dd>${t(b.order.level)} · ${t(b.order.format)}</dd><dt>${t('Your spot')}</dt><dd>${t('1 of {n} players', { n: b.order.spots })}</dd>` : `<dt>${t('Booked for')}</dt><dd>${bf.type === 'other' ? esc(bf.name) + ' · ' + esc(bf.phone) : bf.type === 'child' ? esc(bf.name) : t('Myself')}</dd>${by}
+      <dt>${t('Sessions')}</dt><dd>${P.lang === 'ar' ? t('{d} days · {n} × 1.5 hr', { d: b.order.days.length, n: list.length }) : `${b.order.days.length} ${b.order.days.length === 1 ? 'day' : 'days'} · ${list.length} × 1.5 hr`}</dd>`}`) + `
+      ${b.paidAt && !b.free ? `<dt>${t('Paid on')}</dt><dd>${P.date(new Date(b.paidAt), 'full')}</dd>` : ''}
+      ${b.tranRef ? `<dt>${t(b.test ? 'Test ref' : 'PayTabs ref')}</dt><dd>${esc(b.tranRef)}</dd>` : ''}
+      <dt class="total">${t(b.status === 'paid' ? 'Paid' : 'Total')}</dt><dd class="total">${b.free ? t('Free of charge') : money(b.amount)}</dd></dl>`;
+
+    if (b.status === 'paid'){
+      try { sessionStorage.removeItem('sfaOrder'); } catch (e) {}
+      show('paid', b.free ? 'Your free trial is booked' : "You're booked", ref,
+        `<section class="cf-tickets${list.length > 3 ? ' fold' : ''}" id="cfTickets" aria-label="${t('Tickets')}">${list.map((s, i) => T.ticket(s, b).replace('class="tk"', `class="tk" style="--i:${Math.min(i, 3)}"`)).join('')}
+          ${list.length > 3 ? `<button type="button" class="ghost" id="cfMore" aria-expanded="false">${t('Show all {n} tickets', { n: list.length })}</button>` : ''}</section>
+        <aside class="cf-side">
+          <div class="box"><h2>${t(b.free ? 'Summary' : 'Payment')}</h2>${rows}</div>
+          <div class="acts"><a class="btn" href="profile.html#tickets">${t('View my tickets')}${ARROW}</a>
+            <a class="ghost" href="${T.ics(b)}" download="${T.icsName(b)}">${CAL}${t('Add to calendar')}</a>
+            <a class="ghost" href="${T.DIRECTIONS}" target="_blank" rel="noopener">${PIN}${t('Get directions')}</a>
+            ${prog ? (b.order.plan === 'trial' ? `<a class="more" href="program.html?p=${encodeURIComponent(b.order.program)}#book">${t('Subscribe for a month')}</a>` : '') : game ? `<a class="more" href="matches.html">${t('Find another game')}</a>` : b.order.ladies ? `<a class="more" href="ladies-hours.html?sport=${encodeURIComponent(b.order.sport)}#book">${t('Book more ladies hours')}</a>` : `<a class="more" href="courts.html?sport=${encodeURIComponent(b.order.sport)}">${t('Book another court')}</a>`}</div>
+          <div class="box"><h2>${t('Before you play')}</h2><ul class="tips"><li>${t('Your tickets are saved in your profile, under My tickets.')}</li><li>${t('Show the QR code at reception when you arrive.')}</li><li>${t(prog ? 'Arrive at least 15 minutes before the session, in the training kit and sports shoes.' : 'Come 10 minutes early to change and warm up.')}</li></ul></div>
+        </aside>`);
+      $('cfMore')?.addEventListener('click', e => { $('cfTickets').classList.remove('fold'); e.currentTarget.remove(); });
+      return T.paintQR($('body'));
+    }
+    if (b.status === 'failed'){
+      return show('failed', "Payment didn't go through", `${esc(t(b.message || 'The payment was declined or cancelled.'))}. ${t('Nothing was charged.')}<br>${ref}`,
+        `<div class="box">${rows}</div><div class="acts"><a class="btn" href="checkout.html">${t('Try again')}</a><a class="ghost" href="index.html">${t('Back to home')}</a></div>`);
+    }
+    // pending / unknown: PayTabs hasn't settled yet; look again a few times
+    if (tries++ < 5){ show('pending', 'Checking your payment', `${t('Still confirming with PayTabs.')}<br>${ref}`); return setTimeout(load, 3000); }
+    show('pending', 'Payment not confirmed yet', `${t("We haven't heard back from PayTabs. If you were charged, your booking will confirm shortly.")}<br>${ref}`,
+      `<div class="box">${rows}</div><div class="acts"><button class="btn" type="button" onclick="location.reload()">${t('Check again')}</button><a class="ghost" href="index.html">${t('Back to home')}</a></div>`);
+  }
+  load();
+  addEventListener('sfa:prefs', () => { tries = 0; load(); });
+})();
+</script>
+</body>
+</html>

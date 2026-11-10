@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Add-ons · options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<style>
+/* Review page: options for the program checkout's Add-ons card (the Training Kit, SFA_PROGRAM_KIT: price, sizes). Each
+   option works with two participants already ticked (Faisal 10, Lana 14 on Basketball Skills), shows the add-ons total
+   and checks that every kit has a size, like checkout does. DS tokens, square corners, 4/8 spacing. */
+:root{--ink:var(--color-content-primary);--ink-2:var(--color-content-secondary);--ink-3:var(--color-content-tertiary);--ink-4:var(--color-content-disabled);--line:var(--color-border-primary);--line-strong:var(--color-border-secondary);--bg:var(--color-bg-primary);--bg-soft:var(--color-bg-secondary);--brand:var(--color-brand);--brand-10:var(--color-bg-accent-subtle);--danger:var(--color-danger)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg-soft);color:var(--ink);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+main{max-width:880px;margin:0 auto;padding:56px 16px 96px}
+h1{margin:0 0 8px;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.lead{margin:0 0 24px;color:var(--ink-2)}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:40px}
+.ctl span{font:var(--ts-label-m);color:var(--ink-2);margin-inline-end:8px}
+.ctl button{height:40px;padding:0 16px;border:1px solid var(--line-strong);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.ctl button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--neutral-0)}
+.opt{margin:0 0 56px}
+.opt-h{display:flex;align-items:center;gap:12px;margin:0 0 4px}
+.opt-h b{display:grid;place-items:center;flex:none;min-width:32px;height:32px;padding:0 8px;background:var(--brand);color:var(--neutral-0);font:var(--ts-label-m)}
+.opt-h.cur b{background:var(--ink)}
+.opt-h strong{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.opt > p{margin:0 0 16px 44px;font:var(--ts-body-s);color:var(--ink-2)}
+[dir=rtl] .opt > p{margin:0 44px 16px 0}
+.card{background:var(--bg);border:1px solid var(--line)}
+.card-h{padding:20px 24px;border-bottom:1px solid var(--line)}
+.card-h h2{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.card-b{display:grid;gap:16px;padding:24px}
+.note{margin:0;font:var(--ts-body-s);color:var(--ink-2)}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:16px;border-top:1px solid var(--line)}
+.foot p{margin:0;font:var(--ts-body-s);color:var(--ink-2)}
+.foot b{font:var(--ts-label-l);color:var(--ink)}
+.go{height:48px;padding:0 20px;border:0;background:var(--brand);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+.err{display:none;margin:0;font:var(--ts-body-s);color:var(--danger)}
+.bad > .err,.bad .err.own{display:block}
+.ok{margin:0;font:var(--ts-body-s);color:var(--ink-2)}
+@media (max-width:640px){.card-h,.card-b{padding:16px}.foot{display:grid}.go{width:100%}}
+
+/* shared pieces: the kit, a quantity stepper, size chips */
+.kit{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:4px 16px;align-items:center}
+.ic{grid-row:span 2;display:grid;place-items:center;width:64px;aspect-ratio:1;background:var(--bg-soft);color:var(--brand)}
+.ic svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+.kit strong{font:var(--ts-label-l)}
+.kit p{margin:0;font:var(--ts-body-s);color:var(--ink-2)}
+.pr{font:var(--ts-number-s);white-space:nowrap}
+.pr small{font:var(--ts-body-s);color:var(--ink-3)}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line-strong)}
+.qty button{width:40px;height:40px;border:0;background:none;font:var(--ts-label-l);cursor:pointer}
+.qty button:disabled{opacity:.35;cursor:default}
+.qty output{min-width:32px;text-align:center;font:var(--ts-label-l)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{height:40px;padding:0 12px;border:1px solid var(--line-strong);background:var(--bg);font:var(--ts-label-m);cursor:pointer;direction:ltr}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-checked=true]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--brand-10)}
+.chip .sug{margin-inline-start:6px;font:var(--ts-caption);color:var(--ink-3)}
+.lbl{display:block;margin:0 0 8px;font:var(--ts-label-m);color:var(--ink-2)}
+.bad .miss .chip,.bad .miss select{border-color:var(--danger)}   /* only the kits still missing a size */
+
+/* Now: quantity, then a size per kit */
+.n-kit{padding:16px;border:1px solid var(--line-strong)}
+.n-kit.on{border:2px solid var(--brand);padding:15px;background:var(--brand-10)}
+.n-q{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.n-sizes{grid-column:1/-1;display:grid;gap:16px;margin-top:16px}
+
+/* A · per participant */
+.a-rows{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.a-row{display:grid;gap:12px;padding:16px;border:1px solid var(--line-strong)}
+.a-row.on{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.a-top{display:flex;align-items:center;gap:16px}
+.a-top .av{display:grid;place-items:center;flex:none;width:40px;height:40px;background:var(--bg-soft);font:var(--ts-label-m);color:var(--ink-2)}
+.a-top .tx{flex:1;min-width:0;display:grid;gap:2px}
+.a-top .tx strong{font:var(--ts-label-l)}
+.a-top .tx small{font:var(--ts-body-s);color:var(--ink-2)}
+.sw{position:relative;flex:none;width:52px;height:32px;border:1.5px solid var(--line-strong);background:var(--bg-soft);cursor:pointer}
+.sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;background:var(--ink-3);transition:inset-inline-start .2s}
+.sw[aria-checked=true]{background:var(--brand);border-color:var(--brand)}
+.sw[aria-checked=true]::after{inset-inline-start:23px;background:var(--neutral-0)}
+
+/* B · add, then a menu per kit */
+.b-add{height:44px;padding:0 20px;border:1px solid var(--ink);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.b-add:hover{background:var(--ink);color:var(--neutral-0)}
+.b-list{list-style:none;margin:0;padding:0;display:grid;gap:8px;grid-column:1/-1;margin-top:16px}
+.b-list li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px}
+.b-list li > span{font:var(--ts-label-m);color:var(--ink-2)}
+.sel{position:relative;display:flex;align-items:center;height:44px;border:1px solid var(--line-strong);background:var(--bg)}
+.sel select{appearance:none;-webkit-appearance:none;flex:1;min-width:0;height:100%;padding:0 40px 0 12px;border:0;background:transparent;outline:0;font-size:var(--fs-16);cursor:pointer}
+[dir=rtl] .sel select{padding:0 12px 0 40px}
+.sel svg{position:absolute;inset-inline-end:10px;width:20px;height:20px;fill:none;stroke:var(--ink-2);stroke-width:2;pointer-events:none}
+.sel select.ph{color:var(--ink-3)}
+.x{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line-strong);background:var(--bg);cursor:pointer}
+.x svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+
+/* C · quantity per size */
+.c-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.c-cell{display:grid;justify-items:center;gap:8px;padding:12px 8px;border:1px solid var(--line-strong);background:var(--bg)}
+.c-cell.on{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--brand-10)}
+.c-cell b{font:var(--ts-label-l);direction:ltr}
+.c-cell small{font:var(--ts-caption);color:var(--ink-3)}
+@media (max-width:560px){.c-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* D · summary + window */
+.d-sum{display:flex;flex-wrap:wrap;gap:8px}
+.d-sum span{padding:8px 12px;background:var(--brand-10);font:var(--ts-label-m);direction:ltr}
+.d-edit{justify-self:start;height:44px;padding:0 20px;border:1px solid var(--ink);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.d-edit:hover{background:var(--ink);color:var(--neutral-0)}
+dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 64px);padding:0;border:0;background:var(--bg);color:var(--ink)}
+dialog::backdrop{background:rgba(9,9,11,.5)}
+.dh{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.dh h3{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.db{display:grid;gap:16px;padding:24px;overflow:auto}
+.df{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:16px 24px;border-top:1px solid var(--line)}
+.df p{margin:0;font:var(--ts-label-l)}
+.done{height:48px;padding:0 24px;border:0;background:var(--ink);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+/* E · with or without */
+.e-p{display:grid;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.e-n{display:flex;align-items:center;gap:12px;margin:0;font:var(--ts-label-l)}
+.av{display:grid;place-items:center;flex:none;width:40px;height:40px;background:var(--bg-soft);font:var(--ts-label-m);color:var(--ink-2)}
+.e-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.e-card{display:grid;justify-items:start;align-content:start;gap:4px;min-height:96px;padding:16px;border:1px solid var(--line-strong);background:var(--bg);text-align:start;cursor:pointer;position:relative}
+.e-card b{font:var(--ts-label-l)}
+.e-card:has(.e-ic){padding-inline-end:52px}   /* room for the shirt in the corner */
+.e-card small{font:var(--ts-body-s);color:var(--ink-2)}
+.e-card[aria-checked=true]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--brand-10)}
+.e-ic{display:grid;place-items:center;width:32px;height:32px;color:var(--brand)}
+.e-ic svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.e-card .e-ic{position:absolute;top:12px;inset-inline-end:12px}
+/* F · inside participants */
+.f-rows{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.f-row{display:grid;gap:12px;padding:12px 16px;border:1px solid var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--brand-10)}
+.f-top{display:flex;align-items:center;gap:16px}
+.f-top .av{background:var(--bg)}
+.f-top .tx{flex:1;display:grid;gap:2px}
+.f-top .tx strong{font:var(--ts-label-l)}
+.f-top .tx small{font:var(--ts-body-s);color:var(--ink-2)}
+.f-tick{display:grid;place-items:center;width:24px;height:24px;background:var(--brand);color:var(--neutral-0)}
+.f-tick svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.5}
+.f-kit{padding-inline-start:56px}
+.f-add{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px dashed var(--ink-3);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.f-add small{font:var(--ts-body-s);color:var(--ink-2)}
+.f-add svg{width:20px;height:20px;fill:none;stroke:var(--brand);stroke-width:1.8}
+.f-add[aria-pressed=true]{border:1px solid var(--ink)}
+.f-rm{margin-inline-start:8px;font:var(--ts-body-s);color:var(--ink-2);text-decoration:underline}
+.f-sz{padding-inline-start:56px}
+@media (max-width:560px){.f-kit,.f-sz{padding-inline-start:0}}
+/* G · shirts that grow */
+.g-shirts{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;align-items:end}
+.g-s{display:grid;justify-items:center;align-content:end;gap:4px;min-height:96px;padding:8px 2px;border:1px solid var(--line-strong);background:var(--bg);cursor:pointer}
+.g-s b{font:var(--ts-label-s);direction:ltr;white-space:nowrap}
+.g-s small{font:var(--ts-caption);color:var(--ink-3)}
+.g-ic svg{width:calc(40px * var(--k));height:calc(40px * var(--k));fill:none;stroke:var(--ink-2);stroke-width:1.8;stroke-linejoin:round}
+.g-s:hover{border-color:var(--ink)}
+.g-s[aria-checked=true]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--brand-10)}
+.g-s[aria-checked=true] svg{stroke:var(--brand)}
+@media (max-width:640px){.g-shirts{grid-template-columns:repeat(4,minmax(0,1fr))}}
+/* H · one tap */
+.h-all{display:flex;align-items:center;gap:16px;width:100%;padding:16px;border:1px solid var(--line-strong);background:var(--bg);text-align:start;cursor:pointer}
+.h-all[aria-checked=true]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--brand-10)}
+.h-all .tx{flex:1;display:grid;gap:4px}
+.h-all .tx strong{font:var(--ts-label-l)}
+.h-all .tx small{font:var(--ts-body-s);color:var(--ink-2)}
+.h-box{display:grid;place-items:center;flex:none;width:22px;height:22px;border:1.5px solid var(--line-strong);background:var(--bg)}
+.h-box svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:3.2;opacity:0}
+.h-all[aria-checked=true] .h-box{background:var(--brand);border-color:var(--brand)}
+.h-all[aria-checked=true] .h-box svg{opacity:1}
+.h-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.h-list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px 16px;padding:12px 0;border-bottom:1px solid var(--line);font:var(--ts-label-m)}
+.h-list bdi{font:var(--ts-label-l)}
+.h-chg{padding:0;border:0;background:none;font:var(--ts-label-m);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.h-sz{grid-column:1/-1}
+</style>
+</head>
+<body>
+<main>
+<h1>Add-ons</h1>
+<p class="lead" id="lead"></p>
+<div class="ctl" role="group" aria-label="Language"><span>Language</span><button type="button" data-lang="en">English</button><button type="button" data-lang="ar">العربية</button></div>
+<div id="opts"></div>
+</main>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script>
+(() => {
+  const P = window.SFA_PREFS, t = (s, p) => P.t(s, p), K = window.SFA_PROGRAM_KIT, tx = o => o && (P.lang === 'ar' ? o.ar : o.en);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const money = n => `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${n.toLocaleString('en-US')}</span>`;
+  const PEOPLE = [{ key: 'k2', name: 'Faisal Al-Qahtani', age: 10 }, { key: 'k3', name: 'Lana Al-Qahtani', age: 14 }];
+  const MAXQ = 10;
+  // a size to suggest from age: the children's sizes go up in pairs of years, then adult S–XL
+  const suggest = age => age <= 7 ? '6–7 Y' : age <= 9 ? '8–9 Y' : age <= 11 ? '10–11 Y' : age <= 13 ? '12–13 Y' : age <= 15 ? 'S' : 'M';
+  const SHIRT = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M17 6h14l10 6-4 9-5-2v23H16V19l-5 2-4-9z"/><path d="M19 6a5 5 0 0 0 10 0"/></svg>';
+  const CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  const X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  const ini = n => n.split(' ').slice(0, 2).map(w => w[0]).join('');
+  const kitHead = () => `<div class="kit"><span class="ic">${SHIRT}</span><div><strong>${esc(tx(K.name))}</strong><p>${esc(tx(K.items))}</p></div><span class="pr">${money(K.price)} <small>${t('each')}</small></span></div>`;
+  const qty = (attr, n, max = MAXQ, label) => `<span class="qty" role="group" aria-label="${label || t('Quantity')}"><button type="button" ${attr}="-1" aria-label="${t('Fewer')}"${n <= 0 ? ' disabled' : ''}>−</button><output aria-live="polite">${n}</output><button type="button" ${attr}="1" aria-label="${t('More')}"${n >= max ? ' disabled' : ''}>+</button></span>`;
+  const chips = (sel, data, sug) => `<div class="chips" role="radiogroup">${K.sizes.map(z => `<button type="button" class="chip" role="radio" aria-checked="${z === sel}" ${data} data-z="${esc(z)}">${esc(z)}${z === sug ? `<span class="sug">${t('suggested')}</span>` : ''}</button>`).join('')}</div>`;
+
+  // each option keeps its kits as a list of sizes ('' = no size yet); A and D also keep who each kit is for
+  const S = {};
+  const st = id => S[id] || (S[id] = { kits: [], bad: false, open: false });
+  const sizesOK = s => s.kits.every(k => (typeof k === 'string' ? k : k.z));
+  const count = s => s.kits.length;
+  const OPTS = [
+    { id: 'now', cur: true, name: 'Quantity, then a size per kit (now)', why: "What checkout has today: a quantity for the kit, then a row of sizes for each one. Flexible (any number, any sizes), but it doesn't say who each kit is for, so parents work out sizes in their head.",
+      body: s => `<div class="n-kit${count(s) ? ' on' : ''}">${kitHead().replace('<div class="kit">', '<div class="kit" style="padding:0;border:0">')}<div class="n-q"><span class="lbl" style="margin:0">${t('Quantity')}</span>${qty('data-q', count(s))}</div>
+          ${count(s) ? `<div class="n-sizes">${s.kits.map((z, i) => `<div class="need${z ? '' : ' miss'}"><span class="lbl">${t('Kit {n} size', { n: i + 1 })}</span>${chips(z, `data-i="${i}"`)}</div>`).join('')}</div>` : ''}</div>` },
+    { id: 'a', name: 'A kit for each participant', why: "Each participant gets a switch: \"Add a kit for Faisal\". Turning it on shows the sizes with one suggested from their age. Clear who it's for, and the size is usually one tap.",
+      body: s => `${kitHead()}<ul class="a-rows">${PEOPLE.map(c => { const k = s.kits.find(x => x.who === c.key), sug = suggest(c.age);
+          return `<li class="a-row${k ? ' on' : ''}"><div class="a-top"><span class="av" aria-hidden="true">${ini(c.name)}</span><span class="tx"><strong id="a-${c.key}">${esc(t('A kit for {name}', { name: c.name.split(' ')[0] }))}</strong><small>${t('Age {n}', { n: c.age })} · ${t('Suggested size {z}', { z: `<bdi dir="ltr">${sug}</bdi>` })}</small></span><button type="button" class="sw" role="switch" aria-checked="${!!k}" aria-labelledby="a-${c.key}" data-who="${c.key}"></button></div>
+            ${k ? `<div class="need">${chips(k.z, `data-for="${c.key}"`, sug)}</div>` : ''}</li>`; }).join('')}</ul>` },
+    { id: 'b', name: 'Add, then pick from a menu', why: 'The kit is one product line with an Add button. Each kit added becomes a row with a size menu and a remove button. Compact, and the size list stays out of the way until needed.',
+      body: s => `<div class="kit">${kitHead().replace(/^<div class="kit">|<\/div>$/g, '')}<div style="grid-column:1/-1;display:flex;justify-content:flex-end;margin-top:12px">${count(s) ? qty('data-q', count(s)) : `<button type="button" class="b-add" data-q="1">${t('Add')}</button>`}</div>
+          ${count(s) ? `<ul class="b-list">${s.kits.map((z, i) => `<li class="need${z ? '' : ' miss'}"><span>${t('Kit {n}', { n: i + 1 })}</span><div class="sel"><select data-i="${i}" class="${z ? '' : 'ph'}" aria-label="${t('Kit {n} size', { n: i + 1 })}"><option value="">${t('Choose a size')}</option>${K.sizes.map(x => `<option${x === z ? ' selected' : ''}>${esc(x)}</option>`).join('')}</select>${CHEV}</div><button type="button" class="x" data-rm="${i}" aria-label="${t('Remove kit {n}', { n: i + 1 })}">${X}</button></li>`).join('')}</ul>` : ''}</div>` },
+    { id: 'c', name: 'How many of each size', why: 'Sizes laid out as a grid, each with its own count (like ordering team kit). Fastest for families buying several sizes at once; every kit has a size by design, so nothing is left to fix.',
+      body: s => `${kitHead()}<div class="c-grid">${K.sizes.map(z => { const n = s.kits.filter(x => x === z).length;
+          return `<div class="c-cell${n ? ' on' : ''}"><b>${esc(z)}</b>${qty(`data-zq="${esc(z)}" data-d`, n, MAXQ, t('{size}: how many', { size: z }))}</div>`; }).join('')}</div>` },
+    { id: 'd', name: 'Summary, choose in a window', why: 'The card only says what you have ("2 kits · 10–11 Y, S") with an Add or Edit button; the window holds the per-participant switches and sizes. Keeps a long checkout short.',
+      body: s => `${kitHead()}${count(s) ? `<div class="d-sum">${s.kits.map(k => `<span>${esc(PEOPLE.find(c => c.key === k.who).name.split(' ')[0])} · ${esc(k.z || t('size?'))}</span>`).join('')}</div>` : `<p class="note">${t('No kits added.')}</p>`}
+          <button type="button" class="d-edit" data-dlg aria-haspopup="dialog">${count(s) ? t('Edit kits') : t('Add kits')}</button>
+          <dialog id="dDlg" aria-labelledby="dDlgT"><div class="dh"><h3 id="dDlgT">${esc(tx(K.name))}</h3><button type="button" class="x" data-close aria-label="${t('Close')}">${X}</button></div>
+            <div class="db">${OPTS[1].body(s).replace(kitHead(), '')}</div>
+            <div class="df"><p>${count(s) ? money(count(s) * K.price) : '–'}</p><button type="button" class="done" data-close>${t('Done')}</button></div></dialog>` }
+    ,
+    { id: 'e', name: 'With or without the kit', why: 'For each participant, two cards side by side: "Training only" or "Training + kit" with the difference in price. Picking the kit card shows the sizes, the suggested one already chosen. Makes the choice feel like part of the plan.',
+      body: s => `${PEOPLE.map(c => { const k = s.kits.find(x => x.who === c.key), sug = suggest(c.age);
+          return `<div class="e-p"><p class="e-n"><span class="av" aria-hidden="true">${ini(c.name)}</span>${esc(c.name.split(' ')[0])} · ${t('Age {n}', { n: c.age })}</p>
+            <div class="e-two" role="radiogroup" aria-label="${esc(c.name)}"><button type="button" class="e-card" role="radio" aria-checked="${!k}" data-bundle="${c.key}|0"><b>${t('Training only')}</b><small>${t('No extra cost')}</small></button>
+              <button type="button" class="e-card" role="radio" aria-checked="${!!k}" data-bundle="${c.key}|1"><span class="e-ic">${SHIRT}</span><b>${t('Training + kit')}</b><small>+ ${money(K.price)}</small></button></div>
+            ${k ? `<div class="need"><span class="lbl">${t('Size for {name}', { name: esc(c.name.split(' ')[0]) })}</span>${chips(k.z, `data-for="${c.key}"`, sug)}</div>` : ''}</div>`; }).join('')}` },
+    { id: 'f', name: 'Inside each participant', why: 'No separate card: each ticked participant in the Participants list gets a "+ Kit" button, and the size opens right under their name. The kit stays attached to the person it is for.',
+      body: s => `<ul class="f-rows">${PEOPLE.map(c => { const k = s.kits.find(x => x.who === c.key), sug = suggest(c.age);
+          return `<li class="f-row${k ? ' on' : ''}"><div class="f-top"><span class="av" aria-hidden="true">${ini(c.name)}</span><span class="tx"><strong>${esc(c.name)}</strong><small>${t('Age {n}', { n: c.age })}</small></span><span class="f-tick" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></span></div>
+            <div class="f-kit"><button type="button" class="f-add" aria-pressed="${!!k}" data-who="${c.key}">${k ? `${SHIRT}${esc(tx(K.name))} · <bdi dir="ltr">${esc(k.z)}</bdi><span class="f-rm">${t('Remove')}</span>` : `+ ${esc(tx(K.name))} <small>${money(K.price)}</small>`}</button></div>
+            ${k ? `<div class="need f-sz">${chips(k.z, `data-for="${c.key}"`, sug)}</div>` : ''}</li>`; }).join('')}</ul>` },
+    { id: 'g', name: 'Sizes you can see', why: 'Turn on a kit for a participant, then pick the size from shirts that grow from 6–7 Y to XL, with the age range under each and their suggested size marked. Easier to judge than a row of labels.',
+      body: s => `${kitHead()}<ul class="a-rows">${PEOPLE.map(c => { const k = s.kits.find(x => x.who === c.key), sug = suggest(c.age);
+          return `<li class="a-row${k ? ' on' : ''}"><div class="a-top"><span class="av" aria-hidden="true">${ini(c.name)}</span><span class="tx"><strong id="g-${c.key}">${esc(t('A kit for {name}', { name: c.name.split(' ')[0] }))}</strong><small>${t('Age {n}', { n: c.age })}</small></span><button type="button" class="sw" role="switch" aria-checked="${!!k}" aria-labelledby="g-${c.key}" data-who="${c.key}"></button></div>
+            ${k ? `<div class="need g-shirts" role="radiogroup" aria-label="${t('Size for {name}', { name: esc(c.name.split(' ')[0]) })}">${K.sizes.map((z, i) => `<button type="button" class="g-s" role="radio" aria-checked="${z === k.z}" data-for="${c.key}" data-z="${esc(z)}"><span class="g-ic" style="--k:${0.55 + i * 0.065}">${SHIRT}</span><b>${esc(z)}</b>${z === sug ? `<small>${t('suggested')}</small>` : ''}</button>`).join('')}</div>` : ''}</li>`; }).join('')}</ul>` },
+    { id: 'h', name: 'One tap for everyone', why: 'One box: "Add a kit for each participant". Ticking it adds one per person with the size suggested from their age, listed as "Faisal · 10–11 Y · Change". Best when most families want kits for everyone.',
+      body: s => { const all = PEOPLE.every(c => s.kits.some(k => k.who === c.key));
+        return `<button type="button" class="h-all" role="checkbox" aria-checked="${all}" data-all><span class="h-box" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="e-ic">${SHIRT}</span><span class="tx"><strong>${t('Add a kit for each participant')}</strong><small>${esc(tx(K.items))} · ${t('{n} × {price}', { n: PEOPLE.length, price: money(K.price) })}</small></span></button>
+          ${s.kits.length ? `<ul class="h-list">${s.kits.map(k => { const c = PEOPLE.find(x => x.key === k.who);
+            return `<li><span>${esc(c.name.split(' ')[0])}</span><bdi dir="ltr">${esc(k.z)}</bdi><button type="button" class="h-chg" data-chg="${c.key}" aria-expanded="${s.open === c.key}">${s.open === c.key ? t('Done') : t('Change size')}</button>${s.open === c.key ? `<div class="need h-sz">${chips(k.z, `data-for="${c.key}"`, suggest(c.age))}</div>` : ''}</li>`; }).join('')}</ul>` : ''}`; } }
+  ];
+  const foot = s => `<div class="foot"><p>${count(s) ? `<b>${t('{n} × {price}', { n: count(s), price: money(K.price) })}</b> = ${money(count(s) * K.price)}` : t('No add-ons')}</p><button type="button" class="go" data-go>${t('Continue to payment')}</button></div>`;
+  function paintOne(o, focus){
+    const s = st(o.id), el = document.getElementById('card-' + o.id), dOpen = o.id === 'd' && document.getElementById('dDlg')?.open;
+    el.classList.toggle('bad', s.bad);
+    el.querySelector('.card-b').innerHTML = `<p class="note">${t('Optional extras for training.')}</p>${o.body(s)}<p class="err own">${t('Choose a size for every kit.')}</p>${foot(s)}`;
+    if (dOpen){ const d = document.getElementById('dDlg'); d.dir = document.documentElement.dir; d.showModal(); }
+    if (focus) (el.querySelector('dialog[open] ' + focus) || el.querySelector(focus))?.focus({ preventScroll: true });
+  }
+  function wire(o){
+    const el = document.getElementById('card-' + o.id), s = st(o.id), perPerson = o.id === 'a' || o.id === 'd';
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b || b.disabled) return;
+      if (b.dataset.q){ +b.dataset.q > 0 ? s.kits.push('') : s.kits.pop(); s.bad = false; return paintOne(o, `[data-q="${b.dataset.q}"]:not(:disabled), [data-q]`); }
+      if (b.dataset.zq){ const z = b.dataset.zq; if (+b.dataset.d > 0 && s.kits.length < MAXQ) s.kits.push(z); else if (+b.dataset.d < 0){ const i = s.kits.lastIndexOf(z); if (i > -1) s.kits.splice(i, 1); } return paintOne(o, `[data-zq="${z}"][data-d="${b.dataset.d}"]:not(:disabled)`); }
+      if (b.dataset.i != null && b.dataset.z){ s.kits[+b.dataset.i] = b.dataset.z; s.bad = s.bad && !sizesOK(s); return paintOne(o, `[data-i="${b.dataset.i}"][data-z="${b.dataset.z}"]`); }
+      if (b.dataset.who){ const i = s.kits.findIndex(k => k.who === b.dataset.who); if (i > -1) s.kits.splice(i, 1); else { const c = PEOPLE.find(x => x.key === b.dataset.who); s.kits.push({ who: c.key, z: suggest(c.age) }); } s.bad = false; return paintOne(o, `[data-who="${b.dataset.who}"]`); }
+      if (b.dataset.for && b.dataset.z){ s.kits.find(k => k.who === b.dataset.for).z = b.dataset.z; return paintOne(o, `[data-for="${b.dataset.for}"][data-z="${b.dataset.z}"]`); }
+      if (b.dataset.rm != null){ s.kits.splice(+b.dataset.rm, 1); return paintOne(o, count(s) ? '[data-rm="0"]' : '[data-q]'); }
+      if (b.dataset.dlg !== undefined){ const d = document.getElementById('dDlg'); d.dir = document.documentElement.dir; d.showModal(); d.querySelector('.sw')?.focus(); return; }
+      if (b.dataset.close !== undefined){ document.getElementById('dDlg').close(); return paintOne(o, '[data-dlg]'); }
+      if (b.dataset.bundle){ const [who, on] = b.dataset.bundle.split('|'), i = s.kits.findIndex(k => k.who === who);
+        if (on === '1' && i < 0){ const c = PEOPLE.find(x => x.key === who); s.kits.push({ who, z: suggest(c.age) }); } if (on === '0' && i > -1) s.kits.splice(i, 1); s.bad = false; return paintOne(o, `[data-bundle="${b.dataset.bundle}"]`); }
+      if (b.dataset.all !== undefined){ const all = PEOPLE.every(c => s.kits.some(k => k.who === c.key)); s.kits = all ? [] : PEOPLE.map(c => s.kits.find(k => k.who === c.key) || { who: c.key, z: suggest(c.age) }); s.open = null; s.bad = false; return paintOne(o, '[data-all]'); }
+      if (b.dataset.chg){ s.open = s.open === b.dataset.chg ? null : b.dataset.chg; return paintOne(o, `[data-chg="${b.dataset.chg}"]`); }
+      if (b.dataset.go !== undefined){ s.bad = !sizesOK(s); paintOne(o); if (!s.bad) alert(t('Next: payment')); }
+    });
+    el.addEventListener('change', e => { const sel = e.target.closest('select[data-i]'); if (!sel) return; s.kits[+sel.dataset.i] = sel.value; s.bad = s.bad && !sizesOK(s); paintOne(o, `select[data-i="${sel.dataset.i}"]`); });
+  }
+  function paint(){
+    document.documentElement.lang = P.lang; document.documentElement.dir = P.lang === 'ar' ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === P.lang));
+    document.getElementById('lead').textContent = `Eight ways to add the ${K.name.en} (SAR ${K.price} each, sizes ${K.sizes.join(', ')}) next to today's. Each one works with two participants already chosen: Faisal (10) and Lana (14). Continue checks that every kit has a size.`;
+    document.getElementById('opts').innerHTML = OPTS.map(o => `<section class="opt"><div class="opt-h${o.cur ? ' cur' : ''}"><b>${o.cur ? 'Now' : o.id.toUpperCase()}</b><strong>${o.name}</strong></div><p>${o.why}</p>
+      <section class="card" id="card-${o.id}" aria-labelledby="t-${o.id}"><div class="card-h"><h2 id="t-${o.id}">${t('Add-ons')}</h2></div><div class="card-b"></div></section></section>`).join('');
+    OPTS.forEach(o => { paintOne(o); wire(o); });
+  }
+  document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => P.setLang(b.dataset.lang)));
+  addEventListener('sfa:prefs', paint);
+  paint();
+})();
+</script>
+</body>
+</html>

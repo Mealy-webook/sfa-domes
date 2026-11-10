@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option E</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option E · Split screen: half the screen is the court photo with the headline and the essentials, pinned while the other half scrolls through the tickets, payment and next steps (a trip-confirmation layout).
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf{max-width:none;padding:var(--nav) 0 0}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{display:block}
+.e-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:calc(100vh - var(--nav))}
+.e-art{position:sticky;top:var(--nav);height:calc(100vh - var(--nav));overflow:hidden;background:var(--color-bg-inverse);color:var(--neutral-0)}
+.e-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.e-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.15),rgba(9,9,11,.88))}
+.e-in{position:absolute;inset:auto 0 0;z-index:1;display:grid;gap:16px;padding:clamp(24px,4vw,56px)}
+.e-in .mark{grid-row:auto;width:56px;height:56px}
+.e-in h1{font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.e-in .cf-sub,.e-in .cf-sub .ref{color:inherit}
+.e-in .cf-sub{opacity:.85}
+.e-facts{display:grid;gap:12px;margin:8px 0 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.25)}
+.e-facts div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px}
+.e-facts dt{font:var(--ts-label-s);opacity:.7}
+.e-facts dd{margin:0;font:var(--ts-label-l)}
+.e-col{display:grid;align-content:start;gap:24px;padding:clamp(32px,5vh,56px) var(--g) clamp(56px,9vh,96px);animation:up .7s var(--ease) .1s both}
+.e-col h2{margin:0;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.e-tix{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.e-tk{display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:center;gap:16px;padding:16px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.e-tk small{display:block;font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.e-tk b{display:block;margin-top:4px;font:var(--ts-label-l)}
+.e-tk span{display:block;margin-top:4px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.e-tk .tk-qr{width:112px}
+.e-tk .tk-ref{display:block;margin-top:8px}
+.e-col .acts{grid-template-columns:1fr 1fr}
+.e-col .acts .btn{grid-column:1/-1}
+@media (max-width:900px){.e-wrap{grid-template-columns:minmax(0,1fr)}.e-art{position:relative;top:0;height:420px}}
+@media (max-width:480px){.e-tk{grid-template-columns:minmax(0,1fr) 88px}.e-tk .tk-qr{width:88px}.e-col .acts{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option E · Split screen</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m;
+    return `<div class="e-wrap"><aside class="e-art"><img src="${m.D.img}" alt=""><div class="e-in">
+        <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24">${ICON.check.replace(/<\/?svg[^>]*>/g, '')}</svg></span>
+        <h1>${t(m.title)}</h1><p class="cf-sub">${m.ref}</p>
+        <dl class="e-facts"><div><dt>${t('What')}</dt><dd>${esc(m.D.label)}</dd></div><div><dt>${t('When')}</dt><dd>${m.when}</dd></div><div><dt>${t('For')}</dt><dd>${m.who}</dd></div></dl></div></aside>
+      <div class="e-col"><h2>${t('{n} tickets', { n: m.count })}</h2>
+        <ul class="e-tix">${m.list.map(s => `<li class="e-tk"><div><small>${s.of > 1 ? t('Session {i} of {n}', { i: s.n, n: s.of }) : t('SFA Domes Dammam')}</small><b>${m.date(s)}</b><span>${m.time(s)}${s.player ? ' · ' + esc(s.player) : ''}</span><span class="tk-ref">${esc(s.id)}</span></div>
+          <div class="tk-qr" data-qr="${esc(s.id)}" role="img" aria-label="${t('QR code for {ref}', { ref: esc(s.id) })}"></div></li>`).join('')}</ul>
+        <div class="acts"><a class="btn" href="${acts.tickets}">${t('View my tickets')}${ICON.arrow}</a><a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Add to calendar')}</a><a class="ghost" href="${acts.dir}" target="_blank" rel="noopener">${ICON.pin}${t('Get directions')}</a></div>
+        <div class="box"><h2>${t(m.b.free ? 'Summary' : 'Payment')}</h2>${m.rows}</div>
+        <div class="box"><h2>${t('Before you play')}</h2><ul class="tips">${m.tips.map(x => `<li>${x}</li>`).join('')}</ul></div>
+        ${acts.more ? `<a class="more" href="${acts.more.href}">${acts.more.label}</a>` : ''}</div></div>`;
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

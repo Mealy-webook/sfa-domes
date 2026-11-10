@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Footer options · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600&family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<style>
+/* Review page: five footer concepts for the site, all with the same content as today's footer (partners, links,
+   socials, app stores, copyright, Powered by webook) and the SFA DS: black, brand orange, square corners, Oswald for
+   words, Anton for big numbers, Montserrat for text. Review aid only; delete once one is picked. */
+:root{
+  --brand:#FF5A19; --brand-600:#E85217;
+  --cyan:#3CC3DC; --youth:#7452AA; --families:#EBEB6E; --women:#B9286E; --elders:#323CB9; --pros:#23D782;
+  --ink:#09090B; --l1:#18181B; --l2:#27272A; --mute:#A1A1AA; --mute-2:#71717A; --line:rgba(255,255,255,.16);
+  --font-display:"Anton","Oswald","Arial Narrow",Impact,sans-serif;
+  --font-label:"Tusker Grotesk","Oswald","Arial Narrow",sans-serif;
+  --font-body:"Montserrat","Tajawal",system-ui,sans-serif;
+  --gutter:clamp(16px,6.67vw,96px);
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#F4F4F5;color:var(--ink);font:400 15px/24px var(--font-body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.msi{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-smoothing:antialiased}
+
+/* review chrome */
+.rv-intro{max-width:1440px;margin:0 auto;padding:56px var(--gutter) 24px}
+.rv-intro h1{margin:0 0 8px;font-family:var(--font-label);font-weight:600;font-size:clamp(32px,3.4vw,48px);line-height:1.08;text-transform:uppercase}
+.rv-intro p{margin:0;max-width:70ch;color:#52525B}
+.rv-nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.rv-nav a{display:inline-flex;align-items:center;height:40px;padding:0 14px;border:1px solid #D4D4D8;background:#fff;text-decoration:none;font-family:var(--font-label);font-weight:600;font-size:15px;text-transform:uppercase}
+.rv-nav a:hover{border-color:var(--ink)}
+.rv-tag{max-width:1440px;margin:0 auto;padding:72px var(--gutter) 16px;display:flex;justify-content:space-between;gap:16px;font-family:var(--font-label);font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#71717A}
+.rv-tag b{color:var(--brand)}
+.rv-fake{height:120px;max-width:1440px;margin:0 auto;padding:0 var(--gutter)}
+.rv-fake div{height:100%;border:1px dashed #D4D4D8;display:grid;place-items:center;font-size:13px;color:#A1A1AA}
+
+/* shared footer pieces */
+.ft{position:relative;overflow:hidden;background:var(--ink);color:#fff}
+.ft-in{max-width:1440px;margin:0 auto;padding-inline:var(--gutter)}
+.ft-cols{display:flex;flex-wrap:wrap;gap:24px 56px}
+.ft-cols ul{display:grid;gap:12px;align-content:start;margin:0;padding:0;list-style:none}
+.ft-cols a{font-family:var(--font-label);font-weight:600;font-size:17px;line-height:24px;text-transform:uppercase;text-decoration:none;transition:color .2s}
+.ft-cols a:hover{color:var(--brand)}
+.ft-soc{display:flex;gap:8px}
+.ft-soc a{display:grid;place-items:center;width:48px;height:48px;background:var(--l2);transition:background-color .2s}
+.ft-soc a:hover{background:var(--brand)}
+.ft-soc img{display:block;width:26px;height:26px}
+.ft-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 32px;padding-block:24px;border-top:1px solid var(--line)}
+.ft-copy{margin:0;font-size:14px;color:var(--mute)}
+.ft-stores{display:flex;flex-wrap:wrap;gap:12px}
+.ft-stores a{display:block;transition:opacity .2s}.ft-stores a:hover{opacity:.75}
+.ft-stores img{display:block;height:40px;width:auto}
+.ft-pow{display:flex;align-items:center;gap:10px;text-decoration:none}
+.ft-pow small{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.ft-pow span{display:flex;flex-direction:column;align-items:center}
+.ft-pow img:first-child{height:28px;width:auto}.ft-pow img:last-child{height:9px;width:auto;margin-top:2px}
+.ft-partners{display:flex;flex-wrap:wrap;align-items:center;gap:20px 40px}
+.ft-partners img{display:block;height:44px;width:auto;opacity:.75;transition:opacity .2s}
+.ft-partners img:hover{opacity:1}
+.ft-cta{display:inline-flex;align-items:center;gap:12px;height:60px;padding:0 28px;background:var(--brand);color:#fff;text-decoration:none;font-family:var(--font-label);font-weight:600;font-size:20px;text-transform:uppercase;transition:background-color .25s}
+.ft-cta:hover{background:var(--brand-600)}
+.ft-cta svg{width:20px;height:20px;transition:transform .35s var(--ease)}
+.ft-cta:hover svg{transform:translateX(4px)}
+.ft-eyebrow{margin:0;font-family:var(--font-label);font-weight:500;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+@media (max-width:640px){.ft-cols{gap:24px 32px}.ft-cols ul{min-width:40%}.ft-stores img{height:36px}}
+
+/* ============ 1 · Wordmark: a giant SFA DOMES that rises in and reacts to the pointer ============ */
+.f1 .ft-in{padding-top:clamp(56px,9vh,96px)}
+.f1-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:32px;padding-bottom:clamp(40px,7vh,72px)}
+.f1-ask{margin:12px 0 24px;font-family:var(--font-label);font-weight:600;font-size:clamp(36px,4.4vw,64px);line-height:1;text-transform:uppercase}
+.f1-ask em{font-style:normal;color:var(--brand)}
+.f1-mid{display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;padding-block:32px;border-top:1px solid var(--line)}
+.f1-word{display:flex;justify-content:space-between;margin:0;padding:clamp(8px,2vw,24px) var(--gutter) 0;font-family:var(--font-label);font-weight:600;font-size:clamp(64px,18.2vw,300px);line-height:.8;text-transform:uppercase;user-select:none;overflow:hidden;cursor:default}
+.f1-word span{display:block;transform:translateY(105%);transition:transform 1s var(--ease),color .3s}
+.f1.in .f1-word span{transform:translateY(var(--lift,0px))}
+.f1-word span.hot{color:var(--brand)}
+.f1-word i{flex:0 0 .18em}
+.f1 .ft-bar{margin-top:clamp(16px,3vh,32px)}
+
+/* ============ 2 · Scoreboard: split-flap panels with the live clock, hours and counts ============ */
+.f2{background:#050506}
+.f2 .ft-in{padding-top:clamp(56px,9vh,96px)}
+.f2-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+.f2-live{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-label);font-weight:600;font-size:16px;letter-spacing:.08em;text-transform:uppercase}
+.f2-live i{width:10px;height:10px;background:var(--pros);box-shadow:0 0 12px var(--pros);animation:f2blink 1.6s steps(2) infinite}
+@keyframes f2blink{50%{opacity:.25}}
+.f2-board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:8px;background:var(--l1);border:1px solid var(--line)}
+.f2-cell{padding:18px 18px 16px;background:#000;min-width:0}
+.f2-cell small{display:block;margin-bottom:12px;font-family:var(--font-label);font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.f2-flaps{display:flex;gap:4px}
+.f2-flap{position:relative;display:grid;place-items:center;width:clamp(34px,4vw,58px);height:clamp(50px,5.8vw,84px);background:linear-gradient(#1c1c20 0 49.5%,#111114 50.5% 100%);color:#fff;font-family:var(--font-display);font-size:clamp(30px,3.8vw,56px);line-height:1}
+.f2-flap::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;background:#000}
+.f2-flap.sep{width:auto;padding:0 2px;background:none}
+.f2-flap.sep::after{display:none}
+.f2-flap.flip{animation:f2flip .08s linear}
+@keyframes f2flip{50%{transform:scaleY(.82);filter:brightness(1.6)}}
+.f2-cell.or .f2-flap{color:var(--brand)}
+.f2-rows{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 32px;margin-top:40px}
+.f2-rows a{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);font-family:var(--font-label);font-weight:600;font-size:17px;text-transform:uppercase;text-decoration:none}
+.f2-rows a::after{content:"";flex:1;order:1;height:0;border-bottom:2px dotted rgba(255,255,255,.2)}
+.f2-rows a b{order:2;font-family:var(--font-display);font-weight:400;font-size:15px;color:var(--mute-2)}
+.f2-rows a:hover{color:var(--brand)}.f2-rows a:hover b{color:var(--brand)}
+.f2-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px;padding-block:32px}
+@media (max-width:900px){.f2-board{grid-template-columns:repeat(2,minmax(0,1fr))}.f2-rows{grid-template-columns:minmax(0,1fr)}}
+
+/* ============ 3 · Ball pit: sport balls drop in, pile up and can be grabbed and thrown ============ */
+.f3 .ft-in{position:relative;z-index:2;padding-top:clamp(56px,9vh,96px);pointer-events:none}
+.f3 .ft-in a,.f3 .ft-in button{pointer-events:auto}
+.f3-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:32px}
+.f3-h{margin:10px 0 0;font-family:var(--font-label);font-weight:600;font-size:clamp(48px,7vw,112px);line-height:.9;text-transform:uppercase}
+.f3-h em{font-style:normal;color:var(--brand)}
+.f3-hint{margin:14px 0 0;font-size:14px;color:var(--mute)}
+.f3-pit{position:relative;height:clamp(300px,42vh,440px);margin-top:-40px;touch-action:pan-y}
+.f3-pit canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+.f3-pit canvas.grab{cursor:grabbing}
+.f3 .ft-bar{position:relative;z-index:2;background:var(--ink)}
+
+/* ============ 4 · Kinetic: two rows of sport names race by (faster as you scroll); hover shows the sport ============ */
+.f4 .ft-in{padding-top:clamp(48px,8vh,88px)}
+.f4-rows{padding-block:clamp(24px,4vh,48px);border-block:1px solid var(--line)}
+.f4-row{display:flex;width:max-content;will-change:transform}
+.f4-row a{display:flex;align-items:center;gap:.25em;padding-inline:.25em;font-family:var(--font-label);font-weight:600;font-size:clamp(56px,9vw,150px);line-height:1.05;text-transform:uppercase;text-decoration:none;white-space:nowrap;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.55);transition:color .25s,-webkit-text-stroke-color .25s}
+.f4-row:nth-child(2) a{color:#fff;-webkit-text-stroke-color:transparent}
+.f4-row a::after{content:"";width:.22em;height:.22em;background:var(--brand);flex:none}
+.f4-row a:hover{color:var(--brand);-webkit-text-stroke-color:var(--brand)}
+.f4-peek{position:absolute;z-index:3;left:0;top:0;width:clamp(180px,20vw,300px);aspect-ratio:4/5;pointer-events:none;overflow:hidden;opacity:0;transform:translate(-50%,-50%) scale(.85);transition:opacity .25s,transform .35s var(--ease)}
+.f4-peek.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.f4-peek img{display:block;width:100%;height:100%;object-fit:cover}
+.f4-peek b{position:absolute;left:10px;bottom:10px;padding:4px 8px;background:var(--brand);font-family:var(--font-label);font-weight:600;font-size:14px;text-transform:uppercase}
+.f4-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr);gap:40px;padding-block:clamp(40px,7vh,64px)}
+.f4-grid h3{margin:8px 0 20px;font-family:var(--font-label);font-weight:600;font-size:clamp(28px,3vw,44px);line-height:1;text-transform:uppercase}
+@media (max-width:900px){.f4-grid{grid-template-columns:minmax(0,1fr)}}
+@media (hover:none){.f4-peek{display:none}}
+
+/* ============ 5 · The dome: a wireframe dome that turns with the pointer, a sun setting behind it ============ */
+.f5{background:radial-gradient(120% 80% at 50% 100%,#2a1206 0%,#0b0604 45%,var(--ink) 75%)}
+.f5-stage{position:relative;max-width:1440px;margin:0 auto;padding:clamp(48px,8vh,80px) var(--gutter) 0}
+.f5-svg{display:block;width:100%;height:auto;overflow:hidden}
+.f5-svg .wire{fill:none;stroke:rgba(255,255,255,.28);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.f5-svg .wire.or{stroke:rgba(255,90,25,.85);stroke-width:1.6}
+.f5-svg .draw{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 2.2s var(--ease)}
+.f5.in .f5-svg .draw{stroke-dashoffset:0}
+.f5-svg .sun{transform-box:fill-box;transform-origin:50% 50%;transform:translateY(40%);transition:transform 2.4s var(--ease) .3s}
+.f5.in .f5-svg .sun{transform:none}
+.f5-in{position:absolute;left:0;right:0;bottom:12%;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:0 var(--gutter)}
+.f5-in h3{margin:0;font-family:var(--font-label);font-weight:600;font-size:clamp(36px,6vw,96px);line-height:.92;text-transform:uppercase}
+.f5-in p{margin:0;font-size:15px;color:#E4E4E7}
+.f5-in .ft-cta{margin-top:8px}
+.f5-base{position:relative;border-top:2px solid var(--brand)}
+.f5-base .ft-in{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;padding-block:40px}
+@media (max-width:760px){.f5-in{position:static;margin-top:-8%;padding-bottom:24px}.f5-base .ft-in{grid-template-columns:minmax(0,1fr)}}
+
+/* ============ 6 · Floodlight: the pointer is a floodlight that lights up the court under the dark ============ */
+.f6{min-height:clamp(560px,80vh,760px);cursor:crosshair}
+.f6-court{position:absolute;inset:0;background:center/cover no-repeat;-webkit-mask-image:radial-gradient(circle var(--r,240px) at var(--x,50%) var(--y,40%),#000 0 35%,rgba(0,0,0,.35) 60%,transparent 100%);mask-image:radial-gradient(circle var(--r,240px) at var(--x,50%) var(--y,40%),#000 0 35%,rgba(0,0,0,.35) 60%,transparent 100%);transition:background-image .3s}
+.f6-court::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.2),rgba(9,9,11,.55))}
+.f6 .ft-in{position:relative;z-index:2;padding-top:clamp(56px,9vh,96px);pointer-events:none}
+.f6 .ft-in a{pointer-events:auto}
+.f6-h{margin:10px 0 28px;font-family:var(--font-label);font-weight:600;font-size:clamp(56px,9vw,150px);line-height:.88;text-transform:uppercase}
+.f6-h em{font-style:normal;color:var(--brand)}
+.f6-sports{display:flex;flex-wrap:wrap;gap:6px 22px;margin:0 0 40px;padding:0;list-style:none}
+.f6-sports a{font-family:var(--font-label);font-weight:600;font-size:clamp(20px,2vw,28px);text-transform:uppercase;text-decoration:none;color:rgba(255,255,255,.55);transition:color .2s}
+.f6-sports a:hover,.f6-sports a.on{color:#fff}
+.f6-mid{display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;padding-block:28px;border-top:1px solid var(--line)}
+.f6 .ft-bar{position:relative;z-index:2}
+
+/* ============ 7 · Next free court: a live countdown to the next open slot at the venue ============ */
+.f7 .ft-in{padding-top:clamp(56px,9vh,96px)}
+.f7-board{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:end;padding-bottom:clamp(40px,7vh,64px)}
+.f7-what{margin:10px 0 0;font-family:var(--font-label);font-weight:600;font-size:clamp(26px,2.6vw,40px);line-height:1.1;text-transform:uppercase}
+.f7-what em{font-style:normal;color:var(--brand)}
+.f7-count{display:flex;align-items:flex-end;gap:clamp(8px,1.4vw,20px);margin:18px 0 0}
+.f7-count div{display:grid;gap:6px}
+.f7-count b{font-family:var(--font-display);font-weight:400;font-size:clamp(72px,11vw,180px);line-height:.85;font-variant-numeric:tabular-nums}
+.f7-count small{font-family:var(--font-label);font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.f7-count i{font-style:normal;font-family:var(--font-display);font-size:clamp(48px,7vw,110px);line-height:.85;color:var(--brand);padding-bottom:22px}
+.f7-day{position:relative;height:6px;margin:28px 0 36px;background:var(--l2)}
+.f7-day span{position:absolute;inset:0 auto 0 0;background:var(--brand);transition:width 1s linear}
+.f7-day em{position:absolute;top:14px;font-style:normal;font-size:12px;color:var(--mute)}
+.f7-side{display:grid;gap:20px;justify-items:start}
+.f7-side p{margin:0;color:#D4D4D8}
+.f7-mid{display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;padding-block:28px;border-top:1px solid var(--line)}
+@media (max-width:860px){.f7-board{grid-template-columns:minmax(0,1fr)}}
+
+/* ============ 8 · Curtain: the page lifts off an orange footer underneath; the button follows the pointer ============ */
+.f8-wrap{position:relative}
+.f8-page{position:relative;z-index:2;height:70vh;max-width:1440px;margin:0 auto;padding:0 var(--gutter);background:#F4F4F5;box-shadow:0 30px 60px -30px rgba(9,9,11,.5)}
+.f8-page div{height:100%;border:1px dashed #D4D4D8;display:grid;place-items:center;font-size:13px;color:#A1A1AA;background:#fff}
+.f8{position:sticky;bottom:0;z-index:1;background:var(--brand);color:var(--ink)}
+.f8 .ft-in{padding-top:clamp(48px,8vh,88px)}
+.f8-h{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px}
+.f8-h p{margin:0;font-family:var(--font-label);font-weight:600;font-size:clamp(64px,12vw,200px);line-height:.84;text-transform:uppercase}
+.f8-mag{display:inline-grid;place-items:center;width:clamp(140px,14vw,200px);aspect-ratio:1;background:var(--ink);color:#fff;text-decoration:none;font-family:var(--font-label);font-weight:600;font-size:18px;text-transform:uppercase;text-align:center;line-height:1.1;transition:transform .35s var(--ease),background-color .25s}
+.f8-mag:hover{background:#fff;color:var(--ink)}
+.f8-mag span{display:grid;gap:8px;justify-items:center}
+.f8-mag svg{width:28px;height:28px}
+.f8-mid{display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;padding-block:32px;margin-top:clamp(32px,6vh,56px);border-top:2px solid var(--ink)}
+.f8 .ft-cols a:hover{color:#fff}
+.f8 .ft-soc a{background:var(--ink)}
+.f8 .ft-soc a:hover{background:#fff}.f8 .ft-soc a:hover img{filter:invert(1)}
+.f8 .ft-partners img{filter:brightness(0);opacity:.8}
+.f8 .ft-bar{border-top-color:rgba(9,9,11,.3)}
+.f8 .ft-copy,.f8 .ft-pow small{color:rgba(9,9,11,.7)}
+.f8 .ft-pow img{filter:brightness(0)}
+
+/* ============ 9 · Pitch: the footer is a pitch drawn in white lines; a ball runs to whatever you point at ============ */
+.f9{background:#0b1a10}
+.f9-pitch{position:relative;max-width:1440px;margin:0 auto;padding:clamp(40px,7vh,72px) var(--gutter) 0}
+.f9-svg{display:block;width:100%;height:auto}
+.f9-svg .ln{fill:none;stroke:rgba(255,255,255,.55);stroke-width:2;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.8s var(--ease)}
+.f9.in .f9-svg .ln{stroke-dashoffset:0}
+.f9-svg .ball{transition:transform .7s var(--ease)}
+.f9-zones{position:absolute;inset:clamp(40px,7vh,72px) var(--gutter) 0;display:grid;grid-template-columns:1fr 1.1fr 1fr;align-items:center}
+.f9-zones > div{display:grid;justify-items:center;text-align:center;gap:10px;padding:8px}
+.f9-zones ul{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.f9-zones a{font-family:var(--font-label);font-weight:600;font-size:clamp(14px,1.3vw,18px);text-transform:uppercase;text-decoration:none;transition:color .2s}
+.f9-zones a:hover{color:var(--brand)}
+.f9-ko{display:grid;gap:12px;justify-items:center}
+.f9-ko b{font-family:var(--font-label);font-weight:600;font-size:clamp(28px,3.4vw,52px);line-height:.95;text-transform:uppercase}
+.f9-ko .ft-cta{height:52px;font-size:17px}
+.f9-under{display:flex;flex-wrap:wrap;justify-content:space-between;gap:24px;padding-block:28px}
+@media (max-width:760px){.f9-zones{position:static;grid-template-columns:minmax(0,1fr);gap:24px;padding-top:24px}.f9-svg{display:none}.f9-zones > div{justify-items:start;text-align:start}}
+
+/* ============ 10 · Back to top, the long way: shoot the ball into the hoop and the page scrolls up ============ */
+.f10 .ft-in{padding-top:clamp(56px,9vh,96px)}
+.f10-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,420px);gap:clamp(24px,4vw,64px);align-items:end}
+.f10-h{margin:10px 0 28px;font-family:var(--font-label);font-weight:600;font-size:clamp(48px,6vw,96px);line-height:.9;text-transform:uppercase}
+.f10-court{position:relative;height:340px}
+.f10-court svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.f10-ball{position:absolute;left:8%;bottom:0;width:56px;height:56px;padding:0;border:0;background:none;cursor:pointer;z-index:2}
+.f10-ball svg{position:static;display:block;width:100%;height:100%}
+.f10-ball:hover{transform:translateY(-4px)}
+.f10-shoot{position:absolute;left:0;bottom:-46px;display:flex;align-items:center;gap:10px;font-family:var(--font-label);font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.f10-shoot b{font-family:var(--font-display);font-weight:400;font-size:22px;color:#fff}
+.f10-net{transform-box:fill-box;transform-origin:50% 0}
+.f10-net.swish{animation:f10swish .5s var(--ease)}
+@keyframes f10swish{30%{transform:scaleY(1.25) scaleX(.92)}}
+.f10-mid{display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;padding-block:28px;margin-top:72px;border-top:1px solid var(--line)}
+@media (max-width:860px){.f10-grid{grid-template-columns:minmax(0,1fr)}.f10-court{height:260px}}
+
+@media (prefers-reduced-motion:reduce){.f1-word span{transition:none}.f2-live i{animation:none}.f5-svg .draw,.f5-svg .sun{transition:none}}
+</style>
+</head>
+<body>
+<header class="rv-intro">
+  <h1>Footer · ten concepts</h1>
+  <p>Each one carries the same content as today's footer: partners, links, socials, the app stores, the copyright and Powered by webook. Scroll down to bring each one in; they react to the pointer.</p>
+  <nav class="rv-nav" aria-label="Jump to"><a href="#o1">1 · Wordmark</a><a href="#o2">2 · Scoreboard</a><a href="#o3">3 · Ball pit</a><a href="#o4">4 · Kinetic sports</a><a href="#o5">5 · The dome</a><a href="#o6">6 · Floodlight</a><a href="#o7">7 · Next free court</a><a href="#o8">8 · Curtain</a><a href="#o9">9 · Pitch</a><a href="#o10">10 · Shoot to top</a></nav>
+</header>
+
+<!-- 1 -->
+<p class="rv-tag" id="o1"><span><b>1</b> · Wordmark</span><span>Giant SFA DOMES rises in · letters lift and glow under the pointer</span></p>
+<div class="rv-fake"><div>page content above</div></div>
+<footer class="ft f1" data-in>
+  <div class="ft-in">
+    <div class="f1-top">
+      <div>
+        <p class="ft-eyebrow">SFA Domes Dammam</p>
+        <p class="f1-ask">Your court is <em>waiting.</em></p>
+        <a class="ft-cta" href="courts.html?sport=football">Book a court<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></a>
+      </div>
+      <div data-part="partners"></div>
+    </div>
+    <div class="f1-mid"><nav class="ft-cols" data-part="cols" aria-label="Footer"></nav><div data-part="soc"></div></div>
+  </div>
+  <p class="f1-word" aria-label="SFA Domes"></p>
+  <div class="ft-in"><div class="ft-bar" data-part="bar"></div></div>
+</footer>
+
+<!-- 2 -->
+<p class="rv-tag" id="o2"><span><b>2</b> · Scoreboard</span><span>Split-flap panels flip to the live Dammam time, today's hours and the venue counts</span></p>
+<div class="rv-fake"><div>page content above</div></div>
+<footer class="ft f2" data-in>
+  <div class="ft-in">
+    <div class="f2-head"><span class="f2-live"><i aria-hidden="true"></i>Live at SFA Domes Dammam</span><div data-part="soc"></div></div>
+    <div class="f2-board" aria-live="off">
+      <div class="f2-cell or"><small>Dammam time</small><div class="f2-flaps" id="f2Clock"></div></div>
+      <div class="f2-cell"><small>Open until</small><div class="f2-flaps" id="f2Close"></div></div>
+      <div class="f2-cell"><small>Courts &amp; fields</small><div class="f2-flaps" id="f2Courts"></div></div>
+      <div class="f2-cell"><small>Sports</small><div class="f2-flaps" id="f2Sports"></div></div>
+    </div>
+    <nav class="f2-rows" id="f2Rows" aria-label="Footer"></nav>
+    <div class="f2-foot"><div data-part="partners"></div><a class="ft-cta" href="courts.html?sport=football">Book a court<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></a></div>
+    <div class="ft-bar" data-part="bar"></div>
+  </div>
+</footer>
+
+<!-- 3 -->
+<p class="rv-tag" id="o3"><span><b>3</b> · Ball pit</span><span>Balls for every sport drop in and pile up · grab one and throw it</span></p>
+<div class="rv-fake"><div>page content above</div></div>
+<footer class="ft f3" data-in>
+  <div class="ft-in">
+    <div class="f3-head">
+      <div><p class="ft-eyebrow">11 sports · one roof</p><p class="f3-h">Pick your<br><em>game.</em></p><p class="f3-hint">Grab a ball and throw it.</p></div>
+      <div style="display:grid;gap:24px;justify-items:end"><nav class="ft-cols" data-part="cols" aria-label="Footer"></nav><div data-part="soc"></div></div>
+    </div>
+  </div>
+  <div class="f3-pit"><canvas id="f3Canvas" aria-hidden="true"></canvas></div>
+  <div class="ft-bar" style="padding-inline:var(--gutter)"><div data-part="partners"></div></div>
+  <div class="ft-in"><div class="ft-bar" data-part="bar"></div></div>
+</footer>
+
+<!-- 4 -->
+<p class="rv-tag" id="o4"><span><b>4</b> · Kinetic sports</span><span>Two rows of sports race by, faster as you scroll · hover one to see it, click to book</span></p>
+<div class="rv-fake"><div>page content above</div></div>
+<footer class="ft f4" data-in>
+  <div class="f4-rows" id="f4Rows"><div class="f4-row"></div><div class="f4-row"></div></div>
+  <figure class="f4-peek" id="f4Peek" aria-hidden="true"><img alt=""><b></b></figure>
+  <div class="ft-in">
+    <div class="f4-grid">
+      <div><p class="ft-eyebrow">SFA Domes Dammam</p><h3>Sport for everyone, under one dome.</h3><div data-part="soc"></div></div>
+      <div style="display:grid;gap:32px"><nav class="ft-cols" data-part="cols" aria-label="Footer"></nav><div data-part="partners"></div></div>
+    </div>
+    <div class="ft-bar" data-part="bar"></div>
+  </div>
+</footer>
+
+<!-- 5 -->
+<p class="rv-tag" id="o5"><span><b>5</b> · The dome</span><span>A wireframe dome draws itself as the sun sets behind it · it turns with the pointer</span></p>
+<div class="rv-fake"><div>page content above</div></div>
+<footer class="ft f5" data-in>
+  <div class="f5-stage">
+    <svg class="f5-svg" id="f5Svg" viewBox="0 0 1200 520" aria-hidden="true">
+      <defs><radialGradient id="f5Sun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFB36B"/><stop offset=".45" stop-color="#FF5A19"/><stop offset="1" stop-color="#FF5A19" stop-opacity="0"/></radialGradient></defs>
+      <circle class="sun" cx="600" cy="430" r="300" fill="url(#f5Sun)" opacity=".55"/>
+      <g id="f5Wire"></g>
+      <line x1="0" y1="520" x2="1200" y2="520" stroke="rgba(255,255,255,.3)"/>
+    </svg>
+    <div class="f5-in">
+      <p class="ft-eyebrow">SFA Domes Dammam · open today <span id="f5Hours"></span></p>
+      <h3>Under one dome.</h3>
+      <a class="ft-cta" href="courts.html?sport=football">Book a court<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></a>
+    </div>
+  </div>
+  <div class="f5-base">
+    <div class="ft-in"><nav class="ft-cols" data-part="cols" aria-label="Footer"></nav><div style="display:grid;gap:24px;align-content:start"><div data-part="soc"></div><div data-part="partners"></div></div></div>
+    <div class="ft-in"><div class="ft-bar" data-part="bar"></div></div>
+  </div>
+</footer>
+<!-- 6 -->
+<p class="rv-tag" id="o6"><span><b>6</b> · Floodlight</span><span>Your pointer is the floodlight · it lights up the court under the dark; hover a sport to switch courts</span></p>
+<div class="rv-fake"><div>page content above</div></div>
+<footer class="ft f6" data-in>
+  <div class="f6-court" id="f6Court" aria-hidden="true"></div>
+  <div class="ft-in">
+    <p class="ft-eyebrow">SFA Domes Dammam</p>
+    <p class="f6-h">Lights <em>on.</em></p>
+    <ul class="f6-sports" id="f6Sports"></ul>
+    <div class="f6-mid"><nav class="ft-cols" data-part="cols" aria-label="Footer"></nav><div style="display:grid;gap:24px;align-content:start"><div data-part="soc"></div><div data-part="partners"></div></div></div>
+    <div class="ft-bar" data-part="bar"></div>
+  </div>
+</footer>
+
+<!-- 7 -->
+<p class="rv-tag" id="o7"><span><b>7</b> · Next free court</span><span>A live countdown to the next open slot anywhere in the venue · one tap books it</span></p>
+<div class="rv-fake"><div>page content above</div></div>
+<footer class="ft f7" data-in>
+  <div class="ft-in">
+    <div class="f7-board">
+      <div>
+        <p class="ft-eyebrow">Next free court</p>
+        <p class="f7-what" id="f7What"></p>
+        <div class="f7-count" aria-live="off"><div><b id="f7H">00</b><small>Hours</small></div><i>:</i><div><b id="f7M">00</b><small>Minutes</small></div><i>:</i><div><b id="f7S">00</b><small>Seconds</small></div></div>
+        <div class="f7-day" aria-hidden="true"><span id="f7Day"></span><em id="f7DayL" style="inset-inline-start:0"></em><em id="f7DayR" style="inset-inline-end:0"></em></div>
+      </div>
+      <div class="f7-side"><p>Every court and field at SFA Domes Dammam, counted down to the next free 1.5-hour slot.</p><a class="ft-cta" id="f7Go" href="#">Book it<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></a><div data-part="soc"></div></div>
+    </div>
+    <div class="f7-mid"><nav class="ft-cols" data-part="cols" aria-label="Footer"></nav><div data-part="partners"></div></div>
+    <div class="ft-bar" data-part="bar"></div>
+  </div>
+</footer>
+
+<!-- 8 -->
+<p class="rv-tag" id="o8"><span><b>8</b> · Curtain</span><span>The page lifts off an orange footer that was underneath all along · the big button leans toward your pointer</span></p>
+<div class="f8-wrap">
+  <div class="f8-page"><div>page content above (scroll down: it lifts off the footer)</div></div>
+  <footer class="ft f8" data-in>
+    <div class="ft-in">
+      <div class="f8-h"><p>Let's<br>play.</p><a class="f8-mag" id="f8Mag" href="courts.html?sport=football"><span>Book a court<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a></div>
+      <div class="f8-mid"><nav class="ft-cols" data-part="cols" aria-label="Footer"></nav><div style="display:grid;gap:24px;align-content:start"><div data-part="soc"></div><div data-part="partners"></div></div></div>
+      <div class="ft-bar" data-part="bar"></div>
+    </div>
+  </footer>
+</div>
+
+<!-- 9 -->
+<p class="rv-tag" id="o9"><span><b>9</b> · Pitch</span><span>The footer is a pitch: lines draw in, links sit in the boxes, the ball runs to whatever you point at</span></p>
+<div class="rv-fake"><div>page content above</div></div>
+<footer class="ft f9" data-in>
+  <div class="f9-pitch">
+    <svg class="f9-svg" id="f9Svg" viewBox="0 0 1200 440" aria-hidden="true">
+      <rect class="ln" pathLength="1" x="2" y="2" width="1196" height="436"/>
+      <line class="ln" pathLength="1" x1="600" y1="2" x2="600" y2="438"/>
+      <circle class="ln" pathLength="1" cx="600" cy="220" r="92"/>
+      <rect class="ln" pathLength="1" x="2" y="88" width="190" height="264"/>
+      <rect class="ln" pathLength="1" x="2" y="160" width="70" height="120"/>
+      <rect class="ln" pathLength="1" x="1008" y="88" width="190" height="264"/>
+      <rect class="ln" pathLength="1" x="1128" y="160" width="70" height="120"/>
+      <path class="ln" pathLength="1" d="M192 172 A60 60 0 0 1 192 268"/>
+      <path class="ln" pathLength="1" d="M1008 172 A60 60 0 0 0 1008 268"/>
+      <g class="ball" id="f9Ball" style="transform:translate(600px,220px)"><circle r="11" fill="#FF5A19"/><circle r="11" fill="none" stroke="#fff" stroke-width="2"/></g>
+    </svg>
+    <div class="f9-zones" id="f9Zones">
+      <div><ul data-col="0"></ul></div>
+      <div class="f9-ko"><p class="ft-eyebrow">Kick-off at SFA Domes</p><b>Your game<br>starts here.</b><a class="ft-cta" href="courts.html?sport=football">Book a field<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></a></div>
+      <div><ul data-col="1"></ul></div>
+    </div>
+  </div>
+  <div class="ft-in">
+    <div class="f9-under"><div data-part="soc"></div><div data-part="partners"></div></div>
+    <div class="ft-bar" data-part="bar"></div>
+  </div>
+</footer>
+
+<!-- 10 -->
+<p class="rv-tag" id="o10"><span><b>10</b> · Back to top, the long way</span><span>Shoot the ball into the hoop and the page scrolls back up · it keeps your score</span></p>
+<div class="rv-fake"><div>page content above</div></div>
+<footer class="ft f10" data-in>
+  <div class="ft-in">
+    <div class="f10-grid">
+      <div><p class="ft-eyebrow">SFA Domes Dammam</p><p class="f10-h">Seen enough?<br>Take the shot.</p><a class="ft-cta" href="courts.html?sport=basketball">Book a court<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></a></div>
+      <div class="f10-court" id="f10Court">
+        <svg viewBox="0 0 420 340" aria-hidden="true" preserveAspectRatio="xMidYMax meet">
+          <rect x="300" y="20" width="110" height="74" fill="none" stroke="#fff" stroke-width="3"/>
+          <rect x="332" y="48" width="46" height="32" fill="none" stroke="#fff" stroke-width="2"/>
+          <line x1="408" y1="94" x2="408" y2="340" stroke="#3f3f46" stroke-width="6"/>
+          <g class="f10-net" id="f10Net"><path d="M296 92 L306 140 M316 92 L318 140 M336 92 L330 140 M356 92 L342 140 M366 92 L350 140 M296 92 L366 92 M300 112 L362 112 M304 130 L354 130" stroke="rgba(255,255,255,.6)" stroke-width="1.5" fill="none"/></g>
+          <ellipse cx="331" cy="92" rx="38" ry="6" fill="none" stroke="#FF5A19" stroke-width="4"/>
+          <line x1="0" y1="338" x2="420" y2="338" stroke="rgba(255,255,255,.3)"/>
+        </svg>
+        <button class="f10-ball" id="f10Ball" type="button" aria-label="Back to top"><svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26" fill="#FF5A19"/><path d="M2 28h52M28 2v52M9 9c9 7 9 31 0 38M47 9c-9 7-9 31 0 38" stroke="#09090B" stroke-width="2.4" fill="none"/></svg></button>
+        <p class="f10-shoot">Back to top · shots made <b id="f10Score">0</b></p>
+      </div>
+    </div>
+    <div class="f10-mid"><nav class="ft-cols" data-part="cols" aria-label="Footer"></nav><div style="display:grid;gap:24px;align-content:start"><div data-part="soc"></div><div data-part="partners"></div></div></div>
+    <div class="ft-bar" data-part="bar"></div>
+  </div>
+</footer>
+<div style="height:120px"></div>
+
+<script src="f/courts-data.js"></script>
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  // ---- the same content in every footer
+  const COLS = [['Home', 'About', 'Corporate Events', 'Contact us'], ['News', 'Calendar', 'Community Sports Groups', 'Vendar gate'], ['Brand Guidelines', 'Annual Report (2020)', 'Privacy Policy & Terms & Conditions']];
+  const SOC = [['Instagram', 'soc-instagram'], ['Facebook', 'soc-facebook'], ['YouTube', 'soc-youtube'], ['LinkedIn', 'soc-linkedin'], ['X', 'soc-x']];
+  const PARTNERS = [['SFA Domes', 'logo-sfa-domes'], ['Saudi Sports for All Federation', 'logo-sfa'], ['Saudi Vision 2030', 'logo-vision2030'], ['Ministry of Sport', 'logo-mos']];
+  const esc = s => s.replace(/&/g, '&amp;');
+  const PART = {
+    cols: () => COLS.map(c => `<ul>${c.map(l => `<li><a href="#">${esc(l)}</a></li>`).join('')}</ul>`).join(''),
+    soc: () => `<div class="ft-soc">${SOC.map(([n, f]) => `<a href="#" aria-label="${n}"><img src="f/footer/${f}.svg" alt=""></a>`).join('')}</div>`,
+    partners: () => `<div class="ft-partners" aria-label="Partners">${PARTNERS.map(([n, f]) => `<img src="f/footer/${f}.svg" alt="${n}">`).join('')}</div>`,
+    bar: () => `<p class="ft-copy">© 2026 sportsforall.com</p><div class="ft-stores"><a href="#" aria-label="Download on the App Store"><img src="f/footer/store-apple.svg" alt=""></a><a href="#" aria-label="Get it on Google Play"><img src="f/footer/store-google.svg" alt=""></a><a href="#" aria-label="Explore it on AppGallery"><img src="f/footer/store-huawei.svg" alt=""></a></div>` +
+      `<a class="ft-pow" href="https://webook.com" target="_blank" rel="noopener" aria-label="Powered by webook.com"><small>Powered by</small><span><img src="f/footer/wbk-logo.svg" alt=""><img src="f/footer/wbk-sub.svg" alt=""></span></a>`,
+  };
+  $$('[data-part]').forEach(el => { const html = PART[el.dataset.part](); if (el.tagName === 'NAV' || el.classList.contains('ft-bar')) el.innerHTML = html; else el.outerHTML = html; });
+
+  // each footer gets .in when it scrolls into view (once)
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); e.target.dispatchEvent(new Event('ft:in')); io.unobserve(e.target); } }), { threshold: .25 });
+  $$('[data-in]').forEach(f => io.observe(f));
+
+  const SPORTS = window.SFA_SPORTS, HOURS = window.SFA_SCHEDULE.HOURS;
+  const hhmm = m => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+
+  // ================= 1 · wordmark
+  (() => {
+    const f = $('.f1'), w = $('.f1-word');
+    w.innerHTML = [...'SFA DOMES'].map((c, i) => c === ' ' ? '<i></i>' : `<span aria-hidden="true" style="transition-delay:${i * 50}ms">${c}</span>`).join('');
+    const letters = $$('span', w);
+    f.addEventListener('ft:in', () => setTimeout(() => letters.forEach(l => l.style.transitionDelay = ''), 1400));
+    // letters near the pointer lift and turn orange; they settle when it leaves
+    let raf = 0, px = -1e4;
+    const paint = () => { raf = 0; letters.forEach(l => { const r = l.getBoundingClientRect(), d = Math.abs(px - (r.left + r.width / 2)), k = Math.max(0, 1 - d / (r.width * 1.6)); l.style.setProperty('--lift', `${(-k * 0.16 * r.height).toFixed(1)}px`); l.classList.toggle('hot', k > .55); }); };
+    w.addEventListener('pointermove', e => { px = e.clientX; if (!raf) raf = requestAnimationFrame(paint); });
+    w.addEventListener('pointerleave', () => { px = -1e4; paint(); });
+  })();
+
+  // ================= 2 · scoreboard
+  (() => {
+    const f = $('.f2'), GLYPHS = '0123456789:';
+    const build = (el, text) => { el.innerHTML = [...text].map(c => `<span class="f2-flap${c === ':' ? ' sep' : ''}">${c}</span>`).join(''); };
+    // a flap runs through a few glyphs before it lands on its character
+    const flipTo = (el, text, stagger = 70) => {
+      if (el.children.length !== text.length) build(el, text.replace(/[0-9]/g, '0'));
+      [...text].forEach((c, i) => {
+        const cell = el.children[i]; if (c === ':' || cell.textContent === c) return;
+        if (reduce){ cell.textContent = c; return; }
+        let n = 6 + Math.floor(Math.random() * 6);
+        setTimeout(function step(){ cell.classList.remove('flip'); void cell.offsetWidth; cell.classList.add('flip'); cell.textContent = n-- > 0 ? GLYPHS[Math.floor(Math.random() * 10)] : c; if (n >= 0) setTimeout(step, 70); }, i * stagger);
+      });
+    };
+    // Dammam is UTC+3 all year
+    const now = () => { const d = new Date(Date.now() + (new Date().getTimezoneOffset() + 180) * 60000); return d; };
+    const clock = () => { const d = now(); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+    const close = () => hhmm(HOURS[now().getDay()][1]);
+    const courts = String(9).padStart(2, '0'), sports = String(Object.keys(SPORTS).length).padStart(2, '0');
+    [['f2Clock', '00:00'], ['f2Close', '00:00'], ['f2Courts', '00'], ['f2Sports', '00']].forEach(([id, t]) => build($('#' + id), t));
+    f.addEventListener('ft:in', () => {
+      flipTo($('#f2Clock'), clock()); flipTo($('#f2Close'), close(), 90); flipTo($('#f2Courts'), courts, 110); flipTo($('#f2Sports'), sports, 130);
+      setInterval(() => flipTo($('#f2Clock'), clock(), 40), 5000);
+    });
+    $('#f2Rows').innerHTML = COLS.flat().map((l, i) => `<a href="#">${esc(l)}<b>${String(i + 1).padStart(2, '0')}</b></a>`).join('');
+  })();
+
+  // ================= 3 · ball pit (small circle physics: gravity, walls, ball-to-ball pushes, grab and throw)
+  (() => {
+    const f = $('.f3'), cv = $('#f3Canvas'), ctx = cv.getContext('2d');
+    const KIT = [['sports_soccer', '#FFFFFF', '#09090B'], ['sports_basketball', '#FF5A19', '#09090B'], ['sports_tennis', '#EBEB6E', '#09090B'], ['sports_volleyball', '#3CC3DC', '#09090B'],
+      ['sports_handball', '#B9286E', '#FFFFFF'], ['sports_rugby', '#23D782', '#09090B'], ['pickleball', '#7452AA', '#FFFFFF'], ['fitness_center', '#323CB9', '#FFFFFF']];
+    let W = 0, H = 0, dpr = 1, balls = [], running = false, grab = null, last = 0;
+    const size = () => { const r = cv.getBoundingClientRect(); dpr = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; };
+    const spawn = () => {
+      const n = W < 640 ? 16 : 26, base = W < 640 ? 26 : Math.max(34, Math.min(56, W / 26));
+      balls = Array.from({ length: n }, (_, i) => { const k = KIT[i % KIT.length], r = base * (.75 + Math.random() * .5); return { x: r + Math.random() * (W - 2 * r), y: -r - Math.random() * H * 1.6, vx: (Math.random() - .5) * 2, vy: 0, r, a: Math.random() * 6.28, va: 0, k }; });
+    };
+    const step = dt => {
+      const g = 1800;
+      for (const b of balls){
+        if (b === grab) continue;
+        b.vy += g * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.a += b.va * dt;
+        if (b.y + b.r > H){ b.y = H - b.r; b.vy *= -.42; b.vx *= .92; b.va = b.vx / b.r; if (Math.abs(b.vy) < 30) b.vy = 0; }
+        if (b.x - b.r < 0){ b.x = b.r; b.vx *= -.6; } if (b.x + b.r > W){ b.x = W - b.r; b.vx *= -.6; }
+      }
+      for (let it = 0; it < 3; it++) for (let i = 0; i < balls.length; i++) for (let j = i + 1; j < balls.length; j++){
+        const a = balls[i], b = balls[j], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || .01, min = a.r + b.r;
+        if (d >= min) continue;
+        const nx = dx / d, ny = dy / d, push = (min - d) / 2, ga = a === grab, gb = b === grab;
+        if (!ga){ a.x -= nx * push * (gb ? 2 : 1); a.y -= ny * push * (gb ? 2 : 1); } if (!gb){ b.x += nx * push * (ga ? 2 : 1); b.y += ny * push * (ga ? 2 : 1); }
+        const rv = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny; if (rv > 0) continue;
+        const imp = -1.4 * rv / 2;
+        if (!ga){ a.vx -= imp * nx; a.vy -= imp * ny; } if (!gb){ b.vx += imp * nx; b.vy += imp * ny; }
+      }
+    };
+    const draw = () => {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      for (const b of balls){
+        ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.a);
+        ctx.beginPath(); ctx.arc(0, 0, b.r, 0, Math.PI * 2); ctx.fillStyle = b.k[1]; ctx.fill();
+        ctx.fillStyle = b.k[2]; ctx.font = `${Math.round(b.r * 1.15)}px "Material Symbols Outlined"`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(b.k[0], 0, b.r * .04);
+        ctx.restore();
+      }
+    };
+    const loop = t => { if (!running) return; const dt = Math.min(.033, (t - last) / 1000 || .016); last = t; step(dt); draw(); requestAnimationFrame(loop); };
+    const start = () => { if (running) return; running = true; last = performance.now(); requestAnimationFrame(loop); };
+    new IntersectionObserver(es => { running = false; if (es[0].isIntersecting) start(); }).observe(cv);
+    f.addEventListener('ft:in', () => { document.fonts.load('40px "Material Symbols Outlined"', 'sports_soccer').finally(() => { size(); spawn(); start(); }); });
+    addEventListener('resize', () => { if (!balls.length) return; size(); balls.forEach(b => { b.x = Math.min(W - b.r, b.x); }); });
+    // grab and throw
+    let px = 0, py = 0, pvx = 0, pvy = 0, pt = 0;
+    const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    cv.addEventListener('pointerdown', e => {
+      const [x, y] = pos(e); grab = balls.find(b => Math.hypot(b.x - x, b.y - y) < b.r) || null; if (!grab) return;
+      cv.setPointerCapture(e.pointerId); cv.classList.add('grab'); px = x; py = y; pt = performance.now(); pvx = pvy = 0; e.preventDefault();
+    });
+    cv.addEventListener('pointermove', e => {
+      if (!grab) return; const [x, y] = pos(e), t = performance.now(), dt = Math.max(1, t - pt) / 1000;
+      pvx = (x - px) / dt; pvy = (y - py) / dt; px = x; py = y; pt = t; grab.x = x; grab.y = Math.min(H - grab.r, y); grab.vx = grab.vy = 0;
+    });
+    const drop = () => { if (!grab) return; grab.vx = Math.max(-2400, Math.min(2400, pvx)); grab.vy = Math.max(-2400, Math.min(2400, pvy)); grab.va = grab.vx / grab.r; grab = null; cv.classList.remove('grab'); };
+    cv.addEventListener('pointerup', drop); cv.addEventListener('pointercancel', drop);
+  })();
+
+  // ================= 4 · kinetic sports
+  (() => {
+    const f = $('.f4'), rows = $$('.f4-row', f), peek = $('#f4Peek');
+    const list = Object.entries(SPORTS).map(([k, s]) => `<a href="courts.html?sport=${k}" data-k="${k}">${s.name}</a>`).join('');
+    rows.forEach(r => { r.innerHTML = list + list + list; });
+    const pos = rows.map(() => 0); let boost = 0, lastY = scrollY, run = false, lastT = 0;
+    addEventListener('scroll', () => { boost = Math.min(14, boost + Math.abs(scrollY - lastY) * .06); lastY = scrollY; }, { passive: true });
+    const tick = t => {
+      if (!run) return; const dt = Math.min(.05, (t - lastT) / 1000 || .016); lastT = t;
+      boost *= Math.pow(.04, dt);
+      rows.forEach((r, i) => { const third = r.scrollWidth / 3, v = (60 + boost * 60) * (i ? 1 : -1); pos[i] = ((pos[i] + v * dt) % third + third) % third; r.style.transform = `translateX(${-pos[i]}px)`; });
+      requestAnimationFrame(tick);
+    };
+    if (!reduce) new IntersectionObserver(es => { run = es[0].isIntersecting; if (run){ lastT = performance.now(); requestAnimationFrame(tick); } }).observe(f);
+    // the hovered sport's photo follows the pointer
+    let tx = 0, ty = 0, cx = 0, cy = 0, follow = false;
+    const glide = () => { cx += (tx - cx) * .18; cy += (ty - cy) * .18; peek.style.left = cx + 'px'; peek.style.top = cy + 'px'; if (follow) requestAnimationFrame(glide); };
+    $('#f4Rows').addEventListener('pointermove', e => {
+      const r = f.getBoundingClientRect(); tx = e.clientX - r.left; ty = e.clientY - r.top;
+      const a = e.target.closest('a[data-k]');
+      if (a){ if (peek.dataset.k !== a.dataset.k){ peek.dataset.k = a.dataset.k; $('img', peek).src = `f/courts/${a.dataset.k}.jpg`; $('b', peek).textContent = SPORTS[a.dataset.k].name; } if (!follow){ cx = tx; cy = ty; follow = true; glide(); } peek.classList.add('on'); }
+      else peek.classList.remove('on');
+    });
+    $('#f4Rows').addEventListener('pointerleave', () => { peek.classList.remove('on'); follow = false; });
+  })();
+
+  // ================= 5 · the dome
+  (() => {
+    const f = $('.f5'), g = $('#f5Wire'), CX = 600, BASE = 520, RX = 540, RY = 440, M = 9, P = 6;
+    $('#f5Hours').textContent = (() => { const [o, c] = HOURS[new Date().getDay()]; return `${hhmm(o)} – ${hhmm(c)}`; })();
+    // parallels: horizontal rings at even heights; meridians: half-ellipses whose width follows cos(angle + turn)
+    let html = '';
+    for (let i = 1; i <= P; i++){ const a = i / (P + 1) * Math.PI / 2, y = BASE - RY * Math.sin(a), hw = RX * Math.cos(a), ry = 26 * Math.cos(a);
+      html += `<path class="wire draw" pathLength="1" d="M${CX - hw} ${y} A${hw} ${ry} 0 0 0 ${CX + hw} ${y}"/>`; }
+    for (let i = 0; i < M; i++) html += `<path class="wire draw${i === 0 ? ' or' : ''}" pathLength="1" data-m="${i}"/>`;
+    html += `<path class="wire draw or" pathLength="1" d="M${CX - RX} ${BASE} A${RX} ${RY} 0 0 1 ${CX + RX} ${BASE}"/>`;
+    g.innerHTML = html;
+    const mer = $$('[data-m]', g);
+    let turn = 0, target = 0, auto = 0, run = false;
+    const paint = () => mer.forEach((p, i) => { const a = (i / M) * Math.PI + turn, w = Math.abs(Math.cos(a)) * RX; p.setAttribute('d', `M${CX - w} ${BASE} A${Math.max(w, .5)} ${RY} 0 0 1 ${CX + w} ${BASE}`); });
+    paint();
+    const tick = () => { if (!run) return; if (!reduce) auto += .0015; turn += (target + auto - turn) * .06; paint(); requestAnimationFrame(tick); };
+    new IntersectionObserver(es => { run = es[0].isIntersecting; if (run) requestAnimationFrame(tick); }).observe(f);
+    f.addEventListener('pointermove', e => { const r = f.getBoundingClientRect(); target = ((e.clientX - r.left) / r.width - .5) * 1.2; });
+  })();
+})();
+</script>
+<script>
+/* concepts 6–10 (the shared parts were filled in by the script above) */
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const SPORTS = window.SFA_SPORTS, SCH = window.SFA_SCHEDULE;
+  const pad = n => String(n).padStart(2, '0');
+  const hhmm = m => `${pad(Math.floor(m / 60) % 24)}:${pad(m % 60)}`;
+  // Dammam time (UTC+3, no daylight saving)
+  const dammam = () => new Date(Date.now() + (new Date().getTimezoneOffset() + 180) * 60000);
+  const dk = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  // ================= 6 · floodlight
+  (() => {
+    const f = $('.f6'), court = $('#f6Court'), list = $('#f6Sports');
+    list.innerHTML = Object.entries(SPORTS).map(([k, s], i) => `<li><a href="courts.html?sport=${k}" data-k="${k}"${i === 0 ? ' class="on"' : ''}>${s.name}</a></li>`).join('');
+    const show = k => { court.style.backgroundImage = `url(f/courts/${k}.jpg)`; $$('a', list).forEach(a => a.classList.toggle('on', a.dataset.k === k)); };
+    show(Object.keys(SPORTS)[0]);
+    list.addEventListener('pointerover', e => { const a = e.target.closest('a[data-k]'); if (a) show(a.dataset.k); });
+    let tx = .5, ty = .4, x = .5, y = .4, user = 0, run = false, t0 = performance.now();
+    f.addEventListener('pointermove', e => { const r = f.getBoundingClientRect(); tx = (e.clientX - r.left) / r.width; ty = (e.clientY - r.top) / r.height; user = performance.now(); });
+    const tick = t => {
+      if (!run) return;
+      // with no pointer for a moment, the light drifts on its own
+      if (t - user > 2500){ const s = (t - t0) / 1000; tx = .5 + Math.sin(s * .5) * .32; ty = .45 + Math.sin(s * .8) * .18; }
+      x += (tx - x) * .12; y += (ty - y) * .12;
+      court.style.setProperty('--x', (x * 100).toFixed(2) + '%'); court.style.setProperty('--y', (y * 100).toFixed(2) + '%');
+      court.style.setProperty('--r', Math.round(Math.max(200, f.clientWidth * .2)) + 'px');
+      requestAnimationFrame(tick);
+    };
+    new IntersectionObserver(es => { run = es[0].isIntersecting; if (run) requestAnimationFrame(tick); }).observe(f);
+  })();
+
+  // ================= 7 · next free court
+  (() => {
+    let next = null;
+    // earliest free slot from now, over every court of every sport, looking up to a week ahead
+    const find = () => {
+      const now = dammam(), mins = now.getHours() * 60 + now.getMinutes();
+      for (let d = 0; d < 7; d++){
+        const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d), key = dk(day);
+        const starts = SCH.startsFor(key).filter(s => d > 0 || s > mins);
+        for (const s of starts){
+          for (const [k, sp] of Object.entries(SPORTS)) for (let ci = 0; ci < sp.courts.length; ci++){
+            if (!window.SFA_IS_BOOKED(k, ci, key, s)) return { k, ci, key, s, at: new Date(day.getFullYear(), day.getMonth(), day.getDate(), 0, s), d };
+          }
+        }
+      }
+      return null;
+    };
+    const label = n => `${n.d === 0 ? 'Today' : n.d === 1 ? 'Tomorrow' : n.at.toLocaleDateString('en-GB', { weekday: 'long' })} ${hhmm(n.s)} · <em>${SPORTS[n.k].name}</em> · ${SPORTS[n.k].courts[n.ci][0]}`;
+    const tick = () => {
+      const now = dammam();
+      if (!next || next.at <= now){ next = find(); if (next){ $('#f7What').innerHTML = label(next); $('#f7Go').href = `court-details.html?sport=${next.k}&court=${next.ci}`; } }
+      if (next){ const left = Math.max(0, Math.floor((next.at - now) / 1000)); $('#f7H').textContent = pad(Math.floor(left / 3600)); $('#f7M').textContent = pad(Math.floor(left / 60) % 60); $('#f7S').textContent = pad(left % 60); }
+      // today's opening hours as a bar, filled up to now
+      const [o, c] = SCH.HOURS[now.getDay()], m = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+      $('#f7Day').style.width = Math.max(0, Math.min(100, (m - o) / (c - o) * 100)).toFixed(2) + '%';
+      $('#f7DayL').textContent = `Opens ${hhmm(o)}`; $('#f7DayR').textContent = `Closes ${hhmm(c)}`;
+    };
+    tick(); setInterval(tick, 1000);
+  })();
+
+  // ================= 8 · curtain: the button leans toward the pointer
+  (() => {
+    const mag = $('#f8Mag'), zone = $('.f8-h');
+    zone.addEventListener('pointermove', e => { const r = mag.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2), d = Math.hypot(dx, dy), k = Math.max(0, 1 - d / 420); mag.style.transform = `translate(${dx * k * .35}px, ${dy * k * .35}px)`; });
+    zone.addEventListener('pointerleave', () => { mag.style.transform = ''; });
+  })();
+
+  // ================= 9 · pitch
+  (() => {
+    const cols = [['Home', 'About', 'Corporate Events', 'Contact us', 'News', 'Calendar'], ['Community Sports Groups', 'Vendar gate', 'Brand Guidelines', 'Annual Report (2020)', 'Privacy Policy & Terms & Conditions']];
+    $$('#f9Zones [data-col]').forEach(ul => { ul.innerHTML = cols[+ul.dataset.col].map(l => `<li><a href="#">${l.replace(/&/g, '&amp;')}</a></li>`).join(''); });
+    const svg = $('#f9Svg'), ball = $('#f9Ball'), zones = $('#f9Zones');
+    // the ball runs to the link (or button) under the pointer, in the pitch's own coordinates
+    zones.addEventListener('pointerover', e => {
+      const a = e.target.closest('a'); if (!a) return;
+      const s = svg.getBoundingClientRect(), r = a.getBoundingClientRect(), sc = 1200 / s.width;
+      const left = a.closest('[data-col="0"]'), x = left ? r.right + 18 : a.closest('[data-col="1"]') ? r.left - 18 : r.left + r.width / 2;
+      const y = a.classList.contains('ft-cta') ? r.bottom + 22 : r.top + r.height / 2;
+      ball.style.transform = `translate(${((x - s.left) * sc).toFixed(1)}px, ${((y - s.top) * sc).toFixed(1)}px)`;
+    });
+    zones.addEventListener('pointerleave', () => { ball.style.transform = 'translate(600px,220px)'; });
+  })();
+
+  // ================= 10 · shoot for the top
+  (() => {
+    const court = $('#f10Court'), btn = $('#f10Ball'), net = $('#f10Net'); let score = 0, busy = false;
+    btn.addEventListener('click', () => {
+      if (busy) return; busy = true;
+      const go = () => { score++; $('#f10Score').textContent = score; setTimeout(() => { scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); btn.style.transform = ''; busy = false; }, 450); };
+      if (reduce || !btn.animate){ go(); return; }
+      const c = court.getBoundingClientRect(), b = btn.getBoundingClientRect(), svgScale = Math.min(c.width / 420, c.height / 340), offX = (c.width - 420 * svgScale) / 2;
+      const rimX = c.left + offX + 331 * svgScale, rimY = c.top + (c.height - 340 * svgScale) + 92 * svgScale;
+      const dx = rimX - (b.left + b.width / 2), dy = rimY - (b.top + b.height / 2) - b.height / 2, peak = dy - 140;
+      // a parabola: up past the rim, then down through it
+      const frames = []; for (let i = 0; i <= 24; i++){ const t = i / 24, x = dx * t, y = (1 - t) * (1 - t) * 0 + 2 * (1 - t) * t * peak + t * t * (dy + b.height * .9); frames.push({ transform: `translate(${x}px, ${y}px) rotate(${t * 540}deg) scale(${1 - t * .35})` }); }
+      const anim = btn.animate(frames, { duration: 900, easing: 'cubic-bezier(.3,.05,.6,1)', fill: 'forwards' });
+      setTimeout(() => { net.classList.remove('swish'); void net.getBoundingClientRect(); net.classList.add('swish'); }, 760);
+      anim.onfinish = () => { go(); setTimeout(() => anim.cancel(), 500); };
+    });
+  })();
+})();
+</script>
+</body>
+</html>

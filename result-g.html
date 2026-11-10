@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Booking · SFA Domes · option G</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="f/tickets.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/result-base.css">
+<style>
+/* Confirmation option G · Editorial: big type says when to come ("See you Thu 12 Nov"), then every session as one row of a simple table with its QR a tap away. Payment and tips share the bottom. Reads quickly and keeps long bookings (12 sessions) compact.
+   Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+body[data-state=paid] .cf-head{display:none}
+body[data-state=paid] .cf-grid{display:block}
+.g-hd{display:grid;gap:16px;padding-bottom:clamp(32px,5vh,48px);margin-bottom:clamp(32px,5vh,48px);border-bottom:2px solid var(--color-content-primary);animation:up .7s var(--ease) both}
+.g-eye{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.g-eye b{display:inline-flex;align-items:center;gap:8px;color:var(--color-brand)}
+.g-eye svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:square}
+.g-hd h1{font:var(--ts-display-xl);text-transform:var(--type-case-display);max-width:16ch}
+.g-hd h1 em{font-style:normal;color:var(--color-brand)}
+.g-hd p{margin:0;font:var(--ts-body-l);color:var(--color-content-secondary)}
+.g-tbl{width:100%;border-collapse:collapse;animation:up .7s var(--ease) .1s both}
+.g-tbl th{padding:0 16px 12px;font:var(--ts-label-s);color:var(--color-content-tertiary);text-align:start;border-bottom:1px solid var(--color-border-secondary)}
+.g-tbl td{padding:16px;border-bottom:1px solid var(--color-border-primary);font:var(--ts-label-l);vertical-align:middle}
+.g-tbl td.n{width:48px;font:var(--ts-number-s);color:var(--color-content-tertiary)}
+.g-tbl td.r{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.g-tbl td:last-child,.g-tbl th:last-child{text-align:end}
+.g-qb{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-label-m);cursor:pointer}
+.g-qb svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+.g-qb:hover{background:var(--color-content-primary);color:var(--neutral-0);border-color:var(--color-content-primary)}
+.g-more{margin-top:16px}
+.g-foot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:clamp(32px,5vh,48px)}
+.g-foot .acts{align-content:start}
+dialog.g-dlg{width:min(360px,calc(100vw - 32px));padding:0;border:0;background:var(--color-bg-primary);color:var(--color-content-primary)}
+dialog.g-dlg::backdrop{background:rgba(9,9,11,.6)}
+.g-dlg-in{display:grid;justify-items:center;gap:12px;padding:24px}
+.g-dlg-in b{font:var(--ts-label-l)}
+.g-dlg-in .tk-qr{width:240px}
+.g-dlg-in small{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.g-dlg-in button{justify-self:stretch;height:48px;border:0;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+@media (max-width:960px){.g-foot{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.g-hd h1{font:var(--ts-display-l)}.g-tbl thead{display:none}.g-tbl tr{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:4px 12px;padding:16px 0;border-bottom:1px solid var(--color-border-primary)}.g-tbl td{padding:0;border:0}.g-tbl td.n{grid-row:span 3;width:auto}.g-tbl td:last-child{grid-row:1/span 3;grid-column:3;align-self:center}}
+</style>
+</head>
+<body>
+<div data-site-nav></div>
+<main class="cf pending" id="cf" aria-live="polite">
+  <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
+    <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
+  <div class="cf-grid" id="body"></div>
+</main>
+<div data-site-footer></div>
+<a class="opt-tag" href="result-options.html">Option G · Editorial</a>
+
+<script src="f/site-nav.js"></script>
+<script src="f/site-footer.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/tickets.js"></script>
+<script>
+window.RESULT_VIEW = {
+  paid: m => { const { t, esc, ICON, acts } = m, s0 = m.list[0], P = window.SFA_PREFS;
+    const day = P.date(window.SFA_TICKETS.toDate(s0.date), { weekday: 'short', day: 'numeric', month: 'short' });
+    return `<header class="g-hd"><p class="g-eye"><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>${t(m.title)}</b>${m.ref}</p>
+        <h1>${t('See you {day}', { day: `<em>${day}</em>` })}</h1><p>${esc(m.D.label)} · ${m.time(s0)} · ${t('For {name}', { name: m.who })}${m.count > 1 ? ' · ' + t('{n} sessions', { n: m.count }) : ''}</p></header>
+      <table class="g-tbl"><thead><tr><th>#</th><th>${t('Date')}</th><th>${t('Time')}</th><th>${t('Ticket ref')}</th><th>${t('Ticket')}</th></tr></thead>
+        <tbody>${m.list.map((s, i) => `<tr${i > 5 ? ' hidden data-x' : ''}><td class="n">${String(i + 1).padStart(2, '0')}</td><td>${m.date(s)}</td><td>${m.time(s)}</td><td class="r">${esc(s.id)}${s.player ? ' · ' + esc(s.player) : ''}</td><td><button type="button" class="g-qb" data-q="${i}">${ICON.qr}${t('Show QR')}</button></td></tr>`).join('')}</tbody></table>
+      ${m.count > 6 ? `<button type="button" class="ghost g-more" id="gMore">${t('Show all {n} tickets', { n: m.count })}</button>` : ''}
+      <div class="g-foot"><div class="box"><h2>${t(m.b.free ? 'Summary' : 'Payment')}</h2>${m.rows}</div>
+        <div class="box"><h2>${t('Before you play')}</h2><ul class="tips">${m.tips.map(x => `<li>${x}</li>`).join('')}</ul></div>
+        <div class="acts"><a class="btn" href="${acts.tickets}">${t('View my tickets')}${ICON.arrow}</a><a class="ghost" href="${acts.ics}" download="${acts.icsName}">${ICON.cal}${t('Add to calendar')}</a><a class="ghost" href="${acts.dir}" target="_blank" rel="noopener">${ICON.pin}${t('Get directions')}</a>${acts.more ? `<a class="more" href="${acts.more.href}">${acts.more.label}</a>` : ''}</div></div>
+      <dialog class="g-dlg" id="gDlg" aria-label="${t('Ticket')}"><div class="g-dlg-in"><b id="gDlgT"></b><div class="tk-qr" id="gQr" role="img"></div><span class="tk-ref" id="gDlgR"></span><small>${t('Show this at reception')}</small><button type="button" data-close>${t('Close')}</button></div></dialog>`;
+  },
+  after: m => {
+    const d = document.getElementById('gDlg');
+    document.getElementById('gMore')?.addEventListener('click', e => { document.querySelectorAll('.g-tbl [data-x]').forEach(r => r.hidden = false); e.currentTarget.remove(); });
+    document.querySelectorAll('.g-qb').forEach(b => b.addEventListener('click', () => { const s = m.list[+b.dataset.q], q = document.getElementById('gQr');
+      document.getElementById('gDlgT').innerHTML = `${m.date(s)} · ${m.time(s)}`; document.getElementById('gDlgR').textContent = s.id;
+      q.removeAttribute('data-qr-done'); q.dataset.qr = s.id; q.setAttribute('aria-label', m.t('QR code for {ref}', { ref: s.id })); window.SFA_TICKETS.paintQR(d); d.dir = document.dir; d.showModal(); }));
+    d.addEventListener('click', e => { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
+  }
+};
+</script>
+<script src="f/result-core.js"></script>
+</body>
+</html>

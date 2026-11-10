@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Participants · options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<style>
+/* Review page: options for the program checkout's Participants card. Each option is working with the demo account's
+   people (Sara + Yousef 7, Faisal 10, Lana 14) on Basketball Skills (ages 10–14, from the next start day): Faisal and Lana
+   can take part, Sara and Yousef are shown with the reason. "Add a new child" adds a child for this booking only (on the
+   site the "Save this child to your account?" prompt runs at that point). DS tokens, square corners, 4/8 spacing. */
+:root{--ink:var(--color-content-primary);--ink-2:var(--color-content-secondary);--ink-3:var(--color-content-tertiary);--ink-4:var(--color-content-disabled);--line:var(--color-border-primary);--line-strong:var(--color-border-secondary);--bg:var(--color-bg-primary);--bg-soft:var(--color-bg-secondary);--brand:var(--color-brand);--brand-10:var(--color-bg-accent-subtle);--danger:var(--color-danger)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg-soft);color:var(--ink);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+main{max-width:880px;margin:0 auto;padding:56px 16px 96px}
+h1{margin:0 0 8px;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.lead{margin:0 0 24px;color:var(--ink-2)}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:40px}
+.ctl span{font:var(--ts-label-m);color:var(--ink-2);margin-inline-end:8px}
+.ctl button{height:40px;padding:0 16px;border:1px solid var(--line-strong);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.ctl button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--neutral-0)}
+.opt{margin:0 0 56px}
+.opt-h{display:flex;align-items:center;gap:12px;margin:0 0 4px}
+.opt-h b{display:grid;place-items:center;flex:none;min-width:32px;height:32px;padding:0 8px;background:var(--brand);color:var(--neutral-0);font:var(--ts-label-m)}
+.opt-h.cur b{background:var(--ink)}
+.opt-h strong{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.opt-h a{margin-inline-start:auto;display:inline-flex;flex:none;white-space:nowrap;align-items:center;height:40px;padding:0 16px;background:var(--ink);color:var(--neutral-0);font:var(--ts-label-m);text-decoration:none}
+@media (max-width:640px){.opt-h{flex-wrap:wrap}.opt-h strong{flex:1;min-width:0}}
+.opt > p{margin:0 0 16px 44px;font:var(--ts-body-s);color:var(--ink-2)}
+[dir=rtl] .opt > p{margin:0 44px 16px 0}
+
+/* the card, as in checkout */
+.card{background:var(--bg);border:1px solid var(--line)}
+.card-h{padding:20px 24px;border-bottom:1px solid var(--line)}
+.card-h h2{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.card-b{display:grid;gap:16px;padding:24px}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:16px;border-top:1px solid var(--line)}
+.foot p{margin:0;font:var(--ts-body-s);color:var(--ink-2)}
+.foot b{font:var(--ts-label-l);color:var(--ink)}
+.go{height:48px;padding:0 20px;border:0;background:var(--brand);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+.err{display:none;margin:0;font:var(--ts-body-s);color:var(--danger)}
+.bad .err{display:block}
+.ok{margin:0;font:var(--ts-body-s);color:var(--ink-2)}
+.ok:empty{display:none}
+.lbl{margin:0;font:var(--ts-label-m);color:var(--ink-2)}
+@media (max-width:640px){.card-h{padding:16px}.card-b{padding:16px}.foot{display:grid}.go{width:100%}}
+
+.av{display:grid;place-items:center;flex:none;width:40px;height:40px;background:var(--bg-soft);font:var(--ts-label-m);color:var(--ink-2)}
+.tx{display:grid;gap:4px;min-width:0}
+.tx strong{font:var(--ts-label-l)}
+.tx small{font:var(--ts-body-s);color:var(--ink-2)}
+.no .tx small{color:var(--danger)}
+.box{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1.5px solid var(--line-strong);background:var(--bg)}
+.box svg{width:16px;height:16px;opacity:0}
+[aria-checked=true] .box{border-color:var(--brand);background:var(--brand);color:var(--neutral-0)}
+[aria-checked=true] .box svg{opacity:1}
+
+/* A / D / E · checklist rows */
+.rows{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.row{display:flex;align-items:center;gap:16px;width:100%;min-height:64px;padding:12px 16px;border:1px solid var(--line-strong);background:var(--bg);text-align:start;cursor:pointer}
+.row:hover:not(:disabled){border-color:var(--ink)}
+.row[aria-checked=true]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.row[aria-checked=true] .av{background:var(--brand-10);color:var(--ink)}
+.row:disabled{cursor:not-allowed;background:var(--bg-soft);border-color:var(--line)}
+.row:disabled strong,.row:disabled .av{opacity:.5}
+.row .tx{flex:1}
+.row:disabled .box{visibility:hidden}
+.add{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border:1px dashed var(--ink-4);background:none;font:var(--ts-label-m);cursor:pointer}
+.add:hover{border-color:var(--ink)}
+.add svg,.ico{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+
+/* B · tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.tile{position:relative;display:grid;justify-items:start;align-content:start;gap:12px;min-height:136px;padding:16px;border:1px solid var(--line-strong);background:var(--bg);text-align:start;cursor:pointer}
+.tile .av{width:48px;height:48px;font:var(--ts-label-l)}
+.tile .box{position:absolute;top:12px;inset-inline-end:12px}
+.tile[aria-checked=true]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+.tile[aria-checked=true] .av{background:var(--brand);color:var(--neutral-0)}
+.tile:disabled{cursor:not-allowed;background:var(--bg-soft);border-color:var(--line)}
+.tile:disabled .av,.tile:disabled strong{opacity:.5}
+.tile:disabled .box{display:none}
+.tile.plus{place-content:center;justify-items:center;text-align:center;border-style:dashed;border-color:var(--ink-4);font:var(--ts-label-m)}
+.tile.plus svg{width:24px;height:24px}
+.tile:hover:not(:disabled){border-color:var(--ink)}
+
+/* C · places with one menu each */
+.qty{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.qty .tx strong{font:var(--ts-label-l)}
+.stp{display:inline-grid;grid-template-columns:40px 40px 40px;border:1px solid var(--line-strong)}
+.stp button{height:40px;border:0;background:var(--bg);font:var(--ts-label-l);cursor:pointer}
+.stp button:disabled{color:var(--ink-4);cursor:default}
+.stp output{display:grid;place-items:center;font:var(--ts-label-l);border-inline:1px solid var(--line)}
+.places{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.place{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;gap:16px}
+.place > span{font:var(--ts-label-m);color:var(--ink-2)}
+.sel{position:relative;display:flex;align-items:center;height:48px;border:1px solid var(--line-strong);background:var(--bg)}
+.sel:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.sel select{appearance:none;-webkit-appearance:none;flex:1;min-width:0;height:100%;padding:0 40px 0 16px;border:0;background:transparent;outline:0;font-size:var(--fs-16);cursor:pointer}
+[dir=rtl] .sel select{padding:0 16px 0 40px}
+.sel select.ph{color:var(--ink-3)}
+.sel svg{position:absolute;inset-inline-end:12px;width:20px;height:20px;fill:none;stroke:var(--ink-2);stroke-width:2;pointer-events:none}
+.bad .sel.empty{border-color:var(--danger);box-shadow:inset 0 0 0 1px var(--danger)}
+@media (max-width:640px){.place{grid-template-columns:minmax(0,1fr);gap:8px}}
+
+/* D · me switch */
+.me{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid var(--line-strong)}
+.me .tx{flex:1}
+.sw{position:relative;flex:none;width:52px;height:32px;border:1.5px solid var(--line-strong);background:var(--bg-soft);cursor:pointer}
+.sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;background:var(--ink-3);transition:inset-inline-start .2s}
+.sw[aria-checked=true]{background:var(--brand);border-color:var(--brand)}
+.sw[aria-checked=true]::after{inset-inline-start:23px;background:var(--neutral-0)}
+.sw:disabled{opacity:.5;cursor:not-allowed}
+.me.no .tx small{color:var(--danger)}
+
+/* E · summary + dialog */
+.sum{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.sum li{display:flex;align-items:center;gap:16px;padding:12px 16px;background:var(--bg-soft)}
+.sum li .tx{flex:1}
+.x{display:grid;place-items:center;width:40px;height:40px;border:0;background:none;color:var(--ink-2);cursor:pointer}
+.x:hover{color:var(--ink)}
+.edit{display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border:1px solid var(--ink);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.edit:hover{background:var(--ink);color:var(--neutral-0)}
+.empty-s{margin:0;padding:16px;border:1px dashed var(--line-strong);font:var(--ts-body-s);color:var(--ink-2)}
+dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 64px);padding:0;border:0;background:var(--bg);color:var(--ink)}
+dialog::backdrop{background:rgba(9,9,11,.5)}
+.dlg-h{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.dlg-h h3{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.dlg-b{display:grid;gap:16px;padding:24px;overflow:auto}
+.dlg-f{display:flex;justify-content:flex-end;gap:16px;align-items:center;padding:16px 24px;border-top:1px solid var(--line)}
+.dlg-f p{margin:0 auto 0 0;font:var(--ts-body-s);color:var(--ink-2)}
+[dir=rtl] .dlg-f p{margin:0 0 0 auto}
+.done{height:48px;padding:0 24px;border:0;background:var(--ink);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+
+/* add-a-child form (shared) */
+.kf{display:grid;gap:16px;padding:16px;border:1px solid var(--ink);background:var(--bg)}
+.kf h3{margin:0;font:var(--ts-label-l)}
+.kf-r{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.fld label{display:block;margin-bottom:8px;font:var(--ts-label-m);color:var(--ink-2)}
+.in{display:flex;height:48px;border:1px solid var(--line-strong)}
+.in:focus-within{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.in input{flex:1;min-width:0;padding:0 16px;border:0;background:none;outline:0;font-size:var(--fs-16)}
+.fld .err{margin-top:8px}
+.fld.bad .in,.fld.bad .gen button{border-color:var(--danger)}
+.fld.bad .err{display:block}
+.gen{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gen button{height:48px;border:1px solid var(--line-strong);background:var(--bg);font:var(--ts-label-m);cursor:pointer}
+.gen button[aria-checked=true]{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand);background:var(--brand-10)}
+.kf-a{display:flex;align-items:center;gap:16px}
+.kf-go{height:44px;padding:0 20px;border:0;background:var(--ink);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+.kf-x{padding:0;border:0;background:none;color:var(--ink-2);font:var(--ts-label-m);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+@media (max-width:640px){.kf{padding:12px}.kf-r{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<main>
+<h1>Participants</h1>
+<p class="lead" id="lead"></p>
+<div class="ctl" role="group" aria-label="Language"><span>Language</span><button type="button" data-lang="en">English</button><button type="button" data-lang="ar">العربية</button></div>
+<div id="opts"></div>
+</main>
+<script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script>
+(() => {
+  const P = window.SFA_PREFS, t = (s, p) => P.t(s, p);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const PROG = window.SFA_PROGRAMS['basketball-skills'], START = window.SFA_PROGRAM_START_DAYS(PROG)[0], MAX = window.SFA_PROGRAM_MAX_PEOPLE;
+  const PRICE = window.SFA_PROGRAM_PRICE(PROG, 'month');
+  const money = n => `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${n.toLocaleString('en-US')}</span>`;
+  const ages = `⁦${PROG.ages}⁩`;
+  const BASE = [
+    { key: 'me', first: 'Sara', last: 'Al-Qahtani', dob: '1990-05-02', gender: 'female', you: true },
+    { key: 'k1', first: 'Yousef', last: 'Al-Qahtani', dob: '2019-03-14', gender: 'male' },
+    { key: 'k2', first: 'Faisal', last: 'Al-Qahtani', dob: '2016-10-02', gender: 'male' },
+    { key: 'k3', first: 'Lana', last: 'Al-Qahtani', dob: '2012-06-21', gender: 'female' }
+  ];
+  const name = c => window.SFA_FULL_NAME(c), ini = c => (c.first[0] + (c.last[0] || '')).toUpperCase();
+  const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+  const born = dob => P.date(toDate(dob), { day: 'numeric', month: 'short', year: 'numeric' });
+  const why = c => window.SFA_PROGRAM_ELIGIBLE(PROG, c, START) ? t('Ages {a} only', { a: ages }) : '';
+  const sub = c => why(c) || [c.you ? t('You') : t('Born {date}', { date: born(c.dob) }), t('Age {n}', { n: window.SFA_AGE(c.dob, START) }), c.fresh ? t('This booking only') : ''].filter(Boolean).join(' · ');
+  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+  const PLUS = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+  const CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  const X = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
+  // one state per option: people (base + added), picked keys, the add form
+  const S = {};
+  const st = id => S[id] || (S[id] = { people: BASE.map(x => ({ ...x })), pick: [], places: [null], form: null, er: {}, note: '', bad: false });
+  const blank = () => ({ first: '', last: '', dob: '', gender: '' });
+
+  const formHTML = (id, s) => { const f = s.form, er = s.er, r = { min: '', max: '' };
+    const fld = (k, l, extra) => `<div class="fld${er[k] ? ' bad' : ''}"><label for="${id}-${k}">${t(l)}</label><div class="in"><input id="${id}-${k}" data-f="${k}" value="${esc(f[k])}" ${extra}></div><p class="err">${er[k] ? t(er[k]) : ''}</p></div>`;
+    return `<div class="kf"><h3>${t('Add a new child')}</h3><div class="kf-r">${fld('first', 'First name', 'autocomplete="off"')}${fld('last', 'Last name', 'autocomplete="off"')}</div>
+      <div class="kf-r">${fld('dob', 'Date of birth', 'type="date"')}<div class="fld${er.gender ? ' bad' : ''}"><span class="lbl" style="display:block;margin-bottom:8px">${t('Gender')}</span><div class="gen" role="radiogroup" aria-label="${t('Gender')}">${['male', 'female'].map(g => `<button type="button" role="radio" data-gen="${g}" aria-checked="${f.gender === g}">${t(g === 'male' ? 'Male' : 'Female')}</button>`).join('')}</div><p class="err">${er.gender ? t(er.gender) : ''}</p></div></div>
+      <p class="ok">${t('Ages {a} on the start day', { a: ages })}</p>
+      <div class="kf-a"><button type="button" class="kf-go" data-kgo>${t('Continue')}</button><button type="button" class="kf-x" data-kx>${t('Cancel')}</button></div></div>`; };
+  // reads the form; on success adds the child (this booking only) and returns it
+  const formGo = (root, s) => {
+    root.querySelectorAll('[data-f]').forEach(i => s.form[i.dataset.f] = i.value);
+    const c = { first: s.form.first.trim(), last: s.form.last.trim(), dob: s.form.dob, gender: s.form.gender };
+    s.er = window.SFA_CHILD_ERRORS(c, START) || {};
+    if (!Object.keys(s.er).length && window.SFA_PROGRAM_ELIGIBLE(PROG, c, START)) s.er.dob = 'Ages {a} only';
+    if (s.er.dob === 'Ages {a} only') s.er.dob = t('Ages {a} only', { a: ages });
+    if (Object.keys(s.er).length) return null;
+    const k = { ...c, key: 'n' + Date.now(), fresh: true }; s.people.push(k); s.form = null; s.er = {};
+    s.note = t('{name} was added for this booking. On the site you are asked whether to save them to My children.', { name: name(k) });
+    return k;
+  };
+  const foot = (id, n) => `<div class="foot"><p>${n ? `<b>${t('{n} × {price}', { n, price: money(PRICE) })}</b> · ${t(n === 1 ? '1 participant' : '{n} participants', { n })}` : t('No one chosen yet')}</p><button type="button" class="go" data-go>${t('Continue to payment')}</button></div>`;
+  const rowsHTML = (s, list, max) => `<ul class="rows">${list.map(c => { const r = why(c), on = s.pick.includes(c.key), full = !on && s.pick.length >= max;
+      return `<li><button type="button" class="row${r ? ' no' : ''}" role="checkbox" aria-checked="${on}" data-k="${c.key}"${r || full ? ' disabled' : ''}><span class="av" aria-hidden="true">${esc(ini(c))}</span><span class="tx"><strong>${esc(name(c))}</strong><small>${full && !r ? t('Up to {n} people', { n: max }) : sub(c)}</small></span><span class="box" aria-hidden="true">${CHECK}</span></button></li>`; }).join('')}</ul>`;
+  const toggle = (s, k) => { s.pick = s.pick.includes(k) ? s.pick.filter(x => x !== k) : [...s.pick, k]; s.bad = false; };
+
+  const OPTS = [
+    { id: 'now', cur: true, name: 'Places, one at a time (now)', why: 'What checkout has today: set the number of places, then open each place and choose For myself or For a child, then the child from a menu. Clear about "one place = one person", but it takes several taps per person and hides who can take part until you open a place.' },
+    { id: 'a', name: 'One checklist', why: 'Everyone on the account in one list; tick who is taking part. The number of places is simply how many are ticked. People who can\'t take part stay in the list, greyed, with the reason. Fewest taps.',
+      body: s => `${rowsHTML(s, s.people, MAX)}${s.form ? formHTML('a', s) : `<button type="button" class="add" data-add>${PLUS}${t('Add a new child')}</button>`}` },
+    { id: 'b', name: 'Tiles', why: 'The same choice as big square tiles with initials, age and a tick: quick to scan on a phone, and the + tile adds a child. Works best with a handful of people.',
+      body: s => `<div class="tiles">${s.people.map(c => { const r = why(c), on = s.pick.includes(c.key);
+          return `<button type="button" class="tile" role="checkbox" aria-checked="${on}" data-k="${c.key}"${r ? ' disabled' : ''}><span class="box" aria-hidden="true">${CHECK}</span><span class="av" aria-hidden="true">${esc(ini(c))}</span><span class="tx"><strong>${esc(c.first)}${c.you ? ` (${t('You')})` : ''}</strong><small>${r || t('Age {n}', { n: window.SFA_AGE(c.dob, START) }) + (c.fresh ? ' · ' + t('This booking only') : '')}</small></span></button>`; }).join('')}
+          ${s.form ? '' : `<button type="button" class="tile plus" data-add>${PLUS}${t('Add a new child')}</button>`}</div>${s.form ? formHTML('b', s) : ''}` },
+    { id: 'c', name: 'Places with one menu each', why: 'Keeps today\'s places but drops the For myself / For a child step: each place is one menu listing you and your children, with anyone who can\'t take part disabled and the reason in the menu.',
+      body: s => `<div class="qty"><span class="tx"><strong id="cQ">${t('Places')}</strong><small>${t('{amount} each', { amount: money(PRICE) })} · ${t('up to {n}', { n: MAX })}</small></span>
+          <span class="stp" role="group" aria-labelledby="cQ"><button type="button" data-places="-1" aria-label="${t('Fewer')}"${s.places.length <= 1 ? ' disabled' : ''}>−</button><output aria-live="polite">${s.places.length}</output><button type="button" data-places="1" aria-label="${t('More')}"${s.places.length >= MAX ? ' disabled' : ''}>+</button></span></div>
+        <ol class="places">${s.places.map((k, i) => `<li class="place"><span>${t('Place {n}', { n: i + 1 })}</span><div class="sel${k ? '' : ' empty'}"><select data-place="${i}" class="${k ? '' : 'ph'}" aria-label="${t('Who takes place {n}?', { n: i + 1 })}">
+            <option value="">${t('Choose who is taking part')}</option>
+            ${s.people.map(c => { const r = why(c), o = s.places.findIndex((x, j) => x === c.key && j !== i);
+              return `<option value="${c.key}"${k === c.key ? ' selected' : ''}${r || o > -1 ? ' disabled' : ''}>${esc(name(c))}${c.you ? ` (${t('You')})` : ''} — ${r || (o > -1 ? t('In place {n}', { n: o + 1 }) : t('Age {n}', { n: window.SFA_AGE(c.dob, START) }))}</option>`; }).join('')}
+            <option value="__new">${t('Add a new child')}…</option></select>${CHEV}</div></li>`).join('')}</ol>
+        ${s.form ? formHTML('c', s) : ''}` },
+    { id: 'd', name: 'You, then your children', why: 'Mirrors the court checkout\'s For myself / For a child: a switch for "I\'m taking part" (off and explained when you can\'t), then your children as a checklist. Separates the adult from the children the story is about.',
+      body: s => { const me = s.people[0], r = why(me), on = s.pick.includes('me');
+        return `<div class="me${r ? ' no' : ''}"><span class="av" aria-hidden="true">${esc(ini(me))}</span><span class="tx"><strong id="dMe">${t("I'm taking part")}</strong><small>${r || sub(me)}</small></span><button type="button" class="sw" role="switch" aria-checked="${on}" aria-labelledby="dMe" data-k="me"${r ? ' disabled' : ''}></button></div>
+          <p class="lbl">${t('Your children')}</p>${rowsHTML(s, s.people.slice(1), MAX - (on ? 1 : 0))}${s.form ? formHTML('d', s) : `<button type="button" class="add" data-add>${PLUS}${t('Add a new child')}</button>`}`; } },
+    { id: 'e', name: 'Summary, edit in a window', why: 'The card stays short: who is taking part, with a remove button each, and "Choose participants" opens a window with the checklist and Add a new child. Good when checkout already has a lot on it.',
+      body: s => { const list = s.pick.map(k => s.people.find(c => c.key === k));
+        return `${list.length ? `<ul class="sum">${list.map(c => `<li><span class="av" aria-hidden="true">${esc(ini(c))}</span><span class="tx"><strong>${esc(name(c))}</strong><small>${sub(c)}</small></span><button type="button" class="x" data-rm="${c.key}" aria-label="${t('Remove {name}', { name: esc(name(c)) })}">${X}</button></li>`).join('')}</ul>` : `<p class="empty-s">${t('Choose who is taking part. Each person gets their own tickets.')}</p>`}
+          <button type="button" class="edit" data-dlg aria-haspopup="dialog">${list.length ? t('Edit participants') : t('Choose participants')}</button>
+          <dialog id="eDlg" aria-labelledby="eDlgT"><div class="dlg-h"><h3 id="eDlgT">${t('Participants')}</h3><button type="button" class="x" data-close aria-label="${t('Close')}">${X}</button></div>
+            <div class="dlg-b">${rowsHTML(s, s.people, MAX)}${s.form ? formHTML('e', s) : `<button type="button" class="add" data-add>${PLUS}${t('Add a new child')}</button>`}</div>
+            <div class="dlg-f"><p>${t(list.length === 1 ? '1 participant' : '{n} participants', { n: list.length })}</p><button type="button" class="done" data-close>${t('Done')}</button></div></dialog>`; } }
+  ];
+
+  function paintOne(o, focus){
+    const s = st(o.id), el = document.getElementById('card-' + o.id), n = o.id === 'c' ? s.places.filter(Boolean).length : s.pick.length;
+    const dlgOpen = o.id === 'e' && document.getElementById('eDlg')?.open;
+    el.classList.toggle('bad', s.bad);
+    el.querySelector('.card-b').innerHTML = `${s.note ? `<p class="ok" role="status">${esc(s.note)}</p>` : ''}${o.body(s)}<p class="err">${t(o.id === 'c' ? 'Choose a participant for every place.' : 'Choose at least one participant.')}</p>${foot(o.id, n)}`;
+    if (dlgOpen){ const d = document.getElementById('eDlg'); d.dir = document.documentElement.dir; d.showModal(); }
+    if (focus) el.querySelector(focus)?.focus({ preventScroll: true });
+  }
+  function wire(o){
+    const el = document.getElementById('card-' + o.id), s = st(o.id);
+    el.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b || b.disabled) return;
+      if (b.dataset.k){ toggle(s, b.dataset.k); s.note = ''; return paintOne(o, `[data-k="${b.dataset.k}"]`); }
+      if (b.dataset.add !== undefined){ s.form = blank(); s.er = {}; s.note = ''; return paintOne(o, `#${o.id}-first`); }
+      if (b.dataset.gen){ el.querySelectorAll('[data-f]').forEach(i => s.form[i.dataset.f] = i.value); s.form.gender = b.dataset.gen; delete s.er.gender; return paintOne(o, `[data-gen="${b.dataset.gen}"]`); }
+      if (b.dataset.kx !== undefined){ s.form = null; s.er = {}; return paintOne(o, '[data-add]'); }
+      if (b.dataset.kgo !== undefined){ const pi = s.formPlace; const k = formGo(el, s);
+        if (k){ if (o.id === 'c'){ s.places[pi ?? s.places.findIndex(x => !x)] = k.key; } else if (s.pick.length < MAX) s.pick.push(k.key); }
+        return paintOne(o, k ? (o.id === 'c' ? `[data-place]` : `[data-k="${k.key}"]`) : '.fld.bad input, .fld.bad button'); }
+      if (b.dataset.places){ const d = +b.dataset.places; if (d > 0) s.places.push(null); else s.places.pop(); s.bad = false; return paintOne(o); }
+      if (b.dataset.rm){ s.pick = s.pick.filter(x => x !== b.dataset.rm); return paintOne(o, '[data-dlg]'); }
+      if (b.dataset.dlg !== undefined){ const d = document.getElementById('eDlg'); d.dir = document.documentElement.dir; d.showModal(); d.querySelector('.row:not(:disabled)')?.focus(); return; }
+      if (b.dataset.close !== undefined){ document.getElementById('eDlg').close(); s.form = null; return paintOne(o, '[data-dlg]'); }
+      if (b.dataset.go !== undefined){ const n = o.id === 'c' ? s.places.every(Boolean) : s.pick.length > 0; s.bad = !n; paintOne(o); if (s.bad) el.querySelector('.err').scrollIntoView({ block: 'center', behavior: 'smooth' }); else alert(t('Next: payment')); }
+    });
+    el.addEventListener('change', e => { const sel = e.target.closest('[data-place]'); if (!sel) return; const i = +sel.dataset.place;
+      if (sel.value === '__new'){ s.places[i] = null; s.formPlace = i; s.form = blank(); s.er = {}; return paintOne(o, `#${o.id}-first`); }
+      s.places[i] = sel.value || null; s.bad = false; paintOne(o, `[data-place="${i}"]`); });
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.closest('.kf input')){ e.preventDefault(); el.querySelector('[data-kgo]').click(); } });
+  }
+
+  function paint(){
+    document.documentElement.lang = P.lang; document.documentElement.dir = P.lang === 'ar' ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === P.lang));
+    document.getElementById('lead').textContent = `Five ways to choose who is taking part in a program, next to today's. Each one works with the demo account on ${PROG.name.en} (ages ${PROG.ages}, starting ${START}): Faisal and Lana can take part; Sara and Yousef are shown with the reason. Add a new child to see the form.`;
+    document.getElementById('opts').innerHTML = OPTS.map(o => `<section class="opt"><div class="opt-h${o.cur ? ' cur' : ''}"><b>${o.cur ? 'Now' : o.id.toUpperCase()}</b><strong>${o.name}</strong>${o.cur ? `<a href="program.html?p=basketball-skills#book">Try it live</a>` : ''}</div><p>${o.why}</p>
+      ${o.cur ? '' : `<section class="card" id="card-${o.id}" aria-labelledby="t-${o.id}"><div class="card-h"><h2 id="t-${o.id}">${t('Participants')}</h2></div><div class="card-b"></div></section>`}</section>`).join('');
+    OPTS.filter(o => !o.cur).forEach(o => { paintOne(o); wire(o); });
+  }
+  document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => P.setLang(b.dataset.lang)));
+  addEventListener('sfa:prefs', paint);
+  paint();
+})();
+</script>
+</body>
+</html>

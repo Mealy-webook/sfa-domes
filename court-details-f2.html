@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Court details (F2 · Airbnb, photo in column) · SFA Domes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600&family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="f/court-details.css">
+<style>
+/* F · Airbnb-style listing: title row, the court photo, then details on the left (highlights, description, what the
+   court offers, the month calendar) and a sticky reserve card on the right with the price, picks, total and Reserve. */
+.ab{padding-top:calc(90px + clamp(24px,4vh,40px));background:var(--bg)}
+.ab-top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:20px}
+.ab-top h1{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0}
+.ab-top .eyebrow{font-size:var(--fs-16)}
+.ab-top .hero-sub{margin-top:8px}
+.ab-top .hero-book{margin:0;flex:none}
+/* one photo per court, three ways (F1 wide · F2 in the left column · F3 with a fixed venue tile) */
+.ab-gal{display:grid;gap:8px;margin-bottom:clamp(28px,5vh,48px)}
+.ab-gal .about-media,.ab-gal figure{margin:0;aspect-ratio:auto;height:100%;overflow:hidden;background:var(--bg-soft)}
+.ab-gal img{width:100%;height:100%;object-fit:cover;display:block}
+.ab-gal--wide{height:clamp(260px,40vw,540px)}
+.ab-gal--tile{grid-template-columns:2fr 1fr;height:clamp(280px,40vw,520px)}
+.ab-gal--tile figcaption{font:var(--ts-label-m);text-transform:var(--type-case-label);position:absolute;left:12px;bottom:12px;padding:6px 10px;background:rgba(9,9,11,.72);color:var(--neutral-0)}
+.ab-gal--tile figure{position:relative}
+.ab-photo{padding-top:0!important;border-top:0!important}
+.ab-photo .about-media{aspect-ratio:4/3}
+.ab-photo + section{border-top:0}
+/* no reserve card: the details take one column, and the bottom booking bar slides up once a time is picked */
+.ab-cols{display:grid;grid-template-columns:minmax(0,960px);padding-bottom:clamp(48px,8vh,80px)}
+.ab-side{display:none}
+.ab-main > section{padding:28px 0;border-top:1px solid var(--line)}
+.ab-main > section:first-child{padding-top:0;border-top:0}
+.ab-kind{font:var(--ts-title-m);text-transform:var(--type-case-title);margin:0}
+.ab-kind + p{margin:4px 0 0;color:var(--ink-2)}
+.ab-h{font:var(--ts-title-m);text-transform:var(--type-case-title);margin:0 0 18px}
+.ab .about-feats{grid-template-columns:minmax(0,1fr);gap:18px;font-size:var(--fs-16);color:var(--ink)}
+.ab .about-feats svg{width:26px;height:26px;color:var(--ink)}
+.ab .about-lead{margin:0;max-width:62ch}
+.ab .booking{padding:0;scroll-margin-top:100px}
+.ab .booking .step-head{border-bottom:0;padding-bottom:0}
+.ab .booking .step-head h2{font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.ab-side{position:sticky;top:110px}
+.ab-side .summary{position:static;max-height:none;box-shadow:0 18px 40px -24px rgba(9,9,11,.35);border-color:var(--line-strong)}
+.ab-rate{display:flex;align-items:baseline;gap:6px;margin:0 0 14px;font-family:var(--type-font);font-weight:var(--type-w-label)}
+.ab-rate b{font-size:var(--fs-32);line-height:1}.ab-rate small{font-size:var(--fs-16);color:var(--ink-3)}
+.ab-note{margin:10px 0 0;text-align:center;font-size:var(--fs-14);color:var(--ink-3)}
+.ab-wide{padding:clamp(40px,7vh,64px) 0;border-top:1px solid var(--line)}
+body[class^=v-f] .faq{background:var(--bg)}
+body[class^=v-f] .faq-wrap{border-top:1px solid var(--line)}
+@media (max-width:1023px){.ab-cols{grid-template-columns:minmax(0,1fr)}}
+@media (min-width:1024px){
+  body[class^=v-f] .go{display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;transform:translateY(105%);transition:transform .5s var(--ease);background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);box-shadow:0 -12px 32px -24px rgba(9,9,11,.4)}
+  body[class^=v-f] .go .inner{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:88px;padding-block:14px}
+  body[class^=v-f] .go-pick small{display:block;font-size:var(--fs-14);line-height:18px;color:var(--ink-3)}
+  body[class^=v-f] .go-pick strong{font:var(--ts-number-m);display:block}
+  body[class^=v-f] .go .book{width:auto;height:56px}
+  body[class^=v-f] .go.on{transform:none}
+  body[class^=v-f].has-picks .faq{padding-bottom:140px}
+}
+@media (max-width:760px){.ab-gal--wide{height:auto;aspect-ratio:4/3}.ab-gal--tile{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 120px;height:auto}.ab-gal--tile .about-media{aspect-ratio:4/3}.ab-top{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body class="v-f2">
+<div data-site-nav></div>
+
+<main>
+<div class="ab">
+  <div class="inner">
+    <div class="ab-top">
+      <div>
+        <p class="eyebrow lbl" id="eyebrow"></p>
+        <h1 id="courtName"></h1>
+        <p class="hero-sub" id="heroSub"></p>
+      </div>
+      <div class="hero-book">
+        <p class="hero-price"><small>From</small><b id="heroPrice"></b></p>
+        <div class="hero-actions"><span id="heroFav"></span><button class="share" id="shareBtn" type="button" aria-label="Share" title="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v9h14v-9"/></svg></button><button class="cta" type="button" data-book><span>Book this court</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></button></div>
+      </div>
+    </div>
+
+    <div class="ab-cols">
+      <div class="ab-main">
+        <section class="ab-photo">
+      <figure class="about-media"><img id="aboutImg" src="" alt=""></figure>
+        </section>
+        <section><p class="ab-kind">Indoor court in SFA Domes Dammam</p><p>Artificial grass · Adults 5v5/6v6 · Youth 6v6 · 7v7</p></section>
+        <section><ul class="about-feats">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M7 3v5a5 5 0 0 0 10 0V3"/><path d="M12 13v8M8 21h8"/></svg><span>Clubhouse washrooms and showers for men and women</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><path d="M10 16V8h3a2.5 2.5 0 0 1 0 5h-3"/></svg><span>250 parking spots</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="m6.5 6.5 11 11"/></svg><span>Cleats are not allowed on the artificial grass</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M3 4h18"/><path d="M5 4v16c3-2 4-6 4-16M19 4v16c-3-2-4-6-4-16"/></svg><span>Can be covered by curtains for privacy</span></li>
+          </ul></section>
+        <section class="about" aria-labelledby="aboutH" style="padding:28px 0;background:none;border-bottom:0">
+          <h2 class="ab-h" id="aboutH">About the court</h2>
+          <p class="about-lead" id="aboutLead"></p>
+        </section>
+        <section>
+          <h2 class="ab-h">What this court offers</h2>
+          <dl class="about-stats">
+            <div><dt>Type</dt><dd id="stType"></dd></div>
+            <div><dt>Surface</dt><dd>Artificial grass</dd></div>
+            <div class="st-wide"><dt>Ideal for</dt><dd>Adults 5v5/6v6 · Youth 6v6 · 7v7</dd></div>
+            <div><dt>Setting</dt><dd>Indoor</dd></div>
+            <div class="st-hours" id="stHoursBtn" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="hoursPop"><dt>Open today</dt><dd><span id="stHours" dir="ltr"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></dd></div>
+          </dl>
+        </section>
+        <section class="booking" id="book" aria-labelledby="dayTitle">
+        <section class="step">
+          <div class="step-head"><h2 id="dayTitle">Days &amp; times</h2>
+            <div class="legend" aria-hidden="true"><span><i></i>Free</span><span><i class="pk"></i>Picked</span><span><i class="bk"></i>Booked</span></div>
+          </div>
+          <p class="step-note">1.5-hour slots. Tap a day to open its times. Book as many days and slots as you like, up to 3 months ahead.</p>
+          <div class="panel cal">
+            <div class="cal-head">
+              <p class="cal-month" id="calMonth" aria-live="polite"></p>
+              <div class="cal-nav"><button class="arrow" id="calPrev" type="button" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button><button class="arrow" id="calNext" type="button" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button></div>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+            <div class="cal-key" aria-hidden="true"><span><i class="k-pick"></i>Has times picked</span><span><i class="k-act"></i>Open day</span></div>
+          </div>
+        </section>
+        </section>
+      </div>
+      <div class="ab-side" hidden>
+      <aside class="summary" aria-label="Booking summary">
+        <div class="sum-body">
+          <p class="sum-title">Your booking <span id="sumCount"></span></p>
+          <div id="sumDays"></div>
+          <dl class="sum-rows" id="sumRows"></dl>
+          <div class="sum-total"><small>Total</small><strong id="sumTotal"></strong></div>
+          <button class="book" id="bookBtn" type="button" disabled>Pick a time</button>
+        </div>
+      </aside>
+        <p class="ab-note">You won't be charged until checkout</p>
+      </div>
+    </div>
+    <section class="ab-wide" aria-labelledby="locTitle">
+      <h2 class="ab-h" id="locTitle">Where you'll play</h2>
+        <div class="loc-grid">
+          <div class="loc-card">
+            <p class="loc-name">SFA Domes Dammam</p>
+            <p class="loc-city">Dammam, Saudi Arabia</p>
+            <ul class="loc-list">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1"/></svg><a href="tel:+966537448666" dir="ltr">+966 53 744 8666</a></li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><rect x="3" y="5" width="18" height="14"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:Domes.info@sfa.sa">Domes.info@sfa.sa</a></li>
+            </ul>
+            <a class="loc-btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=26.4047835,50.0250094" target="_blank" rel="noopener"><span>Directions</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+          </div>
+          <div class="loc-map" id="locMap">
+            <iframe title="Map showing SFA Domes in Dammam" src="https://www.google.com/maps/embed?origin=mfe&amp;pb=!1m3!2m1!1s26.4047835,50.0250094!6i15" loading="lazy" referrerpolicy="no-referrer-when-downgrade" tabindex="-1"></iframe>
+            <button class="loc-cover" type="button"><span>Click to explore the map</span></button>
+          </div>
+        </div>
+    </section>
+  </div>
+</div>
+
+  <section class="faq" aria-labelledby="faqTitle">
+    <div class="inner">
+      <div class="faq-wrap">
+        <h2 id="faqTitle">Things to know</h2>
+        <div class="faq-list">
+        <details class="faq-item"><summary><span>How long is a booking?</span><i aria-hidden="true"></i></summary><p>Courts are booked in 1.5-hour slots. Pick as many slots and days as you like, up to 3 months ahead.</p></details>
+        <details class="faq-item"><summary><span>Do I need an account to book?</span><i aria-hidden="true"></i></summary><p>Yes. Sign in or create an account when you continue to booking. It only takes a minute, and your details fill in at checkout.</p></details>
+        <details class="faq-item"><summary><span>Can I book for someone else?</span><i aria-hidden="true"></i></summary><p>Yes. At checkout, choose "Someone else" under Booking for and add the player's name and mobile number.</p></details>
+        <details class="faq-item"><summary><span>What should I bring?</span><i aria-hidden="true"></i></summary><p>Sportswear and the right shoes for the court. The clubhouse has washrooms and showers for men and women.</p></details>
+        <details class="faq-item"><summary><span>When should I arrive?</span><i aria-hidden="true"></i></summary><p>Check in at the front desk a few minutes before your slot. You'll be on the court in minutes.</p></details>
+        <details class="faq-item"><summary><span>What are the court hours?</span><i aria-hidden="true"></i></summary><p>Sunday to Wednesday 9 AM to 12 AM, Thursday 9 AM to 1 AM, Friday 8 AM to 1 AM, and Saturday 8 AM to 12 AM.</p></details>
+        <details class="faq-item"><summary><span>Is there parking?</span><i aria-hidden="true"></i></summary><p>Yes, SFA Domes Dammam has 250 parking spots.</p></details>
+        <details class="faq-item"><summary><span>Can I pay by cash?</span><i aria-hidden="true"></i></summary><p>No. All payments must be made upon booking through the SFA App, with the provision of multiple online payment options.</p></details>
+        <details class="faq-item"><summary><span>What are the dimensions of the fields/courts?</span><i aria-hidden="true"></i></summary><p>The dimensions of all courts are set to professional standards. By selecting a court type, the accompanying description can assist you in determining the number of players allowed.</p></details>
+        <details class="faq-item"><summary><span>Do I have to bring my own balls/equipment? Is there equipment that can be rented?</span><i aria-hidden="true"></i></summary><p>Free balls and bibs are provided for each booking.</p></details>
+        <details class="faq-item"><summary><span>Which currency will I pay in?</span><i aria-hidden="true"></i></summary><p>All prices are in Saudi riyals (SAR), and that is what you pay.</p></details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="hrs-pop" id="hoursPop" role="dialog" aria-modal="true" aria-labelledby="hoursPopTitle" hidden>
+    <div class="hrs-back" data-close></div>
+    <div class="hrs-card">
+      <div class="hrs-head"><h3 id="hoursPopTitle">Court hours</h3><button class="hrs-x" type="button" data-close aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <dl id="hoursPopList"></dl>
+    </div>
+  </div>
+</main>
+
+<div class="go" id="go">
+  <div class="inner">
+    <div class="go-pick"><small id="goWhen"></small><strong id="goTotal"></strong></div>
+    <button class="book" id="goBtn" type="button" disabled>Pick a time</button>
+  </div>
+</div>
+
+<script src="f/site-nav.js"></script>
+<script src="f/courts-data.js"></script>
+<script src="f/i18n-ar.js"></script>
+<script src="f/prefs.js"></script>
+<script src="f/auth.js"></script>
+<script src="f/court-details.js"></script>
+</body>
+</html>
