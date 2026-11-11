@@ -154,7 +154,7 @@ html[dir=rtl] .cta svg{scale:-1 1}
 .sum-total{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:12px 0 16px;padding-top:16px;border-top:1px solid var(--line-strong)}
 .sum-total small{font:var(--ts-label-l);text-transform:var(--type-case-label);color:var(--ink-2)}
 .sum-total strong{font:var(--ts-number-l)}
-.book{font:var(--ts-label-l);display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:60px;padding:0 24px;background:var(--brand);border:0;color:var(--neutral-0);text-decoration:none;cursor:pointer;transition:background-color .25s;text-transform:var(--type-case-label)}
+.book{font:var(--ts-label-l);display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;padding:0 24px;background:var(--brand);border:0;color:var(--neutral-0);text-decoration:none;cursor:pointer;transition:background-color .25s;text-transform:var(--type-case-label)}
 .book:hover:not(:disabled){background:var(--brand-600)}
 .book:disabled{background:var(--line);color:var(--ink-3);cursor:not-allowed}
 .book .sar{width:.7em;height:.7em}

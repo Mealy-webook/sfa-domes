@@ -57,7 +57,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display);ove
 .seg{display:inline-flex;gap:2px;padding:3px;margin-bottom:16px;background:var(--color-bg-secondary)}
 .seg button{height:40px;padding:0 16px;border:0;background:none;color:var(--color-content-secondary);font:var(--ts-label-m);cursor:pointer}
 /* selected = the plan card's style everywhere: 2px brand, tint, ink text */
-.seg button[aria-pressed=true]{background:var(--color-bg-accent-subtle);color:var(--color-content-primary);box-shadow:inset 0 0 0 2px var(--color-brand)}
+.seg button[aria-pressed=true]{background:var(--color-content-primary);color:var(--neutral-0)}
 .rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-border-primary)}
 .row{position:relative;display:grid;grid-template-columns:76px 120px minmax(0,1fr) auto;align-items:center;gap:20px;padding:16px 8px;border-bottom:1px solid var(--color-border-primary);animation:up .5s var(--ease) both;animation-delay:calc(var(--i,0) * .04s);transition:background-color .2s}
 .row:hover{background:var(--color-bg-secondary)}
@@ -143,8 +143,9 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
 .type{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-label-m);cursor:pointer;transition:border-color .2s,background-color .2s}
 .type:hover{border-color:var(--color-content-primary)}
 .type b{font:var(--ts-label-s);color:var(--color-content-tertiary)}
-.type[aria-pressed=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
-.type[aria-pressed=true] b{color:var(--color-content-secondary)}
+/* filters look the same on every page (courts, programs, games): the picked one is a solid dark chip */
+.type[aria-pressed=true]{border-color:var(--color-content-primary);background:var(--color-content-primary);color:var(--neutral-0)}
+.type[aria-pressed=true] b{color:inherit;opacity:.7}
 
 /* participants */
 .pl-lead{margin:-8px 0 16px;max-width:640px}
@@ -247,7 +248,8 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 /* hover never hides a selection */
-.type[aria-pressed=true]:hover,.pl-gen button[aria-checked=true]:hover{border-color:var(--color-brand)}
+.type[aria-pressed=true]:hover{border-color:var(--color-content-primary)}
+.pl-gen button[aria-checked=true]:hover{border-color:var(--color-brand)}
 </style>
 </head>
 <body>
