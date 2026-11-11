@@ -15,53 +15,53 @@
 <style>
 /* Confirmation option J · Bento: everything at a glance as a grid of tiles: the court photo with "You're booked", the date and time big, who it's for, the first QR, every session day, actions, payment and tips. 4 columns on desktop, 2 on phones.
    Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
-.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-caption-1-bold);text-decoration:none}
 body[data-state=paid] .cf-head{display:none}
 body[data-state=paid] .cf-grid{display:block}
 .j-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;grid-template-areas:"hero hero date time" "hero hero qr who" "ses ses qr act" "pay pay tips cta"}
 .j-t{position:relative;min-width:0;display:grid;align-content:space-between;gap:16px;padding:24px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);animation:up .7s var(--ease) both;animation-delay:calc(var(--i,0) * .05s)}
-.j-t > small{font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.j-t > small{font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
 .j-hero{grid-area:hero;min-height:360px;align-content:end;overflow:hidden;background:var(--neutral-950,#09090b);color:var(--neutral-0);border:0}
 .j-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .j-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.05) 20%,rgba(9,9,11,.88))}
 .j-hero > div{position:relative;z-index:1;display:grid;gap:12px}
 .j-ok{display:grid;place-items:center;width:48px;height:48px;background:var(--color-brand)}
 .j-ok svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:square}
-.j-hero h1{font:var(--ts-display-l);text-transform:var(--type-case-display)}
-.j-hero p{margin:0;font:var(--ts-label-l)}
-.j-hero .ref{font:var(--ts-label-m);opacity:.8}
+.j-hero h1{font:var(--ts-display-m);text-transform:var(--type-case-display)}
+.j-hero p{margin:0;font:var(--ts-body-l-bold)}
+.j-hero .ref{font:var(--ts-body-default-bold);opacity:.8}
 .j-date{grid-area:date}.j-time{grid-area:time}.j-who{grid-area:who}.j-qr{grid-area:qr}.j-ses{grid-area:ses}.j-act{grid-area:act}.j-pay{grid-area:pay}.j-tips{grid-area:tips}.j-cta{grid-area:cta}
-.j-num{display:block;font:var(--ts-display-xl);line-height:1}
-.j-date b,.j-time b{display:block;margin-top:8px;font:var(--ts-label-l)}
+.j-num{display:block;font:var(--ts-display-l);line-height:1}
+.j-date b,.j-time b{display:block;margin-top:8px;font:var(--ts-body-l-bold)}
 .j-mo{display:block;font:var(--ts-body-s);color:var(--color-content-secondary)}
-.j-time .j-num{font:var(--ts-display-m)}
-.j-who strong{display:block;font:var(--ts-title-m);text-transform:var(--type-case-title);overflow-wrap:anywhere}
+.j-time .j-num{font:var(--ts-display-s)}
+.j-who strong{display:block;font:var(--ts-title-section);text-transform:var(--type-case-title);overflow-wrap:anywhere}
 .j-who span{font:var(--ts-body-s);color:var(--color-content-secondary)}
 .j-qr{justify-items:center;text-align:center;align-content:center}
 .j-qr .tk-qr{width:min(200px,100%)}
-.j-qr small{font:var(--ts-caption);color:var(--color-content-tertiary)}
-.j-qr a{font:var(--ts-label-m);color:var(--color-content-secondary)}
+.j-qr small{font:var(--ts-caption-1);color:var(--color-content-tertiary)}
+.j-qr a{font:var(--ts-body-default-bold);color:var(--color-content-secondary)}
 .j-qr a:hover{color:var(--color-brand)}
 .j-ses ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:4px}
 .j-ses li{display:grid;gap:2px;padding:8px 12px;background:var(--color-bg-secondary)}
-.j-ses li b{font:var(--ts-label-m)}
-.j-ses li span{font:var(--ts-caption);color:var(--color-content-secondary)}
-.j-ses li.x{place-content:center;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.j-ses li b{font:var(--ts-body-default-bold)}
+.j-ses li span{font:var(--ts-caption-1);color:var(--color-content-secondary)}
+.j-ses li.x{place-content:center;font:var(--ts-body-default-bold);color:var(--color-content-secondary)}
 .j-act{align-content:start;gap:8px}
 .j-act .ghost{height:48px}
 .j-pay .rows{font:var(--ts-body-s)}
 .j-tips .tips{gap:12px}
 .j-cta{background:var(--color-brand);color:var(--neutral-0);border-color:var(--color-brand);text-decoration:none;transition:background-color .25s}
 .j-cta:hover{background:var(--color-bg-accent-hover)}
-.j-cta strong{font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.j-cta strong{font:var(--ts-title-body);text-transform:var(--type-case-title)}
 .j-cta svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
 [dir=rtl] .j-cta svg{scale:-1 1}
 .j-cta span{font:var(--ts-body-s);opacity:.85}
-.j-more{display:block;margin-top:16px;text-align:center;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.j-more{display:block;margin-top:16px;text-align:center;font:var(--ts-body-default-bold);color:var(--color-content-secondary)}
 .j-more:hover{color:var(--color-brand)}
 @media (max-width:1100px){.j-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"hero hero" "date time" "who qr" "act qr" "ses ses" "cta cta" "pay pay" "tips tips"}}
-@media (max-width:560px){.j-grid{grid-template-areas:"hero hero" "date time" "who who" "qr qr" "ses ses" "act act" "cta cta" "pay pay" "tips tips"}.j-hero{min-height:300px}.j-hero h1{font:var(--ts-display-m)}.j-t{padding:20px}.j-num{font:var(--ts-display-l)}.j-mo{font:var(--ts-body-s);color:var(--color-content-secondary)}
-.j-time .j-num{font:var(--ts-title-l)}}
+@media (max-width:560px){.j-grid{grid-template-areas:"hero hero" "date time" "who who" "qr qr" "ses ses" "act act" "cta cta" "pay pay" "tips tips"}.j-hero{min-height:300px}.j-hero h1{font:var(--ts-display-s)}.j-t{padding:20px}.j-num{font:var(--ts-display-m)}.j-mo{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.j-time .j-num{font:var(--ts-title-screen)}}
 </style>
 </head>
 <body>

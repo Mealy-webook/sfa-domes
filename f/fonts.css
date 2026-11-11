@@ -1,4 +1,5 @@
-/* SFA DS type: Loew Next (headlines in Black, ALL CAPS; body and labels in Regular; Medium for body emphasis).
+/* SFA DS type: WBK DS3's type system (sizes, line heights, weights, case and style names, from the DS3 Figma file
+   7A6dVxDIAuVzxlz8b9s9TZ), set in SFA's own font, Loew Next (Ahmed, 2026-11-11: "map the type to DS3, same font").
    Files from befonts.com ("Personal Use Only" licence, see LICENSE-befonts.txt): fine for this prototype, a licensed
    copy is needed before launch. Weight ranges map the weights the pages ask for: 100–400 → Regular, 500–700 → Medium,
    800–950 → Black. Loew Next has no Arabic, so Arabic text falls through to the next font in each stack (Tajawal). */
@@ -7,74 +8,77 @@
 @font-face{font-family:"Loew Next";src:url(fonts/LoewNext-Black.otf) format("opentype");font-weight:800 950;font-style:normal;font-display:swap}
 
 /* ---------------------------------------------------------------------------------------------------------------
-   Type tokens, laid out like WBK DS3: 1) locked size primitives, 2) a Typography collection with English and
-   Arabic modes (font + semantic weights + case), 3) text styles built only from those. Mode follows the page
-   language: English by default, Arabic on html[lang=ar] / html[dir=rtl] (set by f/prefs.js). See typography.html.
+   Type tokens = WBK DS3: 1) 🔒 size primitives, 2) 🆃 Typography with English and Arabic modes (font, weights, case),
+   3) 🅃 the 17 DS3 text styles. DS3 sizes apply on every screen size (Ahmed's pick: no larger desktop steps).
+   Mode follows the page language: English by default, Arabic on html[lang=ar] / html[dir=rtl] (set by f/prefs.js).
+   Letter spacing from DS3 is on the .ts-* classes; pages that use font:var(--ts-…) get the size, weight and leading.
    --------------------------------------------------------------------------------------------------------------- */
 :root{
-  /* 🔒 Size primitives · font size: one scale, about 1.2× per step on a 16px base, every step on a 4px grid */
-  --fs-12:12px; --fs-14:14px; --fs-16:16px; --fs-18:18px; --fs-20:20px; --fs-24:24px; --fs-28:28px; --fs-32:32px;
-  --fs-40:40px; --fs-48:48px; --fs-56:56px; --fs-64:64px;
-  /* 🔒 Size primitives · font weight (Loew Next files: Regular 400, Medium 500, Black 900; Bold 700 is Arabic only) */
-  --fw-regular:400; --fw-medium:500; --fw-bold:700; --fw-black:900;
-  /* 🔒 Size primitives · line height: tight for big type, open for reading */
-  --lh-display:1.05; --lh-title:1.2; --lh-ui:1.25; --lh-body:1.5; --lh-lead:1.6;
+  /* 🔒 Size primitives · font size: DS3's ramp (plus 15, 22 and 30, which DS3's Body-Default, Title Section and Title
+     Screen styles use) */
+  --fs-10:10px; --fs-12:12px; --fs-13:13px; --fs-15:15px; --fs-17:17px; --fs-18:18px; --fs-20:20px; --fs-22:22px;
+  --fs-24:24px; --fs-28:28px; --fs-30:30px; --fs-32:32px; --fs-36:36px; --fs-40:40px; --fs-44:44px; --fs-52:52px;
+  /* 🔒 Size primitives · font weight (DS3) */
+  --fw-regular:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700; --fw-extrabold:800; --fw-black:900;
 
-  /* 🆃 Typography · English mode */
+  /* 🆃 Typography · English */
   --type-font:"Loew Next","Montserrat","Tajawal",system-ui,sans-serif;
-  --type-w-display:var(--fw-black);   /* hero and section display lines, big numbers */
-  --type-w-title:var(--fw-black);     /* page titles, section headings, card titles */
-  --type-w-label:var(--fw-medium);    /* buttons, tabs, menu, chips, field labels: Medium reads better than Regular at UI sizes */
-  --type-w-body:var(--fw-regular);
-  --type-w-body-bold:var(--fw-medium);
-  --type-case-display:uppercase; --type-case-title:uppercase; --type-case-label:none;
+  --type-w-display:var(--fw-black);       /* DS3 Display */
+  --type-w-title:var(--fw-bold);          /* DS3 Title */
+  --type-w-body:var(--fw-regular);        /* DS3 Body */
+  --type-w-body-bold:var(--fw-semibold);  /* DS3 Body Bold (also buttons, tabs, chips, labels) */
+  --type-w-caption-bold:var(--fw-bold);   /* DS3 Caption Bold */
+  --type-w-label:var(--type-w-body-bold);
+  --type-case-display:uppercase; --type-case-title:none; --type-case-label:none;
 }
-/* 🆃 Typography · Arabic mode (Loew Next Arabic once its files arrive; Tajawal stands in, it has 400/500/700) */
+/* 🆃 Typography · Arabic (DS3's Arabic mode) */
 html[lang=ar],html[dir=rtl]{
   --type-font:"Loew Next Arabic","Tajawal","Geeza Pro",system-ui,sans-serif;
-  --type-w-display:var(--fw-bold); --type-w-title:var(--fw-bold); --type-w-label:var(--fw-medium); --type-w-body-bold:var(--fw-medium);
+  --type-w-display:var(--fw-extrabold); --type-w-title:var(--fw-semibold); --type-w-body:var(--fw-regular); --type-w-body-bold:var(--fw-semibold); --type-w-caption-bold:var(--fw-semibold);
   --type-case-display:none; --type-case-title:none;
 }
 
-/* 🅃 Text styles: each is a font shorthand (weight, size / line height, family) plus a case token. Pages use them as
-   font:var(--ts-title-l);text-transform:var(--type-case-title). The .ts-* classes are the same styles as classes. */
-/* Sizes follow common practice: body 16px (lead 18px), UI labels 14–16px, nothing under 12px; headings step up by
-   about 1.2× and scale with the screen between a phone and a wide desktop. */
+/* 🅃 Text styles: the 17 DS3 styles, each a font shorthand (weight, size / line height, family). Pages use them as
+   font:var(--ts-title-section); Display styles also take text-transform:var(--type-case-display). */
 :root,html[lang=ar],html[dir=rtl]{
-  --ts-display-xl:var(--type-w-display) clamp(var(--fs-40),5vw,var(--fs-64))/var(--lh-display) var(--type-font);
-  --ts-display-l:var(--type-w-display) clamp(var(--fs-32),4vw,var(--fs-48))/var(--lh-display) var(--type-font);
-  --ts-display-m:var(--type-w-display) clamp(var(--fs-28),3.2vw,var(--fs-40))/var(--lh-display) var(--type-font);
-  --ts-title-l:var(--type-w-title) clamp(var(--fs-24),2.4vw,var(--fs-32))/var(--lh-title) var(--type-font);
-  --ts-title-m:var(--type-w-title) clamp(var(--fs-20),1.8vw,var(--fs-24))/var(--lh-title) var(--type-font);
-  --ts-title-s:var(--type-w-title) var(--fs-20)/var(--lh-title) var(--type-font);
-  --ts-number-l:var(--type-w-display) clamp(var(--fs-40),4.4vw,var(--fs-56))/1 var(--type-font);
-  --ts-number-m:var(--type-w-display) var(--fs-28)/1.1 var(--type-font);
-  --ts-number-s:var(--type-w-display) var(--fs-20)/var(--lh-title) var(--type-font);
-  --ts-label-l:var(--type-w-label) var(--fs-16)/var(--lh-ui) var(--type-font);
-  --ts-label-m:var(--type-w-label) var(--fs-14)/var(--lh-ui) var(--type-font);
-  --ts-label-s:var(--type-w-label) var(--fs-12)/var(--lh-ui) var(--type-font);
-  --ts-body-l:var(--type-w-body) var(--fs-18)/var(--lh-lead) var(--type-font);
-  --ts-body-l-bold:var(--type-w-body-bold) var(--fs-18)/var(--lh-lead) var(--type-font);
-  --ts-body-m:var(--type-w-body) var(--fs-16)/var(--lh-body) var(--type-font);
-  --ts-body-m-bold:var(--type-w-body-bold) var(--fs-16)/var(--lh-body) var(--type-font);
-  --ts-body-s:var(--type-w-body) var(--fs-14)/var(--lh-body) var(--type-font);
-  --ts-caption:var(--type-w-body) var(--fs-12)/1.4 var(--type-font);
+  /* Display (Black, ALL CAPS) */
+  --ts-display-l:var(--type-w-display) var(--fs-40)/44px var(--type-font);
+  --ts-display-m:var(--type-w-display) var(--fs-40)/40px var(--type-font);
+  --ts-display-s:var(--type-w-display) var(--fs-32)/36px var(--type-font);
+  --ts-display-xs:var(--type-w-display) var(--fs-24)/28px var(--type-font);
+  /* Titles (Bold) */
+  --ts-title-screen:var(--type-w-title) var(--fs-30)/34px var(--type-font);
+  --ts-title-section:var(--type-w-title) var(--fs-22)/28px var(--type-font);
+  --ts-title-body:var(--type-w-title) var(--fs-18)/24px var(--type-font);
+  /* Body (Regular) */
+  --ts-body-l:var(--type-w-body) var(--fs-17)/24px var(--type-font);
+  --ts-body-default:var(--type-w-body) var(--fs-15)/22px var(--type-font);
+  --ts-body-s:var(--type-w-body) var(--fs-13)/20px var(--type-font);
+  /* Body bold (SemiBold): also buttons, tabs, chips and field labels */
+  --ts-body-l-bold:var(--type-w-body-bold) var(--fs-17)/24px var(--type-font);
+  --ts-body-default-bold:var(--type-w-body-bold) var(--fs-15)/22px var(--type-font);
+  --ts-body-s-bold:var(--type-w-body-bold) var(--fs-13)/20px var(--type-font);
+  /* Captions */
+  --ts-caption-1:var(--type-w-body) var(--fs-12)/16px var(--type-font);
+  --ts-caption-1-bold:var(--type-w-caption-bold) var(--fs-12)/16px var(--type-font);
+  --ts-caption-2:var(--type-w-body) var(--fs-10)/14px var(--type-font);
+  --ts-caption-2-bold:var(--type-w-caption-bold) var(--fs-10)/14px var(--type-font);
 }
-.ts-display-xl{font:var(--ts-display-xl);text-transform:var(--type-case-display)}
-.ts-display-l{font:var(--ts-display-l);text-transform:var(--type-case-display)}
-.ts-display-m{font:var(--ts-display-m);text-transform:var(--type-case-display)}
-.ts-title-l{font:var(--ts-title-l);text-transform:var(--type-case-title)}
-.ts-title-m{font:var(--ts-title-m);text-transform:var(--type-case-title)}
-.ts-title-s{font:var(--ts-title-s);text-transform:var(--type-case-title)}
-.ts-number-l{font:var(--ts-number-l)}
-.ts-number-m{font:var(--ts-number-m)}
-.ts-number-s{font:var(--ts-number-s)}
-.ts-label-l{font:var(--ts-label-l);text-transform:var(--type-case-label)}
-.ts-label-m{font:var(--ts-label-m);text-transform:var(--type-case-label)}
-.ts-label-s{font:var(--ts-label-s);text-transform:var(--type-case-label)}
-.ts-body-l{font:var(--ts-body-l)}
+/* the same styles as classes, with DS3's letter spacing */
+.ts-display-l{font:var(--ts-display-l);text-transform:var(--type-case-display);letter-spacing:-.025em}
+.ts-display-m{font:var(--ts-display-m);text-transform:var(--type-case-display);letter-spacing:-.5px}
+.ts-display-s{font:var(--ts-display-s);text-transform:var(--type-case-display);letter-spacing:-.5px}
+.ts-display-xs{font:var(--ts-display-xs);text-transform:var(--type-case-display);letter-spacing:-.5px}
+.ts-title-screen{font:var(--ts-title-screen);letter-spacing:-.005em}
+.ts-title-section{font:var(--ts-title-section);letter-spacing:-.005em}
+.ts-title-body{font:var(--ts-title-body);letter-spacing:-.005em}
+.ts-body-l{font:var(--ts-body-l);letter-spacing:.005em}
+.ts-body-default{font:var(--ts-body-default);letter-spacing:.01em}
+.ts-body-s{font:var(--ts-body-s);letter-spacing:.01em}
 .ts-body-l-bold{font:var(--ts-body-l-bold)}
-.ts-body-m{font:var(--ts-body-m)}
-.ts-body-m-bold{font:var(--ts-body-m-bold)}
-.ts-body-s{font:var(--ts-body-s)}
-.ts-caption{font:var(--ts-caption)}
+.ts-body-default-bold{font:var(--ts-body-default-bold);letter-spacing:.0125em}
+.ts-body-s-bold{font:var(--ts-body-s-bold);letter-spacing:.0125em}
+.ts-caption-1{font:var(--ts-caption-1);letter-spacing:.01em}
+.ts-caption-1-bold{font:var(--ts-caption-1-bold);letter-spacing:.01em}
+.ts-caption-2{font:var(--ts-caption-2);letter-spacing:.01em}
+.ts-caption-2-bold{font:var(--ts-caption-2-bold);letter-spacing:.01em}

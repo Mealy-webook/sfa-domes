@@ -15,7 +15,7 @@
 <style>
 /* Confirmation option I · Stories: the confirmation plays as four full-height stories (booked → when and where → your ticket → get ready), with bars that fill once, auto-advance, tap a side to move and hold to pause. Payment folds away beside it.
    Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
-.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-caption-1-bold);text-decoration:none}
 body[data-state=paid] .cf-head{display:none}
 body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,440px) minmax(0,360px);justify-content:center}
 .i-wrap{display:grid;gap:12px;animation:up .7s var(--ease) both;min-width:0}
@@ -31,7 +31,7 @@ body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,440px) minmax(0,36
 .i-st.light{color:var(--color-content-primary)}
 .i-st.light .i-bars span{background:rgba(9,9,11,.12)}
 .i-st.light .i-bars i{background:var(--color-content-primary)}
-.i-top{position:absolute;inset:28px 12px auto;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:8px;font:var(--ts-label-s)}
+.i-top{position:absolute;inset:28px 12px auto;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:8px;font:var(--ts-caption-1-bold)}
 .i-top b{display:inline-flex;align-items:center;gap:8px}
 .i-top b::before{content:"";width:24px;height:24px;background:var(--color-brand) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='square'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/16px no-repeat}
 .i-top button{display:grid;place-items:center;width:32px;height:32px;border:0;background:transparent;color:inherit;cursor:pointer}
@@ -44,41 +44,41 @@ body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,440px) minmax(0,36
 .i-bg{position:absolute!important;inset:0;width:100%;height:100%;object-fit:cover;opacity:1!important;translate:none!important;z-index:-2}
 .i-sl::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(9,9,11,.7) 0%,rgba(9,9,11,.1) 22%,rgba(9,9,11,.1) 40%,rgba(9,9,11,.92) 100%)}
 .i-sl.plain::before{background:none}
-.i-eye{margin:0;font:var(--ts-label-m);opacity:.8}
-.i-big{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display);line-height:1}
+.i-eye{margin:0;font:var(--ts-body-default-bold);opacity:.8}
+.i-big{margin:0;font:var(--ts-display-m);text-transform:var(--type-case-display);line-height:1}
 .i-big em{font-style:normal;color:var(--color-brand)}
 .i-p{margin:0;font:var(--ts-body-l);opacity:.9}
-.i-p .ref,.i-sl .ref{font:var(--ts-label-m)}
+.i-p .ref,.i-sl .ref{font:var(--ts-body-default-bold)}
 .i-facts{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 20px;margin:0;padding-top:16px;border-top:1px solid rgba(255,255,255,.2)}
-.i-facts dt{font:var(--ts-label-s);opacity:.7}
-.i-facts dd{margin:0;font:var(--ts-label-l);overflow-wrap:anywhere}
+.i-facts dt{font:var(--ts-caption-1-bold);opacity:.7}
+.i-facts dd{margin:0;font:var(--ts-body-l-bold);overflow-wrap:anywhere}
 .i-days{display:flex;flex-wrap:wrap;gap:4px}
-.i-days span{padding:4px 8px;background:rgba(255,255,255,.14);font:var(--ts-label-s)}
+.i-days span{padding:4px 8px;background:rgba(255,255,255,.14);font:var(--ts-caption-1-bold)}
 /* the ticket story is light, so the QR reads like the real thing */
 .i-sl.tk-sl{background:var(--color-bg-primary);color:var(--color-content-primary);align-content:center;justify-items:center;text-align:center}
 .i-sl.tk-sl::before{background:none}
 .i-sl.tk-sl .tk-qr{width:min(240px,64vw)}
-.i-sl.tk-sl small{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.i-sl.tk-sl small{font:var(--ts-caption-1);color:var(--color-content-tertiary)}
 .i-sl.tk-sl .i-eye{color:var(--color-content-secondary);opacity:1}
-.i-sl.tk-sl h2{margin:0;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.i-sl.tk-sl h2{margin:0;font:var(--ts-title-section);text-transform:var(--type-case-title)}
 .i-sl .tips{color:rgba(255,255,255,.85)}
 .i-sl .acts{position:relative;z-index:4}
 .i-sl .ghost{background:transparent;border-color:rgba(255,255,255,.4);color:var(--neutral-0)}
 .i-sl .ghost:hover{background:var(--neutral-0);color:var(--color-content-primary)}
 .i-sl .more{color:rgba(255,255,255,.8)}
-.i-pg{display:flex;align-items:center;justify-content:space-between;gap:8px;font:var(--ts-label-m);color:var(--color-content-secondary)}
-.i-pg button{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-label-m);cursor:pointer}
+.i-pg{display:flex;align-items:center;justify-content:space-between;gap:8px;font:var(--ts-body-default-bold);color:var(--color-content-secondary)}
+.i-pg button{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-default-bold);cursor:pointer}
 .i-pg button:disabled{opacity:.35;cursor:default}
 .i-pg svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
 [dir=rtl] .i-pg svg{scale:-1 1}
 .i-side{display:grid;gap:16px;align-content:start;animation:up .7s var(--ease) .15s both}
 .i-det{background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
-.i-det summary{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 24px;font:var(--ts-label-l);cursor:pointer;list-style:none}
+.i-det summary{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 24px;font:var(--ts-body-l-bold);cursor:pointer;list-style:none}
 .i-det summary::-webkit-details-marker{display:none}
-.i-det summary span{font:var(--ts-number-s)}
+.i-det summary span{font:var(--ts-title-body)}
 .i-det .rows{padding:0 24px 24px}
 @media (max-width:960px){body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,440px)}}
-@media (max-width:560px){body[data-state=paid] .cf{padding-top:calc(var(--nav) + 16px)}.i-st{min-height:0;height:calc(100svh - var(--nav) - 96px)}.i-big{font:var(--ts-display-m)}.i-sl{padding:80px 20px 24px}}
+@media (max-width:560px){body[data-state=paid] .cf{padding-top:calc(var(--nav) + 16px)}.i-st{min-height:0;height:calc(100svh - var(--nav) - 96px)}.i-big{font:var(--ts-display-s)}.i-sl{padding:80px 20px 24px}}
 </style>
 </head>
 <body>

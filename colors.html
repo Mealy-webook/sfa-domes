@@ -20,9 +20,9 @@ body{background:var(--color-bg-primary);color:var(--color-content-primary);font:
 code{font:400 12px/18px ui-monospace,Menlo,monospace;color:var(--color-content-secondary)}
 .top{position:sticky;top:0;z-index:5;background:var(--color-bg-primary);border-bottom:1px solid var(--color-border-primary)}
 .top .in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px}
-.top b{font:var(--ts-title-s);font-size:16px;text-transform:var(--type-case-title)}
+.top b{font:var(--ts-title-body);font-size:16px;text-transform:var(--type-case-title)}
 .mode{display:inline-flex;border:1px solid var(--color-border-strong)}
-.mode button{height:36px;padding:0 16px;border:0;background:var(--color-bg-primary);color:var(--color-content-primary);cursor:pointer;font:var(--ts-label-s);font-size:14px}
+.mode button{height:36px;padding:0 16px;border:0;background:var(--color-bg-primary);color:var(--color-content-primary);cursor:pointer;font:var(--ts-caption-1-bold);font-size:14px}
 .mode button[aria-pressed=true]{background:var(--color-bg-inverse);color:var(--color-content-inverse)}
 .head{padding:56px 0 32px;background:var(--neutral-950);color:var(--neutral-0)}
 .head p.k{margin:0 0 10px;color:var(--color-brand)}
@@ -36,18 +36,18 @@ code{font:400 12px/18px ui-monospace,Menlo,monospace;color:var(--color-content-s
 .sec-h{display:flex;align-items:center;gap:12px;margin:0 0 6px}
 .sec-h::before{content:"";width:5px;height:26px;background:var(--color-brand)}
 .sec-d{margin:0 0 22px;max-width:70ch;color:var(--color-content-secondary)}
-.grp{margin:22px 0 10px;font:var(--ts-label-s);color:var(--color-content-tertiary)}
+.grp{margin:22px 0 10px;font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
 .sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .chip{border:1px solid var(--color-border-primary);background:var(--color-bg-primary)}
 .chip i{display:block;height:72px;border-bottom:1px solid var(--color-border-primary)}
 .chip div{padding:10px 12px}
-.chip b{display:block;font:var(--ts-label-s);font-size:14px;line-height:20px;color:var(--color-content-primary)}
+.chip b{display:block;font:var(--ts-caption-1-bold);font-size:14px;line-height:20px;color:var(--color-content-primary)}
 .chip code{display:block}
 /* semantic rows */
 .sem{border-top:1px solid var(--color-border-secondary)}
 .row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) 120px;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--color-border-primary)}
 .row.hd{font:var(--ts-body-s);color:var(--color-content-tertiary)}
-.row b{display:block;font:var(--ts-label-s);font-size:14px;line-height:20px}
+.row b{display:block;font:var(--ts-caption-1-bold);font-size:14px;line-height:20px}
 .row .v{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--color-content-secondary)}
 .row .v i{flex:none;width:28px;height:28px;border:1px solid var(--color-border-primary)}
 .row .live{height:40px;border:1px solid var(--color-border-primary)}
@@ -56,11 +56,11 @@ html[data-mode=light] .row .v.l,html[data-mode=dark] .row .v.d{font-weight:500;c
 .demo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .card{padding:24px;border:1px solid var(--color-border-primary);background:var(--color-bg-primary);color:var(--color-content-primary)}
 .card p{margin:0}
-.card .t{font:var(--ts-title-s);text-transform:var(--type-case-title)}
-.card .s{margin-top:6px;font:var(--ts-body-m);color:var(--color-content-secondary)}
+.card .t{font:var(--ts-title-body);text-transform:var(--type-case-title)}
+.card .s{margin-top:6px;font:var(--ts-body-default);color:var(--color-content-secondary)}
 .card .chips{display:flex;gap:8px;margin:16px 0}
 .card .chips span{display:inline-flex;align-items:center;height:28px;padding:0 10px;background:var(--color-bg-accent-subtle);color:var(--color-content-accent);font:var(--ts-body-s)}
-.card .btn{display:inline-flex;align-items:center;height:52px;padding:0 24px;background:var(--color-bg-accent);color:var(--color-content-on-accent);font:var(--ts-label-l)}
+.card .btn{display:inline-flex;align-items:center;height:52px;padding:0 24px;background:var(--color-bg-accent);color:var(--color-content-on-accent);font:var(--ts-body-l-bold)}
 .card .note{margin-top:14px;padding:10px 12px;background:var(--color-bg-secondary);border:1px solid var(--color-border-primary);font:var(--ts-body-s);color:var(--color-content-tertiary)}
 .foot{margin:64px 0 96px;padding-top:18px;border-top:1px solid var(--color-border-primary);font:var(--ts-body-s);color:var(--color-content-tertiary)}
 @media (max-width:900px){.layers,.demo{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.row .live{display:none}.row.hd span:last-child{display:none}}
@@ -71,39 +71,39 @@ html[data-mode=light] .row .v.l,html[data-mode=dark] .row .v.d{font-weight:500;c
 
 <header class="head">
   <div class="in">
-    <p class="k ts-label-s">Design system · same structure as WBK DS3</p>
-    <h1 class="ts-display-l">Colour</h1>
+    <p class="k ts-caption-1-bold">Design system · same structure as WBK DS3</p>
+    <h1 class="ts-display-m">Colour</h1>
     <p class="d ts-body-l">Three layers, each built only from the one before it. Switch the mode at the top: the Colour collection swaps between Light and Dark, and the sample cards follow. The site uses Light for the inner pages and Dark for the homepage.</p>
     <nav class="layers" aria-label="Layers">
-      <a href="#primitives"><span class="ts-title-s">1 · Primitives</span><small>Locked raw colours</small></a>
-      <a href="#collection"><span class="ts-title-s">2 · Colour</span><small>Light / Dark modes: backgrounds, content, borders</small></a>
-      <a href="#brand"><span class="ts-title-s">3 · Brand &amp; feedback</span><small>Programmes, danger, warning, overlays</small></a>
+      <a href="#primitives"><span class="ts-title-body">1 · Primitives</span><small>Locked raw colours</small></a>
+      <a href="#collection"><span class="ts-title-body">2 · Colour</span><small>Light / Dark modes: backgrounds, content, borders</small></a>
+      <a href="#brand"><span class="ts-title-body">3 · Brand &amp; feedback</span><small>Programmes, danger, warning, overlays</small></a>
     </nav>
   </div>
 </header>
 
 <main class="in">
   <section class="sec" id="primitives">
-    <h2 class="sec-h ts-title-s">1 · Colour primitives</h2>
-    <p class="sec-d ts-body-m">The raw values. Pages don't use them for meaning; the Colour collection points at them. The two off-brand oranges the homepage had (#F95C1B, #F95D27) were folded into Orange 500.</p>
+    <h2 class="sec-h ts-title-body">1 · Colour primitives</h2>
+    <p class="sec-d ts-body-default">The raw values. Pages don't use them for meaning; the Colour collection points at them. The two off-brand oranges the homepage had (#F95C1B, #F95D27) were folded into Orange 500.</p>
     <div id="prims"></div>
   </section>
 
   <section class="sec" id="collection">
-    <h2 class="sec-h ts-title-s">2 · Colour</h2>
-    <p class="sec-d ts-body-m">The semantic layer, with a Light and a Dark mode like DS3's. Names follow DS3: backgrounds, content and borders, each primary → tertiary, plus accent, inverse and states. The highlighted column is the mode in use.</p>
+    <h2 class="sec-h ts-title-body">2 · Colour</h2>
+    <p class="sec-d ts-body-default">The semantic layer, with a Light and a Dark mode like DS3's. Names follow DS3: backgrounds, content and borders, each primary → tertiary, plus accent, inverse and states. The highlighted column is the mode in use.</p>
     <div class="sem" id="sem"></div>
   </section>
 
   <section class="sec" id="brand">
-    <h2 class="sec-h ts-title-s">3 · Brand &amp; feedback</h2>
-    <p class="sec-d ts-body-m">The same in both modes.</p>
+    <h2 class="sec-h ts-title-body">3 · Brand &amp; feedback</h2>
+    <p class="sec-d ts-body-default">The same in both modes.</p>
     <div class="sw" id="brandSw"></div>
   </section>
 
   <section class="sec">
-    <h2 class="sec-h ts-title-s">In use</h2>
-    <p class="sec-d ts-body-m">The same card built only from semantic tokens, in each mode.</p>
+    <h2 class="sec-h ts-title-body">In use</h2>
+    <p class="sec-d ts-body-default">The same card built only from semantic tokens, in each mode.</p>
     <div class="demo">
       <div class="card" data-mode="light"><p class="t">Field F1</p><p class="s">5-a-side field · 5 v 5</p><div class="chips"><span>Indoor</span><span>Free balls and bibs</span></div><span class="btn">Check availability</span><p class="note">Light mode · inner pages</p></div>
       <div class="card" data-mode="dark"><p class="t">Field F1</p><p class="s">5-a-side field · 5 v 5</p><div class="chips"><span>Indoor</span><span>Free balls and bibs</span></div><span class="btn">Check availability</span><p class="note">Dark mode · homepage</p></div>

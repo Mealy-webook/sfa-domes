@@ -17,12 +17,12 @@
 .tb-top{padding:calc(90px + clamp(24px,4vh,40px)) 0 clamp(24px,4vh,36px);background:var(--bg)}
 .tb-top-in{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:clamp(20px,3vw,40px);align-items:end}
 .tb-top .about-media{aspect-ratio:4/3}
-.tb-title h1{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0}
+.tb-title h1{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0}
 .tb-title .hero-book{margin-top:20px}
 .tb-tabs{position:sticky;top:90px;z-index:20;background:var(--bg);border-block:1px solid var(--line-strong);transition:top .45s var(--ease)}
 body:has(.hdr-cn.hq-away) .tb-tabs{top:0}
 .tb-tabs .inner{display:flex;gap:0;overflow-x:auto;scrollbar-width:none}
-.tb-tab{font:var(--ts-label-l);text-transform:var(--type-case-label);flex:none;height:60px;padding:0 22px;border:0;border-bottom:3px solid transparent;background:none;color:var(--ink-3);cursor:pointer;white-space:nowrap;transition:color .2s,border-color .2s}
+.tb-tab{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);flex:none;height:60px;padding:0 22px;border:0;border-bottom:3px solid transparent;background:none;color:var(--ink-3);cursor:pointer;white-space:nowrap;transition:color .2s,border-color .2s}
 .tb-tab:hover{color:var(--ink)}
 .tb-tab[aria-selected=true]{color:var(--ink);border-bottom-color:var(--brand)}
 .tb-tab:first-child{margin-inline-start:-22px}
@@ -37,7 +37,7 @@ body:has(.hdr-cn.hq-away) .tb-tabs{top:0}
 .tb .about-lead{margin:0 0 24px}
 .tb-loc{padding:clamp(40px,7vh,64px) 0}
 .v-b .faq-wrap{border-top:0}
-@media (max-width:760px){.tb-top-in{grid-template-columns:minmax(0,1fr)}.tb-top .about-media{aspect-ratio:16/9}.tb-tab{padding:0 16px;font-size:var(--fs-16)}.tb-tab:first-child{margin-inline-start:-16px}}
+@media (max-width:760px){.tb-top-in{grid-template-columns:minmax(0,1fr)}.tb-top .about-media{aspect-ratio:16/9}.tb-tab{padding:0 16px;font-size:var(--fs-15)}.tb-tab:first-child{margin-inline-start:-16px}}
 @media (prefers-reduced-motion:reduce){.tb-panel{animation:none}}
 </style>
 </head>

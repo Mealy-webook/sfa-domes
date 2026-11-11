@@ -16,7 +16,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg-soft);color:var(--ink);font:var(--ts-body-m);-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--bg-soft);color:var(--ink);font:var(--ts-body-default);-webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom,0px)}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--brand);outline-offset:3px}
 .inner{max-width:1440px;margin:0 auto;padding-inline:var(--gutter)}
@@ -26,26 +26,26 @@ a{color:inherit}
 
 /* hero: the court's photo, dark behind the title, price and Book button bottom-right */
 /* court title block at the top of About (the old photo banner, now on the light page) */
-.eyebrow{font:var(--ts-label-s);display:flex;align-items:center;gap:8px;margin:0 0 8px;color:var(--ink);text-transform:var(--type-case-label)}
+.eyebrow{font:var(--ts-caption-1-bold);display:flex;align-items:center;gap:8px;margin:0 0 8px;color:var(--ink);text-transform:var(--type-case-label)}
 .eyebrow .ico{display:grid;place-items:center;width:32px;height:32px;background:var(--color-bg-inverse);color:var(--color-content-inverse)}
 .eyebrow .msi{font-size:var(--fs-24)}
 .eyebrow img{width:22px;height:22px;display:block}
-.about h1{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0;letter-spacing:.005em}
+.about h1{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0;letter-spacing:.005em}
 .hero-sub{font:var(--ts-body-l);margin:12px 0 0;color:var(--ink-2)}
 .hero-book{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin:24px 0 0}
 .hero-price{margin:0;display:flex;align-items:baseline;gap:8px;font-family:var(--type-font);font-weight:var(--type-w-title);text-transform:var(--type-case-title);color:var(--ink)}
-.hero-price small{font-size:var(--fs-16);font-weight:400;text-transform:none;color:var(--ink-3)}
-.hero-price b{font:var(--ts-number-m)}
+.hero-price small{font-size:var(--fs-15);font-weight:400;text-transform:none;color:var(--ink-3)}
+.hero-price b{font:var(--ts-display-xs)}
 .hero-actions{display:flex;gap:8px}
 /* share: same square as the heart; uses the phone's share sheet, or copies the link */
 .share{display:inline-grid;place-items:center;flex:none;width:56px;height:56px;padding:0;border:1px solid var(--line-strong);background:var(--bg);color:var(--ink);cursor:pointer;transition:border-color .2s}
 .share:hover{border-color:var(--ink)}
 .share svg{width:24px;height:24px}
 /* phones: heart, share and Book share one full-width row, the button text on one line */
-@media (max-width:480px){.hero-actions{width:100%}.hero-actions .cta{flex:1 1 auto;justify-content:center;padding:0 16px;font-size:var(--fs-18);white-space:nowrap}}
+@media (max-width:480px){.hero-actions{width:100%}.hero-actions .cta{flex:1 1 auto;justify-content:center;padding:0 16px;font-size:var(--fs-17);white-space:nowrap}}
 
 /* primary action */
-.cta{font:var(--ts-label-l);display:inline-flex;align-items:center;gap:8px;height:56px;padding:0 28px;border:0;background:var(--brand);color:var(--neutral-0);cursor:pointer;text-decoration:none;transition:background-color .25s;text-transform:var(--type-case-label)}
+.cta{font:var(--ts-body-l-bold);display:inline-flex;align-items:center;gap:8px;height:56px;padding:0 28px;border:0;background:var(--brand);color:var(--neutral-0);cursor:pointer;text-decoration:none;transition:background-color .25s;text-transform:var(--type-case-label)}
 .cta svg{width:20px;height:20px;transition:transform .35s var(--ease)}
 .cta:hover{background:var(--brand-600)}
 .cta:hover svg{transform:translateX(3px)}
@@ -59,34 +59,34 @@ html[dir=rtl] .cta svg{scale:-1 1}
 
 .step{margin-top:clamp(28px,4.5vh,44px)}
 .page > div > .step:first-child{margin-top:0}
-.booking .step-head h2{font:var(--ts-display-m);text-transform:var(--type-case-display)}
+.booking .step-head h2{font:var(--ts-display-s);text-transform:var(--type-case-display)}
 .step-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line-strong)}
-.step-head h2{font:var(--ts-title-m);text-transform:var(--type-case-title);margin:0}
-.step-head h2 b{display:inline-grid;place-items:center;width:28px;height:28px;margin-inline-end:8px;background:var(--ink);color:var(--neutral-0);font-size:var(--fs-16);font-weight:600;vertical-align:2px}
+.step-head h2{font:var(--ts-title-section);text-transform:var(--type-case-title);margin:0}
+.step-head h2 b{display:inline-grid;place-items:center;width:28px;height:28px;margin-inline-end:8px;background:var(--ink);color:var(--neutral-0);font-size:var(--fs-15);font-weight:600;vertical-align:2px}
 .step-head h2 em{font-style:normal;color:var(--brand)}
-.step-note{margin:-6px 0 16px;font-size:var(--fs-14);color:var(--ink-3)}
+.step-note{margin:-6px 0 16px;font-size:var(--fs-13);color:var(--ink-3)}
 .panel{background:var(--bg);border:1px solid var(--line);padding:clamp(16px,2vw,24px)}
 
 /* calendar, with the open day's time slots folded in under its week */
 .cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-.cal-month{margin:0;font:var(--ts-label-m);text-transform:var(--type-case-label)}
+.cal-month{margin:0;font:var(--ts-body-default-bold);text-transform:var(--type-case-label)}
 .cal-nav{display:flex;gap:8px}
 .arrow{width:40px;height:40px;display:grid;place-items:center;padding:0;border:1px solid var(--line-strong);background:var(--bg);cursor:pointer;transition:background-color .25s,color .25s,opacity .25s,border-color .25s}
 .arrow svg{width:18px;height:18px}
 .arrow:hover:not(:disabled){background:var(--ink);border-color:var(--ink);color:var(--neutral-0)}
 .arrow:disabled{opacity:.35;cursor:default}
 .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
-.cal-dow{font:var(--ts-label-m);text-transform:var(--type-case-label);padding-bottom:4px;text-align:center;color:var(--ink-3)}
-.day{font:var(--ts-label-l);text-transform:var(--type-case-label);position:relative;height:clamp(44px,5.4vw,60px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;background:var(--bg-soft);border:1px solid transparent;cursor:pointer;font-variant-numeric:tabular-nums;transition:background-color .2s,border-color .2s,color .2s}
+.cal-dow{font:var(--ts-body-default-bold);text-transform:var(--type-case-label);padding-bottom:4px;text-align:center;color:var(--ink-3)}
+.day{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);position:relative;height:clamp(44px,5.4vw,60px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;background:var(--bg-soft);border:1px solid transparent;cursor:pointer;font-variant-numeric:tabular-nums;transition:background-color .2s,border-color .2s,color .2s}
 .day:hover:not(:disabled){border-color:var(--ink-4)}
 .day:disabled{background:transparent;color:var(--ink-4);cursor:default}
 .day.today::after{content:"";position:absolute;inset-inline-start:50%;bottom:6px;width:14px;height:2px;margin-inline-start:-7px;background:currentColor}
-.day small{font:var(--ts-caption);letter-spacing:0}
+.day small{font:var(--ts-caption-1);letter-spacing:0}
 /* selected = the plan card's style (2px brand, tint, ink text), on every pickable control */
 .day.picked{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
 .day.active{border:2px solid var(--ink)}
 .day.picked.active{border:2px solid var(--color-brand);box-shadow:none}
-.cal-key{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:16px;font-size:var(--fs-14);color:var(--ink-3)}
+.cal-key{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:16px;font-size:var(--fs-13);color:var(--ink-3)}
 .cal-key i{display:inline-block;width:12px;height:12px;margin-inline-end:8px;vertical-align:-1px}
 .cal-key .k-pick{background:var(--color-bg-accent-subtle);box-shadow:inset 0 0 0 2px var(--color-brand)}
 .cal-key .k-act{border:2px solid var(--ink)}
@@ -100,35 +100,35 @@ html[dir=rtl] .cta svg{scale:-1 1}
 .cal-times .slot[aria-pressed="true"]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
 
 /* time slots */
-.legend{display:flex;gap:16px;font-size:var(--fs-14);color:var(--ink-3)}
+.legend{display:flex;gap:16px;font-size:var(--fs-13);color:var(--ink-3)}
 .legend i{display:inline-block;width:12px;height:12px;margin-inline-end:8px;vertical-align:-1px;border:1px solid var(--line-strong);background:var(--bg)}
 .legend .bk{background:repeating-linear-gradient(135deg,transparent 0 3px,rgba(9,9,11,.18) 3px 4px)}
 .legend .pk{background:var(--color-bg-accent-subtle);border:2px solid var(--color-brand)}
 .slots-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-.slots-day{font:var(--ts-body-m-bold);margin:0}
-.linkbtn{padding:0;border:0;background:none;cursor:pointer;font-size:var(--fs-14);text-decoration:underline;text-underline-offset:3px;color:var(--ink-2)}
+.slots-day{font:var(--ts-body-default-bold);margin:0}
+.linkbtn{padding:0;border:0;background:none;cursor:pointer;font-size:var(--fs-13);text-decoration:underline;text-underline-offset:3px;color:var(--ink-2)}
 .linkbtn:hover{color:var(--brand)}
 .period{margin:0 0 16px}
 .period:last-child{margin-bottom:0}
-.period h3{font:var(--ts-label-m);text-transform:var(--type-case-label);margin:0 0 8px;color:var(--ink-3)}
+.period h3{font:var(--ts-body-default-bold);text-transform:var(--type-case-label);margin:0 0 8px;color:var(--ink-3)}
 .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px}
-.slot{font:var(--ts-label-l);text-transform:var(--type-case-label);position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 8px;background:var(--bg);border:1px solid var(--line-strong);cursor:pointer;font-variant-numeric:tabular-nums;white-space:nowrap;transition:background-color .2s,border-color .2s,color .2s}
+.slot{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 8px;background:var(--bg);border:1px solid var(--line-strong);cursor:pointer;font-variant-numeric:tabular-nums;white-space:nowrap;transition:background-color .2s,border-color .2s,color .2s}
 .slot:hover:not(:disabled){border-color:var(--ink)}
 .slot[aria-pressed="true"]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
 .slot:disabled{cursor:not-allowed;color:var(--ink-4);background:repeating-linear-gradient(135deg,transparent 0 5px,rgba(9,9,11,.06) 5px 6px),var(--bg-soft);border-color:var(--line)}
 .slot.booked:disabled{text-decoration:line-through}
 /* ladies hours: women-only on Courts 1 and 2 (booked from ladies-hours.html); the slot says so instead of looking booked */
 .slot.ladies span{display:grid;justify-items:center;gap:2px}
-.lad-tag{font:var(--ts-caption);color:var(--color-programme-women)}
+.lad-tag{font:var(--ts-caption-1);color:var(--color-programme-women)}
 /* phones: two time buttons a row; this comes after the .slot rules so its smaller type and padding win */
-@media (max-width:480px){.slots{grid-template-columns:repeat(2,minmax(0,1fr))}.slot{font-size:var(--fs-14);padding:0 8px;white-space:normal;line-height:1.15;text-align:center}.cal-times{padding:12px}}
+@media (max-width:480px){.slots{grid-template-columns:repeat(2,minmax(0,1fr))}.slot{font-size:var(--fs-13);padding:0 8px;white-space:normal;line-height:1.15;text-align:center}.cal-times{padding:12px}}
 .empty{margin:0;padding:24px;border:1px dashed var(--line-strong);color:var(--ink-2);text-align:center}
 
 
 /* summary */
 .summary{position:sticky;top:106px;background:var(--bg);border:1px solid var(--line)}
 .sum-body{padding:20px}
-.sum-title{font:var(--ts-label-l);text-transform:var(--type-case-label);display:flex;justify-content:space-between;align-items:baseline;margin:0 0 8px;color:var(--ink-2)}
+.sum-title{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);display:flex;justify-content:space-between;align-items:baseline;margin:0 0 8px;color:var(--ink-2)}
 .sum-title span{font:var(--ts-body-s);letter-spacing:0;color:var(--ink-3)}
 .sum-days{list-style:none;margin:0 0 16px;padding:0;overflow:auto;overscroll-behavior:contain;border-top:1px solid var(--line)}
 /* desktop: the day list scrolls inside the card so the Book button never drops below the window */
@@ -140,21 +140,21 @@ html[dir=rtl] .cta svg{scale:-1 1}
   .sum-days{min-height:0}
 }
 .sum-day{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 8px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
-.sum-day button.go-day{font:var(--ts-label-l);text-transform:var(--type-case-label);grid-column:1;padding:0;border:0;background:none;text-align:start;cursor:pointer}
+.sum-day button.go-day{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);grid-column:1;padding:0;border:0;background:none;text-align:start;cursor:pointer}
 .sum-day button.go-day:hover{color:var(--brand)}
-.sum-day .sub{grid-column:2;font-size:var(--fs-14);font-weight:600;white-space:nowrap}
+.sum-day .sub{grid-column:2;font-size:var(--fs-13);font-weight:600;white-space:nowrap}
 .sum-day .rm{grid-column:3;width:24px;height:24px;display:grid;place-items:center;padding:0;border:0;background:none;cursor:pointer;color:var(--ink-3)}
 .sum-day .rm:hover{color:var(--danger)}
 .sum-day .rm svg{width:16px;height:16px}
-.sum-day ul{grid-column:1/-1;list-style:none;margin:0;padding:0;font-size:var(--fs-14);line-height:20px;color:var(--ink-2)}
-.sum-empty{margin:0 0 16px;padding:16px;border:1px dashed var(--line-strong);font-size:var(--fs-14);line-height:20px;color:var(--ink-3);text-align:center}
-.sum-rows{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0 0 4px;font-size:var(--fs-14);line-height:20px}
+.sum-day ul{grid-column:1/-1;list-style:none;margin:0;padding:0;font-size:var(--fs-13);line-height:20px;color:var(--ink-2)}
+.sum-empty{margin:0 0 16px;padding:16px;border:1px dashed var(--line-strong);font-size:var(--fs-13);line-height:20px;color:var(--ink-3);text-align:center}
+.sum-rows{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0 0 4px;font-size:var(--fs-13);line-height:20px}
 .sum-rows dt{color:var(--ink-3)}
 .sum-rows dd{margin:0;text-align:end}
 .sum-total{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:12px 0 16px;padding-top:16px;border-top:1px solid var(--line-strong)}
-.sum-total small{font:var(--ts-label-l);text-transform:var(--type-case-label);color:var(--ink-2)}
-.sum-total strong{font:var(--ts-number-l)}
-.book{font:var(--ts-label-l);display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;padding:0 24px;background:var(--brand);border:0;color:var(--neutral-0);text-decoration:none;cursor:pointer;transition:background-color .25s;text-transform:var(--type-case-label)}
+.sum-total small{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);color:var(--ink-2)}
+.sum-total strong{font:var(--ts-display-m)}
+.book{font:var(--ts-body-l-bold);display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;padding:0 24px;background:var(--brand);border:0;color:var(--neutral-0);text-decoration:none;cursor:pointer;transition:background-color .25s;text-transform:var(--type-case-label)}
 .book:hover:not(:disabled){background:var(--brand-600)}
 .book:disabled{background:var(--line);color:var(--ink-3);cursor:not-allowed}
 .book .sar{width:.7em;height:.7em}
@@ -166,8 +166,8 @@ html[dir=rtl] .cta svg{scale:-1 1}
   .go{display:block;position:fixed;transform:translateY(105%);transition:transform .5s var(--ease);left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);box-shadow:0 -12px 32px -24px rgba(9,9,11,.4);padding-bottom:env(safe-area-inset-bottom,0px)}
   .go .inner{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:88px;padding-block:16px}
   .go-pick{min-width:0}
-  .go-pick small{display:block;font-size:var(--fs-14);line-height:18px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .go-pick strong{font:var(--ts-number-m);display:block}
+  .go-pick small{display:block;font-size:var(--fs-13);line-height:18px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .go-pick strong{font:var(--ts-display-xs);display:block}
   .go .book{width:auto;flex:none;height:56px}
   .go.on{transform:none}
   body.has-picks .faq{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))}
@@ -177,15 +177,15 @@ html[dir=rtl] .cta svg{scale:-1 1}
 /* About the court: copy, quick stats and dome features beside the court photo */
 .about{padding:calc(90px + clamp(32px,6vh,64px)) 0 clamp(48px,8vh,88px);background:var(--bg);border-bottom:1px solid var(--line)}
 .about-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:start}
-.kicker{margin:0 0 8px;font-size:var(--fs-16);color:var(--brand)}
-.about h2:not([class]){font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0}
+.kicker{margin:0 0 8px;font-size:var(--fs-15);color:var(--brand)}
+.about h2:not([class]){font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0}
 .about-lead{font:var(--ts-body-l);margin:28px 0 24px;max-width:52ch;color:var(--ink-2)}
 .about-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin:0 0 24px;border-top:1px solid var(--line-strong);border-inline-start:1px solid var(--line-strong)}
 .about-stats div{padding:16px 16px;border-bottom:1px solid var(--line-strong);border-inline-end:1px solid var(--line-strong)}
-.about-stats dt{font:var(--ts-label-m);text-transform:var(--type-case-label);color:var(--ink-3)}
+.about-stats dt{font:var(--ts-body-default-bold);text-transform:var(--type-case-label);color:var(--ink-3)}
 .about-stats .st-wide{grid-column:1/-1}
-.about-stats dd{font:var(--ts-label-l);text-transform:var(--type-case-label);margin:4px 0 0}
-.about-feats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;margin:0;padding:0;list-style:none;font-size:var(--fs-14);line-height:20px;color:var(--ink-2)}
+.about-stats dd{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);margin:4px 0 0}
+.about-feats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;margin:0;padding:0;list-style:none;font-size:var(--fs-13);line-height:20px;color:var(--ink-2)}
 .about-feats li{display:flex;gap:8px;align-items:flex-start}
 .about-feats svg{flex:none;width:20px;height:20px;color:var(--brand)}
 /* Open today opens a popup with the week's court hours */
@@ -199,11 +199,11 @@ html[dir=rtl] .cta svg{scale:-1 1}
 .hrs-back{position:absolute;inset:0;background:rgba(9,9,11,.5);animation:hrsFade .2s ease}
 .hrs-card{position:relative;width:min(100%,380px);padding:20px 24px 24px;background:var(--bg);border:1px solid var(--line);box-shadow:0 24px 60px rgba(9,9,11,.22);animation:hrsIn .25s cubic-bezier(.22,1,.36,1)}
 .hrs-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 16px;padding:0 0 12px;border-bottom:1px solid var(--line)}
-.hrs-head h3{font:var(--ts-label-l);text-transform:var(--type-case-label);margin:0}
+.hrs-head h3{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);margin:0}
 .hrs-x{display:grid;place-items:center;width:36px;height:36px;margin-inline-end:-8px;padding:0;border:0;background:none;color:var(--ink);cursor:pointer}
 .hrs-x:hover{background:var(--bg-soft)}
 .hrs-x svg{width:20px;height:20px}
-.hrs-card dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0;font-size:var(--fs-16);line-height:20px}
+.hrs-card dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0;font-size:var(--fs-15);line-height:20px}
 .hrs-card dt{color:var(--ink-2)}
 .hrs-card dd{margin:0;text-align:end;font-variant-numeric:tabular-nums}
 .hrs-card .today{font-weight:600;color:var(--ink)}
@@ -217,23 +217,23 @@ html[dir=rtl] .cta svg{scale:-1 1}
 
 /* Location: venue details and directions beside a map that only takes the scroll wheel after a click */
 .about-loc{margin-top:clamp(40px,6vh,64px);padding-top:clamp(28px,4vh,40px);border-top:1px solid var(--line)}
-.about-sub{font:var(--ts-title-m);text-transform:var(--type-case-title);margin:0 0 20px}
-.loc-name{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0}
+.about-sub{font:var(--ts-title-section);text-transform:var(--type-case-title);margin:0 0 20px}
+.loc-name{font:var(--ts-display-s);text-transform:var(--type-case-display);margin:0}
 .loc-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(20px,3vw,40px);align-items:stretch}
 .loc-card{display:flex;flex-direction:column;padding:clamp(20px,3vw,32px);background:var(--bg);border:1px solid var(--line)}
 .loc-city{margin:8px 0 20px;color:var(--ink-2)}
-.loc-list{display:grid;gap:12px;margin:0 0 24px;padding:16px 0 0;list-style:none;border-top:1px solid var(--line);font-size:var(--fs-16)}
+.loc-list{display:grid;gap:12px;margin:0 0 24px;padding:16px 0 0;list-style:none;border-top:1px solid var(--line);font-size:var(--fs-15)}
 .loc-list li{display:flex;gap:12px;align-items:center}
 .loc-list svg{flex:none;width:20px;height:20px;color:var(--brand)}
 .loc-list a{text-decoration:none}
 .loc-list a:hover{color:var(--brand);text-decoration:underline;text-underline-offset:3px}
-.loc-btn{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 24px;background:var(--color-bg-primary);color:var(--color-content-primary);border:1px solid var(--color-border-strong);text-decoration:none;font:var(--ts-label-l);transition:background-color .25s,color .25s}
+.loc-btn{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 24px;background:var(--color-bg-primary);color:var(--color-content-primary);border:1px solid var(--color-border-strong);text-decoration:none;font:var(--ts-body-l-bold);transition:background-color .25s,color .25s}
 .loc-btn:hover{background:var(--color-bg-inverse);color:var(--color-content-inverse)}
 .loc-btn svg{width:18px;height:18px}
 .loc-map{position:relative;min-height:360px;background:var(--bg-soft);border:1px solid var(--line);overflow:hidden}
 .loc-map iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:grayscale(.15)}
 .loc-cover{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:0 0 16px;border:0;background:linear-gradient(180deg,transparent 60%,rgba(9,9,11,.35));cursor:pointer}
-.loc-cover span{font:var(--ts-label-m);text-transform:var(--type-case-label);padding:8px 16px;background:var(--ink);color:var(--neutral-0)}
+.loc-cover span{font:var(--ts-body-default-bold);text-transform:var(--type-case-label);padding:8px 16px;background:var(--ink);color:var(--neutral-0)}
 .loc-map.live .loc-cover{display:none}
 @media (max-width:860px){.loc-grid{grid-template-columns:minmax(0,1fr)}.loc-map{min-height:300px}}
 html[dir=rtl] .loc-btn svg{scale:-1 1}
@@ -241,7 +241,7 @@ html[dir=rtl] .loc-btn svg{scale:-1 1}
 /* FAQ: native <details>, one plus that turns into a minus */
 .faq{padding:0 0 calc(clamp(56px,10vh,96px) + env(safe-area-inset-bottom,0px))}
 .faq-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:clamp(24px,4vw,64px);padding-top:clamp(48px,8vh,88px);border-top:1px solid var(--line-strong)}
-.faq h2{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0}
+.faq h2{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0}
 .faq-list{border-top:1px solid var(--line-strong)}
 .faq-item{border-bottom:1px solid var(--line-strong)}
 .faq-item summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 0;cursor:pointer;list-style:none;font:var(--ts-body-l-bold)}
@@ -265,7 +265,7 @@ html[dir=rtl] .faq-item p{padding:0 0 24px 56px}
 .strip{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:2px 2px 8px;margin:0 -2px}
 .strip::-webkit-scrollbar{display:none}
 .sday{flex:none;width:64px;height:auto;padding:8px 0;gap:2px;scroll-snap-align:start;background:var(--bg);border:1px solid var(--line-strong)}
-.sday small{font:var(--ts-label-s);text-transform:var(--type-case-label);color:var(--ink-3)}
+.sday small{font:var(--ts-caption-1-bold);text-transform:var(--type-case-label);color:var(--ink-3)}
 .sday b{font-size:var(--fs-24);line-height:1.1}
 .sday.picked{background:var(--bg);color:var(--ink)}
 .sday.picked small{color:var(--ink-3)}
@@ -283,21 +283,21 @@ html[dir=rtl] .faq-item p{padding:0 0 24px 56px}
 [data-picker=strip] ~ .cal-key{display:none}
 /* time pills with a price under the start time */
 .slot.pill{flex-direction:column;gap:2px;height:64px}
-.slot.pill b{font-size:var(--fs-18);font-weight:600}
-.slot.pill small{font:var(--ts-caption);letter-spacing:0;color:var(--ink-3)}
+.slot.pill b{font-size:var(--fs-17);font-weight:600}
+.slot.pill small{font:var(--ts-caption-1);letter-spacing:0;color:var(--ink-3)}
 .slot.pill[aria-pressed=true] small{color:rgba(255,255,255,.85)}
 .slot.pill .sar{width:.75em;height:.75em}
 /* start-time chips in one wrapping row */
 .slots.chips{display:flex;flex-wrap:wrap;gap:8px}
-.slot.chip{height:44px;padding:0 16px;font-size:var(--fs-16)}
+.slot.chip{height:44px;padding:0 16px;font-size:var(--fs-15)}
 /* one row per slot, Add on the end */
 .slots.rows{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
 .slot.srow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"time price act" "meta price act";align-items:center;gap:2px 20px;height:auto;padding:16px 4px;border:0;border-bottom:1px solid var(--line);background:none;text-align:start;white-space:normal}
 .slot.srow:hover:not(:disabled){border-color:var(--line);background:var(--bg-soft)}
-.sr-time{grid-area:time;font-size:var(--fs-18)}
+.sr-time{grid-area:time;font-size:var(--fs-17)}
 .sr-meta{font:var(--ts-body-s);grid-area:meta;color:var(--ink-3)}
-.sr-price{grid-area:price;font-size:var(--fs-18)}
-.sr-act{grid-area:act;display:grid;place-items:center;min-width:96px;height:40px;padding:0 16px;border:1px solid var(--ink);font-size:var(--fs-16);text-transform:uppercase}
+.sr-price{grid-area:price;font-size:var(--fs-17)}
+.sr-act{grid-area:act;display:grid;place-items:center;min-width:96px;height:40px;padding:0 16px;border:1px solid var(--ink);font-size:var(--fs-15);text-transform:uppercase}
 .sr-on{display:none}
 .slot.srow[aria-pressed=true]{background:var(--brand-10);color:var(--ink)}
 .slot.srow[aria-pressed=true] .sr-act{background:var(--brand);border-color:var(--brand);color:var(--neutral-0)}
@@ -309,7 +309,7 @@ html[dir=rtl] .faq-item p{padding:0 0 24px 56px}
 @media (max-width:480px){.slot.srow{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"time act" "meta act" "price act";padding:12px 0}.sr-act{min-width:80px}}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* Loew Next is wide: on phones the bottom bar's button takes a smaller label so the count and total keep their room */
-@media (max-width:480px){.go .book{font-size:var(--fs-16);padding:0 16px}.go .inner{gap:12px}}
+@media (max-width:480px){.go .book{font-size:var(--fs-15);padding:0 16px}.go .inner{gap:12px}}
 
 /* hover never hides a selection */
 .slot[aria-pressed="true"]:hover:not(:disabled),.day.picked:hover:not(:disabled){border-color:var(--color-brand)}

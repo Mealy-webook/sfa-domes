@@ -15,7 +15,7 @@
 <style>
 /* Confirmation option E · Split screen: half the screen is the court photo with the headline and the essentials, pinned while the other half scrolls through the tickets, payment and next steps (a trip-confirmation layout).
    Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
-.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-caption-1-bold);text-decoration:none}
 body[data-state=paid] .cf{max-width:none;padding:var(--nav) 0 0}
 body[data-state=paid] .cf-head{display:none}
 body[data-state=paid] .cf-grid{display:block}
@@ -25,19 +25,19 @@ body[data-state=paid] .cf-grid{display:block}
 .e-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.15),rgba(9,9,11,.88))}
 .e-in{position:absolute;inset:auto 0 0;z-index:1;display:grid;gap:16px;padding:clamp(24px,4vw,56px)}
 .e-in .mark{grid-row:auto;width:56px;height:56px}
-.e-in h1{font:var(--ts-display-l);text-transform:var(--type-case-display)}
+.e-in h1{font:var(--ts-display-m);text-transform:var(--type-case-display)}
 .e-in .cf-sub,.e-in .cf-sub .ref{color:inherit}
 .e-in .cf-sub{opacity:.85}
 .e-facts{display:grid;gap:12px;margin:8px 0 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.25)}
 .e-facts div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:16px}
-.e-facts dt{font:var(--ts-label-s);opacity:.7}
-.e-facts dd{margin:0;font:var(--ts-label-l)}
+.e-facts dt{font:var(--ts-caption-1-bold);opacity:.7}
+.e-facts dd{margin:0;font:var(--ts-body-l-bold)}
 .e-col{display:grid;align-content:start;gap:24px;padding:clamp(32px,5vh,56px) var(--g) clamp(56px,9vh,96px);animation:up .7s var(--ease) .1s both}
-.e-col h2{margin:0;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.e-col h2{margin:0;font:var(--ts-title-section);text-transform:var(--type-case-title)}
 .e-tix{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .e-tk{display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:center;gap:16px;padding:16px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
-.e-tk small{display:block;font:var(--ts-label-s);color:var(--color-content-tertiary)}
-.e-tk b{display:block;margin-top:4px;font:var(--ts-label-l)}
+.e-tk small{display:block;font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
+.e-tk b{display:block;margin-top:4px;font:var(--ts-body-l-bold)}
 .e-tk span{display:block;margin-top:4px;font:var(--ts-body-s);color:var(--color-content-secondary)}
 .e-tk .tk-qr{width:112px}
 .e-tk .tk-ref{display:block;margin-top:8px}

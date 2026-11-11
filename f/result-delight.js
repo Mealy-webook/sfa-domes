@@ -15,7 +15,7 @@
   const css = document.createElement('style');
   css.textContent = `
 .rx svg.rx-i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
-.rx-tag{position:fixed;inset-inline-start:16px;bottom:16px;z-index:60;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+.rx-tag{position:fixed;inset-inline-start:16px;bottom:16px;z-index:60;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-caption-1-bold);text-decoration:none}
 /* a */
 .rx-conf{position:fixed;inset:0;z-index:70;pointer-events:none;overflow:hidden}
 .rx-conf i{position:absolute;width:10px;height:10px;will-change:transform,opacity}
@@ -32,22 +32,22 @@
 .rx-b .tk-qr{position:relative;overflow:hidden}
 .rx-b .tk-qr svg{animation:rx-qr .3s ease both;animation-delay:calc(1s + var(--i,0) * .35s)}
 .rx-b .tk-qr::after{content:"";position:absolute;inset-inline:0;top:0;height:3px;background:var(--color-brand);opacity:0;animation:rx-scan .7s linear both;animation-delay:calc(.35s + var(--i,0) * .35s)}
-.rx-b .rx-stamp{position:absolute;top:16px;inset-inline-end:16px;z-index:2;padding:6px 12px;border:3px solid var(--color-brand);color:var(--color-brand);font:var(--ts-title-s);letter-spacing:.08em;rotate:-10deg;background:color-mix(in srgb,var(--color-bg-primary) 85%,transparent);animation:rx-stamp .45s cubic-bezier(.2,1.4,.4,1) 1.6s both}
+.rx-b .rx-stamp{position:absolute;top:16px;inset-inline-end:16px;z-index:2;padding:6px 12px;border:3px solid var(--color-brand);color:var(--color-brand);font:var(--ts-title-body);letter-spacing:.08em;rotate:-10deg;background:color-mix(in srgb,var(--color-bg-primary) 85%,transparent);animation:rx-stamp .45s cubic-bezier(.2,1.4,.4,1) 1.6s both}
 /* c */
 .rx-cd{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px 24px;margin:0 0 clamp(24px,4vh,40px);padding:20px 24px;background:var(--color-bg-inverse);color:var(--color-content-inverse);animation:up .7s cubic-bezier(.22,1,.36,1) .15s both}
-.rx-cd small{display:block;font:var(--ts-label-s);opacity:.7}
+.rx-cd small{display:block;font:var(--ts-caption-1-bold);opacity:.7}
 .rx-cd .n{display:flex;gap:16px;margin-top:8px}
 .rx-cd .n span{display:grid;justify-items:center;min-width:56px}
-.rx-cd .n b{font:var(--ts-number-l);font-variant-numeric:tabular-nums;line-height:1}
-.rx-cd .n em{font:var(--ts-label-s);font-style:normal;opacity:.7;margin-top:4px}
-.rx-cd .w{margin-top:8px;font:var(--ts-label-m)}
-.rx-share{display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 20px;border:0;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-l);cursor:pointer}
+.rx-cd .n b{font:var(--ts-display-m);font-variant-numeric:tabular-nums;line-height:1}
+.rx-cd .n em{font:var(--ts-caption-1-bold);font-style:normal;opacity:.7;margin-top:4px}
+.rx-cd .w{margin-top:8px;font:var(--ts-body-default-bold)}
+.rx-share{display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 20px;border:0;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-body-l-bold);cursor:pointer}
 .rx-share:hover{background:var(--color-bg-accent-hover)}
-.rx-toast{position:fixed;bottom:72px;left:50%;translate:-50% 0;z-index:80;padding:12px 16px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-m)}
+.rx-toast{position:fixed;bottom:72px;left:50%;translate:-50% 0;z-index:80;padding:12px 16px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-body-default-bold)}
 @media (max-width:640px){.rx-cd{grid-template-columns:minmax(0,1fr)}.rx-share{width:100%;justify-content:center}.rx-cd .n{gap:8px}.rx-cd .n span{min-width:48px}}
 /* d */
 .rx-chips{display:flex;flex-wrap:wrap;gap:8px;margin:-16px 0 clamp(24px,4vh,40px);animation:up .7s cubic-bezier(.22,1,.36,1) .2s both}
-.rx-chips > span{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);font:var(--ts-label-m)}
+.rx-chips > span{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);font:var(--ts-body-default-bold)}
 .rx-chips .msi{font-size:var(--fs-20);color:var(--color-brand)}
 .rx-chips .mi{display:inline-block;width:20px;height:20px;background:var(--color-brand);-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
 .rx-bring{margin:0}
@@ -55,7 +55,7 @@
 .rx-bring li{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--color-bg-secondary);font:var(--ts-body-s)}
 .rx-bring li::before{content:"";width:8px;height:8px;background:var(--color-brand)}
 @media (max-width:560px){.rx-chips{margin-top:-8px}}
-@media (max-width:760px){.rx-b .rx-stamp{top:12px;inset-inline-end:32px;font:var(--ts-label-l)}}   /* the tilted stamp stays inside a phone-width ticket */
+@media (max-width:760px){.rx-b .rx-stamp{top:12px;inset-inline-end:32px;font:var(--ts-body-l-bold)}}   /* the tilted stamp stays inside a phone-width ticket */
 @media (prefers-reduced-motion:reduce){.rx *,.rx *::before,.rx *::after{animation:none!important}}`;
   document.head.appendChild(css);
   document.body.insertAdjacentHTML('beforeend', `<a class="rx-tag" href="result-options.html">Delight ${cx.toUpperCase()} · ${NAMES[cx]}</a>`);
@@ -103,7 +103,7 @@
         badminton: ['Your racket', 'Indoor court shoes', 'Water bottle'], tennis: ['Your racket', 'Indoor court shoes', 'Water bottle'], 'table-tennis': ['Your bat', 'Indoor shoes', 'Water bottle'] };
       const items = BRING[sportKey] || ['Indoor court shoes', 'Water bottle', 'Towel'];
       const tips = document.querySelectorAll('#body .box')[1] || document.querySelector('#body .box:last-of-type');
-      tips?.insertAdjacentHTML('beforeend', `<div class="rx-bring" style="margin-top:16px"><p style="margin:0 0 8px;font:var(--ts-label-m)">${t('What to bring')}</p><ul>${items.map(x => `<li>${esc(t(x))}</li>`).join('')}</ul></div>`);
+      tips?.insertAdjacentHTML('beforeend', `<div class="rx-bring" style="margin-top:16px"><p style="margin:0 0 8px;font:var(--ts-body-default-bold)">${t('What to bring')}</p><ul>${items.map(x => `<li>${esc(t(x))}</li>`).join('')}</ul></div>`);
     }
   }
   function toast(msg){ const el = document.createElement('div'); el.className = 'rx-toast'; el.setAttribute('role', 'status'); el.textContent = msg; document.body.appendChild(el); setTimeout(() => el.remove(), 2600); }

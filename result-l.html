@@ -15,31 +15,31 @@
 <style>
 /* Confirmation option L · Map: the page opens on a full-width map of SFA Domes Dammam with the booking card on it (booked, what, when, for, directions). Underneath: how arrival works in three steps, the tickets, then payment.
    Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
-.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-caption-1-bold);text-decoration:none}
 body[data-state=paid] .cf{max-width:none;padding:var(--nav) 0 clamp(56px,9vh,96px)}
 body[data-state=paid] .cf-head{display:none}
 body[data-state=paid] .cf-grid{display:block}
 .l-map{position:relative;height:clamp(520px,72vh,720px);background:var(--color-bg-tertiary);overflow:hidden}
 .l-map iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:grayscale(.6) contrast(1.05)}
 .l-card{position:absolute;z-index:1;inset-block-start:clamp(24px,5vh,56px);inset-inline-start:var(--g);width:min(420px,calc(100% - 32px));display:grid;gap:16px;padding:28px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);box-shadow:0 24px 48px -16px rgba(9,9,11,.35);animation:up .7s var(--ease) both}
-.l-ok{display:flex;align-items:center;gap:12px;font:var(--ts-label-m);color:var(--color-brand)}
+.l-ok{display:flex;align-items:center;gap:12px;font:var(--ts-body-default-bold);color:var(--color-brand)}
 .l-ok::before{content:"";width:32px;height:32px;background:var(--color-brand) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='square'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/20px no-repeat}
-.l-card h1{font:var(--ts-display-m);text-transform:var(--type-case-display)}
-.l-card .rows{font:var(--ts-body-m)}
-.l-card .rows dd{font:var(--ts-label-l)}
+.l-card h1{font:var(--ts-display-s);text-transform:var(--type-case-display)}
+.l-card .rows{font:var(--ts-body-default)}
+.l-card .rows dd{font:var(--ts-body-l-bold)}
 .l-card .acts{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .l-card .acts .btn{grid-column:1/-1}
 .l-card .ghost{height:48px}
 .l-card .cf-sub{font:var(--ts-body-s)}
 .l-pin{position:absolute;z-index:1;left:50%;top:50%;translate:-50% -100%;display:grid;justify-items:center;pointer-events:none}
-.l-pin b{padding:8px 12px;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-label-s);white-space:nowrap}
+.l-pin b{padding:8px 12px;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-caption-1-bold);white-space:nowrap}
 .l-pin i{width:2px;height:16px;background:var(--color-content-primary)}
 .l-in{max-width:var(--max);margin:0 auto;padding:clamp(40px,6vh,64px) var(--g) 0;display:grid;gap:clamp(40px,6vh,64px)}
-.l-h{margin:0 0 20px;font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.l-h{margin:0 0 20px;font:var(--ts-title-section);text-transform:var(--type-case-title)}
 .l-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;counter-reset:s}
 .l-steps li{display:grid;gap:8px;align-content:start;padding:24px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
-.l-steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font:var(--ts-number-s);color:var(--color-brand)}
-.l-steps b{font:var(--ts-label-l)}
+.l-steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font:var(--ts-title-body);color:var(--color-brand)}
+.l-steps b{font:var(--ts-body-l-bold)}
 .l-steps span{font:var(--ts-body-s);color:var(--color-content-secondary)}
 .l-two{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:clamp(20px,3vw,40px);align-items:start}
 .l-tix{display:grid;gap:16px}
@@ -51,7 +51,7 @@ body[data-state=paid] .cf-grid{display:block}
   .l-map iframe{height:260px;order:-1}
   .l-pin{display:none}
   .l-card{position:relative;inset:auto;width:auto;margin:-40px 16px 0;box-shadow:0 16px 32px -16px rgba(9,9,11,.35);padding:20px}
-  .l-card h1{font:var(--ts-title-l)}
+  .l-card h1{font:var(--ts-title-screen)}
   .l-card .ghost{padding:0 12px;white-space:nowrap}
 }
 </style>

@@ -15,13 +15,13 @@
 <style>
 /* Confirmation option D · Wallet: app-style: one big ticket at a time with a large QR to scan at the door; a strip of sessions switches between them. On phones the main actions stay in a bar at the bottom.
    Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
-.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-caption-1-bold);text-decoration:none}
 body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,1fr) 360px}
 .d-wal{display:grid;gap:16px;animation:up .7s var(--ease) .1s both;min-width:0}
 .d-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
 .d-chips::-webkit-scrollbar{display:none}
 .d-chip{flex:none;display:grid;gap:2px;min-width:112px;padding:10px 14px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:inherit;text-align:start;cursor:pointer}
-.d-chip b{font:var(--ts-label-m)}
+.d-chip b{font:var(--ts-body-default-bold)}
 .d-chip span{font:var(--ts-body-s);color:var(--color-content-secondary)}
 .d-chip[aria-selected=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand)}
 .d-pass{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
@@ -30,14 +30,14 @@ body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,1fr) 360px}
 .d-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .d-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.1),rgba(9,9,11,.85))}
 .d-ph-in{position:absolute;inset:auto 0 0;z-index:1;padding:24px;color:var(--neutral-0);display:grid;gap:8px}
-.d-ph-in small{font:var(--ts-label-s);opacity:.8}
-.d-ph-in h2{margin:0;font:var(--ts-title-l);text-transform:var(--type-case-title)}
-.d-ph-in p{margin:0;font:var(--ts-label-l)}
+.d-ph-in small{font:var(--ts-caption-1-bold);opacity:.8}
+.d-ph-in h2{margin:0;font:var(--ts-title-screen);text-transform:var(--type-case-title)}
+.d-ph-in p{margin:0;font:var(--ts-body-l-bold)}
 .d-ph-in span{font:var(--ts-body-s);opacity:.85}
 .d-scan{display:grid;justify-items:center;align-content:center;gap:12px;padding:32px 24px;text-align:center;border-inline-start:2px dashed var(--color-border-secondary)}
 .d-scan .tk-qr{width:min(220px,100%)}
-.d-scan small{font:var(--ts-caption);color:var(--color-content-tertiary)}
-.d-pg{display:flex;align-items:center;justify-content:space-between;gap:8px;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.d-scan small{font:var(--ts-caption-1);color:var(--color-content-tertiary)}
+.d-pg{display:flex;align-items:center;justify-content:space-between;gap:8px;font:var(--ts-body-default-bold);color:var(--color-content-secondary)}
 .d-pg button{display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);cursor:pointer}
 .d-pg button:disabled{opacity:.35;cursor:default}
 .d-pg svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}

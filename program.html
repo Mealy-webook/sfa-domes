@@ -28,31 +28,31 @@
 .pj-plan[aria-checked=true]{border:2px solid var(--color-brand);padding:15px 17px 17px;background:var(--color-bg-accent-subtle)}
 .pj-dot{width:20px;height:20px;border:2px solid var(--color-border-strong);border-radius:50%}
 .pj-plan[aria-checked=true] .pj-dot{border:6px solid var(--color-brand)}
-.pj-plan strong{font:var(--ts-label-l)}
+.pj-plan strong{font:var(--ts-body-l-bold)}
 .pj-plan small{grid-column:2/-1;font:var(--ts-body-s);color:var(--color-content-secondary)}
-.pj-plan .pj-pr{grid-row:1;grid-column:3;display:flex;align-items:baseline;height:24px;gap:8px;font:var(--ts-number-s);white-space:nowrap}
-.pj-plan .pj-pr.free{font:var(--ts-label-l)}
+.pj-plan .pj-pr{grid-row:1;grid-column:3;display:flex;align-items:baseline;height:24px;gap:8px;font:var(--ts-title-body);white-space:nowrap}
+.pj-plan .pj-pr.free{font:var(--ts-body-l-bold)}
 .pj-plan .pj-was{font:var(--ts-body-s);color:var(--color-content-tertiary);text-decoration:line-through}
-.pj-tag{position:absolute;top:-11px;inset-inline-end:14px;padding:2px 8px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-s)}
+.pj-tag{position:absolute;top:-11px;inset-inline-end:14px;padding:2px 8px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-caption-1-bold)}
 @media (max-width:760px){.pj-plans{grid-template-columns:minmax(0,1fr)}}
 
 /* start days: only the days a plan can start on (the next 3 training days), one row of equal tiles; the open day's
    times fold out under the row, its pointer under that tile */
 .cal-grid[data-days]{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .cal-grid[data-days] .day{height:auto;padding:12px 8px;gap:4px}
-.cal-grid[data-days] .day small{font:var(--ts-label-s);text-transform:none}
-.cal-grid[data-days] .day b{font:var(--ts-number-s)}
+.cal-grid[data-days] .day small{font:var(--ts-caption-1-bold);text-transform:none}
+.cal-grid[data-days] .day b{font:var(--ts-title-body)}
 .cal-grid[data-days] .day.picked small{color:inherit}
 .cal-grid[data-days] .cal-times{margin:8px 0 0}
 .cal-grid[data-days] .cal-times::before{inset-inline-start:calc((var(--col) + .5) / 3 * 100%)}
 
 /* the program's own sections */
 .pj-list{list-style:none;margin:0;padding:0;display:grid;gap:0}
-.pj-list li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--color-border-primary);font:var(--ts-body-m)}
+.pj-list li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--color-border-primary);font:var(--ts-body-default)}
 .pj-list li::before{content:"";width:8px;height:8px;margin:8px 8px 0;background:var(--color-brand)}
 .pj-terms{counter-reset:t}
 .pj-terms li{counter-increment:t;font:var(--ts-body-s);color:var(--color-content-secondary)}
-.pj-terms li::before{content:counter(t,decimal-leading-zero);width:auto;height:auto;margin:0;background:none;font:var(--ts-label-m);color:var(--color-content-tertiary)}
+.pj-terms li::before{content:counter(t,decimal-leading-zero);width:auto;height:auto;margin:0;background:none;font:var(--ts-body-default-bold);color:var(--color-content-tertiary)}
 #terms:not(.all) .pj-terms li:nth-child(n+6){display:none}
 #stats > div:nth-child(4){grid-column:auto}
 
@@ -68,7 +68,7 @@
 .gal.n4 .ph:nth-child(2){grid-column:2}
 .gal.n4,.gal.n5{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)}
 .gal.n4 .ph:nth-child(2){grid-column:2/-1}
-.gal-all{position:absolute;inset-inline-end:16px;bottom:16px;z-index:1;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border:1px solid var(--color-content-primary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-label-m);cursor:pointer}
+.gal-all{position:absolute;inset-inline-end:16px;bottom:16px;z-index:1;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border:1px solid var(--color-content-primary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-default-bold);cursor:pointer}
 .gal-all:hover{background:var(--color-content-primary);color:var(--neutral-0)}
 .gal-all svg{width:16px;height:16px;fill:currentColor}
 .gal-count{display:none}
@@ -78,14 +78,14 @@
   .gal button.ph{flex:0 0 100%;scroll-snap-align:start}
   .gal-all{display:none}
   .gal-wrap{position:relative}
-  .gal-count{display:block;position:absolute;inset-inline-end:12px;bottom:40px;z-index:1;padding:4px 8px;background:rgba(9,9,11,.7);color:var(--neutral-0);font:var(--ts-label-s)}
+  .gal-count{display:block;position:absolute;inset-inline-end:12px;bottom:40px;z-index:1;padding:4px 8px;background:rgba(9,9,11,.7);color:var(--neutral-0);font:var(--ts-caption-1-bold)}
 }
 /* the viewer: one photo at a time, arrows and arrow keys, thumbnails underneath */
 .lb{width:100vw;max-width:none;height:100svh;max-height:none;margin:0;padding:0;border:0;background:var(--neutral-950);color:var(--neutral-0)}
 .lb::backdrop{background:var(--neutral-950)}
 .lb-in{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:100%}
 .lb-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px}
-.lb-top span{font:var(--ts-label-m);color:var(--neutral-300)}
+.lb-top span{font:var(--ts-body-default-bold);color:var(--neutral-300)}
 .lb-x{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--white-a16);background:none;color:inherit;cursor:pointer}
 .lb-x svg,.lb-nav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
 .lb-stage{position:relative;min-height:0;overflow:hidden}

@@ -4,19 +4,19 @@
 .tk-ph{position:relative;min-height:220px;overflow:hidden;background:var(--color-bg-tertiary)}
 .tk-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .tk-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,0) 50%,rgba(9,9,11,.7))}
-.tk-sp{position:absolute;inset-inline-start:16px;bottom:14px;z-index:1;display:flex;align-items:center;gap:8px;color:var(--neutral-0);font:var(--ts-label-l);text-transform:var(--type-case-label)}
+.tk-sp{position:absolute;inset-inline-start:16px;bottom:14px;z-index:1;display:flex;align-items:center;gap:8px;color:var(--neutral-0);font:var(--ts-body-l-bold);text-transform:var(--type-case-label)}
 .tk-ico{display:grid;place-items:center;width:28px;height:28px;background:var(--color-brand);color:var(--neutral-0)}
-.tk-ico .msi{font-size:var(--fs-18)}
+.tk-ico .msi{font-size:var(--fs-17)}
 .tk-ico img{width:18px;height:18px}
 .tk-main{display:grid;align-content:start;gap:8px;padding:20px 24px;min-width:0}
-.tk-eye{margin:0;font:var(--ts-label-m);color:var(--color-content-tertiary)}
-.tk-court{margin:0;font:var(--ts-title-l);text-transform:var(--type-case-title)}
+.tk-eye{margin:0;font:var(--ts-body-default-bold);color:var(--color-content-tertiary)}
+.tk-court{margin:0;font:var(--ts-title-screen);text-transform:var(--type-case-title)}
 /* date and time on one full-width line; who and which session share the next (the session column sizes to its text) */
 .tk-dl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;margin:8px 0 0;padding-top:16px;border-top:1px solid var(--color-border-primary)}
 .tk-dl .tk-when{grid-column:1/-1}
 .tk-dl bdi{white-space:nowrap}
-.tk-dl dt{font:var(--ts-label-s);color:var(--color-content-tertiary)}
-.tk-dl dd{margin:2px 0 0;font:var(--ts-label-l);text-transform:var(--type-case-label)}
+.tk-dl dt{font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
+.tk-dl dd{margin:2px 0 0;font:var(--ts-body-l-bold);text-transform:var(--type-case-label)}
 .tk-stub{position:relative;display:grid;justify-items:center;align-content:center;gap:8px;padding:20px 16px;border-inline-start:2px dashed var(--color-border-secondary);text-align:center}
 .tk-stub::before,.tk-stub::after{content:"";position:absolute;inset-inline-start:-13px;width:24px;height:24px;border-radius:50%;background:var(--tk-hole,var(--color-bg-secondary));border:1px solid var(--color-border-primary)}
 .tk-stub::before{top:-13px;clip-path:inset(12px 0 0 0)}
@@ -29,8 +29,8 @@
 .tk-qr--lock svg path{fill:none}   /* .tk-qr path fills the QR modules; the lock is an outline */
 .tk-stub--lock small{color:var(--color-content-secondary)}
 .tk-qr--off{background:repeating-linear-gradient(45deg,var(--color-bg-secondary) 0 6px,var(--color-bg-tertiary) 6px 12px)}
-.tk-ref{font:var(--ts-label-s);letter-spacing:.02em;white-space:nowrap}
-.tk-stub small{font:var(--ts-caption);color:var(--color-content-tertiary)}
+.tk-ref{font:var(--ts-caption-1-bold);letter-spacing:.02em;white-space:nowrap}
+.tk-stub small{font:var(--ts-caption-1);color:var(--color-content-tertiary)}
 @media (max-width:760px){
   .tk{grid-template-columns:minmax(0,1fr)}
   .tk-ph{min-height:0;aspect-ratio:16/9}

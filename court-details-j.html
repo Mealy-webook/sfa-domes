@@ -18,9 +18,9 @@
 .fv-media{position:sticky;top:0;height:100svh;overflow:hidden}
 .fv-media .about-media{aspect-ratio:auto;height:100%;margin:0}
 .fv-body{padding:calc(90px + clamp(28px,5vh,56px)) clamp(24px,4vw,64px) 140px;min-width:0}
-.fv-body h1{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0}
+.fv-body h1{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0}
 .fv-meta{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0;padding:0;list-style:none}
-.fv-meta li{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-soft);font-size:var(--fs-14);font-weight:500}
+.fv-meta li{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-soft);font-size:var(--fs-13);font-weight:500}
 .fv-meta svg{width:18px;height:18px;color:var(--brand)}
 .fv-body .hero-book{margin-top:20px}
 .fv-body .hero-actions .cta{display:none}
@@ -28,7 +28,7 @@
 .v-j .booking .inner{padding-inline:0}
 .v-j .page{grid-template-columns:minmax(0,1fr)}
 .v-j .summary{display:none}
-.v-j .booking .step-head h2{font:var(--ts-title-m);text-transform:var(--type-case-title)}
+.v-j .booking .step-head h2{font:var(--ts-title-section);text-transform:var(--type-case-title)}
 .v-j .booking .legend,.v-j .step-note{display:none}
 .v-j .panel{padding:0;border:0;background:none}
 .v-j .slot.srow{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"act time price" "act meta price";padding:14px;margin-bottom:8px;border:1px solid var(--line-strong)}
@@ -40,7 +40,7 @@
 .v-j .slot.srow:disabled .sr-act{opacity:.4}
 .fv-more{margin-top:40px}
 .fv-more > details{border-top:1px solid var(--line-strong)}
-.fv-more summary{font:var(--ts-label-l);text-transform:var(--type-case-label);display:flex;justify-content:space-between;align-items:center;padding:18px 0;cursor:pointer;list-style:none}
+.fv-more summary{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);display:flex;justify-content:space-between;align-items:center;padding:18px 0;cursor:pointer;list-style:none}
 .fv-more summary::-webkit-details-marker{display:none}
 .fv-more summary::after{content:"+";font-size:var(--fs-24);line-height:1}
 .fv-more details[open] summary::after{content:"–"}
@@ -55,9 +55,9 @@
 .v-j .go{display:block;position:fixed;bottom:0;left:50%;right:0;z-index:30;transform:none;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);box-shadow:0 -12px 32px -24px rgba(9,9,11,.4)}
 html[dir=rtl] .v-j .go{left:0;right:50%}
 .v-j .go .inner{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:84px;padding:12px clamp(24px,4vw,64px)}
-.v-j .go-pick small{display:block;font-size:var(--fs-14);line-height:18px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.v-j .go-pick strong{font:var(--ts-number-m);display:flex;align-items:baseline;gap:6px}
-.v-j .go-from{font:var(--ts-label-m);text-transform:var(--type-case-label);color:var(--ink-3)}
+.v-j .go-pick small{display:block;font-size:var(--fs-13);line-height:18px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-j .go-pick strong{font:var(--ts-display-xs);display:flex;align-items:baseline;gap:6px}
+.v-j .go-from{font:var(--ts-body-default-bold);text-transform:var(--type-case-label);color:var(--ink-3)}
 .v-j .go .book{width:auto;flex:none;height:56px}
 @media (max-width:1023px){
   .fv{grid-template-columns:minmax(0,1fr)}

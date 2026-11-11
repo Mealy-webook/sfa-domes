@@ -129,18 +129,18 @@ html[lang=ar] body :is(h1,h2){line-height:1.35 !important}
 html[dir=rtl] .sfa-flip,html[dir=rtl] :is(.back,.cta,.arrow,#payBtn,.go-day) svg,html[dir=rtl] .act-arrow{scale:-1 1}
 html[dir=rtl] .sp-cap-count{direction:ltr;unicode-bidi:isolate}
 .sfa-prefs{display:inline-flex;gap:8px;align-items:center}
-.sfa-prefs__btn{font:var(--ts-label-l);text-transform:var(--type-case-label);position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:44px;min-width:44px;padding:0 12px;border:1px solid var(--neutral-300);background:var(--neutral-0);color:var(--neutral-950);cursor:pointer;transition:border-color .2s,background-color .2s,color .2s}
+.sfa-prefs__btn{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:44px;min-width:44px;padding:0 12px;border:1px solid var(--neutral-300);background:var(--neutral-0);color:var(--neutral-950);cursor:pointer;transition:border-color .2s,background-color .2s,color .2s}
 .sfa-prefs__btn:hover{border-color:var(--neutral-950)}
 .sfa-prefs__btn svg{width:13px;height:13px}
-.sfa-prefs__lang{font-family:"Tajawal",sans-serif;text-transform:none;letter-spacing:0;font-size:var(--fs-16)}
+.sfa-prefs__lang{font-family:"Tajawal",sans-serif;text-transform:none;letter-spacing:0;font-size:var(--fs-15)}
 .sfa-cur-menu{position:fixed;z-index:1001;min-width:200px;background:var(--neutral-0);border:1px solid var(--neutral-200);box-shadow:0 18px 40px -20px rgba(9,9,11,.45);padding:6px 0;animation:sfaCurIn .22s cubic-bezier(.22,1,.36,1)}
 @keyframes sfaCurIn{from{opacity:0;transform:translateY(-6px)}}
 .sfa-cur-menu button{font:var(--ts-body-s);display:flex;width:100%;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px;border:0;background:none;cursor:pointer;text-align:start;color:var(--neutral-950)}
 .sfa-cur-menu button:hover{background:var(--neutral-100)}
-.sfa-cur-menu button b{font:var(--ts-label-l);text-transform:var(--type-case-label);letter-spacing:.03em}
+.sfa-cur-menu button b{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);letter-spacing:.03em}
 .sfa-cur-menu button[aria-checked=true]{color:var(--orange-500)}
-.sfa-cur-menu p{font:var(--ts-caption);margin:6px 0 0;padding:8px 16px 4px;border-top:1px solid var(--neutral-200);color:var(--neutral-500)}
-@media (max-width:560px){.sfa-prefs{gap:6px}.sfa-prefs__btn{padding:0 8px;min-width:36px;height:40px;font-size:var(--fs-14)}.sfa-prefs__btn svg{display:none}.sfa-prefs__lang{font-size:var(--fs-14)}}`;
+.sfa-cur-menu p{font:var(--ts-caption-1);margin:6px 0 0;padding:8px 16px 4px;border-top:1px solid var(--neutral-200);color:var(--neutral-500)}
+@media (max-width:560px){.sfa-prefs{gap:6px}.sfa-prefs__btn{padding:0 8px;min-width:36px;height:40px;font-size:var(--fs-13)}.sfa-prefs__btn svg{display:none}.sfa-prefs__lang{font-size:var(--fs-13)}}`;
   function setDoc(){
     const h = document.documentElement;
     h.lang = lang; h.dir = lang === 'ar' ? 'rtl' : 'ltr';

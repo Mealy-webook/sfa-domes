@@ -12,18 +12,18 @@
 /* Review page: four "more delightful" directions for checkout. Each opens the real checkout.html with ?cx=a…d
    (f/checkout-delight.js adds the layer), on a court booking or a program month set up by the buttons here. */
 *{box-sizing:border-box}
-body{margin:0;background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-default);-webkit-font-smoothing:antialiased}
 main{max-width:960px;margin:0 auto;padding:56px 16px 96px}
-h1{margin:0 0 8px;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+h1{margin:0 0 8px;font:var(--ts-display-m);text-transform:var(--type-case-display)}
 .lead{margin:0 0 40px;color:var(--color-content-secondary)}
 ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 li{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:8px 16px;padding:20px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
-li > b{display:grid;place-items:center;min-width:40px;height:40px;padding:0 8px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-m)}
+li > b{display:grid;place-items:center;min-width:40px;height:40px;padding:0 8px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-body-default-bold)}
 li.cur > b{background:var(--color-content-primary)}
-li strong{display:block;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+li strong{display:block;font:var(--ts-title-body);text-transform:var(--type-case-title)}
 li p{margin:4px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
 .go{display:flex;gap:8px}
-.go button{height:40px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-label-m);cursor:pointer;white-space:nowrap}
+.go button{height:40px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-body-default-bold);cursor:pointer;white-space:nowrap}
 .go button:first-child{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
 .go button:hover{border-color:var(--color-brand)}
 .go button:first-child:hover{background:var(--color-brand)}

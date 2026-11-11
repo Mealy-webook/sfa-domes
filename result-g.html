@@ -15,23 +15,23 @@
 <style>
 /* Confirmation option G · Editorial: big type says when to come ("See you Thu 12 Nov"), then every session as one row of a simple table with its QR a tap away. Payment and tips share the bottom. Reads quickly and keeps long bookings (12 sessions) compact.
    Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
-.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-caption-1-bold);text-decoration:none}
 body[data-state=paid] .cf-head{display:none}
 body[data-state=paid] .cf-grid{display:block}
 .g-hd{display:grid;gap:16px;padding-bottom:clamp(32px,5vh,48px);margin-bottom:clamp(32px,5vh,48px);border-bottom:2px solid var(--color-content-primary);animation:up .7s var(--ease) both}
-.g-eye{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0;font:var(--ts-label-m);color:var(--color-content-secondary)}
+.g-eye{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:0;font:var(--ts-body-default-bold);color:var(--color-content-secondary)}
 .g-eye b{display:inline-flex;align-items:center;gap:8px;color:var(--color-brand)}
 .g-eye svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:square}
-.g-hd h1{font:var(--ts-display-xl);text-transform:var(--type-case-display);max-width:16ch}
+.g-hd h1{font:var(--ts-display-l);text-transform:var(--type-case-display);max-width:16ch}
 .g-hd h1 em{font-style:normal;color:var(--color-brand)}
 .g-hd p{margin:0;font:var(--ts-body-l);color:var(--color-content-secondary)}
 .g-tbl{width:100%;border-collapse:collapse;animation:up .7s var(--ease) .1s both}
-.g-tbl th{padding:0 16px 12px;font:var(--ts-label-s);color:var(--color-content-tertiary);text-align:start;border-bottom:1px solid var(--color-border-secondary)}
-.g-tbl td{padding:16px;border-bottom:1px solid var(--color-border-primary);font:var(--ts-label-l);vertical-align:middle}
-.g-tbl td.n{width:48px;font:var(--ts-number-s);color:var(--color-content-tertiary)}
+.g-tbl th{padding:0 16px 12px;font:var(--ts-caption-1-bold);color:var(--color-content-tertiary);text-align:start;border-bottom:1px solid var(--color-border-secondary)}
+.g-tbl td{padding:16px;border-bottom:1px solid var(--color-border-primary);font:var(--ts-body-l-bold);vertical-align:middle}
+.g-tbl td.n{width:48px;font:var(--ts-title-body);color:var(--color-content-tertiary)}
 .g-tbl td.r{font:var(--ts-body-s);color:var(--color-content-secondary)}
 .g-tbl td:last-child,.g-tbl th:last-child{text-align:end}
-.g-qb{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-label-m);cursor:pointer}
+.g-qb{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-body-default-bold);cursor:pointer}
 .g-qb svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
 .g-qb:hover{background:var(--color-content-primary);color:var(--neutral-0);border-color:var(--color-content-primary)}
 .g-more{margin-top:16px}
@@ -40,12 +40,12 @@ body[data-state=paid] .cf-grid{display:block}
 dialog.g-dlg{width:min(360px,calc(100vw - 32px));padding:0;border:0;background:var(--color-bg-primary);color:var(--color-content-primary)}
 dialog.g-dlg::backdrop{background:rgba(9,9,11,.6)}
 .g-dlg-in{display:grid;justify-items:center;gap:12px;padding:24px}
-.g-dlg-in b{font:var(--ts-label-l)}
+.g-dlg-in b{font:var(--ts-body-l-bold)}
 .g-dlg-in .tk-qr{width:240px}
-.g-dlg-in small{font:var(--ts-caption);color:var(--color-content-tertiary)}
-.g-dlg-in button{justify-self:stretch;height:48px;border:0;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-label-m);cursor:pointer}
+.g-dlg-in small{font:var(--ts-caption-1);color:var(--color-content-tertiary)}
+.g-dlg-in button{justify-self:stretch;height:48px;border:0;background:var(--color-content-primary);color:var(--neutral-0);font:var(--ts-body-default-bold);cursor:pointer}
 @media (max-width:960px){.g-foot{grid-template-columns:minmax(0,1fr)}}
-@media (max-width:640px){.g-hd h1{font:var(--ts-display-l)}.g-tbl thead{display:none}.g-tbl tr{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:4px 12px;padding:16px 0;border-bottom:1px solid var(--color-border-primary)}.g-tbl td{padding:0;border:0}.g-tbl td.n{grid-row:span 3;width:auto}.g-tbl td:last-child{grid-row:1/span 3;grid-column:3;align-self:center}}
+@media (max-width:640px){.g-hd h1{font:var(--ts-display-m)}.g-tbl thead{display:none}.g-tbl tr{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:4px 12px;padding:16px 0;border-bottom:1px solid var(--color-border-primary)}.g-tbl td{padding:0;border:0}.g-tbl td.n{grid-row:span 3;width:auto}.g-tbl td:last-child{grid-row:1/span 3;grid-column:3;align-self:center}}
 </style>
 </head>
 <body>

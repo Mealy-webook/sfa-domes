@@ -20,7 +20,7 @@
 .sp-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.35) 0%,rgba(9,9,11,0) 28%,rgba(9,9,11,0) 45%,rgba(9,9,11,.82) 100%);pointer-events:none}
 .sp-head{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:0 clamp(24px,3.4vw,56px) clamp(28px,5vh,56px)}
 .sp-head .eyebrow{color:var(--neutral-0)}
-.sp-head h1{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0}
+.sp-head h1{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0}
 .sp-head .hero-sub{color:rgba(255,255,255,.86)}
 .sp-head .hero-price{color:var(--neutral-0)}
 .sp-head .hero-price small{color:rgba(255,255,255,.7)}
@@ -30,7 +30,7 @@
 .sp-head .sfa-fav[aria-pressed=true]{background:var(--neutral-0);border-color:var(--neutral-0)}
 .sp-body{min-width:0;padding:calc(90px + clamp(28px,5vh,56px)) clamp(24px,3.4vw,56px) 0;background:var(--bg)}
 .sp-body .inner{max-width:none;padding-inline:0}
-.sp-h{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0 0 20px}
+.sp-h{font:var(--ts-display-s);text-transform:var(--type-case-display);margin:0 0 20px}
 .sp .about{padding:0 0 clamp(40px,7vh,64px);background:none;border:0}
 .sp .about-lead{margin:0 0 24px}
 .sp .booking{padding:clamp(40px,7vh,64px) 0;border-top:1px solid var(--line-strong);scroll-margin-top:90px}
@@ -44,8 +44,8 @@
 @media (min-width:1024px){
   .v-a .go{display:block;position:fixed;left:calc(100% * 5 / 11);right:0;bottom:0;z-index:30;transform:translateY(105%);transition:transform .5s var(--ease);background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);box-shadow:0 -12px 32px -24px rgba(9,9,11,.4)}
   .v-a .go .inner{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:88px;padding:14px clamp(24px,3.4vw,56px)}
-  .v-a .go-pick small{display:block;font-size:var(--fs-14);line-height:18px;color:var(--ink-3)}
-  .v-a .go-pick strong{font:var(--ts-number-m);display:block}
+  .v-a .go-pick small{display:block;font-size:var(--fs-13);line-height:18px;color:var(--ink-3)}
+  .v-a .go-pick strong{font:var(--ts-display-xs);display:block}
   .v-a .go .book{width:auto;height:56px}
   .v-a .go.on{transform:none}
   html[dir=rtl] .v-a .go{left:0;right:calc(100% * 5 / 11)}

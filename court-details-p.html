@@ -16,8 +16,8 @@
    story with a pull-quote, and booking as a ticket — the days and times on the ticket, the total on its stub. */
 .ed{background:var(--bg)}
 .ed-head{padding-top:calc(90px + clamp(40px,8vh,96px));padding-bottom:clamp(24px,4vh,40px)}
-.ed-issue{font:var(--ts-label-m);text-transform:var(--type-case-label);margin:0 0 18px;padding-bottom:12px;border-bottom:2px solid var(--ink);display:flex;justify-content:space-between;gap:16px}
-.ed-head h1{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0;letter-spacing:-.01em}
+.ed-issue{font:var(--ts-body-default-bold);text-transform:var(--type-case-label);margin:0 0 18px;padding-bottom:12px;border-bottom:2px solid var(--ink);display:flex;justify-content:space-between;gap:16px}
+.ed-head h1{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0;letter-spacing:-.01em}
 .ed-head .eyebrow{margin-bottom:16px}
 .ed-head .hero-sub{margin-top:18px;font-size:clamp(18px,1.6vw,24px);max-width:36ch;color:var(--ink)}
 .ed-hero{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,4vw,64px);align-items:start;padding-bottom:clamp(48px,8vh,96px)}
@@ -27,25 +27,25 @@
 .ed-side .about-stats{grid-template-columns:minmax(0,1fr);margin:0}
 .ed-side .about-stats .st-wide{grid-column:auto}
 .ed-story{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,4vw,64px);padding-bottom:clamp(56px,10vh,120px)}
-.ed-quote{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0;color:var(--brand)}
+.ed-quote{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0;color:var(--brand)}
 .ed-quote::before{content:"“";display:block;font-size:1.6em;line-height:.6}
 .ed-text .about-lead{margin:0 0 28px;max-width:60ch;font-size:clamp(18px,1.4vw,21px);line-height:1.6;color:var(--ink)}
 .ed-text .about-lead::first-letter{float:inline-start;margin:6px 12px 0 0;font-family:var(--type-font);font-weight:var(--type-w-label);font-size:4.4em;line-height:.8;color:var(--brand)}
 .ed-text .about-feats{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 28px;padding-top:24px;border-top:1px solid var(--line-strong)}
 .ed-ticket{padding-bottom:clamp(56px,10vh,120px)}
-.ed-ticket h2{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0 0 20px}
+.ed-ticket h2{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0 0 20px}
 .ticket{display:grid;grid-template-columns:minmax(0,1fr) 360px;border:2px solid var(--ink);background:var(--bg)}
 .ticket-main{padding:24px;min-width:0}
 .ticket-main .booking{padding:0;scroll-margin-top:100px}
 .ticket-main .step-head{border:0;padding:0;margin-bottom:6px}
-.ticket-main .step-head h2{font:var(--ts-label-l);text-transform:var(--type-case-label)}
+.ticket-main .step-head h2{font:var(--ts-body-l-bold);text-transform:var(--type-case-label)}
 .ticket-main .legend{display:none}
 .ticket-main .panel{padding:0;border:0}
 .ticket-stub{border-inline-start:2px dashed var(--ink);background:var(--bg-soft)}
 .ticket-stub .summary{position:static;max-height:none;border:0;background:none}
 .ticket-stub .sum-body{padding:24px}
 .ed-more{padding:clamp(48px,8vh,80px) 0;border-top:2px solid var(--ink)}
-.ed-more h2{font:var(--ts-display-l);text-transform:var(--type-case-display);margin:0 0 20px}
+.ed-more h2{font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0 0 20px}
 .v-p .faq-wrap{border-top:2px solid var(--ink)}
 @media (max-width:1023px){.ticket{grid-template-columns:minmax(0,1fr)}.ticket-stub{border-inline-start:0;border-top:2px dashed var(--ink)}}
 @media (max-width:860px){.ed-hero,.ed-story{grid-template-columns:minmax(0,1fr)}.ed-hero .about-media{grid-column:1;margin-inline-end:0}.ed-side{grid-row:auto}.ed-text .about-feats{grid-template-columns:minmax(0,1fr)}}

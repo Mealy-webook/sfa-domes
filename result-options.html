@@ -12,18 +12,18 @@
 /* Review page: whole-page directions for the booking confirmation (result.html). Each option is a live page on real
    bookings: a court booked for a child (3 sessions over 2 days) and a program month. Square corners, DS tokens. */
 *{box-sizing:border-box}
-body{margin:0;background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-default);-webkit-font-smoothing:antialiased}
 main{max-width:960px;margin:0 auto;padding:56px 16px 96px}
-h1{margin:0 0 8px;font:var(--ts-display-l);text-transform:var(--type-case-display)}
+h1{margin:0 0 8px;font:var(--ts-display-m);text-transform:var(--type-case-display)}
 .lead{margin:0 0 40px;color:var(--color-content-secondary)}
 ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 li{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:8px 16px;padding:20px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
-li > b{display:grid;place-items:center;width:40px;height:40px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-label-m)}
+li > b{display:grid;place-items:center;width:40px;height:40px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-body-default-bold)}
 li.cur > b{background:var(--color-content-primary)}
-li strong{display:block;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+li strong{display:block;font:var(--ts-title-body);text-transform:var(--type-case-title)}
 li p{margin:4px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
 .go{display:flex;flex-wrap:wrap;gap:8px}
-.go a{display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1px solid var(--color-border-secondary);color:inherit;font:var(--ts-label-m);text-decoration:none;white-space:nowrap}
+.go a{display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1px solid var(--color-border-secondary);color:inherit;font:var(--ts-body-default-bold);text-decoration:none;white-space:nowrap}
 .go a:first-child{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
 .go a:hover{border-color:var(--color-brand)}
 .go a:first-child:hover{background:var(--color-brand)}
@@ -34,7 +34,7 @@ li p{margin:4px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
 <main>
 <h1>Confirmation page</h1>
 <p class="lead">Fifteen whole-page directions for the booking confirmation, next to the live one. Every option works with real bookings: open a court booked for Yousef (3 sessions over 2 days) or a program month (12 sessions). Each page is responsive and switches to Arabic like the live one.</p>
-<h2 style="margin:0 0 8px;font:var(--ts-title-m);text-transform:var(--type-case-title)">Redesign from the benchmark · 10 Nov</h2>
+<h2 style="margin:0 0 8px;font:var(--ts-title-section);text-transform:var(--type-case-title)">Redesign from the benchmark · 10 Nov</h2>
 <p class="lead" style="margin-bottom:24px">Three new directions built on the confirmation benchmark. None shows QR codes or directions on the page (they live in My tickets), each says the QR works on the session day, and each offers the next booking. No cancellation rule yet.</p>
 <ol style="margin-bottom:56px">
   <li><b>M</b><div><strong>Booking card</strong><p>Like Time2book and Cal.com: one calm column with a single card (what, when as a weekly pattern, who, coach, where, paid). All dates and payment fold away. View my tickets leads, then book more and calendar.</p></div>
@@ -44,7 +44,7 @@ li p{margin:4px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
   <li><b>O</b><div><strong>Action list · live</strong><p>Like Viator and Eventbrite: a photo card with "You're all set, Sara", then a list of what to do now (tickets, calendar, sessions and booking details open in place, book more), with "More at SFA Domes" suggestions beside it.</p></div>
     <div class="go"><a href="result-o.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-o.html?cart=SFA-MW8UUVFQ-A018">Program</a><a href="result-o.html?cart=SFA-MW39RJRN-DE08">Trial</a><a href="result-o.html?cart=SFA-MW8WSJUN-1301">Game</a></div></li>
 </ol>
-<h2 style="margin:0 0 16px;font:var(--ts-title-m);text-transform:var(--type-case-title)">Earlier directions</h2>
+<h2 style="margin:0 0 16px;font:var(--ts-title-section);text-transform:var(--type-case-title)">Earlier directions</h2>
 <ol>
   <li class="cur"><b>Now</b><div><strong>Live now: Action list (O)</strong><p>Picked on 10 Nov. A card with "You're all set", the confirmation email address and the booking as icon rows (what, when, where, who, booking ref with Copy), then a list of what to do now (tickets, calendar, sessions, booking details, book more) and "More at SFA Domes" beside it. No photo, QR codes or directions on the page.</p></div>
     <div class="go"><a href="result.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
@@ -77,7 +77,7 @@ li p{margin:4px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
   <li><b>L</b><div><strong>Map</strong><p>Opens on a map of SFA Domes Dammam with the booking card on it and Get directions first. Underneath: arriving in three steps (arrive by, check in, head to the court), then the tickets and payment.</p></div>
     <div class="go"><a href="result-l.html?cart=SFA-MW8UUVFH-45E3">Court</a><a href="result-l.html?cart=SFA-MW8UUVFQ-A018">Program</a></div></li>
 </ol>
-<h2 style="margin:56px 0 8px;font:var(--ts-title-m);text-transform:var(--type-case-title)">Delight on the live page</h2>
+<h2 style="margin:56px 0 8px;font:var(--ts-title-section);text-transform:var(--type-case-title)">Delight on the live page</h2>
 <p class="lead" style="margin-bottom:24px">Four layers on top of the previous layout (result-v1.html), so you can see the moment itself. Reload the page to see an animation again.</p>
 <ol>
   <li><b>A</b><div><strong>Celebrate</strong><p>A burst of square confetti from the check mark (brand and programme colours), the mark pulses and the headline rises in.</p></div>

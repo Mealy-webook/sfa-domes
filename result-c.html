@@ -15,14 +15,14 @@
 <style>
 /* Confirmation option C · Next steps: the page reads as what happens next: confirmed, add to calendar, get there, show your ticket. The tickets sit in the last step; payment stays beside it.
    Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
-.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-caption-1-bold);text-decoration:none}
 .c-steps{list-style:none;margin:0;padding:0;display:grid;gap:0;counter-reset:st;animation:up .7s var(--ease) .1s both}
 .c-steps > li{position:relative;display:grid;grid-template-columns:40px minmax(0,1fr);gap:0 20px;padding-bottom:32px}
-.c-steps > li::before{counter-increment:st;content:counter(st);display:grid;place-items:center;width:40px;height:40px;background:var(--color-bg-primary);border:1px solid var(--color-border-secondary);font:var(--ts-label-l);position:relative;z-index:1}
+.c-steps > li::before{counter-increment:st;content:counter(st);display:grid;place-items:center;width:40px;height:40px;background:var(--color-bg-primary);border:1px solid var(--color-border-secondary);font:var(--ts-body-l-bold);position:relative;z-index:1}
 .c-steps > li.done::before{content:"";background:var(--color-brand) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='square'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/22px no-repeat;border-color:var(--color-brand)}
 .c-steps > li:not(:last-child)::after{content:"";position:absolute;top:40px;bottom:0;inset-inline-start:20px;border-inline-start:1px solid var(--color-border-secondary)}
 .c-step{min-width:0;padding-top:8px}
-.c-step h2{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.c-step h2{margin:0;font:var(--ts-title-body);text-transform:var(--type-case-title)}
 .c-step > p{margin:8px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
 .c-step > .ghost{display:inline-flex;margin-top:16px;height:44px}
 .c-tix{display:grid;gap:16px;margin-top:16px}

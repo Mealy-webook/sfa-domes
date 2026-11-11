@@ -19,7 +19,7 @@
 
   const css = document.createElement('style');
   css.textContent = `
-.dobp-btn{display:flex;align-items:center;gap:12px;width:100%;height:100%;min-height:46px;padding:0 16px;border:0;background:transparent;color:inherit;font:inherit;font-size:var(--fs-16);text-align:start;cursor:pointer}
+.dobp-btn{display:flex;align-items:center;gap:12px;width:100%;height:100%;min-height:46px;padding:0 16px;border:0;background:transparent;color:inherit;font:inherit;font-size:var(--fs-15);text-align:start;cursor:pointer}
 .dobp-btn span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dobp-btn .ph{color:var(--color-content-tertiary)}
 .dobp-btn:focus-visible{outline:2px solid var(--color-brand);outline-offset:-2px}
@@ -31,22 +31,22 @@
 .dobp-pan{margin-top:8px;padding:12px;border:1px solid var(--color-content-primary);background:var(--color-bg-primary);color:var(--color-content-primary)}
 .dobp-pan[hidden]{display:none}
 .dobp-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-bottom:12px}
-.dobp-steps button{height:44px;padding:0 4px;border:0;border-bottom:2px solid var(--color-border-primary);background:none;color:var(--color-content-tertiary);font:var(--ts-label-m);cursor:pointer}
+.dobp-steps button{height:44px;padding:0 4px;border:0;border-bottom:2px solid var(--color-border-primary);background:none;color:var(--color-content-tertiary);font:var(--ts-body-default-bold);cursor:pointer}
 .dobp-steps button[aria-selected=true]{border-color:var(--color-brand);color:var(--color-content-primary)}
 .dobp-steps button:disabled{cursor:default}
-.dobp-steps small{display:block;font:var(--ts-caption);color:var(--color-content-secondary)}
+.dobp-steps small{display:block;font:var(--ts-caption-1);color:var(--color-content-secondary)}
 .dobp-g{display:grid;gap:4px}
 .dobp-g.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .dobp-g.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .dobp-g.d7{grid-template-columns:repeat(7,minmax(0,1fr))}
-.dobp-g .wk{display:grid;place-items:center;height:28px;font:var(--ts-label-s);color:var(--color-content-tertiary)}
-.dobp-g button{height:40px;border:1px solid transparent;background:var(--color-bg-secondary);color:inherit;font:var(--ts-label-m);font-variant-numeric:tabular-nums;cursor:pointer}
+.dobp-g .wk{display:grid;place-items:center;height:28px;font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
+.dobp-g button{height:40px;border:1px solid transparent;background:var(--color-bg-secondary);color:inherit;font:var(--ts-body-default-bold);font-variant-numeric:tabular-nums;cursor:pointer}
 .dobp-g button:hover:not(:disabled){border-color:var(--color-content-primary)}
 .dobp-g button:disabled{background:none;color:var(--color-content-disabled);text-decoration:line-through;cursor:default}
 .dobp-g button[aria-pressed=true]{background:var(--color-brand);color:var(--neutral-0)}
 .dobp-dec{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px}
 .dobp-dec::-webkit-scrollbar{display:none}
-.dobp-dec button{flex:none;height:36px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:inherit;font:var(--ts-label-s);cursor:pointer}
+.dobp-dec button{flex:none;height:36px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:inherit;font:var(--ts-caption-1-bold);cursor:pointer}
 .dobp-dec button[aria-pressed=true]{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
 .dobp-blank{height:40px}`;
   document.head.appendChild(css);

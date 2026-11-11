@@ -15,14 +15,14 @@
 <style>
 /* Confirmation option H · Calendar: the booked days are marked on a month calendar, so a 12-session program or a multi-day court booking shows its rhythm at a glance; tap a day to see its ticket beside it. Payment and actions sit underneath.
    Review page (result-options.html); the live page is result.html. Logic: f/result-core.js. DS tokens only, square corners. */
-.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-label-s);text-decoration:none}
+.opt-tag{position:fixed;inset-inline-end:16px;bottom:16px;z-index:50;padding:8px 12px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-caption-1-bold);text-decoration:none}
 body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,420px) minmax(0,1fr)}
 .h-cal{display:grid;gap:16px;animation:up .7s var(--ease) .1s both}
 .h-mo{background:var(--color-bg-primary);border:1px solid var(--color-border-primary);padding:20px}
-.h-mo h2{margin:0 0 12px;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.h-mo h2{margin:0 0 12px;font:var(--ts-title-body);text-transform:var(--type-case-title)}
 .h-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
-.h-g .wk{display:grid;place-items:center;height:28px;font:var(--ts-label-s);color:var(--color-content-tertiary)}
-.h-g span.d,.h-g button{display:grid;place-items:center;aspect-ratio:1;font:var(--ts-label-m);font-variant-numeric:tabular-nums}
+.h-g .wk{display:grid;place-items:center;height:28px;font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
+.h-g span.d,.h-g button{display:grid;place-items:center;aspect-ratio:1;font:var(--ts-body-default-bold);font-variant-numeric:tabular-nums}
 .h-g span.d{color:var(--color-content-tertiary)}
 .h-g button{position:relative;border:1px solid var(--color-brand);background:var(--color-bg-accent-subtle);cursor:pointer}
 .h-g button i{position:absolute;bottom:3px;width:4px;height:4px;background:var(--color-brand)}
@@ -32,7 +32,7 @@ body[data-state=paid] .cf-grid{grid-template-columns:minmax(0,420px) minmax(0,1f
 .h-key span{display:inline-flex;align-items:center;gap:8px}
 .h-key i{width:14px;height:14px;border:1px solid var(--color-brand);background:var(--color-bg-accent-subtle)}
 .h-side{display:grid;gap:16px;align-content:start;animation:up .7s var(--ease) .2s both}
-.h-day{margin:0;font:var(--ts-title-s);text-transform:var(--type-case-title)}
+.h-day{margin:0;font:var(--ts-title-body);text-transform:var(--type-case-title)}
 .h-tix{display:grid;gap:16px}
 .h-bot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
 @media (max-width:1100px){.h-bot{grid-template-columns:minmax(0,1fr)}}

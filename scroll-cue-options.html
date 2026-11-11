@@ -15,13 +15,13 @@
    design-system tokens; square corners (circles only where the thing is round). Delete once one is picked. */
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--neutral-950);color:var(--neutral-0);font:var(--ts-body-m);-webkit-font-smoothing:antialiased}
+body{background:var(--neutral-950);color:var(--neutral-0);font:var(--ts-body-default);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1440px;margin:0 auto;padding:48px 16px 96px}
-.intro h1{margin:0 0 8px;font:var(--ts-title-l);text-transform:var(--type-case-title)}
+.intro h1{margin:0 0 8px;font:var(--ts-title-screen);text-transform:var(--type-case-title)}
 .intro p{margin:0;max-width:70ch;color:var(--neutral-400)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(560px,1fr));gap:24px;margin-top:32px}
 @media (max-width:620px){.grid{grid-template-columns:minmax(0,1fr)}}
-.tag{display:flex;justify-content:space-between;gap:12px;margin:0 0 10px;font:var(--ts-label-m);color:var(--neutral-400)}
+.tag{display:flex;justify-content:space-between;gap:12px;margin:0 0 10px;font:var(--ts-body-default-bold);color:var(--neutral-400)}
 .tag b{color:var(--neutral-0)}
 .hero{position:relative;aspect-ratio:16/10;overflow:hidden;background:url(f/a_001.webp) center/cover}
 .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.45),rgba(9,9,11,.15) 40%,rgba(9,9,11,.8))}
@@ -29,7 +29,7 @@ body{background:var(--neutral-950);color:var(--neutral-0);font:var(--ts-body-m);
 .hero .hd h2{margin:0;font:var(--type-w-display) clamp(22px,2.4vw,32px)/1.05 var(--type-font);text-transform:uppercase}
 .cue{position:absolute;z-index:2}
 .bl{left:28px;bottom:28px} .bc{left:50%;bottom:24px;transform:translateX(-50%)} .br{right:28px;bottom:28px}
-.lbl{font:var(--ts-label-m);color:var(--neutral-0)}
+.lbl{font:var(--ts-body-default-bold);color:var(--neutral-0)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}}
 
 /* 1 · line + running dot (on the site now) */
@@ -61,7 +61,7 @@ body{background:var(--neutral-950);color:var(--neutral-0);font:var(--ts-body-m);
 /* 4 · chapter counter: where you are in the tour, with ticks that fill as you go */
 .c4{display:flex;align-items:flex-end;gap:16px}
 .c4 .n{font:var(--type-w-display) 40px/1 var(--type-font)}
-.c4 .n small{font:var(--ts-label-m);color:var(--neutral-400)}
+.c4 .n small{font:var(--ts-body-default-bold);color:var(--neutral-400)}
 .c4 .ticks{display:flex;gap:4px;padding-bottom:8px}
 .c4 .ticks i{width:18px;height:3px;background:rgba(255,255,255,.3)}
 .c4 .ticks i:first-child{background:var(--color-brand);animation:c4 2.4s ease-in-out infinite}

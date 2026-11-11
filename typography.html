@@ -81,13 +81,13 @@ html[data-mode=en] td.en,html[data-mode=ar] td.ar{background:#FFF7ED}
 
 <header class="head">
   <div class="in">
-    <p class="k ts-label-s">Design system · same structure as WBK DS3</p>
-    <h1 class="ts-display-l">Typography</h1>
+    <p class="k ts-caption-1-bold">Design system · same structure as WBK DS3</p>
+    <h1 class="ts-display-m">Typography</h1>
     <p class="d ts-body-l">Three layers, each built only from the one before it. Switch the mode at the top: the Typography collection swaps its font and weights, and every text style below follows.</p>
     <nav class="layers" aria-label="Layers">
-      <a href="#primitives"><span class="ts-title-s">1 · Size primitives</span><small>Locked: font sizes, weights, line heights</small></a>
-      <a href="#collection"><span class="ts-title-s">2 · Typography</span><small>English / Arabic modes: font, weights, case</small></a>
-      <a href="#styles"><span class="ts-title-s">3 · Text styles</span><small>Display, Title, Number, Label, Body</small></a>
+      <a href="#primitives"><span class="ts-title-body">1 · Size primitives</span><small>Locked: font sizes, weights, line heights</small></a>
+      <a href="#collection"><span class="ts-title-body">2 · Typography</span><small>English / Arabic modes: font, weights, case</small></a>
+      <a href="#styles"><span class="ts-title-body">3 · Text styles</span><small>Display, Title, Number, Label, Body</small></a>
     </nav>
   </div>
 </header>
@@ -95,51 +95,51 @@ html[data-mode=en] td.en,html[data-mode=ar] td.ar{background:#FFF7ED}
 <main class="in">
   <!-- 1 -->
   <section class="sec" id="primitives">
-    <h2 class="sec-h ts-title-s">1 · Size primitives</h2>
-    <p class="sec-d ts-body-m">The raw values. Nothing on a page uses them directly; the Typography collection and text styles point at them. Collection <code>🔒 Size Primitives</code>.</p>
+    <h2 class="sec-h ts-title-body">1 · Size primitives</h2>
+    <p class="sec-d ts-body-default">The raw values. Nothing on a page uses them directly; the Typography collection and text styles point at them. Collection <code>🔒 Size Primitives</code>.</p>
     <p class="coll">Font size · <code>--fs-*</code> · one scale, about 1.2× per step from a 16px base, all on a 4px grid</p>
     <div class="sizes" id="sizes"></div>
     <p class="coll" style="margin-top:22px">Font weight · <code>--fw-*</code> (Loew Next files loaded: Regular, Medium, Black)</p>
     <div class="weights">
-      <div><p style="font-weight:400">Aa</p><b class="ts-label-s">Regular · 400</b><br><code>--fw-regular</code></div>
-      <div><p style="font-weight:500">Aa</p><b class="ts-label-s">Medium · 500</b><br><code>--fw-medium</code></div>
-      <div class="off"><p style="font-family:Tajawal,sans-serif;font-weight:700">Aa</p><b class="ts-label-s">Bold · 700</b><br><code>--fw-bold</code> · Arabic mode only</div>
-      <div><p style="font-weight:900">Aa</p><b class="ts-label-s">Black · 900</b><br><code>--fw-black</code></div>
+      <div><p style="font-weight:400">Aa</p><b class="ts-caption-1-bold">Regular · 400</b><br><code>--fw-regular</code></div>
+      <div><p style="font-weight:500">Aa</p><b class="ts-caption-1-bold">Medium · 500</b><br><code>--fw-medium</code></div>
+      <div class="off"><p style="font-family:Tajawal,sans-serif;font-weight:700">Aa</p><b class="ts-caption-1-bold">Bold · 700</b><br><code>--fw-bold</code> · Arabic mode only</div>
+      <div><p style="font-weight:900">Aa</p><b class="ts-caption-1-bold">Black · 900</b><br><code>--fw-black</code></div>
     </div>
     <p class="coll" style="margin-top:22px">Line height · <code>--lh-display</code> 1.05 · <code>--lh-title</code> 1.2 · <code>--lh-ui</code> 1.25 · <code>--lh-body</code> 1.5 · <code>--lh-lead</code> 1.6</p>
   </section>
 
   <!-- 2 -->
   <section class="sec" id="collection">
-    <h2 class="sec-h ts-title-s">2 · Typography</h2>
-    <p class="sec-d ts-body-m">The semantic layer, with one mode per language, like DS3's English / Arabic. Collection <code>🆃 Typography</code>. The page switches mode by its language: English by default, Arabic when the site is in Arabic.</p>
+    <h2 class="sec-h ts-title-body">2 · Typography</h2>
+    <p class="sec-d ts-body-default">The semantic layer, with one mode per language, like DS3's English / Arabic. Collection <code>🆃 Typography</code>. The page switches mode by its language: English by default, Arabic when the site is in Arabic.</p>
     <table>
       <thead><tr><th>Variable</th><th>English</th><th>Arabic</th></tr></thead>
       <tbody>
-        <tr><td><b class="ts-label-s">Font</b><code class="al">--type-font</code></td><td class="en">Loew Next</td><td class="ar">Loew Next Arabic <span class="mut">(Tajawal until the files arrive)</span></td></tr>
-        <tr><td><b class="ts-label-s">Font Weights / Display</b><code class="al">--type-w-display</code></td><td class="en">{Font Weight.Black} 900</td><td class="ar">{Font Weight.Bold} 700</td></tr>
-        <tr><td><b class="ts-label-s">Font Weights / Title</b><code class="al">--type-w-title</code></td><td class="en">{Font Weight.Black} 900</td><td class="ar">{Font Weight.Bold} 700</td></tr>
-        <tr><td><b class="ts-label-s">Font Weights / Label</b><code class="al">--type-w-label</code></td><td class="en">{Font Weight.Medium} 500</td><td class="ar">{Font Weight.Medium} 500</td></tr>
-        <tr><td><b class="ts-label-s">Font Weights / Body</b><code class="al">--type-w-body</code></td><td class="en">{Font Weight.Regular} 400</td><td class="ar">{Font Weight.Regular} 400</td></tr>
-        <tr><td><b class="ts-label-s">Font Weights / Body Bold</b><code class="al">--type-w-body-bold</code></td><td class="en">{Font Weight.Medium} 500</td><td class="ar">{Font Weight.Medium} 500</td></tr>
-        <tr><td><b class="ts-label-s">Case / Display, Title</b><code class="al">--type-case-display, -title</code></td><td class="en">ALL CAPS</td><td class="ar">None (Arabic has no capitals)</td></tr>
-        <tr><td><b class="ts-label-s">Case / Label</b><code class="al">--type-case-label</code></td><td class="en">Sentence case</td><td class="ar">None</td></tr>
+        <tr><td><b class="ts-caption-1-bold">Font</b><code class="al">--type-font</code></td><td class="en">Loew Next</td><td class="ar">Loew Next Arabic <span class="mut">(Tajawal until the files arrive)</span></td></tr>
+        <tr><td><b class="ts-caption-1-bold">Font Weights / Display</b><code class="al">--type-w-display</code></td><td class="en">{Font Weight.Black} 900</td><td class="ar">{Font Weight.Bold} 700</td></tr>
+        <tr><td><b class="ts-caption-1-bold">Font Weights / Title</b><code class="al">--type-w-title</code></td><td class="en">{Font Weight.Black} 900</td><td class="ar">{Font Weight.Bold} 700</td></tr>
+        <tr><td><b class="ts-caption-1-bold">Font Weights / Label</b><code class="al">--type-w-label</code></td><td class="en">{Font Weight.Medium} 500</td><td class="ar">{Font Weight.Medium} 500</td></tr>
+        <tr><td><b class="ts-caption-1-bold">Font Weights / Body</b><code class="al">--type-w-body</code></td><td class="en">{Font Weight.Regular} 400</td><td class="ar">{Font Weight.Regular} 400</td></tr>
+        <tr><td><b class="ts-caption-1-bold">Font Weights / Body Bold</b><code class="al">--type-w-body-bold</code></td><td class="en">{Font Weight.Medium} 500</td><td class="ar">{Font Weight.Medium} 500</td></tr>
+        <tr><td><b class="ts-caption-1-bold">Case / Display, Title</b><code class="al">--type-case-display, -title</code></td><td class="en">ALL CAPS</td><td class="ar">None (Arabic has no capitals)</td></tr>
+        <tr><td><b class="ts-caption-1-bold">Case / Label</b><code class="al">--type-case-label</code></td><td class="en">Sentence case</td><td class="ar">None</td></tr>
       </tbody>
     </table>
   </section>
 
   <!-- 3 -->
   <section class="sec" id="styles">
-    <h2 class="sec-h ts-title-s">3 · Text styles</h2>
-    <p class="sec-d ts-body-m">What designs and pages pick from. Each one is a family, weight, size, line height and case taken from the layers above (classes <code>.ts-*</code> in f/fonts.css). Fluid sizes run between a phone and a wide screen.</p>
+    <h2 class="sec-h ts-title-body">3 · Text styles</h2>
+    <p class="sec-d ts-body-default">What designs and pages pick from. Each one is a family, weight, size, line height and case taken from the layers above (classes <code>.ts-*</code> in f/fonts.css). Fluid sizes run between a phone and a wide screen.</p>
     <div class="ts" id="tsList"></div>
   </section>
 
   <section class="sec">
-    <h2 class="sec-h ts-title-s">Demo font: missing characters</h2>
-    <p class="sec-d ts-body-m">The Loew Next files are a personal-use demo with letters and numbers only. The highlighted characters come from the fallback font until the licensed files are in.</p>
+    <h2 class="sec-h ts-title-body">Demo font: missing characters</h2>
+    <p class="sec-d ts-body-default">The Loew Next files are a personal-use demo with letters and numbers only. The highlighted characters come from the fallback font until the licensed files are in.</p>
     <div class="gl">
-      <div><p class="ts-title-l" style="margin:0">Let<mark>'</mark>s play<mark>!</mark> 9:00 AM <mark>–</mark> 12:00 AM</p><small>Title L</small></div>
+      <div><p class="ts-title-screen" style="margin:0">Let<mark>'</mark>s play<mark>!</mark> 9:00 AM <mark>–</mark> 12:00 AM</p><small>Title L</small></div>
       <div><p class="ts-body-l" style="margin:0">Football <mark>·</mark> SFA Domes Dammam <mark>(</mark>F4 <mark>+</mark> F5<mark>)</mark> <mark>&amp;</mark> 38<mark>%</mark> <mark>©</mark></p><small>Body L</small></div>
     </div>
   </section>
@@ -157,33 +157,33 @@ html[data-mode=en] td.en,html[data-mode=ar] td.ar{background:#FFF7ED}
   const G = (t) => ({ group: t });
   const TS = [
     G('Display · hero and section openers'),
-    ['Display XL', 'ts-display-xl', 'Display 900 · clamp(40–64) / 1.05 · caps', 'Homepage hero only', 'Sport for everyone, under one dome', 'الرياضة للجميع، تحت قبة واحدة'],
-    ['Display L', 'ts-display-l', 'Display 900 · clamp(32–48) / 1.05 · caps', 'Homepage chapter lines, sports page title', 'Works as hard as you do', 'تعمل بجد مثلك'],
-    ['Display M', 'ts-display-m', 'Display 900 · clamp(28–40) / 1.05 · caps', 'Homepage section titles', 'Domes location', 'موقع الدوم'],
+    ['Display XL', 'ts-display-l', 'Display 900 · clamp(40–64) / 1.05 · caps', 'Homepage hero only', 'Sport for everyone, under one dome', 'الرياضة للجميع، تحت قبة واحدة'],
+    ['Display L', 'ts-display-m', 'Display 900 · clamp(32–48) / 1.05 · caps', 'Homepage chapter lines, sports page title', 'Works as hard as you do', 'تعمل بجد مثلك'],
+    ['Display M', 'ts-display-s', 'Display 900 · clamp(28–40) / 1.05 · caps', 'Homepage section titles', 'Domes location', 'موقع الدوم'],
     G('Title · headings'),
-    ['Title L', 'ts-title-l', 'Title 900 · clamp(24–32) / 1.2 · caps', 'Court name, Checkout, programme rows', 'Field F1', 'ملعب F1'],
-    ['Title M', 'ts-title-m', 'Title 900 · clamp(20–24) / 1.2 · caps', 'Card titles', 'One booking, every sport', 'حجز واحد لكل رياضة'],
-    ['Title S', 'ts-title-s', 'Title 900 · 20 / 1.2 · caps · bar', 'Section headings on the court page and checkout', 'Highlights', 'أبرز المزايا', 'bar'],
+    ['Title L', 'ts-title-screen', 'Title 900 · clamp(24–32) / 1.2 · caps', 'Court name, Checkout, programme rows', 'Field F1', 'ملعب F1'],
+    ['Title M', 'ts-title-section', 'Title 900 · clamp(20–24) / 1.2 · caps', 'Card titles', 'One booking, every sport', 'حجز واحد لكل رياضة'],
+    ['Title S', 'ts-title-body', 'Title 900 · 20 / 1.2 · caps · bar', 'Section headings on the court page and checkout', 'Highlights', 'أبرز المزايا', 'bar'],
     G('Number · stats, prices, totals'),
-    ['Number L', 'ts-number-l', 'Display 900 · clamp(40–56) / 1', 'Homepage stats', '38<i>%</i>', '38<i>%</i>', 'num'],
-    ['Number M', 'ts-number-m', 'Display 900 · 28 / 1.1', 'Price card, programme stats', '300 SAR', '300 ر.س'],
-    ['Number S', 'ts-number-s', 'Display 900 · 20 / 1.2', 'Booking bar and checkout total', '450 SAR', '450 ر.س'],
+    ['Number L', 'ts-display-m', 'Display 900 · clamp(40–56) / 1', 'Homepage stats', '38<i>%</i>', '38<i>%</i>', 'num'],
+    ['Number M', 'ts-display-xs', 'Display 900 · 28 / 1.1', 'Price card, programme stats', '300 SAR', '300 ر.س'],
+    ['Number S', 'ts-title-body', 'Display 900 · 20 / 1.2', 'Booking bar and checkout total', '450 SAR', '450 ر.س'],
     G('Label · interface text (Medium)'),
-    ['Label L', 'ts-label-l', 'Label 500 · 16 / 1.25 · sentence case', 'Buttons, menu, tabs, footer links', 'Check availability', 'تحقق من التوفر', 'btn'],
-    ['Label M', 'ts-label-m', 'Label 500 · 14 / 1.25 · sentence case', 'Chips, small buttons, field labels, eyebrows', 'Football · SFA Domes Dammam', 'كرة القدم · دوم الرياضة للجميع', 'eye'],
-    ['Label S', 'ts-label-s', 'Label 500 · 12 / 1.25 · sentence case', 'Tags, tiny meta', 'Indoor · Free balls and bibs', 'داخلي · كرات وصدريات مجانية'],
+    ['Label L', 'ts-body-l-bold', 'Label 500 · 16 / 1.25 · sentence case', 'Buttons, menu, tabs, footer links', 'Check availability', 'تحقق من التوفر', 'btn'],
+    ['Label M', 'ts-body-default-bold', 'Label 500 · 14 / 1.25 · sentence case', 'Chips, small buttons, field labels, eyebrows', 'Football · SFA Domes Dammam', 'كرة القدم · دوم الرياضة للجميع', 'eye'],
+    ['Label S', 'ts-caption-1-bold', 'Label 500 · 12 / 1.25 · sentence case', 'Tags, tiny meta', 'Indoor · Free balls and bibs', 'داخلي · كرات وصدريات مجانية'],
     G('Body · reading text'),
     ['Body L', 'ts-body-l', 'Body 400 · 18 / 1.6', 'Lead paragraphs, descriptions', 'Field F1 is part of our 5 indoor football fields. Book a 1.5-hour slot and check in at the front desk.', 'الملعب F1 واحد من 5 ملاعب كرة قدم داخلية. احجز فترة مدتها ساعة ونصف وسجّل وصولك في الاستقبال.'],
     ['Body L Bold', 'ts-body-l-bold', 'Body Bold 500 · 18 / 1.6', 'FAQ questions, emphasis', 'How long is a booking?', 'ما مدة الحجز؟'],
-    ['Body M', 'ts-body-m', 'Body 400 · 16 / 1.5', 'Default text', 'Pitches, courts, academies and leagues all live in one place.', 'الملاعب والأكاديميات والدوريات في مكان واحد.'],
-    ['Body M Bold', 'ts-body-m-bold', 'Body Bold 500 · 16 / 1.5', 'Emphasis in default text', 'Free balls and bibs with every booking.', 'كرات وصدريات مجانية مع كل حجز.'],
+    ['Body M', 'ts-body-default', 'Body 400 · 16 / 1.5', 'Default text', 'Pitches, courts, academies and leagues all live in one place.', 'الملاعب والأكاديميات والدوريات في مكان واحد.'],
+    ['Body M Bold', 'ts-body-default-bold', 'Body Bold 500 · 16 / 1.5', 'Emphasis in default text', 'Free balls and bibs with every booking.', 'كرات وصدريات مجانية مع كل حجز.'],
     ['Body S', 'ts-body-s', 'Body 400 · 14 / 1.5', 'Cards, notes, secondary lines', '5-a-side field · 5 v 5', 'ملعب خماسي · 5 ضد 5', 'mut'],
-    ['Caption', 'ts-caption', 'Body 400 · 12 / 1.4 · the smallest size', 'Hints, copyright', "Tap for every day's hours · © 2026 sportsforall.com", 'اضغط لعرض ساعات كل يوم · © 2026 sportsforall.com', 'mut'],
+    ['Caption', 'ts-caption-1', 'Body 400 · 12 / 1.4 · the smallest size', 'Hints, copyright', "Tap for every day's hours · © 2026 sportsforall.com", 'اضغط لعرض ساعات كل يوم · © 2026 sportsforall.com', 'mut'],
   ];
   const list = document.getElementById('tsList');
   const paint = mode => {
     list.innerHTML = TS.map(r => r.group ? `<p class="group">${r.group}</p>` :
-      `<div class="ts-row"><div class="meta"><b class="ts-label-m">${r[0]}</b><code>.${r[1]}</code><code>${r[2]}</code><em>${r[3]}</em></div>` +
+      `<div class="ts-row"><div class="meta"><b class="ts-body-default-bold">${r[0]}</b><code>.${r[1]}</code><code>${r[2]}</code><em>${r[3]}</em></div>` +
       `<div class="smp"><span class="${r[1]}${r[6] ? ' ' + r[6] : ''}" ${mode === 'ar' ? 'dir="rtl" lang="ar"' : ''}>${mode === 'ar' ? r[5] : r[4]}</span></div></div>`).join('');
   };
   // mode switch: English / Arabic (the same switch the site makes with its language)
