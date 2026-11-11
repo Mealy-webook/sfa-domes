@@ -600,7 +600,9 @@ button.who-opt:disabled small{color:var(--danger)}
     const heads = () => Math.max(1, picked().length);   // the price shows for one until someone is ticked (Pay still needs one)
     const save = () => { try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (e) {} };
     const sessions = () => window.SFA_PROGRAM_SESSIONS(p, order.start, order.plan);
-    const planPrice = window.SFA_PROGRAM_PRICE(p, order.plan), planFull = window.SFA_PROGRAM_FULL_PRICE(p, order.plan);
+    // a renewal (from My tickets) is one more month at 20% off; everything else is the plan's own price
+    const renewing = !!order.renew && order.plan === 'month';
+    const planPrice = renewing ? window.SFA_RENEW_PRICE(p) : window.SFA_PROGRAM_PRICE(p, order.plan), planFull = renewing ? p.month : window.SFA_PROGRAM_FULL_PRICE(p, order.plan);
     const total = () => heads() * planPrice + kitsOn().length * K.price;
     // the program's own terms open from "terms and conditions"
     $('doc-terms').innerHTML = `<ul>${window.SFA_PROGRAM_TERMS.map(x => `<li>${esc(tx(x))}</li>`).join('')}</ul>`;
@@ -608,13 +610,13 @@ button.who-opt:disabled small{color:var(--danger)}
 
     // summary card: what's booked and what it costs
     function summary(){
-      const n = sessions().length, plan = t({ trial: 'Free trial', month: 'One month subscription', month2: 'Two-month subscription', month3: 'Three-month subscription' }[order.plan]);
+      const n = sessions().length, plan = renewing ? t('One month renewal · 20% off') : t({ trial: 'Free trial', month: 'One month subscription', month2: 'Two-month subscription', month3: 'Three-month subscription' }[order.plan]);
       $('cSport').textContent = `${t(sp.name)} · ${t('SFA Domes Dammam')}`;
       $('cName').textContent = tx(p.name);
       $('cSpecs').textContent = `${t('Ages {a}', { a: `⁦${p.ages}⁩` })} · ${tx(p.level)}`;
       $('days').innerHTML = `<li><b>${t('Starts')}</b><ul><li><span>${P.date(toDate(order.start), 'full')} · ${range(order.time)}</span></li></ul></li>`
         + (picked().length ? `<li><b>${t('Participants')}</b><ul><li><span>${picked().map(c => esc(c.name)).join(', ')}</span></li></ul></li>` : '')
-        + `<li><b>${plan}</b><ul><li><span>${t('{n} × {m} min', { n, m: p.minutes })}${heads() > 1 ? ` · ${t('{k} participants', { k: heads() })}` : ''}</span><span class="slot-p">${planPrice ? money(planPrice * heads()) : t('Free of charge')}</span></li>${planFull > planPrice ? `<li class="pk-save"><span>${t('You save {amount} against paying monthly', { amount: money((planFull - planPrice) * heads()) })}</span></li>` : ''}</ul></li>`
+        + `<li><b>${plan}</b><ul><li><span>${t('{n} × {m} min', { n, m: p.minutes })}${heads() > 1 ? ` · ${t('{k} participants', { k: heads() })}` : ''}</span><span class="slot-p">${planPrice ? money(planPrice * heads()) : t('Free of charge')}</span></li>${planFull > planPrice ? `<li class="pk-save"><span>${renewing ? t('Renewal discount: you save {amount}', { amount: money((planFull - planPrice) * heads()) }) : t('You save {amount} against paying monthly', { amount: money((planFull - planPrice) * heads()) })}</span></li>` : ''}</ul></li>`
         + (kitsOn().length ? `<li><b>${esc(tx(K.name))}</b><ul><li><span>× ${kitsOn().length}${kitsOn().some(Boolean) ? ` · <bdi>${kitsOn().filter(Boolean).map(esc).join(', ')}</bdi>` : ''}</span><span class="slot-p">${money(K.price * kitsOn().length)}</span></li></ul></li>` : '');
       $('total').innerHTML = total() ? money(total()) : t('Free of charge');
       const sar = P.currency === 'SAR'; $('charge').hidden = sar || !total();
@@ -744,15 +746,14 @@ button.who-opt:disabled small{color:var(--danger)}
       if (!reopen || before !== kids.map(c => c.id + c.name + c.dob).join()){ ppCard(); kitCard(); summary(); }
     }
 
-    // ---- add-ons: the Training Kit has its own quantity (not tied to participants); each kit then gets a size
+    // ---- add-ons: the Training Kit is a quantity of its own (not tied to participants); no sizes (removed at Ahmed's request, 2026-11-11)
     function kitCard(){
       if (!$('pkKit')) return;
       const n = order.kitSizes.length;
       $('pkKit').innerHTML = `<p class="pk-note">${t('Optional extras for training.')}</p><div class="pk-kit" id="kitBox"><span class="pk-ic" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M17 6h14l10 6-4 9-5-2v23H16V19l-5 2-4-9z"/><path d="M19 6a5 5 0 0 0 10 0"/></svg></span>
         <div><strong>${esc(tx(K.name))}</strong><p>${esc(tx(K.items))}</p></div><span class="pk-pr">${money(K.price)} <small>${t('each')}</small></span>
         <div class="pk-kq"><span class="pk-lbl" id="kitQL">${t('Quantity')}</span><span class="pk-qty" role="group" aria-labelledby="kitQL"><button type="button" data-kq="-1" aria-label="${t('Fewer')}"${n <= 0 ? ' disabled' : ''}>−</button><output aria-live="polite">${n}</output><button type="button" data-kq="1" aria-label="${t('More')}"${n >= 10 ? ' disabled' : ''}>+</button></span></div>
-        ${n ? `<div class="pk-sizes">${order.kitSizes.map((z, i) => `<div class="pk-size" id="kit-${i}"><span class="pk-lbl" id="kitL${i}">${t('Kit {n} size', { n: i + 1 })}</span>
-            <div class="pk-chips" role="radiogroup" aria-labelledby="kitL${i}">${K.sizes.map(x => `<button type="button" class="pk-chip" role="radio" aria-checked="${x === z}" data-size="${esc(x)}" data-for="${i}" dir="ltr">${esc(x)}</button>`).join('')}</div><p class="err">${t('Choose a kit size.')}</p></div>`).join('')}</div>` : ''}</div>`;
+</div>`;
     }
     main.addEventListener('click', e => {
       if (e.target.closest('#pkMore')) return allSessions();
@@ -761,9 +762,6 @@ button.who-opt:disabled small{color:var(--danger)}
       const kq = e.target.closest('[data-kq]');
       if (kq && !kq.disabled){ if (+kq.dataset.kq > 0) order.kitSizes.push(''); else order.kitSizes.pop();
         save(); kitCard(); summary(); main.querySelector(`[data-kq="${kq.dataset.kq}"]:not(:disabled)`)?.focus(); return; }
-      const sz = e.target.closest('[data-size][data-for]'); if (!sz) return;
-      const i = +sz.dataset.for; order.kitSizes[i] = sz.dataset.size;
-      save(); kitCard(); summary(); main.querySelector(`[data-for="${i}"][data-size="${sz.dataset.size}"]`)?.focus();
     });
     addEventListener('storage', e => { if (e.key === 'sfaKidsRev') loadKids(); });
     cards(); summary();
@@ -776,7 +774,6 @@ button.who-opt:disabled small{color:var(--danger)}
     $('pTerms').addEventListener('change', () => $('fTerms').classList.remove('bad'));
     const checks = {
       ppCard: () => picked().length > 0,
-      kitBox: () => kitsOn().every(Boolean),
       fTerms: () => $('pTerms').checked,
     };
     const alertBox = $('alert');
@@ -784,12 +781,11 @@ button.who-opt:disabled small{color:var(--danger)}
     $('payBtn').addEventListener('click', async () => {
       const bad = Object.keys(checks).filter(id => !checks[id]());
       Object.keys(checks).forEach(id => $(id)?.classList.toggle('bad', bad.includes(id)));
-      kitsOn().forEach((z, i) => $('kit-' + i)?.classList.toggle('bad', !z));
       if (bad.length){ $(bad[0]).scrollIntoView({ block: 'center', behavior: 'smooth' }); $(bad[0]).querySelector('input,button')?.focus({ preventScroll: true }); return; }
       const btn = $('payBtn'); btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span><span>${t(total() ? 'Opening payment…' : 'One moment…')}</span>`; alertBox.innerHTML = '';
       try {
         const r = await fetch('/api/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ terms: true, waiver: true, order: { kind: 'program', program: order.program, plan: order.plan, start: order.start, time: order.time,
-          participants: picked().map(c => c.fresh ? { child: { first: c.first, last: c.last, dob: c.dob, gender: c.gender } } : { ref: c.ref }), kits: kitsOn().slice() } }) });
+          ...(renewing ? { renew: order.renew } : {}), participants: picked().map(c => c.fresh ? { child: { first: c.first, last: c.last, dob: c.dob, gender: c.gender } } : { ref: c.ref }), kits: kitsOn().slice() } }) });
         const data = await r.json().catch(() => ({}));
         if (r.status === 401){ btn.disabled = false; btn.innerHTML = payLabel; return gate(); }
         if (r.status === 409){ alertBox.innerHTML = `<p class="alert">${esc(t(data.error))}<button type="button" class="doc-link" data-reload>${t('Refresh')}</button></p>`; btn.disabled = false; btn.innerHTML = payLabel; loadKids(); return; }

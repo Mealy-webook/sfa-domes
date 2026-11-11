@@ -107,7 +107,7 @@ window.RESULT_VIEW = {
     const TAG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><path d="M7.5 8.5h.01"/></svg>', USER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"/></svg>';
     // the facts: [icon, label, value, second line]
     const facts = [
-      [TAG, t('What'), m.prog ? esc(m.D.label) : esc(t(m.sport?.name || '')) + (m.game ? ` · ${t('Open game')}` : m.ladies ? ` · ${t('Ladies hours')}` : ''), m.prog ? t('{n} sessions', { n }) + (m.coach ? ` · ${esc(m.coach)}` : '') : m.game ? `${t(m.b.order.level)} · ${t(m.b.order.format)}` : n > 1 ? t('{n} sessions', { n }) : ''],
+      [TAG, t('What'), m.prog ? esc(m.D.label) : esc(t(m.sport?.name || '')) + (m.game ? ` · ${t('Open game')}` : m.ladies ? ` · ${t('Ladies hours')}` : ''), m.prog ? t('{n} sessions', { n }) + (m.coach ? ` · ${esc(m.coach)}` : '') : m.game ? `${t(m.b.order.format)}${m.b.order.who ? ' · ' + t({ adults: 'Adults (18+)', kids: 'Kids 6–17' }[m.b.order.who]) : ''}` : n > 1 ? t('{n} sessions', { n }) : ''],
       [ICON.cal, t('When'), n === 1 ? m.date(s0) : m.when, n === 1 ? m.time(s0) : m.pattern],
       [ICON.pin, t('Where'), m.place, m.prog ? '' : esc(t(m.court?.[0] || ''))],
       [USER, t(m.prog ? (many ? 'Participants' : 'Participant') : 'Booked for'), m.who, m.by ? t('Booked by {name}', { name: m.by }) : '']
@@ -122,7 +122,7 @@ window.RESULT_VIEW = {
     return `<div class="o-wrap"><div class="o-main">
       <section class="o-hero">
         <div class="o-in"><span class="o-ok">${ICON.check}${t('Booking confirmed')}</span><h1>${t("You're all set")}<span id="oName"></span></h1>
-          <p>${t(m.b.free ? 'Your free trial is booked.' : "You're booked and paid.")}</p>
+          <p>${t(m.b.free ? (m.game ? 'Your first open game is free.' : 'Your free trial is booked.') : "You're booked and paid.")}</p>
           <p class="o-mail" id="oMail" hidden></p>
           <dl class="o-facts">${facts.map(([ic, k, v, sub]) => `<div><span class="o-fic">${ic}</span><dt>${k}</dt><dd>${v}${sub ? `<small>${sub}</small>` : ''}</dd></div>`).join('')}
             <div class="o-refrow"><span class="o-fic">${HASH}</span><dt>${t('Booking ref')}</dt><dd><bdi id="oRef">${esc(m.b.cartId)}</bdi></dd>

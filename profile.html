@@ -99,6 +99,22 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
 .pg-in{display:grid;gap:8px;align-content:start}
 .pg-in h2{margin:0;font:var(--ts-display-m);text-transform:var(--type-case-display)}
 .pg-in .prog{margin-top:8px}
+.renew{position:relative;z-index:2;height:32px;padding:0 12px;border:1px solid var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-accent);font:var(--ts-label-s);cursor:pointer}
+.renew:hover{background:var(--color-brand);color:var(--neutral-0)}
+.pg-renew{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-top:8px;padding:16px 20px;border-inline-start:4px solid var(--color-brand);background:var(--color-bg-accent-subtle)}
+.pg-renew b{font:var(--ts-label-l)}
+.pg-renew p{margin:4px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.pg-renew s{color:var(--color-content-tertiary)}
+.pg-renew strong{color:var(--color-content-primary);font-weight:500}
+.pg-renew small{display:block;margin-top:4px;font:var(--ts-caption);color:var(--color-content-tertiary)}
+.cx-note{margin:8px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.cx-note.off{color:var(--color-content-tertiary)}
+.cx p{margin:0;font:var(--ts-body-m)}
+.cx .err{color:var(--color-danger);font:var(--ts-body-s)}
+.cx .err:empty{display:none}
+.btn.danger{background:var(--color-danger)}
+.btn.danger:hover{filter:brightness(1.08);background:var(--color-danger)}
+.types.who{margin-top:-20px}
 .pg-note{margin:4px 0 8px;font:var(--ts-body-s);color:var(--color-content-secondary)}
 .empty{display:grid;justify-items:start;gap:12px;padding:32px;border:1px dashed var(--color-border-secondary)}
 .empty p{margin:0;font:var(--ts-body-m);color:var(--color-content-secondary)}
@@ -256,8 +272,8 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
   const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>';
   const CAL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4m8-4v4"/></svg>';
   const PIN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><path d="M12 11.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>';
-  const TABS = ['tickets', 'saved', 'people', 'account'];
-  let user = null, bookings = [], favs = [], people = [], seg = 'up', kind = 'all', pform = null, removing = null, aform = null;
+  const TABS = ['tickets', 'people', 'account'];   // Saved courts removed at Ahmed's request (2026-11-11)
+  let user = null, bookings = [], favs = [], people = [], seg = 'up', kind = 'all', who = 'all', pform = null, removing = null, aform = null;
   const C = window.SFA_CHILD, LOCK = '<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>';
   // booking types: courts, training programs, and any other kind the system adds (named from its key until it has a label)
   const kindOf = b => b.order.kind || 'court';
@@ -270,7 +286,9 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
   const initials = u => String(u.name || '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
   // every paid session, with when it ends, split into upcoming and past
   const all = () => bookings.filter(b => b.status === 'paid').flatMap(b => T.sessions(b).map(s => ({ s, b, endsAt: T.toDate(s.date).getTime() + s.end * 60e3 })));
-  const shown = () => all().filter(x => kind === 'all' || kindOf(x.b) === kind);
+  // who a ticket is for: a program session's participant, or who a court / game was booked for (you, a child, someone else)
+  const personOf = x => x.b.order.kind === 'program' ? (x.s.player || '') : (x.b.order.bookingFor && x.b.order.bookingFor.type !== 'me' && x.b.order.bookingFor.name) || (user ? user.name : '');
+  const shown = () => all().filter(x => (kind === 'all' || kindOf(x.b) === kind) && (who === 'all' || personOf(x) === who));
   const upcoming = (l = shown()) => l.filter(x => x.endsAt > Date.now()).sort((a, b) => a.endsAt - b.endsAt);
   const past = (l = shown()) => l.filter(x => x.endsAt <= Date.now()).sort((a, b) => b.endsAt - a.endsAt);
   // "Today", "Tomorrow" or "In 5 days" for the next session
@@ -295,7 +313,7 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
       <span class="thumb"><img src="${D.img}" alt="" loading="lazy" style="object-position:${D.program ? D.program.focus : '50% 50%'}"></span>
       <span class="info"><strong>${esc(D.label)}</strong><span>${days.length === 1 ? t('1 session') : t('{n} sessions', { n: days.length })}${pattern(days) ? ' · ' + pattern(days) : ''}${who ? ` · ${who}` : ''}</span>
         <span class="prog" aria-label="${t('{p} of {n} sessions played', { p: played, n: days.length })}"><i style="--p:${played / days.length}"></i><em>${t('{p} of {n} played', { p: played, n: days.length })}</em></span></span>
-      <span class="end"><span class="chip${isUp ? ' up' : ''}">${isUp && next ? t('Next · {when}', { when: when({ s: next }) }) : t('Played')}</span><span class="go"><span>${t('View tickets')}</span>${ARROW}</span></span></li>`;
+      <span class="end">${renewInfo(b) ? `<button type="button" class="renew" data-renew="${esc(b.cartId)}">${t('Renew · 20% off')}</button>` : `<span class="chip${isUp ? ' up' : ''}">${isUp && next ? t('Next · {when}', { when: when({ s: next }) }) : t('Played')}</span>`}<span class="go"><span>${t('View tickets')}</span>${ARROW}</span></span></li>`;
   }
   const itemRow = (it, i, isUp) => it.g ? groupRow(it.g, i, isUp) : row(it.x, i, isUp);
   // the program's own view: its details, then every ticket (upcoming, then played)
@@ -313,7 +331,10 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
           <p class="meta">${who}${slot ? ` · ${esc(T.tx(slot.coach))}` : ''} · <bdi>${esc(b.cartId)}</bdi></p>
           <span class="prog big"><i style="--p:${played / days.length}"></i><em>${t('{p} of {n} sessions played', { p: played, n: days.length })}</em></span>
           <p class="pg-note">${t('Each ticket has its own QR code. It unlocks on the day of the session; show it at reception.')}</p>
-          <div class="dlg-acts"><a class="ghost sm" href="${T.ics(b)}" download="${T.icsName(b)}">${CAL}${t('Add to calendar')}</a><a class="ghost sm" href="${T.DIRECTIONS}" target="_blank" rel="noopener">${PIN}${t('Get directions')}</a><a class="ghost sm" href="result.html?cart=${encodeURIComponent(b.cartId)}">${t('Booking details')}</a></div></div></section>
+          <div class="dlg-acts"><a class="ghost sm" href="${T.ics(b)}" download="${T.icsName(b)}">${CAL}${t('Add to calendar')}</a><a class="ghost sm" href="${T.DIRECTIONS}" target="_blank" rel="noopener">${PIN}${t('Get directions')}</a><a class="ghost sm" href="result.html?cart=${encodeURIComponent(b.cartId)}">${t('Booking details')}</a>${T.cancelInfo(b).can ? `<button type="button" class="ghost sm danger" data-cancel="${esc(b.cartId)}">${t('Cancel booking')}</button>` : ''}</div>
+          ${cancelLine(b)}
+          ${(() => { const R = renewInfo(b); if (!R) return ''; const n = T.people(b).length;
+            return `<div class="pg-renew"><div><b>${t('Renew for another month · 20% off')}</b><p>${t('Starts {date} at the same time, for the same participants.', { date: P.date(T.toDate(R.start), 'short') })} <s>${P.money(R.p.month * n)}</s> <strong>${P.money(window.SFA_RENEW_PRICE(R.p) * n)}</strong></p><small>${t('Renewal is open until {date}.', { date: P.date(T.toDate(R.until), 'short') })}</small></div><button type="button" class="btn sm" data-renew="${esc(b.cartId)}">${t('Renew program')}</button></div>`; })()}</div></section>
       <section aria-labelledby="pgUp"><div class="sec"><h2 id="pgUp">${t('Upcoming')}</h2><span>${up.length}</span></div>
         ${up.length ? `<ol class="rows in-grp">${up.map((x, i) => row(x, i, true, sesTitle(x))).join('')}</ol>` : `<p class="meta">${t('No upcoming sessions left in this program.')}</p>`}</section>
       ${pa.length ? `<section aria-labelledby="pgPast" style="margin-top:clamp(32px,6vh,56px)"><div class="sec"><h2 id="pgPast">${t('Played')}</h2><span>${pa.length}</span></div><ol class="rows past in-grp">${pa.map((x, i) => row(x, i, false, sesTitle(x))).join('')}</ol></section>` : ''}`;
@@ -335,11 +356,28 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
     const n = k => upItems(all().filter(x => k === 'all' || kindOf(x.b) === k)).length;
     return `<div class="types" role="group" aria-label="${t('Booking type')}">${['all', ...ks].map(k => `<button type="button" class="type" data-kind="${k}" aria-pressed="${k === kind}">${k === 'all' ? t('All') : kindName(k)}<b>${n(k)}</b></button>`).join('')}</div>`;
   }
+  // the person filter (Ahmed, 2026-11-11): only shown once tickets are for more than one person
+  function persons(){
+    const names = [...new Set(all().map(personOf).filter(Boolean))]; if (names.length < 2) return '';
+    if (who !== 'all' && !names.includes(who)) who = 'all';
+    const mine = user ? user.name : '', order = [mine, ...names.filter(n => n !== mine).sort()].filter(n => names.includes(n));
+    const n = name => upItems(all().filter(x => (kind === 'all' || kindOf(x.b) === kind) && (name === 'all' || personOf(x) === name))).length;
+    return `<div class="types who" role="group" aria-label="${t('Who it’s for')}">${['all', ...order].map(k => `<button type="button" class="type" data-who="${esc(k)}" aria-pressed="${k === who}">${k === 'all' ? t('Everyone') : k === mine ? t('Me') : esc(k.split(' ')[0])}<b>${n(k)}</b></button>`).join('')}</div>`;
+  }
+  // renewing a program (20% off, from its last week until 7 days after) and free cancellation (until 48 h before)
+  const renewed = b => bookings.some(x => x.order.renewOf === b.cartId && x.status === 'paid');
+  const renewInfo = b => { if (b.order.kind !== 'program' || b.order.plan === 'trial' || renewed(b)) return null; const p = window.SFA_PROGRAMS[b.order.program]; if (!p) return null;
+    const R = window.SFA_PROGRAM_RENEW(p, b.order.days.map(d => d.date).sort().pop()); return R.open ? { ...R, p } : null; };
+  const whenBy = d => `${P.date(d, 'short')} · <bdi>${P.time(d.getHours() * 60 + d.getMinutes())}</bdi>`;
+  function cancelLine(b){
+    const C = T.cancelInfo(b);
+    return C.can ? `<p class="cx-note">${t('Free cancellation until {when}', { when: whenBy(C.by) })}</p>` : (C.by.getTime() > b.paidAt ? `<p class="cx-note off">${t('Free cancellation ended {when}', { when: whenBy(C.by) })}</p>` : '');
+  }
   function tickets(){
     const gid = groupId(); if (gid) return groupView(gid);
     const upAll = upcoming(), next = upAll[0], up = upItems(), pa = pastItems();
     const list = seg === 'up' ? up.filter(it => it.g || !next || it.x.s.id !== next.s.id) : pa;
-    return types() + (next ? `<section class="next" aria-labelledby="nextH"><div class="sec"><h2 id="nextH">${t('Next up')}</h2><span class="when">${when(next)}</span></div>${T.ticket(next.s, next.b)}
+    return types() + persons() + (next ? `<section class="next" aria-labelledby="nextH"><div class="sec"><h2 id="nextH">${t('Next up')}</h2><span class="when">${when(next)}</span></div>${T.ticket(next.s, next.b)}
         <div class="dlg-acts" style="margin-top:12px"><a class="ghost" href="${T.ics(next.b)}" download="${T.icsName(next.b)}">${CAL}${t('Add to calendar')}</a><a class="ghost" href="${T.DIRECTIONS}" target="_blank" rel="noopener">${PIN}${t('Get directions')}</a></div></section>` : '')
       + `<section aria-labelledby="listH"><div class="sec"><h2 id="listH">${t('My tickets')}</h2></div>
         <div class="seg" role="group" aria-label="${t('My tickets')}"><button type="button" data-seg="up" aria-pressed="${seg === 'up'}">${t('Upcoming')} (${up.length})</button><button type="button" data-seg="past" aria-pressed="${seg === 'past'}">${t('Past')} (${pa.length})</button></div>
@@ -428,16 +466,16 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
     const since = user.since ? t('Member since {date}', { date: P.date(new Date(user.since), 'month') }) : '';
     root.innerHTML = `<section class="pf-head"><div class="in"><div class="who"><span class="av" aria-hidden="true">${esc(initials(user))}</span>
         <p class="eye">${t('My account')}</p><h1>${esc(user.name)}</h1><p class="meta">${esc(user.email)}${since ? ' · ' + since : ''}</p></div>
-        <div class="tabs" role="tablist" aria-label="${t('My account')}">${[['tickets', 'My tickets', nUp], ['saved', 'Saved courts', favs.length], ['people', 'My children', people.length], ['account', 'My profile']].map(([k, l, n]) =>
+        <div class="tabs" role="tablist" aria-label="${t('My account')}">${[['tickets', 'My tickets', nUp], ['people', 'My children', people.length], ['account', 'My profile']].map(([k, l, n]) =>
           `<button type="button" class="tab" role="tab" id="tab-${k}" aria-controls="panel" aria-selected="${k === cur}" data-tab="${k}">${t(l)}${n !== undefined ? `<b>${n}</b>` : ''}</button>`).join('')}</div></div></section>
-      <section class="in panel" id="panel" role="tabpanel" aria-labelledby="tab-${cur}">${cur === 'tickets' ? tickets() : cur === 'saved' ? saved() : cur === 'people' ? children() : account()}</section>`;
+      <section class="in panel" id="panel" role="tabpanel" aria-labelledby="tab-${cur}">${cur === 'tickets' ? tickets() : cur === 'people' ? children() : account()}</section>`;
     T.paintQR(root); A.paintFavs?.();
   }
 
   function openTicket(id){
     const x = all().find(y => y.s.id === id); if (!x) return;
     dlg.innerHTML = `<div class="dlg-top"><h2 id="dlgH">${t('Ticket')}</h2><button type="button" class="x" data-close aria-label="${t('Close')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
-      <div class="dlg-body">${T.ticket(x.s, x.b)}<div class="dlg-acts"><a class="ghost" href="${T.ics(x.b)}" download="${T.icsName(x.b)}">${CAL}${t('Add to calendar')}</a><a class="ghost" href="${T.DIRECTIONS}" target="_blank" rel="noopener">${PIN}${t('Get directions')}</a><a class="ghost" href="result.html?cart=${encodeURIComponent(x.b.cartId)}">${t('Booking details')}</a></div></div>`;
+      <div class="dlg-body">${T.ticket(x.s, x.b)}<div class="dlg-acts"><a class="ghost" href="${T.ics(x.b)}" download="${T.icsName(x.b)}">${CAL}${t('Add to calendar')}</a><a class="ghost" href="${T.DIRECTIONS}" target="_blank" rel="noopener">${PIN}${t('Get directions')}</a><a class="ghost" href="result.html?cart=${encodeURIComponent(x.b.cartId)}">${t('Booking details')}</a>${T.cancelInfo(x.b).can ? `<button type="button" class="ghost danger" data-cancel="${esc(x.b.cartId)}">${t('Cancel booking')}</button>` : ''}</div>${cancelLine(x.b)}</div>`;
     dlg.dir = document.documentElement.dir; dlg.showModal(); T.paintQR(dlg);
   }
 
@@ -448,7 +486,10 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
   const firstBad = () => root.querySelector('.pf.bad input, .pf.bad button')?.focus();
   const post = async (url, body) => { try { const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }); return { ok: r.ok, d: await r.json().catch(() => ({})) }; } catch (e) { return { ok: false, d: { error: 'Could not reach the server. Try again.' } }; } };
   root.addEventListener('click', async e => {
-    const el = e.target.closest('[data-tab],[data-seg],[data-kind],[data-open],[data-out],[data-signin],[data-padd],[data-pedit],[data-pcancel],[data-psave],[data-gen],[data-rm],[data-rm-yes],[data-rm-no],[data-aedit],[data-acancel],[data-asave],[data-group],[data-back]'); if (!el) return;
+    const el = e.target.closest('[data-tab],[data-seg],[data-kind],[data-open],[data-out],[data-signin],[data-padd],[data-pedit],[data-pcancel],[data-psave],[data-gen],[data-rm],[data-rm-yes],[data-rm-no],[data-aedit],[data-acancel],[data-asave],[data-group],[data-back],[data-who],[data-renew],[data-cancel]'); if (!el) return;
+    if (el.dataset.who){ who = el.dataset.who; paint(); root.querySelector(`[data-who="${CSS.escape(who)}"]`)?.focus(); return; }
+    if (el.dataset.renew){ e.preventDefault(); e.stopPropagation(); return renew(el.dataset.renew); }
+    if (el.dataset.cancel) return askCancel(el.dataset.cancel);
     if (el.dataset.group){ location.hash = '#tickets/' + encodeURIComponent(el.dataset.group); scrollTo({ top: 0 }); return; }
     if (el.hasAttribute('data-back')){ e.preventDefault(); location.hash = '#tickets'; return; }
     if (el.dataset.kind){ kind = el.dataset.kind; paint(); root.querySelector(`[data-kind="${kind}"]`)?.focus(); return; }
@@ -491,7 +532,36 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
     const i = TABS.indexOf(b.dataset.tab), dir = (e.key === 'ArrowRight') !== (document.documentElement.dir === 'rtl') ? 1 : -1;
     location.hash = TABS[(i + dir + TABS.length) % TABS.length];
   });
-  dlg.addEventListener('click', e => { if (e.target === dlg || e.target.closest('[data-close]')) dlg.close(); });
+  // renew: checkout opens with the same program, time and participants, the next training day, 20% off
+  function renew(id){
+    const b = bookings.find(x => x.cartId === id), R = b && renewInfo(b); if (!R) return;
+    const places = T.people(b).map(x => x.ref || (user && x.name === user.name ? 'me' : null)).filter(Boolean);
+    try { sessionStorage.setItem('sfaOrder', JSON.stringify({ kind: 'program', program: b.order.program, plan: 'month', start: R.start, time: b.order.time, renew: b.cartId, people: { added: [], places }, kitSizes: [] })); } catch (e) {}
+    location.href = 'checkout.html';
+  }
+  // cancel: confirm first (the whole booking, every ticket in it), then refund
+  function askCancel(id){
+    const b = bookings.find(x => x.cartId === id); if (!b) return;
+    const D = T.describe(T.sessions(b)[0], b), n = T.sessions(b).length;
+    dlg.innerHTML = `<div class="dlg-top"><h2 id="dlgH">${t('Cancel this booking?')}</h2><button type="button" class="x" data-close aria-label="${t('Close')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="dlg-body cx"><p><b>${esc(D.label)}</b> · <bdi>${esc(b.cartId)}</bdi></p>
+        <p>${n > 1 ? t('All {n} tickets in this booking will be cancelled.', { n }) : t('Your ticket will be cancelled.')} ${b.amount ? t('{amount} goes back to your card within 5 to 10 working days.', { amount: P.money(b.amount) }) : ''} ${t('This can’t be undone.')}</p>
+        <p class="err" id="cxErr" role="alert"></p>
+        <div class="dlg-acts"><button type="button" class="btn sm danger" data-cx-yes="${esc(id)}">${b.amount ? t('Cancel and refund {amount}', { amount: P.money(b.amount) }) : t('Cancel booking')}</button><button type="button" class="ghost sm" data-close>${t('Keep booking')}</button></div></div>`;
+    dlg.dir = document.documentElement.dir; if (!dlg.open) dlg.showModal(); dlg.querySelector('[data-close].ghost')?.focus();
+  }
+  dlg.addEventListener('click', async e => {
+    if (e.target === dlg || e.target.closest('[data-close]')) return dlg.close();
+    const c = e.target.closest('[data-cancel]'); if (c) return askCancel(c.dataset.cancel);
+    const y = e.target.closest('[data-cx-yes]'); if (!y) return;
+    y.disabled = true;
+    const r = await post('/api/auth/cancel', { cart: y.dataset.cxYes });
+    if (!r.ok){ y.disabled = false; dlg.querySelector('#cxErr').textContent = t(r.d.error || 'Something went wrong. Try again.'); return; }
+    dlg.close();
+    const b = await fetch('/api/auth/bookings').then(x => x.json()).catch(() => ({})); bookings = b.bookings || bookings;
+    if (groupId()) history.replaceState(null, '', '#tickets');
+    paint(); A.toast(r.d.refund ? t('Booking cancelled · {amount} refunded', { amount: `${t('SAR')} ${(+r.d.refund).toLocaleString('en-US')}` }) : t('Booking cancelled'));
+  });
   addEventListener('hashchange', paint);
   addEventListener('sfa:prefs', paint);
 

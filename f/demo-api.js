@@ -134,7 +134,17 @@
     const fail = msg => ({ error: msg }), PR = W.SFA_PROGRAMS, PLANS = W.SFA_PROGRAM_PLANS, KIT = W.SFA_PROGRAM_KIT, MAX = W.SFA_PROGRAM_MAX_PEOPLE;
     const p = PR[order.program]; if (!p) return fail('Unknown program.');
     if (!Object.hasOwn(PLANS, order.plan || '')) return fail('Choose a free trial or a subscription.');
-    if (!W.SFA_PROGRAM_START_DAYS(p).includes(order.start)) return fail('Pick one of the next 3 training days to start.');
+    let renew = null;
+    if (order.renew){
+      const ob = db.bookings[order.renew];
+      if (!ob || ob.userId !== user.id || ob.status !== 'paid' || ob.order.kind !== 'program' || ob.order.program !== order.program || ob.order.plan === 'trial') return fail("That program can't be renewed.");
+      if (Object.values(db.bookings).some(b => b.order.renewOf === ob.cartId && b.status === 'paid')) return fail('This program has already been renewed.');
+      const R = W.SFA_PROGRAM_RENEW(p, ob.order.days.map(d => d.date).sort().pop());
+      if (!R.open) return fail('Renewal opens in the last week of the program and closes 7 days after it ends.');
+      if (order.plan !== 'month' || order.start !== R.start || order.time !== ob.order.time) return fail('A renewal is one more month at the same time, from the next training day.');
+      renew = ob;
+    }
+    else if (!W.SFA_PROGRAM_START_DAYS(p).includes(order.start)) return fail('Pick one of the next 3 training days to start.');
     const slot = p.slots.find(s => s.time === order.time); if (!slot) return fail('Pick a time slot.');
     const list = Array.isArray(order.participants) ? order.participants : [];
     if (!list.length) return fail('Add at least one participant.');
@@ -155,28 +165,33 @@
         return fail(`${who.name} has already had a free trial of this program.`);
       delete who.self; people.push(who);
     }
-    const sizes = Array.isArray(order.kits) ? order.kits : [];
-    if (sizes.length && order.plan === 'trial') return fail('Add-ons come with a subscription, not a free trial.');
-    if (sizes.length > 10) return fail('Up to 10 kits per booking.');
-    if (sizes.some(z => !KIT.sizes.includes(z))) return fail('Choose a size for each kit.');
-    const dates = W.SFA_PROGRAM_SESSIONS(p, order.start, order.plan), kits = sizes.length;
-    const amount = people.length * W.SFA_PROGRAM_PRICE(p, order.plan) + kits * KIT.price;
-    return { amount, order: { kind: 'program', program: order.program, sport: p.sport, plan: order.plan, start: order.start, time: slot.time, participants: people, kit: kits ? { qty: kits, sizes } : null, days: dates.map(date => ({ date, starts: [slot.time] })) } };
+    const kits = Math.max(0, Math.min(Array.isArray(order.kits) ? order.kits.length : (+order.kits || 0), 99));   // a quantity; kits have no sizes (Ahmed, 2026-11-11)
+    if (kits && order.plan === 'trial') return fail('Add-ons come with a subscription, not a free trial.');
+    if (kits > 10) return fail('Up to 10 kits per booking.');
+    const dates = W.SFA_PROGRAM_SESSIONS(p, order.start, order.plan);
+    const amount = people.length * (renew ? W.SFA_RENEW_PRICE(p) : W.SFA_PROGRAM_PRICE(p, order.plan)) + kits * KIT.price;
+    return { amount, order: { kind: 'program', program: order.program, sport: p.sport, plan: order.plan, start: order.start, time: slot.time, participants: people, kit: kits ? { qty: kits } : null, days: dates.map(date => ({ date, starts: [slot.time] })), ...(renew ? { renewOf: renew.cartId } : {}) } };
   }
   const gameBookings = id => Object.values(db.bookings).filter(b => b.order.kind === 'game' && b.order.game === id && holding(b));
+  const gamePlayer = b => b.order.bookingFor && b.order.bookingFor.type === 'child' ? 'child:' + (b.order.bookingFor.ref || b.order.bookingFor.name) : 'me';
   function checkGameOrder(order, user){
     const fail = (error, status) => ({ error, status });
     const g = W.SFA_GAME(order && order.game); if (!g) return fail('That game is no longer on.', 409);
     const now = new Date(), today = dk(now);
     if (g.date < today || (g.date === today && g.start <= now.getHours() * 60 + now.getMinutes())) return fail('That game has already started.', 409);
-    if (!user.dob) return fail('Add your date of birth in My account to join a game.');
-    if (W.SFA_AGE(user.dob, g.date) < 18) return fail('Open games are for adults (18+).');
-    const held = gameBookings(g.id);
-    if (held.some(b => b.userId === user.id)) return fail("You've already joined this game.", 409);
+    const ref = order.player && order.player.ref ? order.player.ref : 'me';
+    let p;
+    if (ref === 'me'){ if (!user.dob) return fail('Add your date of birth in My account to join a game.'); p = { type: 'me', name: user.name, dob: user.dob, gender: user.gender }; }
+    else { const c = (user.participants || []).find(x => x.id === ref); if (!c) return fail(STALE_CHILD, 409); p = { type: 'child', ref: c.id, name: c.name, dob: c.dob, gender: c.gender }; }
+    if (W.SFA_GAME_FITS(g, p)) return fail(g.who === 'kids' ? (p.type === 'me' ? 'This game is for kids aged 6 to 17.' : `${p.name} can't join: this game is for kids aged 6 to 17.`) : (p.type === 'me' ? 'This game is for adults (18+).' : `${p.name} can't join: this game is for adults (18+).`));
+    const key = p.type === 'me' ? 'me' : 'child:' + p.ref, held = gameBookings(g.id);
+    if (held.some(b => b.userId === user.id && gamePlayer(b) === key)) return fail(p.type === 'me' ? "You've already joined this game." : `${p.name} is already in this game.`, 409);
     if (g.base + held.length >= g.spots) return fail('That game is full.', 409);
-    return { amount: g.price, order: { kind: 'game', game: g.id, sport: g.sport, court: g.court, days: [{ date: g.date, starts: [g.start] }], level: g.level, format: g.format, spots: g.spots, bookingFor: { type: 'me' } } };
+    const firstFree = !Object.values(db.bookings).some(b => b.userId === user.id && b.order.kind === 'game' && b.status === 'paid' && gamePlayer(b) === key);
+    return { amount: firstFree ? 0 : g.price, player: p, order: { kind: 'game', game: g.id, sport: g.sport, court: g.court, days: [{ date: g.date, starts: [g.start] }], who: g.who, format: g.format, spots: g.spots, firstFree,
+      bookingFor: p.type === 'me' ? { type: 'me' } : { type: 'child', ref: p.ref, name: p.name, dob: p.dob, gender: p.gender } } };
   }
-  const pub = b => { const { cartId, status, amount, order, tranRef, message, paidAt, createdAt, test, free } = b; return { cartId, status, amount, order, tranRef, message, paidAt, createdAt, test: !!test, free: !!free }; };
+  const pub = b => { const { cartId, status, amount, order, tranRef, message, paidAt, createdAt, test, free, cancelledAt, refund } = b; return { cartId, status, amount, order, tranRef, message, paidAt, createdAt, test: !!test, free: !!free, cancelledAt, refund }; };
   const resets = new Map();
 
   // ---- the routes
@@ -287,6 +302,15 @@
         }
         return [200, { favorites: u.favorites }];
       }
+      case '/api/auth/cancel': {
+        const u = currentUser(); if (!u) return [401, { error: 'Please sign in.' }];
+        const b = db.bookings[body.cart]; if (!b || b.userId !== u.id) return [404, { error: 'Booking not found.' }];
+        if (b.status !== 'paid') return [400, { error: 'Only confirmed bookings can be cancelled.' }];
+        const first = Math.min(...b.order.days.flatMap(d => d.starts.map(s => { const x = parse(d.date); x.setMinutes(s); return x.getTime(); })));
+        if (first - Date.now() < 48 * 3600e3) return [400, { error: 'Free cancellation ends 48 hours before the first session.' }];
+        b.status = 'cancelled'; b.cancelledAt = Date.now(); b.refund = b.amount || 0;
+        return [200, { ok: true, refund: b.refund }];
+      }
       case '/api/booked': return [200, [...takenSlots(q.get('sport'), +q.get('court'))]];
       case '/api/games': {
         const days = new Set(String(q.get('days') || '').split(',')), me = currentUser(), out = {};
@@ -305,7 +329,8 @@
         let amount;
         if (order && order.kind === 'game'){
           const gc = checkGameOrder(order, user); if (gc.error) return [gc.status || 400, { error: gc.error }];
-          order = gc.order; amount = gc.amount; order.waiver = { acceptedBy: user.name, at: Date.now(), for: [user.name], guardian: false };
+          order = gc.order; amount = gc.amount; order.waiver = { acceptedBy: user.name, at: Date.now(), for: [gc.player.name], guardian: gc.player.type === 'child' };
+          if (!amount){ db.bookings[cartId] = { cartId, status: 'paid', createdAt: Date.now(), paidAt: Date.now(), amount: 0, order, payer, userId: user.id, free: true }; return [200, { redirect_url: `result.html?cart=${encodeURIComponent(cartId)}`, cartId }]; }
         } else if (order && order.kind === 'program'){
           const pc = checkProgramOrder(order, user); if (pc.error) return [pc.status || 400, { error: pc.error }];
           order = pc.order; amount = pc.amount;
@@ -329,8 +354,8 @@
       }
       case '/api/booking': {
         const b = db.bookings[q.get('cart')]; if (!b) return [404, { error: 'Booking not found.' }];
-        const { cartId, status, amount, order, tranRef, message, paidAt, test, free } = b;
-        return [200, { cartId, status, amount, order, tranRef, message, paidAt, test: !!test, free: !!free }];
+        const { cartId, status, amount, order, tranRef, message, paidAt, test, free, cancelledAt, refund } = b;
+        return [200, { cartId, status, amount, order, tranRef, message, paidAt, test: !!test, free: !!free, cancelledAt, refund }];
       }
     }
     return [404, { error: 'Not found.' }];

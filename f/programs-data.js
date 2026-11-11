@@ -119,8 +119,8 @@
     { en: 'Eat at least two hours before training to ensure optimal performance.', ar: 'تناول الطعام قبل التدريب بساعتين على الأقل لتحقيق أفضل أداء.' },
   ];
   window.SFA_PROGRAM_TERMS = [
-    { en: 'All sport program subscriptions are non-refundable.', ar: 'جميع اشتراكات البرامج الرياضية غير قابلة للاسترداد.' },
-    { en: 'Subscription cancellations are allowed only up to 48 hours before the program start date.', ar: 'يُسمح بإلغاء الاشتراك حتى 48 ساعة فقط قبل تاريخ بدء البرنامج.' },
+    { en: 'You can cancel for free, with a full refund, up to 48 hours before the first session. After that, subscriptions are non-refundable.', ar: 'يمكنك الإلغاء مجانًا مع استرداد كامل المبلغ حتى 48 ساعة قبل الجلسة الأولى. بعد ذلك، تكون الاشتراكات غير قابلة للاسترداد.' },
+    { en: 'Renew within the last week of your program, or up to 7 days after it ends, to get 20% off the next month.', ar: 'جدّد خلال الأسبوع الأخير من برنامجك أو حتى 7 أيام بعد انتهائه لتحصل على خصم 20% على الشهر التالي.' },
     { en: 'Registration is confirmed only upon issuing the payment receipt and sending the confirmation to your registered email.', ar: 'لا يُؤكَّد التسجيل إلا بعد إصدار إيصال الدفع وإرسال التأكيد إلى بريدك الإلكتروني المسجّل.' },
     { en: 'Please ensure that the child participant arrives before the start of the training session to fully benefit from the program.', ar: 'يرجى التأكد من وصول الطفل المشارك قبل بدء الجلسة التدريبية ليستفيد من البرنامج بالكامل.' },
     { en: 'Late arrivals will not be compensated.', ar: 'لن يُعوَّض التأخير عن الحضور.' },
@@ -170,6 +170,17 @@
     if (!(age >= r.min && age <= r.max)) return 'age';
     if (p.women && person.gender !== 'female') return 'gender';
     return null;
+  };
+  // renewing (Ahmed, 2026-11-11): a subscription can be renewed for another month at 20% off, from the last week of the
+  // program until 7 days after its last session. The same program, time and participants start again on the next training
+  // day after the last session (or after today, if that's later). → { open, from, until, start } (dates 'YYYY-MM-DD')
+  window.SFA_RENEW_OFF = 0.2;
+  window.SFA_RENEW_PRICE = p => Math.round(p.month * (1 - window.SFA_RENEW_OFF));
+  window.SFA_PROGRAM_RENEW = (p, lastDate, now = new Date()) => {
+    const at = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }, add = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+    const today = key(now), last = at(lastDate), from = key(add(last, -6)), until = key(add(last, 7));
+    let d = add(lastDate > today ? last : at(today), 1); while (p.days.length && !p.days.includes(d.getDay())) d = add(d, 1);
+    return { open: today >= from && today <= until, from, until, start: key(d) };
   };
   // the most participants one booking can hold
   window.SFA_PROGRAM_MAX_PEOPLE = 6;

@@ -65,19 +65,28 @@ function takenSlots(sport, court){
 
 // online spots held or paid in an open game, and whether this user already has one
 const gameBookings = id => Object.values(bookings).filter(b => b.order.kind === 'game' && b.order.game === id && holding(b));
+// who holds a game spot: you ('me') or one of your children
+const gamePlayer = b => b.order.bookingFor && b.order.bookingFor.type === 'child' ? 'child:' + (b.order.bookingFor.ref || b.order.bookingFor.name) : 'me';
+// a game order: { kind: 'game', game, player: { ref: 'me' | <saved child id> } }. Adult games take you (18+); kids' games take
+// one of your saved children aged 6 to 17 on the day (Ahmed, 2026-11-11). Each person's first open game is free.
 function checkGameOrder(order, user){
   const fail = (error, status) => ({ error, status });
   const g = GAME(order && order.game); if (!g) return fail('That game is no longer on.', 409);
   const now = new Date(), today = dk(now);
   if (g.date < today || (g.date === today && g.start <= now.getHours() * 60 + now.getMinutes())) return fail('That game has already started.', 409);
-  if (!user.dob) return fail('Add your date of birth in My account to join a game.');
-  if (ctx.window.SFA_AGE(user.dob, g.date) < 18) return fail('Open games are for adults (18+).');
-  const held = gameBookings(g.id);
-  if (held.some(b => b.userId === user.id)) return fail("You've already joined this game.", 409);
+  const ref = order.player && order.player.ref ? order.player.ref : 'me';
+  let p;
+  if (ref === 'me'){ if (!user.dob) return fail('Add your date of birth in My account to join a game.'); p = { type: 'me', name: user.name, dob: user.dob, gender: user.gender }; }
+  else { const c = (user.participants || []).find(x => x.id === ref); if (!c) return fail('That child is no longer in My children. Refresh the page to see your current list.', 409); p = { type: 'child', ref: c.id, name: c.name, dob: c.dob, gender: c.gender }; }
+  if (ctx.window.SFA_GAME_FITS(g, p)) return fail(g.who === 'kids' ? (p.type === 'me' ? 'This game is for kids aged 6 to 17.' : `${p.name} can't join: this game is for kids aged 6 to 17.`) : (p.type === 'me' ? 'This game is for adults (18+).' : `${p.name} can't join: this game is for adults (18+).`));
+  const key = p.type === 'me' ? 'me' : 'child:' + p.ref, held = gameBookings(g.id);
+  if (held.some(b => b.userId === user.id && gamePlayer(b) === key)) return fail(p.type === 'me' ? "You've already joined this game." : `${p.name} is already in this game.`, 409);
   if (g.base + held.length >= g.spots) return fail('That game is full.', 409);
+  const firstFree = !Object.values(bookings).some(b => b.userId === user.id && b.order.kind === 'game' && b.status === 'paid' && gamePlayer(b) === key);
   const sport = SPORTS[g.sport], court = sport.courts[g.court];
-  return { amount: g.price, desc: `Open game · ${sport.name} · ${court[0]} · ${g.level} · SFA Domes Dammam`,
-    order: { kind: 'game', game: g.id, sport: g.sport, court: g.court, days: [{ date: g.date, starts: [g.start] }], level: g.level, format: g.format, spots: g.spots, bookingFor: { type: 'me' } } };
+  return { amount: firstFree ? 0 : g.price, desc: `Open game · ${sport.name} · ${court[0]} · ${g.who === 'kids' ? 'Kids 6–17' : 'Adults'} · SFA Domes Dammam`, player: p,
+    order: { kind: 'game', game: g.id, sport: g.sport, court: g.court, days: [{ date: g.date, starts: [g.start] }], who: g.who, format: g.format, spots: g.spots, firstFree,
+      bookingFor: p.type === 'me' ? { type: 'me' } : { type: 'child', ref: p.ref, name: p.name, dob: p.dob, gender: p.gender } } };
 }
 
 // ---- helpers
@@ -185,7 +194,7 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; ch
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.json': 'application/json', '.ico': 'image/x-icon',
   '.otf': 'font/otf', '.ttf': 'font/ttf', '.woff': 'font/woff', '.woff2': 'font/woff2' };
 // a program order: { kind: 'program', program, plan: 'trial' | 'month' | 'month2' | 'month3', start, time,
-//   participants: [{ ref: 'me' | <saved child id> } | { child: { first, last, dob, gender } }], kits: [<size>, …] }.
+//   participants: [{ ref: 'me' | <saved child id> } | { child: { first, last, dob, gender } }], kits: <how many> (or an array, counted) }.
 // Everyone in it pays the plan; kits are a quantity of their own. 'me' and saved children are read from the account, never the
 // page; a child entered for this booking only is checked like My children (saving happens before checkout, through the
 // "Save this child to your account?" prompt). Only you and children: no other adults (Ahmed). The server works out the
@@ -196,7 +205,18 @@ function checkProgramOrder(order, user){
   const fail = msg => ({ error: msg });
   const p = PROGRAMS[order.program]; if (!p) return fail('Unknown program.');
   if (!Object.hasOwn(PLANS, order.plan || '')) return fail('Choose a free trial or a subscription.');
-  if (!START_DAYS(p).includes(order.start)) return fail('Pick one of the next 3 training days to start.');
+  // a renewal: another month of one of your subscriptions, 20% off, in its renewal window, once (Ahmed, 2026-11-11)
+  let renew = null;
+  if (order.renew){
+    const ob = bookings[order.renew];
+    if (!ob || ob.userId !== user.id || ob.status !== 'paid' || ob.order.kind !== 'program' || ob.order.program !== order.program || ob.order.plan === 'trial') return fail("That program can't be renewed.");
+    if (Object.values(bookings).some(b => b.order.renewOf === ob.cartId && b.status === 'paid')) return fail('This program has already been renewed.', 409);
+    const R = ctx.window.SFA_PROGRAM_RENEW(p, ob.order.days.map(d => d.date).sort().pop());
+    if (!R.open) return fail('Renewal opens in the last week of the program and closes 7 days after it ends.');
+    if (order.plan !== 'month' || order.start !== R.start || order.time !== ob.order.time) return fail('A renewal is one more month at the same time, from the next training day.');
+    renew = ob;
+  }
+  else if (!START_DAYS(p).includes(order.start)) return fail('Pick one of the next 3 training days to start.');
   const slot = p.slots.find(s => s.time === order.time); if (!slot) return fail('Pick a time slot.');
   const list = Array.isArray(order.participants) ? order.participants : [];
   if (!list.length) return fail('Add at least one participant.');
@@ -217,15 +237,14 @@ function checkProgramOrder(order, user){
       return fail(`${who.name} has already had a free trial of this program.`);
     delete who.self; people.push(who);
   }
-  // the Training Kit: a quantity of its own (Ahmed), each kit with its size; subscriptions only
-  const sizes = Array.isArray(order.kits) ? order.kits : [];
-  if (sizes.length && order.plan === 'trial') return fail('Add-ons come with a subscription, not a free trial.');
-  if (sizes.length > 10) return fail('Up to 10 kits per booking.');
-  if (sizes.some(z => !KIT.sizes.includes(z))) return fail('Choose a size for each kit.');
-  const dates = PROGRAM_SESSIONS(p, order.start, order.plan), kits = sizes.length;
-  const amount = people.length * PRICE(p, order.plan) + kits * KIT.price;
+  // the Training Kit: a quantity of its own (Ahmed), no sizes; subscriptions only
+  const kits = Math.max(0, Math.min(Array.isArray(order.kits) ? order.kits.length : (+order.kits || 0), 99));   // a quantity; kits have no sizes (Ahmed, 2026-11-11)
+  if (kits && order.plan === 'trial') return fail('Add-ons come with a subscription, not a free trial.');
+  if (kits > 10) return fail('Up to 10 kits per booking.');
+  const dates = PROGRAM_SESSIONS(p, order.start, order.plan);
+  const amount = people.length * (renew ? ctx.window.SFA_RENEW_PRICE(p) : PRICE(p, order.plan)) + kits * KIT.price;
   const clean = { kind: 'program', program: order.program, sport: p.sport, plan: order.plan, start: order.start, time: slot.time, participants: people,
-    kit: kits ? { qty: kits, sizes } : null, days: dates.map(date => ({ date, starts: [slot.time] })) };
+    kit: kits ? { qty: kits } : null, days: dates.map(date => ({ date, starts: [slot.time] })), ...(renew ? { renewOf: renew.cartId } : {}) };
   const months = PLANS[order.plan].months;
   return { order: clean, amount, desc: `${p.name.en} · ${order.plan === 'trial' ? 'Free trial' : `${months} month${months > 1 ? 's' : ''}`} × ${people.length}${kits ? ` · Training Kit × ${kits}` : ''} · SFA Domes Dammam` };
 }
@@ -353,7 +372,7 @@ async function authRoute(req, res, url){
     case '/api/auth/bookings': {
       const u = currentUser(req); if (!u) return send(res, 401, { error: 'Please sign in.' });
       const list = Object.values(bookings).filter(b => b.userId === u.id && b.status !== 'pending').sort((a, b) => b.createdAt - a.createdAt)
-        .map(({ cartId, status, amount, order, tranRef, message, paidAt, createdAt, test, free }) => ({ cartId, status, amount, order, tranRef, message, paidAt, createdAt, test: !!test, free: !!free }));
+        .map(({ cartId, status, amount, order, tranRef, message, paidAt, createdAt, test, free, cancelledAt, refund }) => ({ cartId, status, amount, order, tranRef, message, paidAt, createdAt, test: !!test, free: !!free, cancelledAt, refund }));
       return send(res, 200, { bookings: list });
     }
     // My profile: first and last name, date of birth and gender can change; email and phone are locked
@@ -409,6 +428,22 @@ async function authRoute(req, res, url){
       }
       return send(res, 200, { participants: u.participants, limit: CHILD.LIMIT });
     }
+    // free cancellation (Ahmed, 2026-11-11): the whole booking, until 48 hours before its first session. With real PayTabs the
+    // payment is refunded through PayTabs first; in test mode the refund is only recorded. Cancelled slots and spots free up.
+    case '/api/auth/cancel': {
+      const u = currentUser(req); if (!u) return send(res, 401, { error: 'Please sign in.' });
+      const b = bookings[body.cart]; if (!b || b.userId !== u.id) return send(res, 404, { error: 'Booking not found.' });
+      if (b.status !== 'paid') return send(res, 400, { error: 'Only confirmed bookings can be cancelled.' });
+      const first = Math.min(...b.order.days.flatMap(d => d.starts.map(s => { const [y, m, dd] = d.date.split('-').map(Number); return new Date(y, m - 1, dd, 0, s).getTime(); })));
+      if (first - Date.now() < 48 * 3600e3) return send(res, 400, { error: 'Free cancellation ends 48 hours before the first session.' });
+      if (b.amount && !b.test && configured() && b.tranRef){
+        const r = await paytabs('request', { profile_id: +PT.profileId, tran_type: 'refund', tran_class: 'ecom', cart_id: b.cartId, cart_currency: 'SAR', cart_amount: b.amount, cart_description: 'Booking cancelled · free cancellation', tran_ref: b.tranRef });
+        if ((r.payment_result || {}).response_status !== 'A') return send(res, 502, { error: (r.payment_result || {}).response_message || 'PayTabs could not refund this payment. Try again.' });
+        b.refundRef = r.tran_ref;
+      }
+      b.status = 'cancelled'; b.cancelledAt = Date.now(); b.refund = b.amount || 0; save();
+      return send(res, 200, { ok: true, refund: b.refund });
+    }
     // saved courts ("sport|court" keys) on the signed-in account
     case '/api/auth/favorites': {
       const u = currentUser(req); if (!u) return send(res, 401, { error: 'Please sign in.' });
@@ -462,7 +497,13 @@ const server = http.createServer(async (req, res) => {
       if (order && order.kind === 'game'){
         const gc = checkGameOrder(order, user); if (gc.error) return send(res, gc.status || 400, { error: gc.error });
         order = gc.order; chk = { amount: gc.amount, desc: gc.desc };
-        order.waiver = { acceptedBy: user.name, at: Date.now(), for: [user.name], guardian: false };
+        order.waiver = { acceptedBy: user.name, at: Date.now(), for: [gc.player.name], guardian: gc.player.type === 'child' };
+        // a first open game is free: confirmed straight away
+        if (!chk.amount){
+          bookings[cartId] = { cartId, status: 'paid', createdAt: Date.now(), paidAt: Date.now(), amount: 0, order, payer, userId: user.id, free: true };
+          save();
+          return send(res, 200, { redirect_url: `/result.html?cart=${encodeURIComponent(cartId)}`, cartId });
+        }
       } else if (order && order.kind === 'program'){
         const pc = checkProgramOrder(order, user); if (pc.error) return send(res, pc.status || 400, { error: pc.error });
         order = pc.order; chk = { amount: pc.amount, desc: pc.desc };
@@ -542,8 +583,8 @@ const server = http.createServer(async (req, res) => {
     // what result.html shows
     if (req.method === 'GET' && url.pathname === '/api/booking'){
       const b = bookings[url.searchParams.get('cart')]; if (!b) return send(res, 404, { error: 'Booking not found.' });
-      const { cartId, status, amount, order, tranRef, message, paidAt, test, free } = b;
-      return send(res, 200, { cartId, status, amount, order, tranRef, message, paidAt, test: !!test, free: !!free });
+      const { cartId, status, amount, order, tranRef, message, paidAt, test, free, cancelledAt, refund } = b;
+      return send(res, 200, { cartId, status, amount, order, tranRef, message, paidAt, test: !!test, free: !!free, cancelledAt, refund });
     }
 
     if (req.method === 'GET') return serveStatic(req, res, url.pathname);

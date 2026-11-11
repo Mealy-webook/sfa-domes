@@ -359,7 +359,7 @@ if (!document.querySelector('script[src$="f/dob-pick.js"]')){ const s = document
     await loadFavs();
     const r = anchor.getBoundingClientRect();
     pop = document.createElement('div'); pop.className = 'sfa-pop'; pop.setAttribute('role', 'menu');
-    pop.innerHTML = `<p><strong>${user.name.replace(/</g, '&lt;')}</strong><small>${user.email.replace(/</g, '&lt;')}</small></p><nav class="sfa-pop__links"><a role="menuitem" href="profile.html#tickets">${tr('My tickets')}</a><a role="menuitem" href="profile.html#account">${tr('My account')}</a></nav><div class="sfa-pop__saved">${favList()}</div><button class="sfa-pop__out" type="button" role="menuitem" data-out>${tr('Sign out')}</button>`;
+    pop.innerHTML = `<p><strong>${user.name.replace(/</g, '&lt;')}</strong><small>${user.email.replace(/</g, '&lt;')}</small></p><nav class="sfa-pop__links"><a role="menuitem" href="profile.html#tickets">${tr('My tickets')}</a><a role="menuitem" href="profile.html#account">${tr('My account')}</a></nav><button class="sfa-pop__out" type="button" role="menuitem" data-out>${tr('Sign out')}</button>`;
     pop.dir = document.documentElement.dir;
     document.body.appendChild(pop);
     paintFavs();
@@ -372,7 +372,8 @@ if (!document.querySelector('script[src$="f/dob-pick.js"]')){ const s = document
   // ---- saved courts ("sport|court" keys on the account). Any [data-fav] button toggles; the list sits in the account menu
   let favs = null, favsPromise = null;
   const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.4-4.5-9.1-9.2C1.7 7.6 4 4.6 7.3 4.6c2 0 3.6 1.1 4.7 2.7 1.1-1.6 2.7-2.7 4.7-2.7 3.3 0 5.6 3 4.4 6.5-1.7 4.7-9.1 9.2-9.1 9.2Z"/></svg>';
-  const heart = (key, cls = '') => `<button type="button" class="sfa-fav ${cls}" data-fav="${key}" aria-pressed="false" aria-label="${tr('Save court')}">${HEART}</button>`;
+  // saving courts was removed at Ahmed's request (2026-11-11): heart() renders nothing, so no page shows a save button
+  const heart = () => '';
   function loadFavs(){
     if (!favsPromise) favsPromise = me().then(u => u ? api('favorites').then(r => (favs = new Set(r.ok ? r.data.favorites : []))) : (favs = new Set()));
     return favsPromise;

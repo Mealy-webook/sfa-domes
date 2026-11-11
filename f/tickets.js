@@ -5,6 +5,7 @@
      .sessions(booking)          the booking's sessions in date order: { id, cart, n, of, sport, court, date, start, end }
      .ticket(session, booking)   ticket markup (court photo, date and time, who it's for, QR stub); call .paintQR() after
      .qrLive(session, booking)   'on' | 'soon' | 'over': a program's QR only works on the session day
+     .cancelInfo(booking)        { can, by }: free cancellation of the whole booking until 48 hours before its first session
      .paintQR(root)              draws every [data-qr] inside root (the QR library loads once, from cdnjs)
      .ics(booking) .icsName(b)   an .ics calendar file (Blob URL) with one event per session
      .DIRECTIONS                 Google Maps directions to SFA Domes Dammam
@@ -43,6 +44,11 @@
   const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const qrLive = (s, b) => b.order.kind !== 'program' ? 'on' : s.date === dayKey(new Date()) ? 'on' : s.date > dayKey(new Date()) ? 'soon' : 'over';
   const LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>';
+  const GAME_WHO = { adults: 'Adults (18+)', kids: 'Kids 6–17' };   // open games: who each one is for (older bookings have none)
+  // free cancellation (Ahmed, 2026-11-11): the whole booking, up to 48 hours before its first session → { can, by: Date }
+  const CANCEL_MS = 48 * 3600e3;
+  const firstStart = b => Math.min(...b.order.days.flatMap(d => d.starts.map(s => { const x = toDate(d.date); x.setMinutes(s); return x.getTime(); })));
+  const cancelInfo = b => { const by = new Date(firstStart(b) - CANCEL_MS); return { can: b.status === 'paid' && Date.now() <= by.getTime(), by }; };
   const icon = sp => sp.img ? `<img src="${sp.img}" alt="">` : `<span class="msi">${sp.icon}</span>`;
   function ticket(s, b){
     const D = describe(s, b), sp = D.sp, prog = b.order.kind === 'program', bf = b.order.bookingFor || { type: 'me' };
@@ -50,7 +56,7 @@
     return `<article class="tk" data-ticket="${esc(s.id)}">
       <div class="tk-ph"><img src="${D.img}" alt="" loading="lazy" style="object-position:${D.program ? D.program.focus : '50% 50%'}"><span class="tk-sp"><span class="tk-ico" aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}</span></div>
       <div class="tk-main">
-        <p class="tk-eye">${prog ? t(b.order.plan === 'trial' ? 'Free trial' : 'Training program') : b.order.kind === 'game' ? `${t('Open game')} · ${t(b.order.level)}` : b.order.ladies ? t('Ladies hours') : t('SFA Domes Dammam')}</p>
+        <p class="tk-eye">${prog ? t(b.order.plan === 'trial' ? 'Free trial' : 'Training program') : b.order.kind === 'game' ? `${t('Open game')}${GAME_WHO[b.order.who] ? ' · ' + t(GAME_WHO[b.order.who]) : ''}` : b.order.ladies ? t('Ladies hours') : t('SFA Domes Dammam')}</p>
         <h3 class="tk-court">${esc(D.title)}</h3>
         <dl class="tk-dl">
           <div class="tk-when"><dt>${t('Date and time')}</dt><dd>${P.date(toDate(s.date), 'full')} · <bdi>${P.time(s.start)}</bdi> – <bdi>${P.time(s.end)}</bdi></dd></div>
@@ -98,5 +104,5 @@
   }
   const icsName = b => `sfa-domes-${b.cartId}.ics`;
 
-  window.SFA_TICKETS = { sessions, people, ticket, describe, paintQR, ics, icsName, DIRECTIONS, toDate, tx, qrLive };
+  window.SFA_TICKETS = { sessions, people, ticket, describe, paintQR, ics, icsName, DIRECTIONS, toDate, tx, qrLive, cancelInfo };
 })();

@@ -55,7 +55,7 @@
       <dt>${t('Sessions')}</dt><dd>${sessionsTxt}</dd>`) + `
       ${b.paidAt && !b.free ? `<dt>${t('Paid on')}</dt><dd>${P.date(new Date(b.paidAt), 'full')}</dd>` : ''}
       ${b.tranRef ? `<dt>${t(b.test ? 'Test ref' : 'PayTabs ref')}</dt><dd>${esc(b.tranRef)}</dd>` : ''}
-      <dt class="total">${t(b.status === 'paid' ? 'Paid' : 'Total')}</dt><dd class="total">${b.free ? t('Free of charge') : money(b.amount)}</dd></dl>`;
+      <dt class="total">${t(b.status === 'paid' ? 'Paid' : b.status === 'cancelled' ? 'Refunded' : 'Total')}</dt><dd class="total">${b.free ? t('Free of charge') : money(b.amount)}</dd></dl>`;
 
     if (b.status === 'paid'){
       try { sessionStorage.removeItem('sfaOrder'); } catch (e) {}
@@ -68,7 +68,7 @@
       const slot = prog && prog.slots.find(x => x.time === first.start);
       const m = {
         b, list, prog, sport, court, D: T.describe(first, b), ref, rows, by, who, count: list.length,
-        title: b.free ? 'Your free trial is booked' : "You're booked", sessionsTxt,
+        title: b.free && !game ? 'Your free trial is booked' : "You're booked", sessionsTxt,
         when: first.date === last.date ? date(first) : `${P.date(T.toDate(first.date), 'short')} – ${P.date(T.toDate(last.date), 'short')}`,
         game, ladies: !!b.order.ladies, days, pattern, coach: slot ? T.tx(slot.coach) : '', early: prog ? 15 : 10,
         place: t('SFA Domes Dammam'),
@@ -83,6 +83,11 @@
       show('paid', m.title, ref, V.paid ? V.paid(m) : '');
       V.after && V.after(m);
       return T.paintQR($('body'));
+    }
+    // cancelled for free (up to 48 h before): when, and what went back to the card
+    if (b.status === 'cancelled'){
+      return show('failed', 'Booking cancelled', `${b.cancelledAt ? t('Cancelled on {date}.', { date: P.date(new Date(b.cancelledAt), 'full') }) : ''} ${b.refund ? t('{amount} goes back to your card within 5 to 10 working days.', { amount: money(b.refund) }) : ''}<br>${ref}`,
+        `<div class="box">${rows}</div><div class="acts"><a class="btn" href="profile.html#tickets">${t('View my tickets')}</a><a class="ghost" href="index.html">${t('Back to home')}</a></div>`);
     }
     if (b.status === 'failed'){
       return show('failed', "Payment didn't go through", `${esc(t(b.message || 'The payment was declined or cancelled.'))}. ${t('Nothing was charged.')}<br>${ref}`,
