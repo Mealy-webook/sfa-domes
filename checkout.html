@@ -65,6 +65,10 @@ button,input{font:inherit;color:inherit}
 .ck-card .ck-photo .eb{font:var(--ts-caption);color:var(--neutral-0)}
 .ck-card .ck-photo strong{font:var(--ts-title-m);text-transform:var(--type-case-title);color:var(--neutral-0)}
 .ck-card .ck-photo small{display:none}
+/* a program's start day and time sit on the photo (Ahmed, 2026-11-11) */
+.ck-card .ck-photo .ck-when{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:8px;font:var(--ts-label-m);color:var(--neutral-0)}
+.ck-card .ck-photo .ck-when b{padding:2px 8px;background:var(--color-brand);font:var(--ts-label-s)}
+.ck-card .ck-photo .ck-when[hidden]{display:none}
 .ck-days-h{margin:0;padding:16px 24px 0;font:var(--ts-title-s);text-transform:var(--type-case-title)}   /* title over the days and times */
 .ck-card .days{padding:8px 24px 0}
 .ck-card .ck-sum{padding:16px 24px 24px}
@@ -425,7 +429,7 @@ button.who-opt:disabled small{color:var(--danger)}
   <aside class="pay" aria-label="Your booking and payment">
     <!-- one card: the booking (with its Change link), then what it costs -->
     <section class="panel ck-card" aria-labelledby="revTitle">
-      <div class="court ck-photo"><img id="cImg" src="" alt=""><div><p class="eb lbl" id="cSport"></p><strong id="cName"></strong><small id="cSpecs"></small></div></div>
+      <div class="court ck-photo"><img id="cImg" src="" alt=""><div><p class="eb lbl" id="cSport"></p><strong id="cName"></strong><small id="cSpecs"></small><span class="ck-when" id="cWhen" hidden></span></div></div>
       <h2 class="sr-only" id="revTitle">Your booking</h2>
       <ul class="days" id="days"></ul>
       <div class="ck-sum">
@@ -614,7 +618,8 @@ button.who-opt:disabled small{color:var(--danger)}
       $('cSport').textContent = `${t(sp.name)} · ${t('SFA Domes Dammam')}`;
       $('cName').textContent = tx(p.name);
       $('cSpecs').textContent = `${t('Ages {a}', { a: `⁦${p.ages}⁩` })} · ${tx(p.level)}`;
-      $('days').innerHTML = `<li><b>${t('Starts')}</b><ul><li><span>${P.date(toDate(order.start), 'full')} · ${range(order.time)}</span></li></ul></li>`
+      $('cWhen').hidden = false; $('cWhen').innerHTML = `<b>${t('Starts')}</b><span>${P.date(toDate(order.start), 'full')} · ${range(order.time)}</span>`;
+      $('days').innerHTML = ''
         + (picked().length ? `<li><b>${t('Participants')}</b><ul><li><span>${picked().map(c => esc(c.name)).join(', ')}</span></li></ul></li>` : '')
         + `<li><b>${plan}</b><ul><li><span>${t('{n} × {m} min', { n, m: p.minutes })}${heads() > 1 ? ` · ${t('{k} participants', { k: heads() })}` : ''}</span><span class="slot-p">${planPrice ? money(planPrice * heads()) : t('Free of charge')}</span></li>${planFull > planPrice ? `<li class="pk-save"><span>${renewing ? t('Renewal discount: you save {amount}', { amount: money((planFull - planPrice) * heads()) }) : t('You save {amount} against paying monthly', { amount: money((planFull - planPrice) * heads()) })}</span></li>` : ''}</ul></li>`
         + (kitsOn().length ? `<li><b>${esc(tx(K.name))}</b><ul><li><span>× ${kitsOn().length}${kitsOn().some(Boolean) ? ` · <bdi>${kitsOn().filter(Boolean).map(esc).join(', ')}</bdi>` : ''}</span><span class="slot-p">${money(K.price * kitsOn().length)}</span></li></ul></li>` : '');

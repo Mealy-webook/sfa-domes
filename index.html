@@ -519,12 +519,14 @@ html[lang=ar] .hero-cue-ring text{font-size:13px;letter-spacing:0}
 .pg-card a{display:block;color:inherit;text-decoration:none}
 .pg-card:hover{border-color:var(--brand)}
 .pg-media{position:relative;height:240px;background:var(--neutral-800);overflow:hidden}
-.pg-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.08;transition:transform .5s}
+.pg-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.pg-media img[src*="card-placeholder"]{opacity:.08}   /* only the grey placeholder is faded; real photos show in full */
 .pg-card:hover .pg-media img{transform:scale(1.05)}
 .pg-body{display:flex;flex-direction:column;gap:8px;padding:16px}
 .pg-name{font:var(--ts-label-l);text-transform:var(--type-case-label);margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--neutral-900)}
 .pg-price{margin:0;display:flex;align-items:baseline;gap:4px;font-family:var(--type-font);font-weight:var(--type-w-title);text-transform:var(--type-case-title)}
 .pg-price small{font-size:var(--fs-18);line-height:24px;color:var(--neutral-500)}
+.pg-price small:last-child{font:var(--ts-body-s);text-transform:none;white-space:nowrap}   /* "/ month" stays beside the price */
 .pg-price span{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-18);line-height:28px;color:var(--neutral-900)}
 .pg-price img{width:19px;height:19px;display:block}
 @media (max-width:640px){
@@ -2730,7 +2732,19 @@ void main() {
 
 
 <script src="f/courts-data.js"></script>
+<script src="f/programs-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
 <script src="f/auth.js"></script>
+<script>
+/* the Training programs cards: names from f/programs-data.js in the page's language (they were fixed English text) */
+(() => {
+  const paint = () => { const ar = (window.SFA_PREFS || {}).lang === 'ar';
+    document.querySelectorAll('#pg-training .pg-card a[href*="program.html?p="]').forEach(a => {
+      const p = (window.SFA_PROGRAMS || {})[new URL(a.href).searchParams.get('p')], h = a.querySelector('.pg-name'); if (!p || !h) return;
+      h.setAttribute('data-no-i18n', ''); h.textContent = h.title = ar ? p.name.ar : p.name.en;
+    }); };
+  paint(); addEventListener('sfa:prefs', () => setTimeout(paint));
+})();
+</script>
 </body></html>
