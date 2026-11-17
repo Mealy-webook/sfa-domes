@@ -2,7 +2,7 @@
    3.1:1), and orange is never used for small text on white or the pale tint (2.9–3.1:1). */
 /* Offers (f/offers-data.js): the "Available offers" block on court, game and program pages and checkout, the card tag,
    the summary line. DS tokens, square corners. */
-.of{display:grid;gap:10px;margin:0 0 16px;padding:14px 16px;background:var(--color-bg-accent-subtle);border:1px solid color-mix(in srgb,var(--color-brand) 30%,transparent);text-align:start}
+.of{display:grid;gap:10px;margin:24px 0;padding:14px 16px;background:var(--color-bg-accent-subtle);border:1px solid color-mix(in srgb,var(--color-brand) 30%,transparent);text-align:start}
 .of-h{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-body-s-bold);color:var(--color-content-primary)}
 .of-h svg,.of-tag svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex:none}
 .of-l{list-style:none;margin:0;padding:0;display:grid;gap:8px}
@@ -24,3 +24,7 @@
 /* list pages style every span in a card's tags / title column; the offer tag keeps its own colours there */
 .of-tag,.tags .of-tag,.wh .of-tag{background:var(--orange-700) !important;color:var(--neutral-0) !important}
 .of-tag span,.of-tag svg{color:inherit !important;background:none !important}
+/* 24px clear of what's above and below on every page (Ahmed, 2026-11-17: "need space before the container"); in the game
+   panel the grid gap (20px) already gives most of it, and in checkout the box opens the summary card's padded area */
+.jn > .of{margin:4px 0}
+#ckOffers .of{margin:0 0 24px}
