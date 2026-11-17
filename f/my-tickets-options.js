@@ -435,7 +435,8 @@
           <div class="mt-cta mt-bk-n"><span class="mt-tix">${QRI}<b>${tixCount(m)}</b><small>${tixWord(c, m, tixCount(m))}</small></span><span class="ghost sm mt-view">${c.t('Open booking')}${c.ARROW}</span></div></li>`).join('')}</ol>` : emptyTxt(c));
     },
     view(c, m){
-      const bv = bvOf(); if (BV[bv]) return `<div class="bv bv-${bv}">${BV[bv](c, m)}</div>`;   // the redesign options
+      // Manage rail is the live booking page (Ahmed picked it, 2026-11-17); ?bv=was shows the page it replaced
+      const bv = bvOf() || 'rail'; if (BV[bv]) return `<div class="bv bv-${bv}">${BV[bv](c, m)}</div>`;
       const b = m.b, multi = !(m.people[0] && m.people[0].single) && m.active.length > 1, now = Date.now();
       let f = st.tf[b.cartId]; if (f === undefined || (f !== 'all' && !m.active.some(p => p.i === f))) f = st.tf[b.cartId] = 'all';
       const P0 = f === 'all' ? null : m.people.find(p => p.i === f);
