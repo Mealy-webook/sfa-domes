@@ -174,8 +174,7 @@ dialog::backdrop{background:rgba(9,9,11,.55)}
     document.title = `${t('Open games')} · SFA Domes`;
     const day = f.day || firstDay(), list = upcoming(day).filter(fits);
     root.innerHTML = `<section class="hero" aria-labelledby="h1"><div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true"><span class="msi">groups</span></span>${t('SFA Domes Dammam')}</p>
-        <h1 id="h1">${t('Open games')}</h1><p class="sub">${t('Join a game we run: turn up, play with others, and pay for your own spot only. No team needed.')}</p>
-        <div class="facts"><span>${t('Games for adults and for kids')}</span><span>${t('First game free')}</span><span>${t('One spot per person')}</span><span>${t('Bibs and balls provided')}</span><span class="sample">${t('Sample games · the real schedule is coming')}</span></div></div></section>
+        <h1 id="h1">${t('Open games')}</h1><p class="sub">${t('Join a game we run: turn up, play with others, and pay for your own spot only. No team needed.')}</p></div></section>
       <section class="sec" aria-labelledby="lh">
         <div class="flt">
           <div class="chips" role="group" aria-label="${t('Sport')}"><button type="button" class="chip" data-sport="" aria-pressed="${!f.sport}">${t('All sports')}</button>${Object.keys(GS).map(k => `<button type="button" class="chip" data-sport="${k}" aria-pressed="${f.sport === k}"><span aria-hidden="true">${icon(S[k])}</span>${esc(t(S[k].name))}</button>`).join('')}</div>
