@@ -20,7 +20,7 @@
     $('eyebrow').innerHTML = '<span class="ico" aria-hidden="true">' + (sport.img ? `<img src="${sport.img}" alt="">` : `<span class="msi">${sport.icon}</span>`) + `</span>${t(sport.name)} · ${t('SFA Domes Dammam')}`;
     $('courtName').textContent = t(name);
     $('heroSub').textContent = [kind, surface, format, size].filter(Boolean).map(x => t(x)).join(' · ');
-    $('heroPrice').innerHTML = P.money(price);
+    $('heroPrice').innerHTML = `${P.money(price)} <small>${t('/ hr')}</small>`;   // price + unit, no From (Ahmed, 2026-11-17)
     $('aboutLead').textContent = sport.area === 'field'
       ? (key === 'rugby'
         ? t('Rugby is played on football fields F4 and F5 joined together, inside the SFA Domes Dammam dome. Book a 1.5-hour slot and check in at the front desk.')
@@ -240,7 +240,7 @@
     const hrs = n * SLOT / 60;
     $('sumRows').innerHTML = `<dt>${t('Price')}</dt><dd>${money(price)} ${t('/ hr')} · ${money(SLOT_PRICE)} ${t('/ slot')}</dd><dt>${t('Play time')}</dt><dd>${n ? t('{h} hours', { h: hrs }) : '—'}</dd>`;
     $('sumTotal').innerHTML = was + money(total);
-    $('goTotal').innerHTML = n || !goAlways ? was + money(total) : `<small class="go-from">${t('From')}</small> ${money(price)}`;
+    $('goTotal').innerHTML = n || !goAlways ? was + money(total) : `${money(price)} <small class="go-from">${t('/ hr')}</small>`;
     $('goWhen').textContent = n ? counts(keys.length, n, hrs) : t('{name} · pick days and times', { name: t(name) });
     $('go').classList.toggle('on', n > 0 || goAlways); document.body.classList.toggle('has-picks', n > 0);
     [$('bookBtn'), $('goBtn')].forEach(b => { b.disabled = !n; b.innerHTML = n ? `<span>${t('Book · {total}', { total: money(total) })}</span>` : t('Pick a time'); });

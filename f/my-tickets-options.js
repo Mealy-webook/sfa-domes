@@ -508,6 +508,8 @@
   const payList = (c, m, F) => `<dl class="bv-pay">${F.pay.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}<div class="tot"><dt>${c.t('Paid')}</dt><dd>${F.paid}</dd></div>${F.refunded ? `<div class="ref"><dt>${c.t('Refunded')}</dt><dd>− ${c.P.money(F.refunded)}</dd></div>` : ''}</dl>`;
   const removedList = (c, m) => { const g = m.people.filter(p => p.gone && !p.single); return g.length ? `<ul class="mt-removed">${g.map(p => `<li><b>${c.esc(p.name)}</b>${goneLine(c, m, p)}</li>`).join('')}</ul>` : ''; };
   const personBar = (c, m, P0) => P0 ? `<div class="mt-for"><div><b>${c.esc(P0.name)}</b><small>${role(c, m, P0)}${P0.free ? ` · <em>${c.t('First game free')}</em>` : ''}</small>${sentLine(c, P0)}</div><div class="mt-for-acts">${personActs(c, m, P0, true)}</div></div>` : '';
+  // breadcrumbs, as on every page below the top level (Ahmed, 2026-11-17: unify the site)
+  const crumbsBk = (c, m) => `<nav class="kl-crumbs" aria-label="${c.t('Breadcrumb')}"><a href="index.html">${c.t('Home')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="#tickets" data-back>${c.t('My bookings')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span>${c.esc(m.D.label)}</span></nav>`;
   const backLink = c => `<a class="pg-back" href="#tickets" data-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>${c.t('My bookings')}</a>`;
 
   // ---------- Wallet first: the pass (or program card) big on a dark band, details as a strip, actions pinned ----------
@@ -706,7 +708,7 @@
   // help. On phones the card comes right after the tickets.
   function bvRail(c, m){
     const F = factsOf(c, m), S = statusOf(c, m), t = c.t;
-    return backLink(c) + `<header class="bv-hd"><span class="bv-hd-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
+    return crumbsBk(c, m) + `<header class="bv-hd"><span class="bv-hd-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
         <div><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-hd-ref"><small>${t('Booking ref')}</small>${refCopy(c, m)}</p></div></header>
       <div class="bv-r"><div class="bv-r-main">
         <div class="bv-o1">${statusBox(c, m, S)}</div>

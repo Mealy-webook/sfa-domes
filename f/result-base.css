@@ -49,7 +49,7 @@ h1{margin:0;font:var(--ts-display-m);text-transform:var(--type-case-display)}
 .btn svg,.ghost svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
 [dir=rtl] .btn .fwd{scale:-1 1}
 .more{justify-self:center;margin-top:4px;font:var(--ts-body-default-bold);color:var(--color-content-secondary)}
-.more:hover{color:var(--color-brand)}
+.more:hover{color:var(--color-content-accent)}
 .tips{list-style:none;margin:0;padding:0;display:grid;gap:8px;font:var(--ts-body-s);color:var(--color-content-secondary)}
 .tips li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px}
 .tips li::before{content:"";width:8px;height:8px;margin:8px 8px 0;background:var(--color-brand)}

@@ -7,7 +7,7 @@
 .kl{padding-top:calc(90px + 20px);background:var(--bg)}
 .kl-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;font-size:var(--fs-13);color:var(--ink-3)}
 .kl-crumbs a{color:var(--ink);text-decoration:none}
-.kl-crumbs a:hover{color:var(--brand)}
+.kl-crumbs a:hover{color:var(--color-content-accent)}
 .kl-crumbs svg{width:14px;height:14px}
 .kl-photo{aspect-ratio:21/8;margin:0 0 28px}
 .kl-cols{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:clamp(24px,3vw,48px);align-items:start}
@@ -27,7 +27,7 @@
 .kl-hours:hover{text-decoration-color:currentColor}
 html[dir=rtl] .kl-crumbs svg,html[dir=rtl] .kl-hours svg{transform:scaleX(-1)}
 .kl-facts a{color:var(--ink);text-underline-offset:3px}
-.kl-facts a:hover{color:var(--brand)}
+.kl-facts a:hover{color:var(--color-content-accent)}
 /* section tabs: stick under the site bar (or at the top while the bar is hidden) */
 .kl-tabs{position:sticky;top:90px;z-index:20;margin:28px 0 0;background:var(--bg);border-bottom:1px solid var(--line-strong);transition:top .45s var(--ease)}
 body.kl-away .kl-tabs{top:0}
@@ -46,7 +46,7 @@ body.kl-away .kl-tabs{top:0}
 .kl-courts a[aria-current]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
 .kl-pk{border:1px solid var(--brand);background:var(--bg)}
 .kl-pk-head{display:flex;justify-content:space-between;gap:16px;padding:20px 24px;border-bottom:1px solid var(--line)}
-.kl-pk-head h3{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);margin:0;color:var(--brand)}
+.kl-pk-head h3{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);margin:0;color:var(--color-content-accent)}
 .kl-pk-head p{margin:4px 0 0;font-size:var(--fs-13);color:var(--ink-3)}
 .kl-ticks{display:flex;flex-wrap:wrap;gap:8px 16px;margin:12px 0 0;padding:0;list-style:none;font-size:var(--fs-13);color:var(--ink-2)}
 .kl-ticks li{display:inline-flex;align-items:center;gap:8px}
@@ -99,7 +99,6 @@ body.kl-in-book .kl-card{display:none}
 }
 @media (max-width:640px){
   .kl{padding-top:90px}
-  .kl-crumbs{display:none}
   .kl-photo{margin-bottom:20px}
 }
 @media (max-width:640px){

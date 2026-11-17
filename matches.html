@@ -60,7 +60,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
 .tm small{font:var(--ts-body-s);color:var(--color-content-tertiary)}
 .wh{display:grid;gap:4px;min-width:0}
 .wh strong{display:flex;align-items:center;gap:8px;font:var(--ts-title-body);text-transform:var(--type-case-title)}
-.wh strong .msi,.wh strong .mi{color:var(--color-brand)}
+.wh strong .msi,.wh strong .mi{color:var(--color-content-accent)}
 .wh > span{font:var(--ts-body-s);color:var(--color-content-secondary)}
 .lvl{justify-self:start;margin-top:4px;padding:2px 8px;font:var(--ts-caption-1-bold);background:var(--color-bg-secondary)}
 .lvl.kids{background:var(--color-programme-youth,var(--color-brand));color:var(--neutral-0)}
@@ -125,6 +125,7 @@ dialog::backdrop{background:rgba(9,9,11,.55)}
   .act{display:flex;align-items:center;justify-content:space-between;gap:16px;min-width:0;padding-top:12px;border-top:1px solid var(--color-border-primary)}.pr{justify-items:start}.empty{padding:24px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
+<link rel="stylesheet" href="f/ui.css">
 </head>
 <body>
 <div data-site-nav></div>
@@ -166,7 +167,7 @@ dialog::backdrop{background:rgba(9,9,11,.55)}
       <div class="wh"><strong><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}</strong><span>${esc(t(c[0]))} · ${esc(t(g.format))}</span><span class="lvl${g.who === 'kids' ? ' kids' : ''}">${t(window.SFA_GAME_WHO[g.who].label)}</span>${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('game', { sport: g.sport, court: g.court }) : ''}</div>
       <div class="sp"><div class="sp-t"><span>${my ? t("You're in") : left <= 0 ? t('Full') : left === 1 ? t('1 spot left') : t('{n} spots left', { n: left })}</span><small>${t('{a} of {b} players', { a: n, b: g.spots })}</small></div>
         <div class="sp-bar" style="--n:${g.spots}" aria-hidden="true">${Array.from({ length: g.spots }, (_, k) => `<i class="${k < n ? (my && k === n - 1 ? 'me' : 'on') : ''}"></i>`).join('')}</div></div>
-      <div class="act"><span class="pr"><b>${P.money(g.price)}</b><small>${t('per player')}</small></span>
+      <div class="act"><span class="pr"><b>${P.money(g.price)}</b><small>${t('/ player')}</small></span>
         <a class="join${my ? ' in' : ''}${left <= 0 && !my ? ' off' : ''}" href="game.html?id=${encodeURIComponent(g.id)}">${my ? t("You're in") : left <= 0 ? t('Full') : t('View game')}</a></div>
       <a class="rowlnk" href="game.html?id=${encodeURIComponent(g.id)}" tabindex="-1" aria-hidden="true"></a></li>`;
   }

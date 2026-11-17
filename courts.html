@@ -44,7 +44,7 @@ img{display:block}
 .chip:hover{border-color:var(--color-content-primary)}
 .chip .msi{font-size:var(--fs-20)}
 .mi{display:inline-block;width:20px;height:20px;background:currentColor;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
-.sp .mi{width:18px;height:18px;color:var(--color-brand)}
+.sp .mi{width:18px;height:18px;color:var(--color-content-accent)}
 .chip small{font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
 .chip[aria-pressed=true]{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
 .chip[aria-pressed=true] small{color:inherit;opacity:.7}
@@ -64,7 +64,7 @@ img{display:block}
 .tag.w{background:var(--color-programme-women);color:var(--neutral-0)}
 .bd{display:grid;align-content:start;gap:8px;padding:20px}
 .sp{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
-.sp .msi{font-size:var(--fs-17);color:var(--color-brand)}
+.sp .msi{font-size:var(--fs-17);color:var(--color-content-accent)}
 .nm{margin:0;font:var(--ts-title-body);text-transform:var(--type-case-title)}
 .meta{margin:0;font:var(--ts-body-s);color:var(--color-content-secondary)}
 .pr{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin-top:8px;padding-top:16px;border-top:1px solid var(--color-border-primary)}
@@ -76,6 +76,7 @@ img{display:block}
 @media (max-width:640px){.grid{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
+<link rel="stylesheet" href="f/ui.css">
 </head>
 <body>
 <div data-site-nav></div>
@@ -117,7 +118,7 @@ img{display:block}
           <div class="ph"><img src="${window.SFA_COURT_IMG(key, c)}" alt="" loading="lazy" style="${crop(i)}"><div class="tags">${c[3] ? `<span class="tag">${esc(t(c[3]))}</span>` : ''}${ladies(key, i) ? `<span class="tag w">${t('Ladies hours')}</span>` : ''}${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('court', { sport: key, court: i }) : ''}</div></div>
           <div class="bd"><p class="sp"><span aria-hidden="true">${icon(sport)}</span>${name} · ${esc(t(c[1]))}</p><h3 class="nm"><a class="lnk" href="${url(i)}" data-i="${i}" aria-label="${t('View court')}: ${esc(t(c[0]))}"></a>${esc(t(c[0]))}</h3>
             <p class="meta">${[t('Indoor'), c[2], c[4]].filter(Boolean).map(v => esc(t(v))).join(' · ')}</p>
-            <p class="pr"><small>${t('From')}</small><b>${P.money(c[5])}</b><small>${t('/ hr')}</small><em>${t('90-minute slots')}</em></p></div></article>`).join('')}</div></section>`;
+            <p class="pr"><b>${P.money(c[5])}</b><small>${t('/ hr')}</small><em>${t('90-minute slots')}</em></p></div></article>`).join('')}</div></section>`;
     // back from the details page: the court you opened stays marked
     const pre = root.querySelector(`.lnk[data-i="${params.get('court')}"]`);
     if (params.has('court') && pre && params.get('sport') === key) pre.closest('.tile').classList.add('picked');

@@ -63,7 +63,7 @@ html[dir=rtl] .cta svg{scale:-1 1}
 .step-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 16px;padding-bottom:12px;border-bottom:1px solid var(--line-strong)}
 .step-head h2{font:var(--ts-title-section);text-transform:var(--type-case-title);margin:0}
 .step-head h2 b{display:inline-grid;place-items:center;width:28px;height:28px;margin-inline-end:8px;background:var(--ink);color:var(--neutral-0);font-size:var(--fs-15);font-weight:600;vertical-align:2px}
-.step-head h2 em{font-style:normal;color:var(--brand)}
+.step-head h2 em{font-style:normal;color:var(--color-content-accent)}
 .step-note{margin:-6px 0 16px;font-size:var(--fs-13);color:var(--ink-3)}
 .panel{background:var(--bg);border:1px solid var(--line);padding:clamp(16px,2vw,24px)}
 
@@ -107,7 +107,7 @@ html[dir=rtl] .cta svg{scale:-1 1}
 .slots-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .slots-day{font:var(--ts-body-default-bold);margin:0}
 .linkbtn{padding:0;border:0;background:none;cursor:pointer;font-size:var(--fs-13);text-decoration:underline;text-underline-offset:3px;color:var(--ink-2)}
-.linkbtn:hover{color:var(--brand)}
+.linkbtn:hover{color:var(--color-content-accent)}
 .period{margin:0 0 16px}
 .period:last-child{margin-bottom:0}
 .period h3{font:var(--ts-body-default-bold);text-transform:var(--type-case-label);margin:0 0 8px;color:var(--ink-3)}
@@ -143,7 +143,7 @@ html[dir=rtl] .cta svg{scale:-1 1}
 }
 .sum-day{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 8px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
 .sum-day button.go-day{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);grid-column:1;padding:0;border:0;background:none;text-align:start;cursor:pointer}
-.sum-day button.go-day:hover{color:var(--brand)}
+.sum-day button.go-day:hover{color:var(--color-content-accent)}
 .sum-day .sub{grid-column:2;font-size:var(--fs-13);font-weight:600;white-space:nowrap}
 .sum-day .rm{grid-column:3;width:24px;height:24px;display:grid;place-items:center;padding:0;border:0;background:none;cursor:pointer;color:var(--ink-3)}
 .sum-day .rm:hover{color:var(--danger)}
@@ -180,7 +180,7 @@ html[dir=rtl] .cta svg{scale:-1 1}
 /* About the court: copy, quick stats and dome features beside the court photo */
 .about{padding:calc(90px + clamp(32px,6vh,64px)) 0 clamp(48px,8vh,88px);background:var(--bg);border-bottom:1px solid var(--line)}
 .about-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,64px);align-items:start}
-.kicker{margin:0 0 8px;font-size:var(--fs-15);color:var(--brand)}
+.kicker{margin:0 0 8px;font-size:var(--fs-15);color:var(--color-content-accent)}
 .about h2:not([class]){font:var(--ts-display-m);text-transform:var(--type-case-display);margin:0}
 .about-lead{font:var(--ts-body-l);margin:28px 0 24px;max-width:52ch;color:var(--ink-2)}
 .about-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin:0 0 24px;border-top:1px solid var(--line-strong);border-inline-start:1px solid var(--line-strong)}
@@ -190,7 +190,7 @@ html[dir=rtl] .cta svg{scale:-1 1}
 .about-stats dd{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);margin:4px 0 0}
 .about-feats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;margin:0;padding:0;list-style:none;font-size:var(--fs-13);line-height:20px;color:var(--ink-2)}
 .about-feats li{display:flex;gap:8px;align-items:flex-start}
-.about-feats svg{flex:none;width:20px;height:20px;color:var(--brand)}
+.about-feats svg{flex:none;width:20px;height:20px;color:var(--color-content-accent)}
 /* Open today opens a popup with the week's court hours */
 .st-hours{cursor:pointer;transition:background-color .2s}
 .st-hours:hover{background:var(--bg-soft)}
@@ -227,9 +227,9 @@ html[dir=rtl] .cta svg{scale:-1 1}
 .loc-city{margin:8px 0 20px;color:var(--ink-2)}
 .loc-list{display:grid;gap:12px;margin:0 0 24px;padding:16px 0 0;list-style:none;border-top:1px solid var(--line);font-size:var(--fs-15)}
 .loc-list li{display:flex;gap:12px;align-items:center}
-.loc-list svg{flex:none;width:20px;height:20px;color:var(--brand)}
+.loc-list svg{flex:none;width:20px;height:20px;color:var(--color-content-accent)}
 .loc-list a{text-decoration:none}
-.loc-list a:hover{color:var(--brand);text-decoration:underline;text-underline-offset:3px}
+.loc-list a:hover{color:var(--color-content-accent);text-decoration:underline;text-underline-offset:3px}
 .loc-btn{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 24px;background:var(--color-bg-primary);color:var(--color-content-primary);border:1px solid var(--color-border-strong);text-decoration:none;font:var(--ts-body-l-bold);transition:background-color .25s,color .25s}
 .loc-btn:hover{background:var(--color-bg-inverse);color:var(--color-content-inverse)}
 .loc-btn svg{width:18px;height:18px}
@@ -249,7 +249,7 @@ html[dir=rtl] .loc-btn svg{scale:-1 1}
 .faq-item{border-bottom:1px solid var(--line-strong)}
 .faq-item summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 0;cursor:pointer;list-style:none;font:var(--ts-body-l-bold)}
 .faq-item summary::-webkit-details-marker{display:none}
-.faq-item summary:hover{color:var(--brand)}
+.faq-item summary:hover{color:var(--color-content-accent)}
 .faq-item summary i{position:relative;flex:none;width:32px;height:32px;border:1px solid var(--line-strong);background:var(--bg);transition:background-color .25s,border-color .25s}
 .faq-item summary i::before,.faq-item summary i::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:2px;margin:-1px 0 0 -6px;background:var(--ink);transition:transform .35s var(--ease),background-color .25s}
 .faq-item summary i::after{transform:rotate(90deg)}

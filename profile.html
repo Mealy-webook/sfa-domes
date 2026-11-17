@@ -54,7 +54,7 @@ h1{margin:0;font:var(--ts-display-m);text-transform:var(--type-case-display);ove
 /* tickets: next one up front, then a segmented list */
 .next{margin-bottom:clamp(32px,6vh,56px);animation:up .7s var(--ease) .1s both}
 .next .sec h2::before{content:"";display:inline-block;width:10px;height:10px;margin-inline-end:8px;background:var(--color-brand);vertical-align:2px}
-.when{font:var(--ts-body-default-bold);color:var(--color-brand)!important}
+.when{font:var(--ts-body-default-bold);color:var(--color-content-accent)!important}
 .seg{display:inline-flex;gap:2px;padding:3px;margin-bottom:16px;background:var(--color-bg-secondary)}
 .seg button{height:40px;padding:0 16px;border:0;background:none;color:var(--color-content-secondary);font:var(--ts-body-default-bold);cursor:pointer}
 /* selected = the plan card's style everywhere: 2px brand, tint, ink text */
@@ -89,7 +89,7 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
 .prog.big i{width:200px;height:6px}
 .prog.big em{font:var(--ts-body-default-bold)}
 .pg-back{display:inline-flex;align-items:center;gap:8px;margin-bottom:24px;font:var(--ts-body-default-bold);color:var(--color-content-secondary);text-decoration:none}
-.pg-back:hover{color:var(--color-brand)}
+.pg-back:hover{color:var(--color-content-accent)}
 .pg-back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
 [dir=rtl] .pg-back svg{scale:-1 1}
 .in-grp .row{grid-template-columns:76px minmax(0,1fr) auto}
@@ -252,6 +252,7 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
 .type[aria-pressed=true]:hover{border-color:var(--color-content-primary)}
 .pl-gen button[aria-checked=true]:hover{border-color:var(--color-brand)}
 </style>
+<link rel="stylesheet" href="f/ui.css">
 </head>
 <body>
 <div data-site-nav></div>

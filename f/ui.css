@@ -1,0 +1,53 @@
+/* SFA shared UI (Ahmed, 2026-11-17: "unify the experience across the website", from consistency-audit.html).
+   One place for the components every page shares. Loaded after each page's own styles (end of <head>, or end of <body>
+   on the homepage, whose styles sit in the body), so these rules win. DS3 tokens only, square corners.
+
+   10 · Buttons: three sizes.
+        large  56px · Body-L bold      the one main action on a page (Book, Check availability, Pay, Add to calendar)
+        medium 44px · Body bold        secondary actions and actions inside cards (Directions, View game, Cancel)
+        small  32px · Body-S bold      row actions (Show ticket, Send, Remove, Copy)
+   11 · Filter chips: 44px, the same on every list (sports, booking types, Upcoming / Past / Cancelled).
+   12 · Tags: one tag, 24px, Caption bold; neutral, offer (Orange 700) and status colours; no small orange text on white.
+   13 · Cards: one light border (border-primary).
+    5 · Section headings: Title-section (22px), a rule under it, no orange bar. */
+
+/* ---- 10 · buttons ---- */
+.btn:not(.sm),.book,.cta,.btn-primary,.sp-book,.bv .btn.bv-main,#payBtn{height:56px;font:var(--ts-body-l-bold);text-transform:var(--type-case-label)}
+.ghost,.btn.sm,.ghost.sm,.loc-btn,.kl-faq-more,.gal-all,.bv-act,.bv-cxb,.join,.vn-btn,.bv .ghost.bv-sub,.cx-acts .ghost{height:44px;font:var(--ts-body-default-bold)}
+.ghost.sm,.btn.sm{padding:0 16px}
+.mt-mini,.mt-copy,.o-copy,.rm-slot{height:32px;font:var(--ts-body-s-bold)}
+.mt-copy,.o-copy{padding:0 10px}
+/* square icon buttons beside them */
+.kl-card .share,.hero-actions .share{width:44px;height:44px}
+.cal-nav .arrow,.kl-more-nav .arrow{width:44px;height:44px}
+
+/* ---- 11 · filter chips ---- */
+.chip,.types .type,.seg button{height:44px}
+
+/* ---- 12 · tags ---- */
+.tag,.lvl,.pj-tag,.of-tag,.wh > .lvl,.wh > .of-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;font:var(--ts-caption-1-bold);border-radius:0}
+.pj-tag{background:var(--orange-700);color:var(--neutral-0)}
+.bv-row-i b em,.bv-o-who b em,.bv-rc em,.opt em,.gst em{display:inline-flex;align-items:center;height:24px;padding:0 8px;background:var(--orange-700);color:var(--neutral-0);font:var(--ts-caption-1-bold);font-style:normal}
+
+/* ---- 13 · cards ---- */
+.kl-card,.gm:not(.mine),.bv-card,.mt-card,.tile,.panel,.ck-card,.o-card{border-color:var(--color-border-primary)}
+.bv-card{padding:24px}
+
+/* ---- 5 · section headings ---- */
+.kl-h::before,.v-q .booking .step-head h2::before{display:none}
+.kl-h{font:var(--ts-title-section);text-transform:var(--type-case-title);margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid var(--color-border-primary)}
+.v-q .booking .step-head h2,.step-head h2{font:var(--ts-title-section);text-transform:var(--type-case-title)}
+
+/* ---- 1 · page titles: two levels. Top-level pages (courts, ladies hours, open games, programs, my account) keep Display;
+   every page about one thing (court, game, program, booking, checkout, confirmation) uses Title-screen. ---- */
+.kl-head h1,.bv h1,.o-in h1,.ck-h,.bv-o-top h1{font:var(--ts-title-screen);text-transform:var(--type-case-title);letter-spacing:0}
+
+/* ---- 2 · the way back: breadcrumbs on every page below the top level, replacing one-off back links. On phones they
+   fold to one "← parent" link (the last link in the trail). ---- */
+.kl-crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.kl-crumbs a{color:var(--color-content-primary);text-decoration:none}
+.kl-crumbs a:hover{color:var(--color-content-accent);text-decoration:underline;text-underline-offset:3px}
+.kl-crumbs svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;flex:none}
+html[dir=rtl] .kl-crumbs svg{transform:scaleX(-1)}
+.kl-crumbs span{color:var(--color-content-secondary)}
+@media (max-width:639px){.kl-crumbs{display:flex !important}.kl-crumbs > :not(a:last-of-type){display:none}.kl-crumbs a:last-of-type::before{content:"← "}html[dir=rtl] .kl-crumbs a:last-of-type::before{content:"→ "}}

@@ -77,10 +77,12 @@ body[data-state=paid] .cf-grid{display:block}
 @media (max-width:1100px){.o-wrap{grid-template-columns:minmax(0,1fr)}.o-side{position:static}}
 @media (max-width:760px){.o-facts{grid-template-columns:minmax(0,1fr);gap:16px}.o-refrow{grid-template-columns:40px minmax(0,1fr) auto!important}.o-refrow dd bdi{font:var(--ts-body-default-bold)}.o-copy{width:40px;padding:0;justify-content:center}.o-copy span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.o-in h1{font:var(--ts-title-screen)}.o-row{grid-template-columns:40px minmax(0,1fr) auto;gap:12px;padding:14px 16px}.o-ic{width:40px;height:40px}.o-pan,[dir=rtl] .o-pan{padding:0 16px 16px}}
 </style>
+<link rel="stylesheet" href="f/ui.css">
 </head>
 <body>
 <div data-site-nav></div>
 <main class="cf pending" id="cf" aria-live="polite">
+  <nav class="kl-crumbs" id="cfCrumbs" aria-label="Breadcrumb"></nav>
   <header class="cf-head"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" id="markIcon"><path d="M12 3a9 9 0 1 0 9 9"/></svg></span>
     <h1 id="title">Checking your payment</h1><p class="cf-sub" id="sub">One moment while we confirm with PayTabs.</p></header>
   <div class="cf-grid" id="body"></div>
@@ -154,5 +156,11 @@ window.RESULT_VIEW = {
 };
 </script>
 <script src="f/result-core.js"></script>
+<script>
+/* breadcrumbs, as on every page below the top level (Ahmed, 2026-11-17: unify the site) */
+(() => { const paint = () => { const P = window.SFA_PREFS, el = document.getElementById('cfCrumbs'); if (!P || !el) return; const t = P.t;
+    el.innerHTML = `<a href="index.html">${t('Home')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="profile.html#tickets">${t('My bookings')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span>${t('Booking')}</span>`; };
+  paint(); addEventListener('sfa:prefs', paint); })();
+</script>
 </body>
 </html>

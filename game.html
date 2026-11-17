@@ -113,6 +113,7 @@
 .gm-empty p{margin:0;font:var(--ts-body-l);color:var(--color-content-secondary)}
 @media (max-width:760px){.gm-photo{height:auto;aspect-ratio:4/3;margin-inline:calc(var(--g,16px) * -1)}.jn{padding:20px}}
 </style>
+<link rel="stylesheet" href="f/ui.css">
 </head>
 <body class="v-q" data-go-always>
 <div data-site-nav></div>
@@ -278,11 +279,11 @@
             <li><span><b>${t('Play')}</b>${t('A coach splits the teams and runs the game. Bibs and balls are provided.')}</span></li></ol></section>
         ${document.getElementById('locTpl').innerHTML}
       </div>
-      <aside class="kl-side" aria-label="${t('Price')}"><div class="kl-card"><div class="hero-book"><p class="hero-price"><small>${t('From')}</small><b>${P.money(g.price)}</b></p>${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('game', { sport: g.sport, court: g.court }) : ''}
+      <aside class="kl-side" aria-label="${t('Price')}"><div class="kl-card"><div class="hero-book"><p class="hero-price"><b>${P.money(g.price)} <small>${t('/ player')}</small></b></p>${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('game', { sport: g.sport, court: g.court }) : ''}
           <div class="hero-actions"><a class="cta" href="#join"><span>${t('Join game')}</span>${ARROW}</a></div></div><p class="side-sub">${t('per player')} · ${t('First game free')}</p></div>
         <p class="kl-note">${CHK}<span>${t('Each person’s first open game is free.')}</span></p></aside></div>`;
     document.getElementById('goWhen').innerHTML = `${P.date(toDate(g.date), 'short')} · <bdi>${P.time(g.start)}</bdi>`;
-    document.getElementById('goTotal').innerHTML = `${P.money(g.price)} <small>${t('per player')}</small>`;
+    document.getElementById('goTotal').innerHTML = `${P.money(g.price)} <small>${t('/ player')}</small>`;
     document.getElementById('goBtn').innerHTML = `<span>${t('Join game')}</span>${ARROW}`;
     P.translate?.(root);
     watch();

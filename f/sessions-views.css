@@ -50,7 +50,7 @@
 .sv-tl h3 small{font:var(--ts-body-s);color:var(--ink-3)}
 .sv-tl ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
 .sv-tl li{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font:var(--ts-body-s)}
-.sv-tl li i{font:var(--ts-caption-1-bold);font-style:normal;color:var(--brand)}
+.sv-tl li i{font:var(--ts-caption-1-bold);font-style:normal;color:var(--color-content-accent)}
 .sv-tl li b{font:var(--ts-body-default-bold)}
 .sv-tl li span{color:var(--ink-2)}
 

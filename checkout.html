@@ -88,7 +88,7 @@ button,input{font:inherit;color:inherit}
 .confirm{margin-top:clamp(28px,4.5vh,44px)}
 .confirm .btn{display:inline-flex;width:auto;padding:0 32px}   /* Pay hugs its label */
 .doc-link{display:inline;padding:0;border:0;background:none;color:var(--ink);font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.doc-link:hover{color:var(--brand)}
+.doc-link:hover{color:var(--color-content-accent)}
 /* the terms / waiver reader: both documents in one, each under its own heading; "I agree" ticks the one checkbox */
 .doc-sec + .doc-sec{margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
 .doc-sec h3{margin:0 0 12px;font:var(--ts-body-l-bold);color:var(--ink);scroll-margin-top:96px}
@@ -110,7 +110,7 @@ h1{font:var(--ts-title-screen);margin:0;text-transform:var(--type-case-title)}
 .step-head h2{font:var(--ts-title-body);display:flex;align-items:center;gap:12px;margin:0;text-transform:var(--type-case-title)}
 /* (no bar before section headings on checkout: Ahmed) */
 .step-head a{font-size:var(--fs-13);color:var(--ink-2);text-underline-offset:3px}
-.step-head a:hover{color:var(--brand)}
+.step-head a:hover{color:var(--color-content-accent)}
 .panel{background:var(--bg);border:1px solid var(--line)}
 
 /* order review */
@@ -118,7 +118,7 @@ h1{font:var(--ts-title-screen);margin:0;text-transform:var(--type-case-title)}
 .court img{width:100%;height:100%;min-height:120px;object-fit:cover;display:block}
 .court div{padding:16px 20px}
 .court p{margin:0}
-.court .eb{font-size:var(--fs-15);color:var(--brand)}
+.court .eb{font-size:var(--fs-15);color:var(--color-content-accent)}
 .court strong{font:var(--ts-title-section);text-transform:var(--type-case-title);display:block}
 .court small{display:block;margin-top:4px;font-size:var(--fs-13);line-height:18px;color:var(--ink-3)}
 @media (max-width:560px){.court{grid-template-columns:110px minmax(0,1fr)}.court strong{font-size:var(--fs-20)}}
@@ -247,10 +247,10 @@ h1{font:var(--ts-title-screen);margin:0;text-transform:var(--type-case-title)}
 .pk-next em,.ses-dlg-b em{font:var(--ts-caption-1-bold);font-style:normal;color:var(--ink-3)}
 .pk-rest{margin:16px 0 0;font:var(--ts-body-s);color:var(--ink-2)}
 .pk-more{display:block;margin-top:8px;padding:0;border:0;background:none;color:var(--color-content-primary);font:var(--ts-body-default-bold);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.pk-save span{color:var(--color-brand)!important;white-space:normal!important}
+.pk-save span{color:var(--color-content-accent)!important;white-space:normal!important}
 .pk-kit{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:4px 16px;align-items:center;padding:16px;border:1px solid var(--line-strong)}
 .pk-kit.on{border:2px solid var(--brand);padding:15px;background:var(--color-bg-accent-subtle)}
-.pk-ic{grid-row:span 2;display:grid;place-items:center;width:64px;aspect-ratio:1;background:var(--bg-soft);color:var(--brand)}
+.pk-ic{grid-row:span 2;display:grid;place-items:center;width:64px;aspect-ratio:1;background:var(--bg-soft);color:var(--color-content-accent)}
 .pk-ic svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
 .pk-kit strong{font:var(--ts-body-l-bold)}
 .pk-kit p{margin:0;font:var(--ts-body-s);color:var(--ink-2)}
@@ -434,6 +434,7 @@ button.who-opt:disabled small{color:var(--danger)}
 .ck-card .total small{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);color:var(--ink)}
 .ck-card .total strong{font:var(--ts-display-xs)}
 </style>
+<link rel="stylesheet" href="f/ui.css">
 </head>
 <body>
 <header class="bar">
@@ -447,6 +448,7 @@ button.who-opt:disabled small{color:var(--danger)}
 </header>
 
 <main class="inner page" id="page" hidden>
+  <nav class="kl-crumbs" id="ckCrumbs" aria-label="Breadcrumb"></nav>
   <h1 class="ck-h">Checkout</h1>
 
   <!-- right column: what you're booking, then what it costs -->
@@ -601,6 +603,8 @@ button.who-opt:disabled small{color:var(--danger)}
     const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>';
     const bookUrl = `program.html?p=${encodeURIComponent(order.program)}#book`;
     $('backLink').href = bookUrl;
+    // breadcrumbs, as on every page below the top level (Ahmed, 2026-11-17: unify the site)
+    $('ckCrumbs').innerHTML = `<a href="index.html">${t('Home')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="programs.html">${t('Training programs')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="${bookUrl}">${esc(tx(p.name))}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span>${t('Checkout')}</span>`;
     $('cImg').src = p.img || window.SFA_COURT_IMG(p.sport, sp.courts[p.court || 0]); $('cImg').style.objectPosition = p.focus;
     document.querySelector('.ck-who').hidden = true;
     const main = $('progMain'); main.hidden = false;
@@ -862,6 +866,7 @@ button.who-opt:disabled small{color:var(--danger)}
   // a ladies-hours order (ladies-hours.html) goes back there, and only women and girls can be its players
   const LADIES = !!order.ladies, LADY_RULE = 'Ladies hours are for women and girls only.';
   const bookUrl = LADIES ? `ladies-hours.html?sport=${encodeURIComponent(order.sport)}#book` : `court-details.html?sport=${encodeURIComponent(order.sport)}&court=${order.court}#book`;
+  $('ckCrumbs').innerHTML = `<a href="index.html">${t('Home')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="${LADIES ? 'ladies-hours.html' : 'courts.html?sport=' + encodeURIComponent(order.sport)}">${t(LADIES ? 'Ladies hours' : 'Sports courts')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="${bookUrl}">${esc(t(name))}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span>${t('Checkout')}</span>`;
   $('backLink').href = bookUrl;   // the back arrow returns to the court page's calendar (the card's Change link was removed)
   $('cImg').src = window.SFA_COURT_IMG(order.sport, court);
   let payLabel = '';
