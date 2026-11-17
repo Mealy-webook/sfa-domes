@@ -409,6 +409,30 @@ button.who-opt:disabled small{color:var(--danger)}
 @media (max-width:640px){.ses-dlg .doc-head{padding:16px}.ses-dlg-b{padding:16px}.ses-dlg-b li{gap:12px}}
 /* hover never hides a selection */
 .pk-chip[aria-checked=true]:hover,.pp[aria-checked=true]:hover:not(:disabled),.pk-add[aria-pressed=true]:hover{border-color:var(--color-brand)}
+/* ---------- Booking summary card, as in Figma (court 117:56299, program 117:56385; Ahmed 2026-11-17): photo with the sport,
+   name (and a program's start day and time); "Booking summary"; groups (a day, or the plan / add-ons) under a grey heading,
+   each line with its price and a remove (×), a line between groups; then the total ---------- */
+.ck-card .ck-photo > div{display:flex;flex-direction:column;gap:4px}
+.ck-card .ck-photo .eb,.ck-card .ck-photo strong{margin:0}
+.ck-card .ck-photo .ck-when{display:block;margin:0;font:var(--ts-body-s);color:var(--neutral-0)}
+.ck-sum-h{margin:0;padding:16px 16px 0;font:var(--ts-title-body);text-transform:var(--type-case-title);color:var(--ink)}
+.ck-card .days{padding:16px}
+.ck-card .days > li{display:block;padding:0;border:0}
+.ck-card .days > li + li{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.ck-card .days > li > b{display:block;font:var(--ts-body-default);text-transform:none;color:var(--ink-2)}
+.ck-card .days ul{display:grid;gap:12px;margin-top:12px;font:var(--ts-body-default-bold);color:var(--ink)}
+.ck-card .days ul li{gap:16px;min-height:22px}
+.ck-card .days ul li > span:first-child{overflow-wrap:anywhere}
+.ck-card .days .slot-p{font:var(--ts-body-default-bold);color:var(--ink)}
+.ck-card .days .rm-slot{width:32px;height:32px;margin:-5px -8px;color:var(--ink)}
+.ck-card .days .rm-slot svg{width:16px;height:16px}
+.ck-card .days .rm-slot:hover{color:var(--danger)}
+.ck-card .days .ln-mut{font:var(--ts-body-default);color:var(--ink-3)}
+.ck-card .days .pk-save span{font:var(--ts-body-s)}
+.ck-card .ck-sum{padding:16px;border-top:1px solid var(--line)}
+.ck-card .total{align-items:center}
+.ck-card .total small{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);color:var(--ink)}
+.ck-card .total strong{font:var(--ts-display-xs)}
 </style>
 </head>
 <body>
@@ -430,7 +454,7 @@ button.who-opt:disabled small{color:var(--danger)}
     <!-- one card: the booking (with its Change link), then what it costs -->
     <section class="panel ck-card" aria-labelledby="revTitle">
       <div class="court ck-photo"><img id="cImg" src="" alt=""><div><p class="eb lbl" id="cSport"></p><strong id="cName"></strong><small id="cSpecs"></small><span class="ck-when" id="cWhen" hidden></span></div></div>
-      <h2 class="sr-only" id="revTitle">Your booking</h2>
+      <h2 class="ck-sum-h" id="revTitle">Booking summary</h2>
       <ul class="days" id="days"></ul>
       <div class="ck-sum">
         <div class="total"><small>Total</small><strong id="total"></strong></div>
@@ -615,14 +639,21 @@ button.who-opt:disabled small{color:var(--danger)}
     // summary card: what's booked and what it costs
     function summary(){
       const n = sessions().length, plan = renewing ? t('One month renewal · 20% off') : t({ trial: 'Free trial', month: 'One month subscription', month2: 'Two-month subscription', month3: 'Three-month subscription' }[order.plan]);
-      $('cSport').textContent = `${t(sp.name)} · ${t('SFA Domes Dammam')}`;
+      $('cSport').textContent = t(sp.name);
       $('cName').textContent = tx(p.name);
       $('cSpecs').textContent = `${t('Ages {a}', { a: `⁦${p.ages}⁩` })} · ${tx(p.level)}`;
-      $('cWhen').hidden = false; $('cWhen').innerHTML = `<b>${t('Starts')}</b><span>${P.date(toDate(order.start), 'full')} · ${range(order.time)}</span>`;
-      $('days').innerHTML = ''
-        + (picked().length ? `<li><b>${t('Participants')}</b><ul><li><span>${picked().map(c => esc(c.name)).join(', ')}</span></li></ul></li>` : '')
-        + `<li><b>${plan}</b><ul><li><span>${t('{n} × {m} min', { n, m: p.minutes })}${heads() > 1 ? ` · ${t('{k} participants', { k: heads() })}` : ''}</span><span class="slot-p">${planPrice ? money(planPrice * heads()) : t('Free of charge')}</span></li>${planFull > planPrice ? `<li class="pk-save"><span>${renewing ? t('Renewal discount: you save {amount}', { amount: money((planFull - planPrice) * heads()) }) : t('You save {amount} against paying monthly', { amount: money((planFull - planPrice) * heads()) })}</span></li>` : ''}</ul></li>`
-        + (kitsOn().length ? `<li><b>${esc(tx(K.name))}</b><ul><li><span>× ${kitsOn().length}${kitsOn().some(Boolean) ? ` · <bdi>${kitsOn().filter(Boolean).map(esc).join(', ')}</bdi>` : ''}</span><span class="slot-p">${money(K.price * kitsOn().length)}</span></li></ul></li>` : '');
+      $('cWhen').hidden = false; $('cWhen').innerHTML = `${P.date(toDate(order.start), 'full')} · ${range(order.time)}`;
+      // one line per participant with their price and a remove (×, unticks them; the last one stays), then the add-ons
+      const X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+      const rm = (kind, key, what) => `<button class="rm-slot" type="button" data-rm="${kind}" data-key="${esc(key)}" aria-label="${t('Remove {slot}', { slot: what })}" title="${t('Remove')}">${X}</button>`;
+      const each = planPrice ? money(planPrice) : t('Free of charge'), ppl = picked();
+      const people = ppl.length
+        ? ppl.map(c => `<li><span>${esc(c.name)}</span><span class="slot-p">${each}</span>${ppl.length > 1 ? rm('pp', c.key, c.name) : ''}</li>`).join('')
+        : `<li><span class="ln-mut">${t('No participant chosen yet')}</span><span class="slot-p">${each}</span></li>`;
+      const save = planFull > planPrice ? `<li class="pk-save"><span>${renewing ? t('Renewal discount: you save {amount}', { amount: money((planFull - planPrice) * heads()) }) : t('You save {amount} against paying monthly', { amount: money((planFull - planPrice) * heads()) })}</span></li>` : '';
+      const k = kitsOn().length;
+      $('days').innerHTML = `<li><b>${plan} · ${t('{n} sessions', { n })}</b><ul>${people}${save}</ul></li>`
+        + (k ? `<li><b>${t('Add-ons')}</b><ul><li><span>× ${k} ${esc(tx(K.name))}</span><span class="slot-p">${money(K.price * k)}</span>${rm('kit', 'kit', `${k} × ${tx(K.name)}`)}</li></ul></li>` : '');
       $('total').innerHTML = total() ? money(total()) : t('Free of charge');
       const sar = P.currency === 'SAR'; $('charge').hidden = sar || !total();
       if (!sar && total()) $('charge').innerHTML = t("You'll be charged {amount} in Saudi riyals.", { amount: `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${total().toLocaleString('en-US')}</span>` });
@@ -768,6 +799,13 @@ button.who-opt:disabled small{color:var(--danger)}
       if (kq && !kq.disabled){ if (+kq.dataset.kq > 0) order.kitSizes.push(''); else order.kitSizes.pop();
         save(); kitCard(); summary(); main.querySelector(`[data-kq="${kq.dataset.kq}"]:not(:disabled)`)?.focus(); return; }
     });
+    // the summary's remove (×): a participant is unticked, the add-ons go back to none
+    $('days').addEventListener('click', e => {
+      const b = e.target.closest('[data-rm]'); if (!b) return;
+      if (b.dataset.rm === 'pp'){ order.people.places = order.people.places.filter(k => k !== b.dataset.key); save(); ppCard(); }
+      if (b.dataset.rm === 'kit'){ order.kitSizes = []; save(); kitCard(); }
+      summary();
+    });
     addEventListener('storage', e => { if (e.key === 'sfaKidsRev') loadKids(); });
     cards(); summary();
     window.SFA_AUTH.me().then(u => { me = u; ppCard(); kitCard(); summary(); if (u) loadKids(); });
@@ -820,7 +858,7 @@ button.who-opt:disabled small{color:var(--danger)}
   $('cImg').src = window.SFA_COURT_IMG(order.sport, court);
   let payLabel = '';
   function review(){
-    $('cSport').textContent = `${t(sport.name)} · ${t(LADIES ? 'Ladies hours' : 'SFA Domes Dammam')}`;
+    $('cSport').textContent = LADIES ? `${t(sport.name)} · ${t('Ladies hours')}` : t(sport.name);
     $('cName').textContent = t(name);
     $('cSpecs').textContent = [kind, surface, format, size].filter(Boolean).map(x => t(x)).join(' · ');
     // each time shows its own price and a remove (×); the last one left can't be removed, so checkout always has something to pay for
