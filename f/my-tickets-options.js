@@ -99,14 +99,14 @@
       : `<div class="mt-qr mt-qr--lock">${c.LOCK}<small>${live === 'soon' ? c.t('QR unlocks on {date}', { date: c.P.date(c.T.toDate(s.date), 'short') }) : c.t('This session has ended')}</small></div>`;
   }
   // the booking's own header (A and C full page; B uses a shorter one)
-  function head(c, m, back, backLabel){
+  function head(c, m, back, backLabel, noDetails){
     const b = m.b;
     return `${back ? `<a class="pg-back" href="#tickets" data-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>${c.t(backLabel || 'My tickets')}</a>` : ''}
       <section class="pg-head mt-head"><span class="pg-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
         <div class="pg-in"><p class="eye">${m.kindTxt}</p><h2>${c.esc(m.D.label)}</h2>
           <p class="meta">${m.dateLine}</p><p class="meta">${m.count} · ${c.esc(m.names)} · <bdi>${c.esc(b.cartId)}</bdi></p>
           ${chip(c, m)}
-          <div class="dlg-acts">${m.up ? `<a class="ghost sm" href="${c.T.ics(b)}" download="${c.T.icsName(b)}">${c.CAL}${c.t('Add to calendar')}</a><a class="ghost sm" href="${c.T.DIRECTIONS}" target="_blank" rel="noopener">${c.PIN}${c.t('Get directions')}</a>` : ''}<a class="ghost sm" href="result.html?cart=${encodeURIComponent(b.cartId)}">${c.t('Booking details')}</a>${m.up && c.T.cancelInfo(b).can ? `<button type="button" class="ghost sm danger" data-cancel="${c.esc(b.cartId)}">${c.t(m.n > 1 ? 'Cancel whole booking' : 'Cancel booking')}</button>` : ''}</div>
+          <div class="dlg-acts">${m.up ? `<a class="ghost sm" href="${c.T.ics(b)}" download="${c.T.icsName(b)}">${c.CAL}${c.t('Add to calendar')}</a><a class="ghost sm" href="${c.T.DIRECTIONS}" target="_blank" rel="noopener">${c.PIN}${c.t('Get directions')}</a>` : ''}${noDetails ? '' : `<a class="ghost sm" href="result.html?cart=${encodeURIComponent(b.cartId)}">${c.t('Booking details')}</a>`}${m.up && c.T.cancelInfo(b).can ? `<button type="button" class="ghost sm danger" data-cancel="${c.esc(b.cartId)}">${c.t(m.n > 1 ? 'Cancel whole booking' : 'Cancel booking')}</button>` : ''}</div>
           ${m.up ? c.cancelLine(b) : ''}${m.cancelled ? `<p class="cx-note off">${c.t('Cancelled')}${b.refund ? ' · ' + c.t('{amount} refunded', { amount: c.P.money(b.refund) }) : ''}</p>` : ''}</div></section>`;
   }
   // a program person's sessions, folded away
@@ -341,6 +341,56 @@
   // My bookings (Ahmed, 2026-11-17): "it should be my booking and the booking should be a group of tickets as I booked,
   // inside it I can filter by user". The list is bookings; a booking opens to every ticket in it, filtered by person.
   // =====================================================================================================================
+
+  // ---- the confirmation's details, on the booking page (Ahmed, 2026-11-17): what, when, where, who, ref (copy), payment
+  const IC = {
+    tag: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><path d="M7.5 8.5h.01"/></svg>',
+    cal: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4zM4 10h16M8 3v4m8-4v4"/></svg>',
+    pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><path d="M12 11.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg>',
+    user: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"/></svg>',
+    hash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h15M4 15h15M10 3 8 21M16 3l-2 18"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9z"/><path d="M5 15H4V4h11v1"/></svg>',
+    mail: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/></svg>'
+  };
+  function details(c, m){
+    const b = m.b, o = b.order, T = c.T, P = c.P, t = c.t, esc = c.esc, n = m.days.length, prog = m.kind === 'program' && window.SFA_PROGRAMS[o.program];
+    const sport = window.SFA_SPORTS[o.sport], court = sport && sport.courts[o.court];
+    const s0 = m.days[0], slot = prog && prog.slots.find(x => x.time === s0.start), coach = slot ? T.tx(slot.coach) : '';
+    const sameTime = m.days.every(s => s.start === s0.start), wk = [...new Set(m.days.map(s => T.toDate(s.date).getDay()))].sort((a, b) => a - b);
+    const pattern = n > 1 && sameTime && wk.length < n ? `${wk.map(d => P.date(new Date(2026, 0, 4 + d), { weekday: 'short' })).join(P.lang === 'ar' ? '، ' : ', ')} · <bdi>${P.time(s0.start)}</bdi> – <bdi>${P.time(s0.end)}</bdi>` : '';
+    const nDays = [...new Set(m.ses.map(x => x.date))].length;
+    const when = n === 1 ? [P.date(T.toDate(s0.date), 'full'), `<bdi>${P.time(s0.start)}</bdi> – <bdi>${P.time(s0.end)}</bdi>`]
+      : nDays === 1 ? [P.date(T.toDate(s0.date), 'full'), m.days.map(s => `<bdi>${P.time(s.start)}</bdi>`).join(' · ')]
+      : [`${P.date(T.toDate(s0.date), 'short')} – ${P.date(T.toDate(m.last.date), 'short')}`, pattern || t('{n} sessions', { n })];
+    const bf = o.bookingFor || { type: 'me' }, many = m.active.length > 1, players = !!o.participants;
+    const who = players ? m.active.map(p => esc(p.name)).join(', ') : bf.type === 'other' ? `${esc(bf.name)} · <bdi>${esc(bf.phone || '')}</bdi>` : bf.type === 'child' ? esc(bf.name) : esc(c.user ? c.user.name : t('Myself'));
+    const w = o.waiver, by = w && w.guardian ? `${esc(w.acceptedBy)} · ${t('Guardian')}` : '';
+    const facts = [
+      [IC.tag, t('What'), prog ? esc(m.D.label) : esc(t(sport ? sport.name : '')) + (m.kind === 'game' ? ` · ${t('Open game')}` : o.ladies ? ` · ${t('Ladies hours')}` : ''),
+        prog ? t('{n} sessions', { n }) + (coach ? ` · ${esc(coach)}` : '') : m.kind === 'game' ? `${t(o.format || '')}${o.who ? ' · ' + t({ adults: 'Adults (18+)', kids: 'Kids 6–17' }[o.who]) : ''}` : n > 1 ? t('{n} sessions', { n }) : ''],
+      [IC.cal, t('When'), when[0], when[1]],
+      [IC.pin, t('Where'), t('SFA Domes Dammam'), prog ? '' : esc(t(court ? court[0] : ''))],
+      [IC.user, t(prog ? (many ? 'Participants' : 'Participant') : players ? (many ? 'Players' : 'Player') : 'Booked for'), who, by ? t('Booked by {name}', { name: by }) : '']
+    ];
+    const K = window.SFA_PROGRAM_KIT, kit = o.kit;
+    const plan = prog ? t({ trial: 'Free trial', month: 'One month', month2: 'Two months', month3: 'Three months' }[o.plan] || 'One month') + (o.renewOf ? ' · ' + t('Renewal · 20% off') : '') : '';
+    const sessionsTxt = prog ? t('{n} × {m} min', { n, m: prog.minutes }) : m.kind === 'game' ? t('1 game · 1.5 hr') : `${nDays === 1 ? t('1 day') : t('{n} days', { n: nDays })} · ${t('{n} × 1.5 hr', { n })}`;
+    const pay = [
+      prog ? [t('Plan'), plan] : null,
+      [t('Sessions'), sessionsTxt],
+      kit && K ? [T.tx(K.name), `× ${kit.qty}`] : null,
+      b.paidAt && !b.free ? [t('Paid on'), P.date(new Date(b.paidAt), 'full')] : null,
+      b.tranRef ? [t(b.test ? 'Test ref' : 'PayTabs ref'), `<bdi>${esc(b.tranRef)}</bdi>`] : null
+    ].filter(Boolean);
+    const refunded = b.refund || 0, off = b.status === 'cancelled';
+    return `<section class="mt-det" aria-labelledby="mtDetH"><h2 class="mt-det-h" id="mtDetH">${t('Booking details')}</h2><div class="mt-det-in">
+      <div class="mt-det-l"><dl class="mt-facts">${facts.map(([ic, k, v, sub]) => `<div><span class="mt-fic">${ic}</span><dt>${k}</dt><dd>${v}${sub ? `<small>${sub}</small>` : ''}</dd></div>`).join('')}
+          <div class="mt-refrow"><span class="mt-fic">${IC.hash}</span><dt>${t('Booking ref')}</dt><dd><bdi>${esc(b.cartId)}</bdi></dd><button type="button" class="mt-copy" data-mt-copy="${esc(b.cartId)}" aria-label="${t('Copy booking ref')}">${IC.copy}<span>${t('Copy')}</span></button></div></dl>
+        ${(() => { const em = (b.payer && b.payer.email) || (c.user && c.user.email); return em ? `<p class="mt-mail">${IC.mail}<span>${t('A confirmation email was sent to {email}', { email: `<bdi>${esc(em)}</bdi>` })}</span></p>` : ''; })()}</div>
+      <aside class="mt-pay"><h3>${t('Payment')}</h3><dl>${pay.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
+        <div class="mt-pay-t"><dt>${t('Paid')}</dt><dd>${b.free || !b.amount ? t('Free of charge') : P.money(b.amount)}</dd></div>
+        ${refunded ? `<div class="mt-pay-r"><dt>${t('Refunded')}</dt><dd>− ${P.money(refunded)}</dd></div>` : ''}</dl></aside></div></section>`;
+  }
   const tixCount = m => m.ses.length;
   const BOOK = {
     list(c){
@@ -378,7 +428,7 @@
       const pbar = P0 ? `<div class="mt-for"><div><b>${c.esc(P0.name)}</b><small>${role(c, m, P0)}${P0.free ? ` · <em>${c.t('First game free')}</em>` : ''}</small>${sentLine(c, P0)}</div><div class="mt-for-acts">${personActs(c, m, P0, true)}</div></div>` : '';
       const gone = m.people.filter(p => p.gone && !p.single);
       const R = c.renewInfo(b);
-      return head(c, m, true, 'My bookings')
+      return head(c, m, true, 'My bookings', true) + details(c, m)
         + (R ? `<div class="pg-renew mt-renew"><div><b>${c.t('Renew for another month · 20% off')}</b><p>${c.t('Starts {date} at the same time, for the same participants.', { date: c.P.date(c.T.toDate(R.start), 'short') })}</p></div><button type="button" class="btn sm" data-renew="${c.esc(b.cartId)}">${c.t('Renew program')}</button></div>` : '')
         + `<section class="mt-tix-sec"><div class="sec"><h2>${c.t('Tickets')}</h2><span>${list.length}</span></div>${chips}${pbar}
           ${up.length ? `<ol class="mt-tks">${up.map(row).join('')}</ol>` : `<p class="meta">${c.t(m.cancelled ? 'This booking was cancelled.' : 'No upcoming tickets in this booking.')}</p>`}
@@ -401,8 +451,9 @@
     },
     // returns true when it handled the click
     async click(v, e, c){
-      const el = e.target.closest('[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
+      const el = e.target.closest('[data-mt-copy],[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
       const d = el.dataset;
+      if (d.mtCopy){ try { await navigator.clipboard.writeText(d.mtCopy); } catch (x) {} c.A.toast(c.t('Booking ref copied')); return true; }
       if (d.mtKt){ st.kt = d.mtKt; c.paint(); c.root.querySelector(`[data-mt-kt="${d.mtKt}"]`)?.focus(); return true; }
       if (d.mtTf){ const [cart, k] = d.mtTf.split('|'); st.tf[cart] = k === 'all' ? 'all' : +k; c.paint(); c.root.querySelector(`[data-mt-tf="${CSS.escape(d.mtTf)}"]`)?.focus(); return true; }
       if (d.mtType){ st.type = d.mtType; c.paint(); c.root.querySelector(`[data-mt-type="${d.mtType}"]`)?.focus(); return true; }

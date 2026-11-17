@@ -325,6 +325,7 @@ window.SFA_AR = {
   "Add each guest's full name.": 'أضف الاسم الكامل لكل ضيف.', "Enter each guest's Saudi mobile number, starting with 5.": 'أدخل رقم جوال سعودي لكل ضيف يبدأ بـ 5.',
   'Only 1 spot is left in this game.': 'بقي مكان واحد فقط في هذه المباراة.',
   // My bookings (live, 2026-11-17)
+  'Renewal · 20% off': 'تجديد · خصم 20%', '1 game · 1.5 hr': 'مباراة واحدة · 1.5 ساعة', '1 day': 'يوم واحد', 'A confirmation email was sent to {email}': 'أُرسل بريد التأكيد إلى {email}', 'Booking ref copied': 'نُسخ رقم الحجز',
   'My bookings': 'حجوزاتي', 'Open booking': 'فتح الحجز', 'ticket': 'تذكرة', 'tickets': 'تذاكر', 'QR ready': 'رمز QR جاهز', 'Show ticket': 'عرض التذكرة', 'Filter tickets by person': 'تصفية التذاكر حسب الشخص',
   'This booking was cancelled.': 'أُلغي هذا الحجز.', 'No upcoming tickets in this booking.': 'لا تذاكر قادمة في هذا الحجز.', 'Tickets': 'التذاكر',
   // My bookings restructures (2026-11-17)

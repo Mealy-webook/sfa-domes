@@ -360,3 +360,34 @@
 .mt-kt-dot{width:8px;height:8px;border-radius:50%;background:var(--k)}
 @media (max-width:760px){.mt-kt{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.mt-kt::-webkit-scrollbar{display:none}.mt-kt .type{flex:none}}
 @media (max-width:760px){.mt-bar .mt-kt{margin-inline:calc(var(--g) * -1)}}   /* the phone row runs edge to edge (its padding comes from .types) */
+
+/* booking details on the booking page (2026-11-17): the confirmation's facts (icons, labels for screen readers only) and payment */
+.mt-det{margin:0 0 clamp(32px,6vh,56px);padding-bottom:clamp(24px,4vh,40px);border-bottom:1px solid var(--color-border-primary)}
+.mt-det-h{margin:0 0 20px;font:var(--ts-title-section)}
+.mt-det-in{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+.mt-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;margin:0}
+.mt-facts > div{display:grid;grid-template-columns:40px minmax(0,1fr);column-gap:16px;align-items:center}
+.mt-fic{display:grid;place-items:center;width:40px;height:40px;background:var(--color-bg-secondary)}
+.mt-fic svg,.mt-copy svg,.mt-mail svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+.mt-facts dt{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.mt-facts dd{margin:0;font:var(--ts-body-l-bold);overflow-wrap:anywhere}
+.mt-facts dd small{display:block;margin-top:2px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.mt-refrow{grid-column:1/-1;grid-template-columns:40px max-content auto!important;justify-content:start;column-gap:16px}
+.mt-copy{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-s-bold);cursor:pointer}
+.mt-copy svg{width:16px;height:16px}
+.mt-copy:hover{border-color:var(--color-content-primary)}
+.mt-mail{display:flex;align-items:center;gap:10px;margin:20px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.mt-mail svg{width:18px;height:18px;flex:none}
+.mt-pay{padding:20px;background:var(--color-bg-secondary)}
+.mt-pay h3{margin:0 0 12px;font:var(--ts-title-body)}
+.mt-pay dl{margin:0}
+.mt-pay dl > div{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid var(--color-border-primary);font:var(--ts-body-s)}
+.mt-pay dt{color:var(--color-content-secondary)}
+.mt-pay dd{margin:0;text-align:end;font:var(--ts-body-s-bold)}
+.mt-pay .mt-pay-t{border-bottom:0;padding-top:12px;align-items:baseline}
+.mt-pay .mt-pay-t dt{font:var(--ts-body-l-bold);color:var(--color-content-primary)}
+.mt-pay .mt-pay-t dd{font:var(--ts-display-xs)}
+.mt-pay .mt-pay-r{border:0;padding-top:0}
+.mt-pay .mt-pay-r dd{color:var(--color-danger)}
+@media (max-width:900px){.mt-det-in{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.mt-facts{grid-template-columns:minmax(0,1fr)}.mt-copy span{display:none}.mt-copy{width:36px;padding:0;justify-content:center}}
