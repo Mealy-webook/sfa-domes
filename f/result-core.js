@@ -43,15 +43,16 @@
     const ref = `<span class="ref">${t('Booking ref {ref}', { ref: esc(b.cartId) })}</span>` + (b.test ? `<span class="test-tag">${t('Test payment · nothing was charged')}</span>` : '');
     const prog = b.order.kind === 'program' && window.SFA_PROGRAMS[b.order.program], kit = b.order.kit, K = window.SFA_PROGRAM_KIT, game = b.order.kind === 'game';
     const w = b.order.waiver, by = w && w.guardian ? `${esc(w.acceptedBy)} · ${t('Guardian')}` : '';
-    const who = prog ? T.people(b).map(x => esc(x.name)).join(', ') : bf.type === 'other' ? esc(bf.name) : bf.type === 'child' ? esc(bf.name) : t('Myself');
+    const players = game && b.order.participants ? T.people(b) : null;   // an open game with its list of players (2026-11-17)
+    const who = prog || players ? T.people(b).map(x => esc(x.name)).join(', ') : bf.type === 'other' ? esc(bf.name) : bf.type === 'child' ? esc(bf.name) : t('Myself');
     const sessionsTxt = prog ? t('{n} × {m} min', { n: list[0] ? list[0].of : 0, m: prog.minutes })
-      : P.lang === 'ar' ? t('{d} days · {n} × 1.5 hr', { d: b.order.days.length, n: list.length }) : `${b.order.days.length} ${b.order.days.length === 1 ? 'day' : 'days'} · ${list.length} × 1.5 hr`;
+      : P.lang === 'ar' ? t('{d} days · {n} × 1.5 hr', { d: b.order.days.length, n: list[0] ? list[0].of : 0 }) : `${b.order.days.length} ${b.order.days.length === 1 ? 'day' : 'days'} · ${list[0] ? list[0].of : 0} × 1.5 hr`;
     const rows = `<dl class="rows">` + (prog
       ? `<dt>${t('Program')}</dt><dd>${esc(T.tx(prog.name))}</dd><dt>${t('Plan')}</dt><dd>${t({ trial: 'Free trial', month: 'One month', month2: 'Two months', month3: 'Three months' }[b.order.plan] || 'One month')}</dd>
         <dt>${t(T.people(b).length > 1 ? 'Participants' : 'Participant')}</dt><dd>${T.people(b).map(x => esc(x.name)).join('<br>')}</dd>${by ? `<dt>${t('Booked by')}</dt><dd>${by}</dd>` : ''}<dt>${t('Sessions')}</dt><dd>${sessionsTxt}</dd>
         ${kit ? `<dt>${esc(T.tx(K.name))}</dt><dd>× ${kit.qty}${kit.sizes ? ` · <bdi>${kit.sizes.map(esc).join(', ')}</bdi>` : ''}</dd>` : ''}`
       : `<dt>${t('Court')}</dt><dd>${esc(t(sport?.name || ''))} · ${esc(t(court?.[0] || ''))}</dd>
-      <dt>${t('Booked for')}</dt><dd>${bf.type === 'other' ? esc(bf.name) + ' · ' + esc(bf.phone) : who}</dd>${by ? `<dt>${t('Booked by')}</dt><dd>${by}</dd>` : ''}
+      <dt>${t(players ? (players.length > 1 ? 'Players' : 'Player') : 'Booked for')}</dt><dd>${players ? players.map(x => esc(x.name)).join('<br>') : bf.type === 'other' ? esc(bf.name) + ' · ' + esc(bf.phone) : who}</dd>${by ? `<dt>${t('Booked by')}</dt><dd>${by}</dd>` : ''}
       <dt>${t('Sessions')}</dt><dd>${sessionsTxt}</dd>`) + `
       ${b.paidAt && !b.free ? `<dt>${t('Paid on')}</dt><dd>${P.date(new Date(b.paidAt), 'full')}</dd>` : ''}
       ${b.tranRef ? `<dt>${t(b.test ? 'Test ref' : 'PayTabs ref')}</dt><dd>${esc(b.tranRef)}</dd>` : ''}

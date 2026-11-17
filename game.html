@@ -44,6 +44,42 @@
 .opt:disabled b{opacity:.5}
 .opt:disabled small{color:var(--color-danger)}
 .opt em{font:var(--ts-caption-1-bold);font-style:normal;color:var(--color-content-accent)}
+/* several players (Ahmed, 2026-11-17): each row is a tick box; guests (adult games) are added by full name + Saudi mobile */
+.opt .box{display:grid;place-items:center;width:20px;height:20px;border:2px solid var(--color-border-strong);background:var(--color-bg-primary)}
+.opt .box svg{width:14px;height:14px;opacity:0}
+.opt[aria-checked=true] .box{border-color:var(--color-brand);background:var(--color-brand)}
+.opt[aria-checked=true] .box svg{opacity:1}
+.pl-hint{margin:0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.gst{display:grid;grid-template-columns:20px minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:15px 17px;border:2px solid var(--color-brand);background:var(--color-bg-accent-subtle)}
+.gst .box{display:grid;place-items:center;width:20px;height:20px;background:var(--color-brand)}
+.gst .box svg{width:14px;height:14px}
+.gst b{display:block;font:var(--ts-body-l-bold)}
+.gst small{display:block;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.gst em{font:var(--ts-caption-1-bold);font-style:normal;color:var(--color-content-accent)}
+.gst-x{display:grid;place-items:center;width:32px;height:32px;margin:-6px -8px;padding:0;border:0;background:none;color:var(--color-content-primary);cursor:pointer}
+.gst-x svg{width:16px;height:16px}
+.gst-x:hover{color:var(--color-danger)}
+.add-g{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border:1px dashed var(--color-border-strong);background:var(--color-bg-primary);font:var(--ts-body-default-bold);color:var(--color-content-primary);cursor:pointer}
+.add-g:hover{border-color:var(--color-content-primary)}
+.add-g:disabled{cursor:not-allowed;color:var(--color-content-disabled)}
+.add-g svg{width:18px;height:18px}
+.gf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;padding:16px;border:1px solid var(--color-border-secondary)}
+.gf .full{grid-column:1/-1}
+.gf label{display:block;margin-bottom:8px;font:var(--ts-body-default-bold);color:var(--color-content-secondary)}
+.gf .in{display:flex;align-items:center;height:48px;border:1px solid var(--color-border-strong);background:var(--color-bg-primary)}
+.gf .in:focus-within{border-color:var(--color-content-primary);box-shadow:inset 0 0 0 1px var(--color-content-primary)}
+.gf .in input{flex:1;min-width:0;height:100%;padding:0 14px;border:0;background:transparent;outline:0;font:var(--ts-body-default);color:inherit}
+.gf .in .pre{display:grid;place-items:center;height:100%;padding:0 12px;border-inline-end:1px solid var(--color-border-primary);background:var(--color-bg-secondary);font:var(--ts-body-default);color:var(--color-content-secondary)}
+.gf .bad .in{border-color:var(--color-danger);box-shadow:inset 0 0 0 1px var(--color-danger)}
+.gf .e{display:none;margin:6px 0 0;font:var(--ts-body-s);color:var(--color-danger)}
+.gf .bad .e{display:block}
+.gf-acts{display:flex;gap:8px}
+.gf-acts button{height:44px;padding:0 20px;border:1px solid var(--color-border-strong);background:var(--color-bg-primary);font:var(--ts-body-default-bold);color:var(--color-content-primary);cursor:pointer}
+.gf-acts .ok{border-color:var(--color-brand);background:var(--color-brand);color:var(--color-content-on-accent)}
+.rows .lines{display:grid;gap:6px}
+.rows .lines span{display:flex;justify-content:space-between;gap:12px}
+.rows .lines s{margin-inline-end:6px;color:var(--color-content-secondary)}
+@media (max-width:560px){.gf{grid-template-columns:minmax(0,1fr)}}
 .rows{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;margin:0;font:var(--ts-body-s)}
 .rows dt{color:var(--color-content-tertiary)}
 .rows dd{margin:0;text-align:end;overflow-wrap:anywhere}
@@ -137,12 +173,16 @@
     cal: SV('<path d="M4 6h16v14H4zM4 10h16M8 3v4m8-4v4"/>'), pin: SV('<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><path d="M12 11.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>'),
     who: SV('<path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20a6.5 6.5 0 0 1 13 0M16 4.3a3.5 3.5 0 0 1 0 6.6M18 13.5a6.5 6.5 0 0 1 3.5 6.5"/>'), fmt: SV('<path d="M3 5h18v14H3zM12 5v14"/><path d="M12 9.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z"/>')
   };
-  let me = null, mine = [], online = {}, pick = null, agreed = false, busy = false, err = '';
+  let me = null, mine = [], online = {}, picks = [], guests = [], gForm = null, quote = null, qSeq = 0, agreed = false, busy = false, err = '';
+  const X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  const PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+  const fmtPhone = d => [d.slice(0, 2), d.slice(2, 5), d.slice(5)].filter(Boolean).join(' ');
   const g = window.SFA_GAME(id);
   // who already holds a spot, and who has had a game before (the first is free), from the account's bookings
-  const keyOf = b => b.order.bookingFor && b.order.bookingFor.type === 'child' ? 'child:' + (b.order.bookingFor.ref || b.order.bookingFor.name) : 'me';
-  const inGame = k => mine.some(b => b.order.kind === 'game' && b.order.game === id && b.status === 'paid' && keyOf(b) === k);
-  const hadGame = k => mine.some(b => b.order.kind === 'game' && b.status === 'paid' && keyOf(b) === k);
+  const keysOf = b => (b.order.participants || [b.order.bookingFor && b.order.bookingFor.type === 'child' ? { type: 'child', ref: b.order.bookingFor.ref, name: b.order.bookingFor.name } : { type: 'me' }])
+    .map(x => x.type === 'guest' ? 'tel:' + x.phone : x.type === 'child' ? 'child:' + (x.ref || x.name) : 'me');
+  const inGame = k => mine.some(b => b.order.kind === 'game' && b.order.game === id && b.status === 'paid' && keysOf(b).includes(k));
+  const hadGame = k => mine.some(b => b.order.kind === 'game' && b.status === 'paid' && keysOf(b).includes(k));
   const taken = () => g.base + ((online[g.id] || {}).taken || 0);
   const started = () => { const n = new Date(), k = window.SFA_TODAY(n); return g.date < k || (g.date === k && g.start <= n.getHours() * 60 + n.getMinutes()); };
   // the people on the account who could take a spot: you (adult games) or each child (kids' games)
@@ -158,26 +198,50 @@
   }
   const crumbs = last => `<nav class="kl-crumbs" aria-label="${t('Breadcrumb')}"><a href="index.html">${t('Home')}</a>${CHEV}<a href="matches.html${g ? '?day=' + encodeURIComponent(g.date) : ''}">${t('Open games')}</a>${CHEV}<span>${last}</span></nav>`;
 
+  // the players picked: ticked people on the account, then the guests added for this booking (adult games only)
+  function chosen(){
+    const list = people(), ok = list.filter(x => !x.why);
+    picks = picks.filter(k => ok.some(x => x.key === k));
+    const q = quote && quote.people || [];
+    const freeOf = (type, key) => { const hit = q.find(x => x.type === type && (type === 'guest' ? 'tel:' + x.phone === key : type === 'child' ? 'child:' + x.ref === key : true)); return hit ? hit.free : null; };
+    return [...ok.filter(x => picks.includes(x.key)).map(x => ({ ...x, free: freeOf(x.you ? 'me' : 'child', x.key) ?? x.free })),
+      ...guests.map(x => ({ key: 'tel:' + x.phone, guest: true, name: x.name, phone: x.phone, free: freeOf('guest', 'tel:' + x.phone) ?? false }))];
+  }
+  // the server works out what each player pays (a guest's first game is free too, checked by their mobile)
+  async function requote(){
+    const players = [...picks.map(k => ({ ref: k === 'me' ? 'me' : k.slice(6) })), ...guests.map(x => ({ guest: { name: x.name, phone: x.phone } }))];
+    const n = ++qSeq; if (!players.length || !me){ quote = null; return; }
+    try { const r = await fetch('/api/games/quote', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order: { kind: 'game', game: g.id, players } }) });
+      const d = await r.json().catch(() => ({})); if (n !== qSeq) return; quote = r.ok ? d : null; if (!r.ok && d.error) err = t(d.error); paint(); } catch (x) {}
+  }
   function joinBox(sp, c, left){
     const list = people(), ok = list.filter(x => !x.why);
-    if (pick && !ok.some(x => x.key === pick)) pick = null;
-    if (!pick && ok.length === 1) pick = ok[0].key;
-    const who = list.find(x => x.key === pick), free = who ? who.free : false, price = free ? 0 : g.price;
+    if (!picks.length && !guests.length && ok.length === 1 && !joinBox.auto){ picks = [ok[0].key]; joinBox.auto = true; requote(); }
+    const who = chosen(), n = who.length, room = left - n, price = who.filter(x => !x.free).length * g.price;
     const when = `${P.date(toDate(g.date), 'full')} · <bdi>${P.time(g.start)}</bdi> – <bdi>${P.time(g.start + SLOT)}</bdi>`;
     const closed = started() ? t('This game has already started.') : left <= 0 ? t('This game is full.') : '';
     if (!me) return `<div class="jn"><p class="note">${t('Sign in to join a game.')}</p><button type="button" class="book" data-signin>${t('Sign in')}</button></div>`;
     if (closed) return `<div class="jn"><p class="note bad">${closed}</p><a class="book ghost" href="matches.html">${t('Find another game')}</a></div>`;
-    return `<div class="jn"><div class="pl" role="radiogroup" aria-labelledby="plL"><span id="plL">${t("Who's playing?")}</span>
-        ${list.length ? list.map(x => `<button type="button" class="opt" role="radio" aria-checked="${x.key === pick}" data-pick="${esc(x.key)}"${x.why ? ' disabled' : ''}><span class="dot" aria-hidden="true"></span>
-          <span><b>${esc(x.you ? t('Myself') : x.name)}</b><small>${x.why || (x.age != null ? t('Age {n}', { n: x.age }) : '')}</small></span>${!x.why && x.free ? `<em>${t('First game free')}</em>` : ''}</button>`).join('')
-        : `<p class="note">${t('Kids’ games are for your children aged 6 to 17. Add them in My children.')} <a href="profile.html#people">${t('My children')}</a></p>`}</div>
+    const adults = g.who !== 'kids', F = gForm || {};
+    const row = x => `<button type="button" class="opt" role="checkbox" aria-checked="${picks.includes(x.key)}" data-pick="${esc(x.key)}"${x.why || (!picks.includes(x.key) && room <= 0) ? ' disabled' : ''}><span class="box" aria-hidden="true">${TICK}</span>
+          <span><b>${esc(x.you ? t('Myself') : x.name)}</b><small>${x.why || (!picks.includes(x.key) && room <= 0 ? t('No spots left') : x.age != null ? t('Age {n}', { n: x.age }) : '')}</small></span>${!x.why && x.free ? `<em>${t('First game free')}</em>` : ''}</button>`;
+    const gRow = (x, i) => `<div class="gst"><span class="box" aria-hidden="true">${TICK}</span><span><b>${esc(x.name)}</b><small><bdi>+966 ${esc(fmtPhone(x.phone.slice(4)))}</bdi> · ${t('Guest')}</small></span>${who.find(y => y.key === 'tel:' + x.phone)?.free ? `<em>${t('First game free')}</em>` : '<span></span>'}<button type="button" class="gst-x" data-rmg="${i}" aria-label="${t('Remove {name}', { name: esc(x.name) })}">${X}</button></div>`;
+    const form = gForm ? `<div class="gf" id="gForm"><div class="full${F.bad && F.bad.name ? ' bad' : ''}"><label for="gfN">${t("Guest's full name")}</label><div class="in"><input id="gfN" type="text" autocomplete="off" value="${esc(F.name || '')}" placeholder="${t('e.g. Omar Al-Harbi')}"></div><p class="e">${t('Enter their full name.')}</p></div>
+          <div class="full${F.bad && F.bad.phone ? ' bad' : ''}"><label for="gfP">${t("Guest's mobile")}</label><div class="in"><span class="pre">+966</span><input id="gfP" type="tel" inputmode="numeric" autocomplete="off" maxlength="11" value="${esc(F.phone || '')}" placeholder="5X XXX XXXX"></div><p class="e">${esc(F.bad && F.bad.phone || '')}</p></div>
+          <div class="gf-acts full"><button type="button" class="ok" data-gadd>${t('Add guest')}</button><button type="button" data-gcancel>${t('Cancel')}</button></div></div>` : '';
+    const lines = who.map(x => `<span><span>${esc(x.you ? me.name : x.name)}</span><span>${x.free ? `<s>${P.money(g.price)}</s>${t('Free')}` : P.money(g.price)}</span></span>`).join('');
+    return `<div class="jn"><div class="pl" role="group" aria-labelledby="plL"><span id="plL">${t("Who's playing?")}</span>
+        <p class="pl-hint">${adults ? t('Tick yourself and add guests: each one gets their own spot and ticket.') : t('Tick each of your children who is playing: each one gets their own spot and ticket.')} ${left === 1 ? t('1 spot left') : t('{n} spots left', { n: left })}.</p>
+        ${list.length ? list.map(row).join('') : `<p class="note">${t('Kids’ games are for your children aged 6 to 17. Add them in My children.')} <a href="profile.html#people">${t('My children')}</a></p>`}
+        ${guests.map(gRow).join('')}${form}
+        ${adults && !gForm ? `<button type="button" class="add-g" data-gopen${room <= 0 ? ' disabled' : ''}>${PLUS}<span>${room <= 0 ? t('No spots left') : t('Add a guest')}</span></button>` : ''}</div>
       <dl class="rows"><dt>${t('Game')}</dt><dd>${esc(t(sp.name))} · ${esc(t(g.format))}</dd><dt>${t('When')}</dt><dd>${when}</dd><dt>${t('Where')}</dt><dd>${esc(t(c[0]))} · ${t('SFA Domes Dammam')}</dd>
-        <dt>${t('Player')}</dt><dd>${who ? esc(who.you ? me.name : who.name) : '—'}</dd><dt>${t('Your spot')}</dt><dd>${free ? `<s>${P.money(g.price)}</s>${t('Free')}` : P.money(g.price)}</dd>
-        <span class="sep" aria-hidden="true"></span><dt class="total">${t('Total')}</dt><dd class="total">${price ? P.money(price) : t('Free')}</dd></dl>
-      ${free ? `<p class="note">${t("{name}'s first open game is free.", { name: esc(who.you ? t('Your') : who.name.split(' ')[0]) })}</p>` : ''}
+        <dt>${t(n > 1 ? 'Players' : 'Player')}</dt><dd>${n ? `<span class="lines">${lines}</span>` : '—'}</dd>
+        <span class="sep" aria-hidden="true"></span><dt class="total">${t('Total')}</dt><dd class="total">${n && price ? P.money(price) : n ? t('Free') : '—'}</dd></dl>
+      ${who.some(x => x.free) ? `<p class="note">${t('Each person’s first open game is free.')}</p>` : ''}
       <label class="terms${err && !agreed ? ' bad' : ''}" id="jTerms"><input type="checkbox" id="jT"${agreed ? ' checked' : ''}><span class="box" aria-hidden="true">${TICK}</span><span>${t('I agree to the terms and conditions and the health waiver.')}</span></label>
       <p class="err" role="alert">${esc(err)}</p>
-      <button type="button" class="book" id="jGo"${!who || busy ? ' disabled' : ''}><span>${busy ? t('One moment…') : !who ? t("Choose who's playing") : price ? t('Pay {total}', { total: P.money(price) }) : t('Join for free')}</span>${who && !busy ? ARROW : ''}</button></div>`;
+      <button type="button" class="book" id="jGo"${!n || busy ? ' disabled' : ''}><span>${busy ? t('One moment…') : !n ? t("Choose who's playing") : price ? t('Pay {total}', { total: P.money(price) }) : t('Join for free')}</span>${n && !busy ? ARROW : ''}</button></div>`;
   }
 
   function paint(){
@@ -196,7 +260,7 @@
           <ul class="kl-badges"><li class="${g.who === 'kids' ? 'kids' : ''}">${CHK}<span>${t(w.label)}</span></li><li>${CHK}<span>${t('Indoor')}</span></li><li>${CHK}<span>${t('Bibs and balls provided')}</span></li><li class="free">${CHK}<span>${t('First game free')}</span></li></ul>
           <ul class="kl-facts">
             <li>${I.cal}<div><b>${P.date(toDate(g.date), 'full')}</b><small><bdi>${P.time(g.start)}</bdi> – <bdi>${P.time(g.start + SLOT)}</bdi> · ${t('{m} minutes', { m: SLOT })}</small></div></li>
-            <li>${I.who}<div><b>${t(w.label)}</b><small>${t(g.who === 'kids' ? 'Book a spot for one of your children' : 'Book a spot for yourself')}</small></div></li>
+            <li>${I.who}<div><b>${t(w.label)}</b><small>${t(g.who === 'kids' ? 'Book spots for your children' : 'Book spots for yourself and guests')}</small></div></li>
             <li>${I.fmt}<div><b>${esc(t(g.format))}</b><small>${t('Up to {n} players', { n: g.spots })}</small></div></li>
             <li>${I.pin}<div><b>${t('SFA Domes Dammam')}</b><small>${esc(t(c[0]))}</small></div></li></ul>
           <div class="spots"><div class="spots-t"><span>${left <= 0 ? t('Full') : left === 1 ? t('1 spot left') : t('{n} spots left', { n: left })}</span><small>${t('{a} of {b} players', { a: n, b: g.spots })}</small></div>
@@ -228,22 +292,41 @@
   }
 
   document.addEventListener('click', e => { const a = e.target.closest('a[href="#join"]'); if (!a) return; e.preventDefault(); document.getElementById('join')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  const refocus = sel => root.querySelector(sel)?.focus();
   root.addEventListener('click', async e => {
-    const o = e.target.closest('[data-pick]'); if (o && !o.disabled){ pick = o.dataset.pick; err = ''; paint(); root.querySelector(`[data-pick="${pick}"]`)?.focus(); return; }
+    const o = e.target.closest('[data-pick]');
+    if (o && !o.disabled){ const k = o.dataset.pick; picks = picks.includes(k) ? picks.filter(x => x !== k) : [...picks, k]; err = ''; paint(); refocus(`[data-pick="${CSS.escape(k)}"]`); requote(); return; }
+    if (e.target.closest('[data-gopen]')){ gForm = { name: '', phone: '' }; paint(); refocus('#gfN'); return; }
+    if (e.target.closest('[data-gcancel]')){ gForm = null; paint(); refocus('[data-gopen]'); return; }
+    if (e.target.closest('[data-gadd]')){
+      const name = root.querySelector('#gfN').value.trim().replace(/\s+/g, ' '), digits = root.querySelector('#gfP').value.replace(/\D/g, '').replace(/^0/, ''), phone = '+966' + digits, bad = {};
+      if (name.split(' ').length < 2) bad.name = true;
+      if (!/^5\d{8}$/.test(digits)) bad.phone = t('Enter a Saudi mobile number starting with 5.');
+      else if (me && phone === me.phone) bad.phone = t('That mobile number is yours: tick Myself instead.');
+      else if (guests.some(x => x.phone === phone)) bad.phone = t('This guest is already on the list.');
+      if (bad.name || bad.phone){ gForm = { name, phone: fmtPhone(digits), bad }; paint(); refocus(bad.name ? '#gfN' : '#gfP'); return; }
+      guests.push({ name, phone }); gForm = null; err = ''; paint(); refocus('[data-gopen]'); requote(); return;
+    }
+    const rg = e.target.closest('[data-rmg]'); if (rg){ guests.splice(+rg.dataset.rmg, 1); err = ''; paint(); refocus('[data-gopen]'); requote(); return; }
     if (e.target.closest('[data-signin]')) return window.SFA_AUTH.open({ view: 'login', reason: t('Sign in to join a game.') });
     if (!e.target.closest('#jGo')) return;
     agreed = root.querySelector('#jT').checked;
     if (!agreed){ err = t('Accept the terms to continue'); paint(); root.querySelector('#jT').focus(); return; }
-    const who = people().find(x => x.key === pick); if (!who) return;
+    const players = [...picks.map(k => ({ ref: k === 'me' ? 'me' : k.slice(6) })), ...guests.map(x => ({ guest: { name: x.name, phone: x.phone } }))];
+    if (!players.length) return;
     busy = true; err = ''; paint();
     try {
-      const r = await fetch('/api/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order: { kind: 'game', game: g.id, player: { ref: who.ref } }, terms: true, waiver: true }) });
+      const r = await fetch('/api/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order: { kind: 'game', game: g.id, players }, terms: true, waiver: true }) });
       const d = await r.json().catch(() => ({}));
       if (r.status === 401){ busy = false; paint(); return window.SFA_AUTH.open({ view: 'login', reason: t('Sign in to join a game.') }); }
       if (!r.ok || !d.redirect_url){ busy = false; err = t(d.error || 'Could not start the payment. Try again.'); await load(); return; }
       location.href = d.redirect_url;
     } catch (x) { busy = false; err = t('Could not reach the server. Try again.'); paint(); }
   });
+  // the guest's mobile is typed as 5X XXX XXXX
+  root.addEventListener('input', e => { if (e.target.id === 'gfP'){ const v = e.target.value.replace(/\D/g, '').replace(/^0/, '').slice(0, 9); e.target.value = fmtPhone(v); }
+    if (gForm && (e.target.id === 'gfP' || e.target.id === 'gfN')){ gForm[e.target.id === 'gfN' ? 'name' : 'phone'] = e.target.value; e.target.closest('.bad')?.classList.remove('bad'); } });
+  root.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.target.id === 'gfN' || e.target.id === 'gfP')){ e.preventDefault(); root.querySelector('[data-gadd]')?.click(); } });
   root.addEventListener('change', e => { if (e.target.id === 'jT'){ agreed = e.target.checked; if (agreed) err = ''; root.querySelector('#jTerms').classList.remove('bad'); } });
 
   async function load(){

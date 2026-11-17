@@ -32,7 +32,7 @@
   const people = b => b.order.participants || (b.order.player ? [b.order.player] : []);
   // every session is a ticket; a program booking has one per participant per session (n counts the session)
   function sessions(b){
-    const out = [], prog = b.order.kind === 'program', bf = b.order.bookingFor || {}, who = prog ? people(b) : [bf.type === 'child' ? { name: bf.name } : null];   // a court booked for a child carries their name
+    const out = [], prog = b.order.kind === 'program', bf = b.order.bookingFor || {}, who = prog || b.order.participants ? people(b) : [bf.type === 'child' ? { name: bf.name } : null];   // open games with several players: one ticket each (2026-11-17)   // a court booked for a child carries their name
     const len = prog ? (window.SFA_PROGRAMS[b.order.program] || {}).minutes || SLOT : SLOT;
     let n = 0;
     [...b.order.days].sort((x, y) => x.date.localeCompare(y.date)).forEach(d => [...d.starts].sort((x, y) => x - y).forEach(s => { n++; who.forEach(w => out.push({ date: d.date, start: s, end: s + len, n, player: w && w.name })); }));
@@ -52,7 +52,7 @@
   const icon = sp => sp.img ? `<img src="${sp.img}" alt="">` : `<span class="msi">${sp.icon}</span>`;
   function ticket(s, b){
     const D = describe(s, b), sp = D.sp, prog = b.order.kind === 'program', bf = b.order.bookingFor || { type: 'me' };
-    const who = prog ? [t('Participant'), esc(s.player || '')] : [t('Booked for'), bf.type === 'other' || bf.type === 'child' ? esc(bf.name) : t('Myself')];
+    const who = prog ? [t('Participant'), esc(s.player || '')] : b.order.participants ? [t('Player'), esc(s.player || '')] : [t('Booked for'), bf.type === 'other' || bf.type === 'child' ? esc(bf.name) : t('Myself')];
     return `<article class="tk" data-ticket="${esc(s.id)}">
       <div class="tk-ph"><img src="${D.img}" alt="" loading="lazy" style="object-position:${D.program ? D.program.focus : '50% 50%'}"><span class="tk-sp"><span class="tk-ico" aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}</span></div>
       <div class="tk-main">

@@ -65,30 +65,62 @@ function takenSlots(sport, court){
 
 // online spots held or paid in an open game, and whether this user already has one
 const gameBookings = id => Object.values(bookings).filter(b => b.order.kind === 'game' && b.order.game === id && holding(b));
-// who holds a game spot: you ('me') or one of your children
-const gamePlayer = b => b.order.bookingFor && b.order.bookingFor.type === 'child' ? 'child:' + (b.order.bookingFor.ref || b.order.bookingFor.name) : 'me';
-// a game order: { kind: 'game', game, player: { ref: 'me' | <saved child id> } }. Adult games take you (18+); kids' games take
-// one of your saved children aged 6 to 17 on the day (Ahmed, 2026-11-11). Each person's first open game is free.
+// a game booking's players: order.participants (several since 2026-11-17); older bookings hold one, in bookingFor
+const gamePeople = b => b.order.participants || [b.order.bookingFor && b.order.bookingFor.type === 'child' ? { type: 'child', ref: b.order.bookingFor.ref, name: b.order.bookingFor.name } : { type: 'me' }];
+const spotsOf = b => b.order.kind === 'game' ? gamePeople(b).length : 1;
+// who a player is: you or one of your children (per account), or a guest by their mobile
+const pKey = x => x.type === 'guest' ? 'tel:' + x.phone : x.type === 'child' ? 'child:' + (x.ref || x.name) : 'me';
+// has this person had an open game before? (the first one is free): you and your children by account, guests by mobile;
+// a mobile also matches an account holder who played as "Myself", so a guest's free game is used once
+function playedGame(p, user){
+  const paid = Object.values(bookings).filter(b => b.order.kind === 'game' && b.status === 'paid');
+  if (p.type === 'child') return paid.some(b => b.userId === user.id && gamePeople(b).some(q => pKey(q) === pKey(p)));
+  const phone = p.type === 'me' ? user.phone : p.phone;
+  return paid.some(b => gamePeople(b).some(q => q.type === 'me' ? (p.type === 'me' && b.userId === user.id) || (!!phone && (users[b.userId] || {}).phone === phone) : q.type === 'guest' && !!phone && q.phone === phone));
+}
+// a game order: { kind: 'game', game, players: [{ ref: 'me' | <saved child id> } | { guest: { name, phone } }] } (one player used
+// to come as order.player). Adult games take you and adult guests (full name + Saudi mobile, Ahmed 2026-11-17); kids' games
+// take your saved children aged 6 to 17 on the day. Up to the spots left. Each person's first open game is free.
 function checkGameOrder(order, user){
   const fail = (error, status) => ({ error, status });
   const g = GAME(order && order.game); if (!g) return fail('That game is no longer on.', 409);
   const now = new Date(), today = dk(now);
   if (g.date < today || (g.date === today && g.start <= now.getHours() * 60 + now.getMinutes())) return fail('That game has already started.', 409);
-  const ref = order.player && order.player.ref ? order.player.ref : 'me';
-  let p;
-  if (ref === 'me'){ if (!user.dob) return fail('Add your date of birth in My account to join a game.'); p = { type: 'me', name: user.name, dob: user.dob, gender: user.gender }; }
-  else { const c = (user.participants || []).find(x => x.id === ref); if (!c) return fail('That child is no longer in My children. Refresh the page to see your current list.', 409); p = { type: 'child', ref: c.id, name: c.name, dob: c.dob, gender: c.gender }; }
-  if (ctx.window.SFA_GAME_FITS(g, p)) return fail(g.who === 'kids' ? (p.type === 'me' ? 'This game is for kids aged 6 to 17.' : `${p.name} can't join: this game is for kids aged 6 to 17.`) : (p.type === 'me' ? 'This game is for adults (18+).' : `${p.name} can't join: this game is for adults (18+).`));
-  const key = p.type === 'me' ? 'me' : 'child:' + p.ref, held = gameBookings(g.id);
-  if (held.some(b => b.userId === user.id && gamePlayer(b) === key)) return fail(p.type === 'me' ? "You've already joined this game." : `${p.name} is already in this game.`, 409);
-  if (g.base + held.length >= g.spots) return fail('That game is full.', 409);
-  const firstFree = !Object.values(bookings).some(b => b.userId === user.id && b.order.kind === 'game' && b.status === 'paid' && gamePlayer(b) === key);
+  const list = Array.isArray(order.players) ? order.players : order.player ? [order.player] : [{ ref: 'me' }];
+  if (!list.length) return fail("Choose who's playing.");
+  const held = gameBookings(g.id), left = g.spots - g.base - held.reduce((a, b) => a + spotsOf(b), 0);
+  if (left <= 0) return fail('That game is full.', 409);
+  if (list.length > left) return fail(left === 1 ? 'Only 1 spot is left in this game.' : `Only ${left} spots are left in this game.`, 409);
+  const people = [], seen = new Set();
+  for (const x of list){
+    let p;
+    if (x && x.guest){
+      if (g.who === 'kids') return fail('Guests can join adult games only.');
+      const name = String(x.guest.name || '').trim().replace(/\s+/g, ' '), phone = String(x.guest.phone || '').replace(/\s+/g, '');
+      if (name.split(' ').length < 2) return fail("Add each guest's full name.");
+      if (!phoneOk(phone)) return fail("Enter each guest's Saudi mobile number, starting with 5.");
+      if (phone === user.phone) return fail('That mobile number is yours: tick Myself instead.');
+      p = { type: 'guest', name, phone };
+    } else if (!x || !x.ref || x.ref === 'me'){
+      if (!user.dob) return fail('Add your date of birth in My account to join a game.');
+      p = { type: 'me', name: user.name, dob: user.dob, gender: user.gender };
+    } else {
+      const c = (user.participants || []).find(y => y.id === x.ref); if (!c) return fail('That child is no longer in My children. Refresh the page to see your current list.', 409);
+      p = { type: 'child', ref: c.id, name: c.name, dob: c.dob, gender: c.gender };
+    }
+    if (p.type !== 'guest' && ctx.window.SFA_GAME_FITS(g, p)) return fail(g.who === 'kids' ? (p.type === 'me' ? 'This game is for kids aged 6 to 17.' : `${p.name} can't join: this game is for kids aged 6 to 17.`) : (p.type === 'me' ? 'This game is for adults (18+).' : `${p.name} can't join: this game is for adults (18+).`));
+    const k = pKey(p);
+    if (seen.has(k)) return fail(`${p.type === 'me' ? 'You are' : p.name + ' is'} on the list twice.`);
+    seen.add(k);
+    if (held.some(b => gamePeople(b).some(q => pKey(q) === k && (q.type === 'guest' || b.userId === user.id)))) return fail(p.type === 'me' ? "You've already joined this game." : `${p.name} is already in this game.`, 409);
+    p.free = !playedGame(p, user);
+    people.push(p);
+  }
   const sport = SPORTS[g.sport], court = sport.courts[g.court];
-  return { amount: firstFree ? 0 : g.price, desc: `Open game · ${sport.name} · ${court[0]} · ${g.who === 'kids' ? 'Kids 6–17' : 'Adults'} · SFA Domes Dammam`, player: p,
-    order: { kind: 'game', game: g.id, sport: g.sport, court: g.court, days: [{ date: g.date, starts: [g.start] }], who: g.who, format: g.format, spots: g.spots, firstFree,
-      bookingFor: p.type === 'me' ? { type: 'me' } : { type: 'child', ref: p.ref, name: p.name, dob: p.dob, gender: p.gender } } };
+  return { amount: people.filter(p => !p.free).length * g.price, people, desc: `Open game · ${sport.name} · ${court[0]} · ${g.who === 'kids' ? 'Kids 6–17' : 'Adults'} · ${people.length} × spot · SFA Domes Dammam`,
+    order: { kind: 'game', game: g.id, sport: g.sport, court: g.court, days: [{ date: g.date, starts: [g.start] }], who: g.who, format: g.format, spots: g.spots, price: g.price,
+      firstFree: people.some(p => p.free), participants: people, bookingFor: { type: 'me' } } };
 }
-
 // ---- helpers
 const pad = n => String(n).padStart(2, '0');
 const dk = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -477,9 +509,17 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/api/games'){
       const days = new Set(String(url.searchParams.get('days') || '').split(',')), me = currentUser(req), out = {};
       for (const b of Object.values(bookings)) if (b.order.kind === 'game' && holding(b) && days.has(b.order.days[0].date)){
-        const o = out[b.order.game] || (out[b.order.game] = { taken: 0, mine: false }); o.taken++; if (me && b.userId === me.id) o.mine = true;
+        const o = out[b.order.game] || (out[b.order.game] = { taken: 0, mine: false }); o.taken += spotsOf(b); if (me && b.userId === me.id) o.mine = true;
       }
       return send(res, 200, out);
+    }
+
+    // open games: what a list of players would pay (each person's first game is free; guests are checked by mobile)
+    if (req.method === 'POST' && url.pathname === '/api/games/quote'){
+      const user = currentUser(req); if (!user) return send(res, 401, { error: 'Please sign in to book.' });
+      const { order } = JSON.parse(await readBody(req) || '{}'), gc = checkGameOrder(order, user);
+      if (gc.error) return send(res, gc.status || 400, { error: gc.error });
+      return send(res, 200, { amount: gc.amount, people: gc.people.map(x => ({ type: x.type, ref: x.ref, name: x.name, phone: x.phone, free: x.free })) });
     }
 
     if (req.method === 'GET' && url.pathname === '/api/config'){
@@ -497,7 +537,7 @@ const server = http.createServer(async (req, res) => {
       if (order && order.kind === 'game'){
         const gc = checkGameOrder(order, user); if (gc.error) return send(res, gc.status || 400, { error: gc.error });
         order = gc.order; chk = { amount: gc.amount, desc: gc.desc };
-        order.waiver = { acceptedBy: user.name, at: Date.now(), for: [gc.player.name], guardian: gc.player.type === 'child' };
+        order.waiver = { acceptedBy: user.name, at: Date.now(), for: gc.people.map(x => x.name), guardian: gc.people.some(x => x.type === 'child') };
         // a first open game is free: confirmed straight away
         if (!chk.amount){
           bookings[cartId] = { cartId, status: 'paid', createdAt: Date.now(), paidAt: Date.now(), amount: 0, order, payer, userId: user.id, free: true };

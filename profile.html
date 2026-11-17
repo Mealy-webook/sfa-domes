@@ -289,7 +289,7 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
   // every paid session, with when it ends, split into upcoming and past
   const all = () => bookings.filter(b => b.status === 'paid').flatMap(b => T.sessions(b).map(s => ({ s, b, endsAt: T.toDate(s.date).getTime() + s.end * 60e3 })));
   // who a ticket is for: a program session's participant, or who a court / game was booked for (you, a child, someone else)
-  const personOf = x => x.b.order.kind === 'program' ? (x.s.player || '') : (x.b.order.bookingFor && x.b.order.bookingFor.type !== 'me' && x.b.order.bookingFor.name) || (user ? user.name : '');
+  const personOf = x => x.b.order.kind === 'program' || x.b.order.participants ? (x.s.player || '') : (x.b.order.bookingFor && x.b.order.bookingFor.type !== 'me' && x.b.order.bookingFor.name) || (user ? user.name : '');
   const shown = () => all().filter(x => (kind === 'all' || kindOf(x.b) === kind) && (who === 'all' || personOf(x) === who));
   const upcoming = (l = shown()) => l.filter(x => x.endsAt > Date.now()).sort((a, b) => a.endsAt - b.endsAt);
   const past = (l = shown()) => l.filter(x => x.endsAt <= Date.now()).sort((a, b) => b.endsAt - a.endsAt);
