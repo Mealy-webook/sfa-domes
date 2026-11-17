@@ -64,3 +64,15 @@ html[dir=rtl] .kl-crumbs svg{transform:scaleX(-1)}
 
 /* ---- 9 · prices: the unit sits on the same line as the price ("⃁300 / hr"), in the bottom bar too ---- */
 .go-pick strong .go-from:last-child{display:inline;margin-inline-start:4px}
+
+/* ---- main buttons and badges with white text: Orange 700 (5.2:1), hover Orange 800 (Ahmed, 2026-11-17: "fix buttons";
+   white on the brand orange is only 3.1:1). The brand orange stays for large display text, borders, picks and icons. ---- */
+.btn:not(.danger):not(.ghost):not(.btn-outline):not(.btn-secondary):not(:disabled),.btn-primary,.cta,.book:not(:disabled):not(.ghost),
+.join:not(.in):not(.off),button.go,.bv .btn.bv-main,.mt-mini.mt-accent,.bv-act--accent,.sfa-auth .sa-go:not(:disabled),
+.tab[aria-selected=true] b,.vn-map-tag{background:var(--orange-700);color:var(--neutral-0)}
+.btn:not(.danger):not(.ghost):not(.btn-outline):not(.btn-secondary):not(:disabled):hover,.btn-primary:hover,.cta:hover,.book:not(:disabled):not(.ghost):hover,
+.join:not(.in):not(.off):hover,button.go:hover,.bv .btn.bv-main:hover,.mt-mini.mt-accent:hover,.bv-act--accent:hover,.sfa-auth .sa-go:not(:disabled):hover{background:var(--orange-800);filter:none}
+.mt-mini.mt-accent,.bv-act--accent{border-color:var(--orange-700)}
+/* the header's account button ("Hi, Sara" / Login) */
+.card-nav{--cn-cta:var(--orange-700)}
+.card-nav__cta:hover{background:var(--orange-800);filter:none}

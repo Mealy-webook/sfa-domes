@@ -118,7 +118,7 @@ html[data-mode=light] .row .v.l,html[data-mode=dark] .row .v.d{font-weight:500;c
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const chip = (name, v) => `<div class="chip"><i style="background:var(${v})"></i><div><b>${name}</b><code>${v}</code><code>${css(v)}</code></div></div>`;
   const PRIM = [
-    ['Brand orange', [['Orange 300', '--orange-300'], ['Orange 500', '--orange-500'], ['Orange 600', '--orange-600'], ['Orange 700', '--orange-700']]],
+    ['Brand orange', [['Orange 300', '--orange-300'], ['Orange 500', '--orange-500'], ['Orange 600', '--orange-600'], ['Orange 700', '--orange-700'], ['Orange 800', '--orange-800']]],
     ['Neutrals', [['Neutral 0', '--neutral-0'], ['Neutral 100', '--neutral-100'], ['Neutral 200', '--neutral-200'], ['Neutral 300', '--neutral-300'], ['Neutral 400', '--neutral-400'], ['Neutral 500', '--neutral-500'], ['Neutral 600', '--neutral-600'], ['Neutral 800', '--neutral-800'], ['Neutral 900', '--neutral-900'], ['Neutral 950', '--neutral-950'], ['Black', '--black']]],
     ['Programmes', [['Cyan 500', '--cyan-500'], ['Purple 500', '--purple-500'], ['Yellow 300', '--yellow-300'], ['Pink 600', '--pink-600'], ['Blue 700', '--blue-700'], ['Green 400', '--green-400']]],
     ['Feedback', [['Red 600', '--red-600'], ['Amber 100', '--amber-100'], ['Amber 800', '--amber-800']]],
