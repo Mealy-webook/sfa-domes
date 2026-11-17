@@ -10,7 +10,7 @@
    C = rows grouped by when, and the booking opens as a ticket wallet with a person switcher (event apps).
    profile.html hands over its state and helpers through ctx (see MT_CTX there). */
 (() => {
-  const st = { seg: 'up', who: 'all', panel: null, pick: {}, open: {}, type: 'court', person: 'all', cal: null, tf: {}, kt: 'all' };
+  const st = { seg: 'up', who: 'all', panel: null, pick: {}, open: {}, type: 'court', person: 'all', cal: null, tf: {}, kt: 'all', bt: {}, sel: {} };
   const KIND = { court: 'Court booking', game: 'Open game', program: 'Training program' };
   const dk = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const SEND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-6 16-3-7z"/></svg>';
@@ -576,7 +576,206 @@
              ${S.done.length ? `<details class="mt-hist"${S.up.length ? '' : ' open'}><summary>${c.t('Played')} <b>${S.done.length}</b></summary><ol class="bv-s-list">${S.done.map(tk).join('')}</ol></details>` : ''}`}
         ${removedList(c, m)}</section></div>`;
   }
-  const BV = { wallet: bvWallet, timeline: bvTimeline, split: bvSplit };
+
+  // =====================================================================================================================
+  // Booking page, round 2 (Ahmed, 2026-11-17: "I don't like all options, I want professional options based on best
+  // practice and benchmark and new UI directions"). Built from booking-page-benchmark.html: 21 booking pages (GetYourGuide,
+  // Booking.com, Agoda, Kayak, Turo, Navan, Eventbrite, Klook, DICE, ClassPass…) and the ten rules they share:
+  //  1 status as a sentence with the countdown   2 one main action for the moment   3 manage actions in one place
+  //  4 the cancellation deadline right above Cancel   5 Cancel last and quiet   6 every person a row with a status
+  //  7 the ref in the header, copyable   8 payment as a receipt   9 help at the end   10 tabs for dense pages on phones
+  // profile.html?bv=rail | tabs | order #tickets/<ref>. Same data and actions as the live page.
+  // =====================================================================================================================
+  const HELP = { tel: '+966537448666', telTxt: '+966 53 744 8666', mail: 'Domes.info@sfa.sa' };
+  const IC2 = {
+    phone: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+    doc: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg>',
+    ok: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M12 7v5l3 2"/></svg>',
+    x: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>'
+  };
+  const whenAt = (c, d) => `${c.P.date(d, 'short')} · <bdi>${c.P.time(d.getHours() * 60 + d.getMinutes())}</bdi>`;
+  const dayTime = (c, s) => `${shortDay(c, s.date)} · <bdi>${c.P.time(s.start)}</bdi>`;
+  const againUrl = m => { const o = m.b.order; return m.kind === 'program' ? `program.html?p=${encodeURIComponent(o.program)}` : m.kind === 'game' ? 'matches.html' : o.ladies ? 'ladies-hours.html' : `court-details.html?sport=${encodeURIComponent(o.sport)}&court=${encodeURIComponent(o.court)}`; };
+  const liveTix = (c, m) => m.cancelled ? [] : m.ses.filter(s => s.endsAt > Date.now() && c.T.qrLive(s, m.b) === 'on' && (!s.pi && s.pi !== 0 || !(m.people.find(p => p.i === s.pi) || {}).gone));
+  // rule 1: the status as a sentence, with the countdown
+  function statusOf(c, m){
+    const t = c.t, b = m.b;
+    if (m.cancelled) return { k: 'off', title: t('Booking cancelled'), lead: b.refund ? t('{amount} refunded to your card', { amount: c.P.money(b.refund) }) : '' };
+    if (m.past) return { k: 'done', title: t('Played'), lead: t('Last session {when}', { when: dayTime(c, m.last) }) };
+    const live = liveTix(c, m).length, today = m.next.date === dk(new Date()), prog = m.kind === 'program';
+    return { k: live && today ? 'ok' : 'up', title: t('You’re all set'),
+      lead: `${prog ? t('Next session') + ': ' : ''}<b>${m.when}</b> · ${dayTime(c, m.next)}`,
+      note: live ? (prog ? t('Show the program card at reception') : today ? t('Your QR codes are ready to scan') : t('Show the QR code at reception')) : t('QR codes open on the day of the session') };
+  }
+  const statusBox = (c, m, S, cls) => `<div class="bv-stat bv-stat--${S.k} ${cls || ''}"><span class="bv-stat-ic">${S.k === 'off' ? IC2.x : S.k === 'up' ? IC2.clock : IC2.ok}</span><div><b>${S.title}</b>${S.lead ? `<p>${S.lead}</p>` : ''}${S.note ? `<small>${S.note}</small>` : ''}</div></div>`;
+  // rule 2: one main action for the moment (Show ticket on the day, Add to calendar before, Book again after)
+  function mainAct(c, m){
+    const t = c.t, b = m.b, L = liveTix(c, m).filter(s => s.date === dk(new Date()));   // Show ticket on the day only
+    if (L.length) return m.kind === 'program' || L.length > 1 ? `<button type="button" class="btn bv-main" data-bv-go="bvTix">${QRI}${t(m.kind === 'program' ? (m.active.length > 1 ? 'Show program cards' : 'Show program card') : 'Show tickets')}</button>`
+      : `<button type="button" class="btn bv-main" data-mt-ticket="${c.esc(L[0].id)}">${QRI}${t('Show ticket')}</button>`;
+    if (m.up) return `<a class="btn bv-main" href="${c.T.ics(b)}" download="${c.T.icsName(b)}">${c.CAL}${t('Add to calendar')}</a>`;
+    return `<a class="btn bv-main" href="${againUrl(m)}">${t('Book again')}${c.ARROW}</a>`;
+  }
+  const dirAct = (c, m) => m.up ? `<a class="ghost bv-sub" href="${c.T.DIRECTIONS}" target="_blank" rel="noopener">${c.PIN}${c.t('Get directions')}</a>` : '';
+  // rules 3–5: manage actions together; the free-cancellation deadline right above Cancel, which comes last
+  function cancelBlock(c, m){
+    if (!m.up) return '';
+    const t = c.t, b = m.b, C = c.T.cancelInfo(b), left = (b.amount || 0) - (b.refund || 0);
+    return C.can ? `<div class="bv-cx"><p><b>${t('Free cancellation until {when}', { when: whenAt(c, C.by) })}</b>${left > 0 ? t('Cancel before then for a full refund of {amount}.', { amount: c.P.money(left) }) : t('Cancel before then and your spot goes back on sale.')}</p><button type="button" class="bv-cxb" data-cancel="${c.esc(b.cartId)}">${t(m.n > 1 ? 'Cancel whole booking' : 'Cancel booking')}</button></div>`
+      : `<div class="bv-cx is-off"><p><b>${t('Free cancellation ended {when}', { when: whenAt(c, C.by) })}</b>${t('Bookings can’t be cancelled in the 48 hours before the first session.')}</p></div>`;
+  }
+  function manageList(c, m, withCal){
+    const t = c.t, b = m.b, esc = c.esc, R = c.renewInfo(b), send = m.people.filter(p => m.canSend(p) && !p.sent).length, out = [];
+    if (m.up && withCal) out.push(`<a href="${c.T.ics(b)}" download="${c.T.icsName(b)}">${c.CAL}<span>${t('Add to calendar')}</span>${CHEV}</a>`);
+    if (send) out.push(`<button type="button" data-mt-sendall="${esc(b.cartId)}">${SEND}<span>${send === 1 ? t('Send the guest ticket') : t('Send {n} guest tickets', { n: send })}</span>${CHEV}</button>`);
+    if (R) out.push(`<button type="button" class="is-accent" data-renew="${esc(b.cartId)}">${IC.cal}<span>${t('Renew for another month · 20% off')}</span>${CHEV}</button>`);
+    out.push(`<a href="result.html?cart=${encodeURIComponent(b.cartId)}">${IC2.doc}<span>${t('View confirmation')}</span>${CHEV}</a>`);
+    return `<ul class="bv-mg-l">${out.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  }
+  // rule 6: every person (a court: every time) as a row with its own status, ticket number and actions
+  function rowsOf(c, m){
+    const b = m.b, t = c.t, now = Date.now(), prog = m.kind === 'program', todayK = dk(new Date());
+    const qst = s => m.cancelled ? ['off', t('Cancelled')] : s.endsAt <= now ? ['done', t('Played')] : c.T.qrLive(s, b) === 'on' ? ['ok', t('QR ready')] : ['lock', t('QR opens {date}', { date: shortDay(c, s.date) })];
+    if (m.people[0] && m.people[0].single) return m.ses.map(s => ({ time: true, s, id: s.id, name: shortDay(c, s.date), type: `<bdi>${c.P.time(s.start)}</bdi> – <bdi>${c.P.time(s.end)}</bdi>`, no: s.id, st: qst(s), done: s.endsAt <= now }));
+    return m.people.map(p => {
+      const x = (b.order.participants || [])[p.i] || {}, s = m.nextOf(p), ck = x.checkins || [], total = m.days.length;
+      const type = p.you ? t('You') : p.type === 'guest' ? t('Guest') : p.type === 'child' ? t('Child') : '';
+      let st;
+      if (p.gone) st = ['off', t('Removed') + (p.refund ? ' · ' + t('{amount} refunded', { amount: c.P.money(p.refund) }) : '')];
+      else if (prog){ const nx = m.days.find(d => d.endsAt > now), left = total - ck.length;
+        st = m.cancelled ? ['off', t('Cancelled')] : ck.some(k => k.date === todayK) ? ['ok', t('Checked in today')] : !nx ? ['done', t('Program ended')] : nx.date === todayK && left > 0 ? ['ok', t('QR ready')] : ['lock', t('QR opens {date}', { date: shortDay(c, nx.date) })]; }
+      else st = s ? qst(s) : ['off', ''];
+      const sent = !p.gone && p.type === 'guest' && m.up ? (p.sent ? sentTxt(c, p) : m.canSend(p) ? t('Ticket not sent yet') : '') : '';
+      return { p, s, id: p.i, name: c.esc(p.name), type, phone: p.type === 'guest' && p.phone ? fmtPhone(p.phone) : '', no: prog ? `${b.cartId}-C${p.i + 1}` : s ? s.id : '', st, sent, sentOk: !!p.sent, free: p.free && !p.gone,
+        bal: prog ? { left: Math.max(0, total - ck.length), total, used: ck.length } : null, n: m.ticketsOf(p).length, gone: p.gone };
+    });
+  }
+  const stTag = (c, st) => st[1] ? `<span class="mt-st mt-st--${st[0]}">${st[0] === 'lock' ? c.LOCK : '<i aria-hidden="true"></i>'}${st[1]}</span>` : '';
+  const ini = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  // the row's own actions: open the ticket (or the program card), send it to a guest, remove the person
+  function rowActs(c, m, r, cardBtn){
+    if (r.gone || m.cancelled) return '';
+    const open = r.time || !r.p ? `<button type="button" class="mt-mini" data-mt-ticket="${c.esc(r.s.id)}">${QRI}<span>${c.t('Show ticket')}</span></button>`
+      : m.kind === 'program' ? (cardBtn ? `<button type="button" class="mt-mini" data-bv-card="${c.esc(m.b.cartId)}|${r.id}" aria-expanded="${!!st.open['card|' + m.b.cartId + '|' + r.id]}">${QRI}<span>${c.t(st.open['card|' + m.b.cartId + '|' + r.id] ? 'Hide card' : 'Show card')}</span></button>` : '')
+      : r.s ? `<button type="button" class="mt-mini" data-mt-ticket="${c.esc(r.s.id)}">${QRI}<span>${c.t('Show ticket')}</span></button>` : '';
+    return open + (r.p ? personActs(c, m, r.p) : '');
+  }
+  // the people (or times) as a list, for the rail and tabs layouts; programs show their cards
+  function peopleBlock(c, m){
+    if (m.kind === 'program') return `<div class="bv-pcs">${m.active.map(p => programCard(c, m, p)).join('')}</div>${removedList(c, m)}`;
+    const R = rowsOf(c, m), now = Date.now(), up = R.filter(r => !r.done), done = R.filter(r => r.done);
+    const li = r => `<li class="bv-row${r.gone ? ' is-gone' : ''}${r.done ? ' is-done' : ''}">
+        ${r.time ? `<span class="day" aria-hidden="true"><span>${c.P.date(c.T.toDate(r.s.date), { weekday: 'short' })}</span><b>${c.T.toDate(r.s.date).getDate()}</b><small>${c.P.date(c.T.toDate(r.s.date), { month: 'short' })}</small></span>` : `<span class="bv-av${r.p.you ? ' is-you' : ''}" aria-hidden="true">${ini(r.p.name)}</span>`}
+        <div class="bv-row-i"><b>${r.name}${r.free ? `<em>${c.t('First game free')}</em>` : ''}</b><small>${[r.type, r.phone ? `<bdi>${c.esc(r.phone)}</bdi>` : '', r.no && !r.gone ? `<bdi>${c.esc(r.no)}</bdi>` : ''].filter(Boolean).join(' · ')}</small>
+          ${r.sent ? `<small class="bv-sent${r.sentOk ? ' is-ok' : ''}">${SEND}${r.sent}</small>` : ''}</div>
+        <div class="bv-row-s">${stTag(c, r.st)}</div><div class="bv-row-a">${rowActs(c, m, r)}</div></li>`;
+    return `<ol class="bv-rows">${(up.length ? up : done).map(li).join('')}</ol>${up.length && done.length ? `<details class="mt-hist"><summary>${c.t('Played')} <b>${done.length}</b></summary><ol class="bv-rows">${done.map(li).join('')}</ol></details>` : ''}
+      ${m.people.some(p => m.canRemove(p)) ? `<p class="pg-note">${c.t('You can remove one person until free cancellation ends; their share is refunded and everyone else keeps their spot.')}</p>` : ''}`;
+  }
+  const peopleTitle = (c, m) => m.kind === 'program' ? c.t(m.active.length === 1 ? 'Program card' : 'Program cards') : m.people[0] && m.people[0].single ? c.t('Tickets') : c.t('Players and tickets');
+  const peopleCount = m => m.kind === 'program' ? m.active.length : m.people[0] && m.people[0].single ? m.ses.length : m.active.length;
+  // rule 8: payment as a receipt, line by line
+  function receipt(c, m){
+    const b = m.b, o = b.order, t = c.t, esc = c.esc, P = c.P, K = window.SFA_PROGRAM_KIT, kit = o.kit, L = [];
+    const plan = t({ trial: 'Free trial', month: 'One month', month2: 'Two months', month3: 'Three months' }[o.plan] || 'One month');
+    if (b.free || !b.amount) L.push([esc(m.D.label), t('Free of charge')]);
+    else if (m.kind === 'game') m.people.forEach(p => L.push([`${esc(p.you ? t('You') : p.name)}${p.free ? ` <em>${t('First game free')}</em>` : ''}`, p.free ? P.money(0) : P.money(o.price || 0)]));
+    else if (m.kind === 'program'){ m.people.forEach(p => L.push([`${plan} · ${esc(p.name)}${o.renewOf ? ` <em>${t('Renewal · 20% off')}</em>` : ''}`, P.money(m.share(p))])); if (kit && K) L.push([`${c.T.tx(K.name)} × ${kit.qty}`, P.money(kit.qty * K.price)]); }
+    else L.push([`${esc(m.D.label)} · ${t('{n} × 1.5 hr', { n: m.ses.length })}`, P.money(b.amount)]);
+    const refunds = m.people.filter(p => p.gone && p.refund).map(p => [t('{name} removed', { name: esc(p.name) }), '− ' + P.money(p.refund)]);
+    if (m.cancelled && b.refund) refunds.push([t('Booking cancelled'), '− ' + P.money(b.refund - m.people.reduce((a, p) => a + (p.gone ? p.refund || 0 : 0), 0))]);
+    return `<div class="bv-rc"><dl class="bv-rc-l">${L.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+      <dl class="bv-rc-t"><div><dt>${t('Total paid')}</dt><dd>${b.free || !b.amount ? t('Free of charge') : P.money(b.amount)}</dd></div>${refunds.map(([k, v]) => `<div class="ref"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
+      <dl class="bv-rc-m">${b.paidAt && !b.free ? `<div><dt>${t('Paid on')}</dt><dd>${P.date(new Date(b.paidAt), 'full')}</dd></div>` : ''}${b.tranRef ? `<div><dt>${t('Paid by')}</dt><dd>${t('Card')} · ${t(b.test ? 'Test ref' : 'PayTabs ref')} <bdi>${esc(b.tranRef)}</bdi></dd></div>` : ''}</dl>
+      <a class="bv-rc-doc" href="result.html?cart=${encodeURIComponent(b.cartId)}">${IC2.doc}<span>${t('View confirmation')}</span>${CHEV}</a></div>`;
+  }
+  // rule 9: help at the end, with the ref to quote
+  const helpBox = (c, m) => `<div class="bv-help"><p>${c.t('Call or email SFA Domes and quote your booking ref {ref}.', { ref: `<b><bdi>${c.esc(m.b.cartId)}</bdi></b>` })}</p>
+    <div class="bv-help-l"><a href="tel:${HELP.tel}">${IC2.phone}<span><small>${c.t('Call')}</small><b><bdi>${HELP.telTxt}</bdi></b></span></a><a href="mailto:${HELP.mail}">${IC.mail}<span><small>${c.t('Email')}</small><b>${HELP.mail}</b></span></a></div></div>`;
+  const factGrid = (c, F) => `<dl class="bv-fg">${F.facts.map(([ic, k, v, sub]) => `<div><span class="mt-fic">${ic}</span><dt>${k}</dt><dd>${v}${sub ? `<small>${sub}</small>` : ''}</dd></div>`).join('')}</dl>`;
+  const mailLine = (c, F) => F.email ? `<p class="mt-mail">${IC.mail}<span>${c.t('A confirmation email was sent to {email}', { email: `<bdi>${c.esc(F.email)}</bdi>` })}</span></p>` : '';
+  const placeOf = c => c.t('SFA Domes Dammam');
+
+  // ---------- 1 · Manage rail (GetYourGuide, Navan, Kayak, Turo on web) ----------
+  // content on the left; a sticky Manage booking card on the right with the main action, the deadline over Cancel, then
+  // help. On phones the card comes right after the tickets.
+  function bvRail(c, m){
+    const F = factsOf(c, m), S = statusOf(c, m), t = c.t;
+    return backLink(c) + `<header class="bv-hd"><span class="bv-hd-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
+        <div><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-hd-ref"><small>${t('Booking ref')}</small>${refCopy(c, m)}</p></div></header>
+      <div class="bv-r"><div class="bv-r-main">
+        <div class="bv-o1">${statusBox(c, m, S)}</div>
+        <section class="bv-sec bv-o2" id="bvTix"><div class="sec"><h2>${peopleTitle(c, m)}</h2><span>${peopleCount(m)}</span></div>${peopleBlock(c, m)}</section>
+        <section class="bv-sec bv-o4"><div class="sec"><h2>${t('Booking details')}</h2></div>${factGrid(c, F)}${mailLine(c, F)}</section>
+        <section class="bv-sec bv-o5"><div class="sec"><h2>${t('Receipt')}</h2></div>${receipt(c, m)}</section>
+      </div><aside class="bv-r-side">
+        <section class="bv-card bv-mg bv-o3"><h2>${t('Manage booking')}</h2>${m.up || m.past || m.cancelled ? `<div class="bv-mg-main">${mainAct(c, m)}${dirAct(c, m)}</div>` : ''}${manageList(c, m, !!liveTix(c, m).filter(s => s.date === dk(new Date())).length)}${cancelBlock(c, m)}</section>
+        <section class="bv-card bv-o6"><h2>${t('Need help?')}</h2>${helpBox(c, m)}</section>
+      </aside></div>`;
+  }
+
+  // ---------- 2 · Tabbed record (Turo, Agoda, Kayak in their apps) ----------
+  // a summary that stays on top (status sentence, when, ref, the main action), then tabs that each answer one question
+  function bvTabs(c, m){
+    const F = factsOf(c, m), S = statusOf(c, m), t = c.t, b = m.b, tab = st.bt[b.cartId] || 'tix';
+    const TABS = [['tix', m.kind === 'program' ? peopleTitle(c, m) : t('Tickets'), peopleCount(m)], ['det', t('Details')], ['pay', t('Receipt')], ['help', t('Help')]];
+    const panel = tab === 'det' ? `<div class="bv-x-two"><section><h2 class="bv-h">${t('Booking details')}</h2>${factGrid(c, F)}${mailLine(c, F)}</section>
+          <section class="bv-card bv-mg"><h2>${t('Manage booking')}</h2>${manageList(c, m, !!liveTix(c, m).filter(s => s.date === dk(new Date())).length)}${cancelBlock(c, m)}</section></div>`
+      : tab === 'pay' ? `<section class="bv-x-narrow">${receipt(c, m)}</section>`
+      : tab === 'help' ? `<div class="bv-x-two"><section><h2 class="bv-h">${t('Contact SFA Domes')}</h2>${helpBox(c, m)}</section>
+          <section><h2 class="bv-h">${t('Good to know')}</h2><ul class="bv-know">
+            <li><b>${t('Free cancellation')}</b><span>${t('Cancel the whole booking up to 48 hours before the first session for a full refund.')}</span></li>
+            ${m.kind === 'court' ? '' : `<li><b>${t('One person can’t make it')}</b><span>${t('Remove them until free cancellation ends; their share is refunded and everyone else keeps their spot.')}</span></li>`}
+            <li><b>${t('Your QR code')}</b><span>${m.kind === 'program' ? t('One card per participant. It works on training days; each check-in uses one session.') : t('Each ticket’s QR code works on the day of its session. Show it at reception.')}</span></li>
+            <li><b>${t('Getting there')}</b><span>${placeOf(c)} · <a href="${c.T.DIRECTIONS}" target="_blank" rel="noopener">${t('Get directions')}</a></span></li></ul></section></div>`
+      : `<section id="bvTix">${peopleBlock(c, m)}</section>`;
+    return backLink(c) + `<section class="bv-x-sum"><span class="bv-x-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
+        <div class="bv-x-in"><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1>${statusBox(c, m, S, 'bv-stat--flat')}
+          <dl class="bv-x-kv"><div><dt>${t('Booking ref')}</dt><dd>${refCopy(c, m)}</dd></div><div><dt>${t('Where')}</dt><dd>${placeOf(c)}</dd></div><div><dt>${m.kind === 'program' ? t('Participants') : t('Tickets')}</dt><dd>${m.kind === 'program' ? m.active.length : m.ses.filter(s => !(m.people.find(p => p.i === s.pi) || {}).gone).length}</dd></div></dl>
+          <div class="bv-x-acts">${mainAct(c, m)}${dirAct(c, m)}</div></div></section>
+      <div class="bv-tabbar" role="tablist" aria-label="${t('Booking')}">${TABS.map(([k, l, n]) => `<button type="button" role="tab" id="bvt-${k}" aria-selected="${tab === k}" aria-controls="bvp" data-bv-tab="${c.esc(b.cartId)}|${k}">${l}${n !== undefined ? `<b>${n}</b>` : ''}</button>`).join('')}</div>
+      <div class="bv-tabp" id="bvp" role="tabpanel" aria-labelledby="bvt-${tab}">${panel}</div>`;
+  }
+
+  // ---------- 3 · Order and attendees (Eventbrite, Live Nation, Klook) ----------
+  // the booking read as an order: an order summary, then one row per person (or time) with ticket number, status and
+  // actions; tick guests to send their tickets at once. A program card opens inside its row.
+  function bvOrder(c, m){
+    const F = factsOf(c, m), S = statusOf(c, m), t = c.t, b = m.b, esc = c.esc, R = rowsOf(c, m), prog = m.kind === 'program', times = !!(R[0] && R[0].time);
+    const C = c.T.cancelInfo(b), sendable = R.filter(r => r.p && m.canSend(r.p)), bulk = sendable.length > 1;
+    const sel = (st.sel[b.cartId] || []).filter(i => sendable.some(r => r.id === i)); st.sel[b.cartId] = sel;
+    const by = (b.payer && b.payer.name) || (c.user && c.user.name) || '';
+    const kv = [[t('Booked by'), esc(by)], [t('Booked on'), b.paidAt || b.createdAt ? c.P.date(new Date(b.paidAt || b.createdAt), 'full') : '–'], [t('Total paid'), F.paid],
+      [t('Payment'), b.tranRef ? `${t('Card')} · <bdi>${esc(b.tranRef)}</bdi>` : b.free || !b.amount ? t('Free of charge') : '–'],
+      [prog ? t('Program cards') : t('Tickets'), prog ? m.active.length : m.ses.filter(s => !(m.people.find(p => p.i === s.pi) || {}).gone).length],
+      [t('Free cancellation'), m.cancelled ? t('Cancelled') : C.can ? t('Until {when}', { when: whenAt(c, C.by) }) : t('Ended {when}', { when: whenAt(c, C.by) })]];
+    const cols = times ? [t('Date'), t('Time'), t('Ticket no.'), t('Status'), ''] : prog ? [t('Participant'), t('Card no.'), t('Balance'), t('Status'), ''] : [t('Player'), t('Ticket no.'), t('Ticket delivery'), t('Status'), ''];
+    const row = r => { const k = 'card|' + b.cartId + '|' + r.id, open = prog && st.open[k], chk = bulk && r.p && sendable.some(x => x.id === r.id);
+      return `<tr class="${r.gone ? 'is-gone' : ''}${r.done ? ' is-done' : ''}">${bulk ? `<td class="bv-o-ck">${chk ? `<input type="checkbox" data-bv-sel="${esc(b.cartId)}|${r.id}" ${sel.includes(r.id) ? 'checked' : ''} aria-label="${t('Select {name}', { name: r.name })}">` : ''}</td>` : ''}
+        <td class="c1" data-k="${cols[0]}">${times ? `<b>${r.name}</b>` : `<div class="bv-o-who"><span class="bv-av${r.p.you ? ' is-you' : ''}" aria-hidden="true">${ini(r.p.name)}</span><div><b>${r.name}${r.free ? `<em>${t('First game free')}</em>` : ''}</b><small>${[r.type, r.phone ? `<bdi>${esc(r.phone)}</bdi>` : ''].filter(Boolean).join(' · ')}</small></div></div>`}</td>
+        <td class="c2" data-k="${cols[1]}">${times ? r.type : r.no && !r.gone ? `<bdi class="bv-mono">${esc(r.no)}</bdi>` : '–'}</td>
+        <td class="c3" data-k="${cols[2]}">${times ? `<bdi class="bv-mono">${esc(r.no)}</bdi>` : prog ? (r.gone ? '–' : `<span class="bv-bal"><span><b>${r.bal.left}</b> / ${r.bal.total}</span><i style="--p:${r.bal.total ? r.bal.left / r.bal.total : 0}"></i></span>`) : r.gone ? '–' : r.sent ? `<span class="bv-sent${r.sentOk ? ' is-ok' : ''}">${SEND}${r.sent}</span>` : r.p.type === 'guest' ? '–' : t('On your account')}</td>
+        <td class="c4" data-k="${cols[3]}">${stTag(c, r.st)}</td>
+        <td class="bv-o-a">${rowActs(c, m, r, true)}</td></tr>
+        ${open ? `<tr class="bv-o-open"><td colspan="${cols.length + (bulk ? 1 : 0)}">${programCard(c, m, r.p)}</td></tr>` : ''}`; };
+    const hasSel = sel.length;
+    return backLink(c) + `<header class="bv-o-top"><div><p class="eye">${m.kindTxt} · ${placeOf(c)}</p><h1>${t('Booking')} <bdi>${esc(b.cartId)}</bdi><button type="button" class="mt-copy" data-mt-copy="${esc(b.cartId)}" aria-label="${t('Copy booking ref')}">${IC.copy}<span>${t('Copy')}</span></button></h1></div>
+        <div class="bv-o-links"><a href="result.html?cart=${encodeURIComponent(b.cartId)}">${IC2.doc}${t('View confirmation')}</a>${m.up ? `<a href="${c.T.ics(b)}" download="${c.T.icsName(b)}">${c.CAL}${t('Add to calendar')}</a><a href="${c.T.DIRECTIONS}" target="_blank" rel="noopener">${c.PIN}${t('Get directions')}</a>` : ''}${m.up && C.can ? `<button type="button" class="is-danger" data-cancel="${esc(b.cartId)}">${IC2.x}${t(m.n > 1 ? 'Cancel whole booking' : 'Cancel booking')}</button>` : ''}</div></header>
+      ${statusBox(c, m, S, 'bv-stat--line')}
+      <section class="bv-o-card"><div class="bv-o-ev"><span class="bv-o-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span><div><b>${esc(m.D.label)}</b>
+          <p>${IC.cal}<span>${F.when[0]}<small>${F.when[1]}</small></span></p><p>${IC.pin}<span>${placeOf(c)}${F.facts[1][3] ? `<small>${F.facts[1][3]}</small>` : ''}</span></p>${F.coach ? `<p>${IC.user}<span>${t('Coach')}<small>${esc(F.coach)}</small></span></p>` : ''}</div></div>
+        <div class="bv-o-det"><h2>${t('Order details')}</h2><dl class="bv-o-kv">${kv.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>${m.up && C.can ? `<p class="bv-o-cxn">${t('Cancel before {when} for a full refund.', { when: whenAt(c, C.by) })}</p>` : ''}</div></section>
+      ${(() => { const R2 = c.renewInfo(b); return R2 ? `<div class="pg-renew mt-renew"><div><b>${t('Renew for another month · 20% off')}</b><p>${t('Starts {date} at the same time, for the same participants.', { date: c.P.date(c.T.toDate(R2.start), 'short') })}</p></div><button type="button" class="btn sm" data-renew="${esc(b.cartId)}">${t('Renew program')}</button></div>` : ''; })()}
+      <section class="bv-o-att" id="bvTix"><div class="bv-o-bar"><h2>${times ? t('Times') : prog ? t('Participants') : t('Players')} <span>${times ? R.length : m.active.length}</span></h2>
+          ${bulk ? `<div class="bv-o-bulk${hasSel ? ' is-on' : ''}"><label class="bv-o-all"><input type="checkbox" data-bv-selall="${esc(b.cartId)}" ${hasSel === sendable.length ? 'checked' : ''}><span>${hasSel ? t('{n} selected', { n: hasSel }) : t('Select guests')}</span></label>
+            <button type="button" class="mt-mini mt-accent" data-bv-bulk="${esc(b.cartId)}" ${hasSel ? '' : 'disabled'}>${SEND}<span>${hasSel === 1 ? t('Send 1 ticket') : hasSel ? t('Send {n} tickets', { n: hasSel }) : t('Send tickets')}</span></button></div>` : ''}</div>
+        <div class="bv-o-tw"><table class="bv-o-t${bulk ? ' has-ck' : ''}"><thead><tr>${bulk ? '<th></th>' : ''}${cols.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${R.map(row).join('')}</tbody></table></div>
+        ${m.people.some(p => m.canRemove(p)) ? `<p class="pg-note">${t('You can remove one person until free cancellation ends; their share is refunded and everyone else keeps their spot.')}</p>` : ''}</section>
+      <div class="bv-o-foot"><section><h2 class="bv-h">${t('Receipt')}</h2>${receipt(c, m)}</section><section><h2 class="bv-h">${t('Need help?')}</h2>${helpBox(c, m)}</section></div>`;
+  }
+
+  const BV = { wallet: bvWallet, timeline: bvTimeline, split: bvSplit, rail: bvRail, tabs: bvTabs, order: bvOrder };
 
   const OPT = { bookings: BOOK, a: A, b: B, c: C, type: { list: TYPE.list, view: A.view }, family: { list: FAMILY.list, view: A.view }, calendar: { list: CAL.list, view: A.view }, today: TODAY };
   const PANEL = { b: 1, today: 1 };
@@ -592,8 +791,17 @@
     },
     // returns true when it handled the click
     async click(v, e, c){
-      const el = e.target.closest('[data-bv-scroll],[data-mt-checkin],[data-mt-copy],[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
+      const el = e.target.closest('[data-bv-tab],[data-bv-go],[data-bv-card],[data-bv-sel],[data-bv-selall],[data-bv-bulk],[data-bv-scroll],[data-mt-checkin],[data-mt-copy],[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
       const d = el.dataset;
+      if (d.bvTab){ const [cart, k] = d.bvTab.split('|'); st.bt[cart] = k; c.paint(); c.root.querySelector(`[data-bv-tab="${CSS.escape(d.bvTab)}"]`)?.focus(); return true; }
+      if (d.bvGo){ const x = c.root.querySelector('#' + d.bvGo); if (!x){ const tb = c.root.querySelector('[data-bv-tab$="|tix"]'); if (tb){ tb.click(); return true; } } x?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return true; }
+      if (d.bvCard){ const k = 'card|' + d.bvCard; st.open[k] = !st.open[k]; c.paint(); c.root.querySelector(`[data-bv-card="${CSS.escape(d.bvCard)}"]`)?.focus(); return true; }
+      if (d.bvSel){ const [cart, i] = d.bvSel.split('|'), l = st.sel[cart] = st.sel[cart] || [], n = +i; el.checked ? l.includes(n) || l.push(n) : l.splice(l.indexOf(n), 1); c.paint(); c.root.querySelector(`[data-bv-sel="${CSS.escape(d.bvSel)}"]`)?.focus(); return true; }
+      if (d.bvSelall){ const cart = d.bvSelall, m = all(c).find(x => x.b.cartId === cart); st.sel[cart] = el.checked && m ? m.people.filter(p => m.canSend(p)).map(p => p.i) : []; c.paint(); c.root.querySelector(`[data-bv-selall]`)?.focus(); return true; }
+      if (d.bvBulk){ const cart = d.bvBulk, m = all(c).find(x => x.b.cartId === cart), l = (st.sel[cart] || []).slice(); if (!m || !l.length) return true;
+        el.disabled = true; let ok = 0, err = '';
+        for (const i of l){ const r = await c.post('/api/auth/send-ticket', { cart, i }); if (r.ok) ok++; else err = r.d.error; }
+        st.sel[cart] = []; await c.reload(); c.A.toast(ok ? (ok === 1 ? c.t('Ticket sent') : c.t('{n} tickets sent', { n: ok })) : c.t(err || 'Something went wrong. Try again.')); return true; }
       if (d.bvScroll){ const r = c.root.querySelector('#bvPasses'); if (r){ const dir = document.documentElement.dir === 'rtl' ? -1 : 1, w = (r.firstElementChild || r).getBoundingClientRect().width + 16; r.scrollBy({ left: +d.bvScroll * w * dir, behavior: 'smooth' }); } return true; }
       if (d.mtCheckin){ const [cart, i] = d.mtCheckin.split('|'); el.disabled = true; const r = await c.post('/api/auth/check-in', { cart, i: +i }); await c.reload();
         c.A.toast(r.ok ? c.t('{name} checked in · {n} sessions left', { name: String(r.d.name || '').split(' ')[0], n: r.d.left }) : c.t(r.d.error || 'Something went wrong. Try again.')); return true; }
