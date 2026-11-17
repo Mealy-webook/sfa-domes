@@ -624,7 +624,8 @@
     if (!m.up) return '';
     const t = c.t, b = m.b, C = c.T.cancelInfo(b), left = (b.amount || 0) - (b.refund || 0);
     return C.can ? `<div class="bv-cx"><p><b>${t('Free cancellation until {when}', { when: whenAt(c, C.by) })}</b>${left > 0 ? t('Cancel before then for a full refund of {amount}.', { amount: c.P.money(left) }) : t('Cancel before then and your spot goes back on sale.')}</p><button type="button" class="bv-cxb" data-cancel="${c.esc(b.cartId)}">${t(m.n > 1 ? 'Cancel whole booking' : 'Cancel booking')}</button></div>`
-      : `<div class="bv-cx is-off"><p><b>${t('Free cancellation ended {when}', { when: whenAt(c, C.by) })}</b>${t('Bookings can’t be cancelled in the 48 hours before the first session.')}</p></div>`;
+      // after the deadline Cancel stays in view, switched off, with the reason and who to call (Ahmed: "I can't see the cancel CTA")
+      : `<div class="bv-cx is-off"><p id="bvCxWhy"><b>${t('Free cancellation ended {when}', { when: whenAt(c, C.by) })}</b>${t('Bookings can’t be cancelled in the 48 hours before the first session.')} ${t('Need to change plans? Call SFA Domes on {tel}.', { tel: `<a href="tel:${HELP.tel}"><bdi>${HELP.telTxt}</bdi></a>` })}</p><button type="button" class="bv-cxb" disabled aria-describedby="bvCxWhy">${t(m.n > 1 ? 'Cancel whole booking' : 'Cancel booking')}</button></div>`;
   }
   function manageList(c, m, withCal){
     const t = c.t, b = m.b, esc = c.esc, R = c.renewInfo(b), send = m.people.filter(p => m.canSend(p) && !p.sent).length, out = [];

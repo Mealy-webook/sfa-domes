@@ -629,6 +629,8 @@
 .bv-cxb{justify-self:start;height:44px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-danger);font:var(--ts-body-default-bold);cursor:pointer}
 .bv-cxb:hover{border-color:var(--color-danger)}
 .bv-cx.is-off p b{color:var(--color-content-secondary)}
+.bv-cx p a{color:var(--color-content-primary);font-weight:600}
+.bv-cxb[disabled]{color:var(--color-content-tertiary);border-color:var(--color-border-primary);background:transparent;cursor:not-allowed}
 /* rule 6: people rows */
 .bv-rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-border-primary)}
 .bv-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto auto;align-items:center;gap:8px 16px;padding:14px 0;border-bottom:1px solid var(--color-border-primary)}
