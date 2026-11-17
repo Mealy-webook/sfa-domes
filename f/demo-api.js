@@ -33,7 +33,8 @@
       (o.days || []).forEach(d => d.date = shiftKey(d.date, off));
       if (o.start) o.start = shiftKey(o.start, off);
       if (o.kind === 'game' && o.game){ const p = o.game.split('|'); if (p[2]) { p[2] = shiftKey(p[2], off); o.game = p.join('|'); } }
-      (o.participants || []).forEach(x => (x.checkins || []).forEach(k => { k.date = shiftKey(k.date, off); k.at += ms; }));   // program card check-ins move with the dates
+      // program card check-ins move with the dates; any that would land today or later didn't happen yet, so they're dropped
+      (o.participants || []).forEach(x => { if (!x.checkins) return; x.checkins.forEach(k => { k.date = shiftKey(k.date, off); k.at += ms; }); x.checkins = x.checkins.filter(k => k.date < dk(today)); });
       ['createdAt', 'paidAt'].forEach(k => { if (b[k]) b[k] += ms; }); if (o.waiver && o.waiver.at) o.waiver.at += ms;
       db.bookings[id] = b;
     }
