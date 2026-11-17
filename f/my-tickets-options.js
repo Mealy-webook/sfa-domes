@@ -352,7 +352,8 @@
     copy: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9h11v11H9z"/><path d="M5 15H4V4h11v1"/></svg>',
     mail: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/></svg>'
   };
-  function details(c, m){
+  // the booking's facts and payment as data, so every booking-page layout can show them its own way
+  function factsOf(c, m){
     const b = m.b, o = b.order, T = c.T, P = c.P, t = c.t, esc = c.esc, n = m.days.length, prog = m.kind === 'program' && window.SFA_PROGRAMS[o.program];
     const sport = window.SFA_SPORTS[o.sport], court = sport && sport.courts[o.court];
     const s0 = m.days[0], slot = prog && prog.slots.find(x => x.time === s0.start), coach = slot ? T.tx(slot.coach) : '';
@@ -382,7 +383,11 @@
       b.paidAt && !b.free ? [t('Paid on'), P.date(new Date(b.paidAt), 'full')] : null,
       b.tranRef ? [t(b.test ? 'Test ref' : 'PayTabs ref'), `<bdi>${esc(b.tranRef)}</bdi>`] : null
     ].filter(Boolean);
-    const refunded = b.refund || 0, off = b.status === 'cancelled';
+    const refunded = b.refund || 0, email = (b.payer && b.payer.email) || (c.user && c.user.email) || '';
+    return { facts, pay, refunded, email, paid: b.free || !b.amount ? t('Free of charge') : P.money(b.amount), when, who, by, coach, prog };
+  }
+  function details(c, m){
+    const b = m.b, t = c.t, esc = c.esc, P = c.P, { facts, pay, refunded } = factsOf(c, m);
     return `<section class="mt-det" aria-labelledby="mtDetH"><h2 class="mt-det-h" id="mtDetH">${t('Booking details')}</h2><div class="mt-det-in">
       <div class="mt-det-l"><dl class="mt-facts">${facts.map(([ic, k, v, sub]) => `<div><span class="mt-fic">${ic}</span><dt>${k}</dt><dd>${v}${sub ? `<small>${sub}</small>` : ''}</dd></div>`).join('')}
           <div class="mt-refrow"><span class="mt-fic">${IC.hash}</span><dt>${t('Booking ref')}</dt><dd><bdi>${esc(b.cartId)}</bdi></dd><button type="button" class="mt-copy" data-mt-copy="${esc(b.cartId)}" aria-label="${t('Copy booking ref')}">${IC.copy}<span>${t('Copy')}</span></button></div></dl>
@@ -430,6 +435,7 @@
           <div class="mt-cta mt-bk-n"><span class="mt-tix">${QRI}<b>${tixCount(m)}</b><small>${tixWord(c, m, tixCount(m))}</small></span><span class="ghost sm mt-view">${c.t('Open booking')}${c.ARROW}</span></div></li>`).join('')}</ol>` : emptyTxt(c));
     },
     view(c, m){
+      const bv = bvOf(); if (BV[bv]) return `<div class="bv bv-${bv}">${BV[bv](c, m)}</div>`;   // the redesign options
       const b = m.b, multi = !(m.people[0] && m.people[0].single) && m.active.length > 1, now = Date.now();
       let f = st.tf[b.cartId]; if (f === undefined || (f !== 'all' && !m.active.some(p => p.i === f))) f = st.tf[b.cartId] = 'all';
       const P0 = f === 'all' ? null : m.people.find(p => p.i === f);
@@ -460,6 +466,118 @@
     }
   };
 
+  // =====================================================================================================================
+  // Booking page redesigns (Ahmed, 2026-11-17: "a redesign for my booking details page, complete new"; he picked Wallet
+  // first, Timeline and Split screen). Open with profile.html?bv=wallet|timeline|split#tickets/<ref>; without ?bv the
+  // live booking page is unchanged. Same data and actions as the live page (tickets or program cards, person filter,
+  // details, payment, send / remove / cancel / renew), laid out three different ways.
+  // =====================================================================================================================
+  const bvOf = () => (new URLSearchParams(location.search).get('bv') || '').toLowerCase();
+  const NAV = d => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d < 0 ? 'm15 6-6 6 6 6' : 'm9 6 6 6-6 6'}"/></svg>`;
+  const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+  function bvActs(c, m){
+    const b = m.b, t = c.t, esc = c.esc, R = c.renewInfo(b), out = [];
+    if (m.up){ out.push(`<a class="bv-act" href="${c.T.ics(b)}" download="${c.T.icsName(b)}">${c.CAL}<span>${t('Add to calendar')}</span></a>`); out.push(`<a class="bv-act" href="${c.T.DIRECTIONS}" target="_blank" rel="noopener">${c.PIN}<span>${t('Get directions')}</span></a>`); }
+    if (m.people.some(p => m.canSend(p) && !p.sent)) out.push(`<button type="button" class="bv-act" data-mt-sendall="${esc(b.cartId)}">${SEND}<span>${t('Send guest tickets')}</span></button>`);
+    if (R) out.push(`<button type="button" class="bv-act bv-act--accent" data-renew="${esc(b.cartId)}"><span>${t('Renew · 20% off')}</span></button>`);
+    if (m.up && c.T.cancelInfo(b).can) out.push(`<button type="button" class="bv-act bv-act--danger" data-cancel="${esc(b.cartId)}">${RM}<span>${t(m.n > 1 ? 'Cancel whole booking' : 'Cancel booking')}</span></button>`);
+    return out;
+  }
+  // the person filter and what it selects (shared by the three layouts)
+  function bvSel(c, m){
+    const b = m.b, multi = !(m.people[0] && m.people[0].single) && m.active.length > 1, now = Date.now();
+    let f = st.tf[b.cartId]; if (f === undefined || (f !== 'all' && !m.active.some(p => p.i === f))) f = st.tf[b.cartId] = 'all';
+    const P0 = f === 'all' ? null : m.people.find(p => p.i === f);
+    const list = (P0 ? m.ticketsOf(P0) : m.ses).slice().sort((x, y) => x.startAt - y.startAt || (x.pi || 0) - (y.pi || 0));
+    const chips = cls => multi ? `<div class="types bv-tf ${cls || ''}" role="group" aria-label="${c.t('Filter by person')}"><button type="button" class="type" data-mt-tf="${c.esc(b.cartId)}|all" aria-pressed="${f === 'all'}">${c.t('Everyone')}</button>${m.active.map(p => `<button type="button" class="type" data-mt-tf="${c.esc(b.cartId)}|${p.i}" aria-pressed="${f === p.i}">${c.esc(p.you ? c.t('You') : p.name.split(' ')[0])}</button>`).join('')}</div>` : '';
+    return { multi, P0, chips, list, up: list.filter(s => s.endsAt > now), done: list.filter(s => s.endsAt <= now), people: P0 ? [P0] : m.active };
+  }
+  const personOfS = (m, s) => m.people.find(x => x.i === s.pi) || m.people[0];
+  const shortDay = (c, k) => c.P.date(c.T.toDate(k), { weekday: 'short', day: 'numeric', month: 'short' });
+  // one ticket as a pass: who, when, session, QR (or its lock), ref
+  function bvPass(c, m, s){
+    const p = personOfS(m, s), live = !m.cancelled && c.T.qrLive(s, m.b) === 'on' && s.endsAt > Date.now();
+    return `<article class="bv-pass${live ? '' : ' is-locked'}"><header><small>${m.kindTxt}</small><b>${c.esc(p.you ? c.t('You') : p.name)}</b>${p.type === 'guest' ? `<span>${c.t('Guest')}</span>` : ''}</header>
+      <div class="bv-pass-q">${live ? `<div class="tk-qr" data-qr="${c.esc(s.id)}" role="img" aria-label="${c.t('QR code for {ref}', { ref: c.esc(s.id) })}"></div>` : `<div class="bv-pass-lock">${c.LOCK}<small>${m.cancelled ? c.t('Cancelled') : s.endsAt <= Date.now() ? c.t('Played') : c.t('QR opens {date}', { date: shortDay(c, s.date) })}</small></div>`}</div>
+      <dl><div><dt>${c.t('Date')}</dt><dd>${shortDay(c, s.date)}</dd></div><div><dt>${c.t('Time')}</dt><dd><bdi>${c.P.time(s.start)}</bdi> – <bdi>${c.P.time(s.end)}</bdi></dd></div>${s.of > 1 ? `<div><dt>${c.t('Session')}</dt><dd>${c.t('{i} of {n}', { i: s.n, n: s.of })}</dd></div>` : ''}</dl>
+      <footer><bdi>${c.esc(s.id)}</bdi>${!m.cancelled ? `<button type="button" class="bv-link" data-mt-ticket="${c.esc(s.id)}">${c.t('Full ticket')}</button>` : ''}</footer></article>`;
+  }
+  const refCopy = (c, m) => `<span class="bv-ref"><bdi>${c.esc(m.b.cartId)}</bdi><button type="button" class="mt-copy" data-mt-copy="${c.esc(m.b.cartId)}" aria-label="${c.t('Copy booking ref')}">${IC.copy}<span>${c.t('Copy')}</span></button></span>`;
+  const factList = (c, F) => `<ul class="bv-facts">${F.facts.map(([ic, k, v, sub]) => `<li><span class="mt-fic">${ic}</span><div><small>${k}</small><b>${v}</b>${sub ? `<span>${sub}</span>` : ''}</div></li>`).join('')}</ul>`;
+  const payList = (c, m, F) => `<dl class="bv-pay">${F.pay.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}<div class="tot"><dt>${c.t('Paid')}</dt><dd>${F.paid}</dd></div>${F.refunded ? `<div class="ref"><dt>${c.t('Refunded')}</dt><dd>− ${c.P.money(F.refunded)}</dd></div>` : ''}</dl>`;
+  const removedList = (c, m) => { const g = m.people.filter(p => p.gone && !p.single); return g.length ? `<ul class="mt-removed">${g.map(p => `<li><b>${c.esc(p.name)}</b>${goneLine(c, m, p)}</li>`).join('')}</ul>` : ''; };
+  const personBar = (c, m, P0) => P0 ? `<div class="mt-for"><div><b>${c.esc(P0.name)}</b><small>${role(c, m, P0)}${P0.free ? ` · <em>${c.t('First game free')}</em>` : ''}</small>${sentLine(c, P0)}</div><div class="mt-for-acts">${personActs(c, m, P0, true)}</div></div>` : '';
+  const backLink = c => `<a class="pg-back" href="#tickets" data-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>${c.t('My bookings')}</a>`;
+
+  // ---------- Wallet first: the pass (or program card) big on a dark band, details as a strip, actions pinned ----------
+  function bvWallet(c, m){
+    const F = factsOf(c, m), S = bvSel(c, m), prog = m.kind === 'program';
+    const items = prog ? S.people.map(p => programCard(c, m, p)) : (S.up.length ? S.up : S.done).map(s => bvPass(c, m, s));
+    const acts = bvActs(c, m);
+    return backLink(c) + `<section class="bv-w-band"><div class="bv-w-in">
+        <div class="bv-w-top"><div><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-w-when">${F.when[0]} · ${F.when[1]}</p></div>${chip(c, m)}</div>
+        ${S.chips('on-dark')}
+        <div class="bv-w-row"><div class="bv-w-passes" id="bvPasses">${items.join('') || `<p class="meta">${c.t('No upcoming tickets in this booking.')}</p>`}</div>
+          ${items.length > 1 ? `<div class="bv-w-nav"><button type="button" class="mt-arrow" data-bv-scroll="-1" aria-label="${c.t('Previous')}">${NAV(-1)}</button><span>${items.length} ${prog ? c.t('cards') : c.t('tickets')}</span><button type="button" class="mt-arrow" data-bv-scroll="1" aria-label="${c.t('Next')}">${NAV(1)}</button></div>` : ''}</div></div></section>
+      ${personBar(c, m, S.P0)}
+      <section class="bv-w-strip"><div class="bv-w-facts">${factList(c, F)}<div class="bv-w-ref"><span class="mt-fic">${IC.hash}</span><div><small>${c.t('Booking ref')}</small>${refCopy(c, m)}</div></div></div>
+        <details class="bv-w-pay"><summary><span>${c.t('Payment')}</span><b>${F.paid}</b></summary>${payList(c, m, F)}</details></section>
+      ${!prog && S.up.length && S.done.length ? `<details class="mt-hist"><summary>${c.t('Played')} <b>${S.done.length}</b></summary><div class="bv-w-done">${S.done.map(s => bvPass(c, m, s)).join('')}</div></details>` : ''}
+      ${removedList(c, m)}${m.up ? c.cancelLine(m.b) : ''}
+      ${acts.length ? `<div class="bv-bar" role="group" aria-label="${c.t('Actions')}"><div class="bv-bar-in">${acts.join('')}</div></div>` : ''}`;
+  }
+
+  // ---------- Timeline: the booking as a story, tickets on their dates, details in a side card ----------
+  function bvTimeline(c, m){
+    const F = factsOf(c, m), S = bvSel(c, m), b = m.b, now = Date.now(), prog = m.kind === 'program', todayK = dk(new Date());
+    const nodes = [];
+    if (b.paidAt || b.createdAt) nodes.push({ at: b.paidAt || b.createdAt, k: 'done', ic: CHECK, title: c.t(b.free || !b.amount ? 'Booked' : 'Booked and paid'), sub: `${c.P.date(new Date(b.paidAt || b.createdAt), 'full')}${b.amount ? ' · ' + c.P.money(b.amount) : ''}` });
+    const C = c.T.cancelInfo(b); if (!m.cancelled && C.by) nodes.push({ at: C.by.getTime(), k: C.by.getTime() > now ? 'info' : 'muted', ic: '!', title: c.t(C.by.getTime() > now ? 'Free cancellation until {when}' : 'Free cancellation ended {when}', { when: `${c.P.date(C.by, 'short')} · <bdi>${c.P.time(C.by.getHours() * 60 + C.by.getMinutes())}</bdi>` }), sub: C.by.getTime() > now ? c.t('Cancel before then for a full refund.') : '' });
+    m.people.filter(p => p.gone && !p.single).forEach(p => { const x = (b.order.participants || [])[p.i] || {}; if (x.cancelled) nodes.push({ at: x.cancelled.at, k: 'muted', ic: RM, title: c.t('{name} removed', { name: c.esc(p.name) }), sub: x.cancelled.refund ? c.t('{amount} refunded', { amount: c.P.money(x.cancelled.refund) }) : '' }); });
+    if (m.cancelled) nodes.push({ at: b.cancelledAt || now, k: 'off', ic: RM, title: c.t('Booking cancelled'), sub: b.refund ? c.t('{amount} refunded', { amount: c.P.money(b.refund) }) : '' });
+    m.days.forEach(d => {
+      const k = d.endsAt <= now ? 'done' : d.date === todayK ? 'now' : 'next', who = S.people.filter(p => p.single || m.ticketsOf(p).some(s => s.n === d.n));
+      const rows = who.map(p => { const s = p.single ? m.ses.find(x => x.n === d.n && x.date === d.date && x.start === d.start) : m.ticketsOf(p).find(x => x.n === d.n); if (!s) return '';
+        if (prog){ const ck = ((b.order.participants || [])[p.i] || {}).checkins || [], inn = ck.some(x => x.date === d.date);
+          return `<li><span class="bv-t-who">${c.esc(p.you ? c.t('You') : p.name.split(' ')[0])}</span>${inn ? `<span class="mt-st mt-st--ok"><i></i>${c.t('Checked in')}</span>` : k === 'done' ? `<span class="mt-st mt-st--done"><i></i>${c.t('Missed · still in the balance')}</span>` : `<span class="mt-st"><i></i>${k === 'now' ? c.t('Today') : c.t('Upcoming')}</span>`}</li>`; }
+        return `<li><span class="bv-t-who">${c.esc(p.you ? c.t('You') : p.name.split(' ')[0])}</span>${m.cancelled ? '' : `<button type="button" class="mt-mini" data-mt-ticket="${c.esc(s.id)}">${QRI}<span>${k === 'done' ? c.t('Ticket') : c.t('Show ticket')}</span></button>`}</li>`; }).join('');
+      nodes.push({ at: d.startAt, k: m.cancelled ? 'muted' : k, ic: k === 'done' ? CHECK : String(d.n), title: `${d.of > 1 ? c.t('Session {i} of {n}', { i: d.n, n: d.of }) + ' · ' : ''}${shortDay(c, d.date)}`, sub: `<bdi>${c.P.time(d.start)}</bdi> – <bdi>${c.P.time(d.end)}</bdi>${k === 'now' ? ' · ' + c.t('Today') : ''}`, rows });
+    });
+    nodes.sort((a, z) => a.at - z.at);
+    const nowAt = nodes.findIndex(n => n.at > now);
+    if (!m.cancelled) nodes.splice(nowAt < 0 ? nodes.length : nowAt, 0, { now: true });
+    const acts = bvActs(c, m);
+    return backLink(c) + `<header class="bv-t-head"><span class="bv-t-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span><div><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="meta">${m.count} · ${c.esc(m.names)}</p>${chip(c, m)}</div></header>
+      <div class="bv-t"><section class="bv-t-main"><div class="sec"><h2>${c.t('Timeline')}</h2>${S.chips()}</div>${personBar(c, m, S.P0)}
+          <ol class="bv-tl">${nodes.map(n => n.now ? `<li class="bv-now"><span>${c.t('Now')}</span></li>` : `<li class="bv-n bv-n--${n.k}"><span class="bv-dot">${n.ic}</span><div><b>${n.title}</b>${n.sub ? `<small>${n.sub}</small>` : ''}${n.rows ? `<ul class="bv-t-rows">${n.rows}</ul>` : ''}</div></li>`).join('')}</ol></section>
+        <aside class="bv-t-side">${prog ? `<div class="bv-t-cards">${S.people.map(p => programCard(c, m, p)).join('')}</div>` : ''}
+          <div class="bv-card">${factList(c, F)}<div class="bv-t-ref"><small>${c.t('Booking ref')}</small>${refCopy(c, m)}</div></div>
+          <div class="bv-card"><h3>${c.t('Payment')}</h3>${payList(c, m, F)}</div>
+          ${acts.length ? `<div class="bv-card bv-acts">${acts.join('')}</div>` : ''}${m.up ? c.cancelLine(b) : ''}</aside></div>`;
+  }
+
+  // ---------- Split screen: the booking on a sticky panel, its tickets scrolling beside it ----------
+  function bvSplit(c, m){
+    const F = factsOf(c, m), S = bvSel(c, m), prog = m.kind === 'program', acts = bvActs(c, m);
+    const tk = s => { const p = personOfS(m, s), live = !m.cancelled && c.T.qrLive(s, m.b) === 'on' && s.endsAt > Date.now();
+      return `<li class="bv-s-tk${s.endsAt <= Date.now() ? ' is-done' : ''}"><div class="bv-s-q">${live ? `<div class="tk-qr" data-qr="${c.esc(s.id)}" role="img" aria-label="${c.t('QR code for {ref}', { ref: c.esc(s.id) })}"></div>` : `<div class="bv-s-lock">${c.LOCK}</div>`}</div>
+        <div class="bv-s-i"><b>${S.multi && !S.P0 ? c.esc(p.you ? c.t('You') : p.name) : s.of > 1 ? c.t('Session {i} of {n}', { i: s.n, n: s.of }) : c.esc(m.D.label)}</b><span>${shortDay(c, s.date)} · <bdi>${c.P.time(s.start)}</bdi> – <bdi>${c.P.time(s.end)}</bdi>${S.multi && !S.P0 && s.of > 1 ? ' · ' + c.t('Session {i} of {n}', { i: s.n, n: s.of }) : ''}</span><small><bdi>${c.esc(s.id)}</bdi></small></div>
+        <div class="bv-s-e">${m.cancelled ? `<span class="mt-st mt-st--off"><i></i>${c.t('Cancelled')}</span>` : s.endsAt <= Date.now() ? `<span class="mt-st mt-st--done"><i></i>${c.t('Played')}</span>` : live ? `<span class="mt-st mt-st--ok"><i></i>${c.t('QR ready')}</span>` : `<span class="mt-st mt-st--lock">${c.LOCK}${c.t('QR opens {date}', { date: shortDay(c, s.date) })}</span>`}${!m.cancelled ? `<button type="button" class="mt-mini" data-mt-ticket="${c.esc(s.id)}">${c.t('Enlarge')}</button>` : ''}</div></li>`; };
+    return `<div class="bv-s"><aside class="bv-s-l"><div class="bv-s-l-in">${backLink(c)}
+        <span class="bv-s-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
+        <p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1>${chip(c, m)}
+        ${factList(c, F)}<div class="bv-s-ref"><small>${c.t('Booking ref')}</small>${refCopy(c, m)}</div>
+        ${F.email ? `<p class="mt-mail">${IC.mail}<span>${c.t('A confirmation email was sent to {email}', { email: `<bdi>${c.esc(F.email)}</bdi>` })}</span></p>` : ''}
+        <div class="bv-s-pay"><h3>${c.t('Payment')}</h3>${payList(c, m, F)}</div>
+        ${acts.length ? `<div class="bv-acts">${acts.join('')}</div>` : ''}${m.up ? c.cancelLine(m.b) : ''}</div></aside>
+      <section class="bv-s-r"><div class="sec"><h2>${c.t(prog ? (S.people.length === 1 ? 'Program card' : 'Program cards') : 'Tickets')}</h2><span>${prog ? S.people.length : S.list.length}</span></div>${S.chips()}${personBar(c, m, S.P0)}
+        ${prog ? `<div class="bv-s-cards">${S.people.map(p => programCard(c, m, p)).join('')}</div>`
+          : `${S.up.length ? `<ol class="bv-s-list">${S.up.map(tk).join('')}</ol>` : `<p class="meta">${c.t(m.cancelled ? 'This booking was cancelled.' : 'No upcoming tickets in this booking.')}</p>`}
+             ${S.done.length ? `<details class="mt-hist"${S.up.length ? '' : ' open'}><summary>${c.t('Played')} <b>${S.done.length}</b></summary><ol class="bv-s-list">${S.done.map(tk).join('')}</ol></details>` : ''}`}
+        ${removedList(c, m)}</section></div>`;
+  }
+  const BV = { wallet: bvWallet, timeline: bvTimeline, split: bvSplit };
+
   const OPT = { bookings: BOOK, a: A, b: B, c: C, type: { list: TYPE.list, view: A.view }, family: { list: FAMILY.list, view: A.view }, calendar: { list: CAL.list, view: A.view }, today: TODAY };
   const PANEL = { b: 1, today: 1 };
   // ---- the hooks profile.html calls
@@ -474,8 +592,9 @@
     },
     // returns true when it handled the click
     async click(v, e, c){
-      const el = e.target.closest('[data-mt-checkin],[data-mt-copy],[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
+      const el = e.target.closest('[data-bv-scroll],[data-mt-checkin],[data-mt-copy],[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
       const d = el.dataset;
+      if (d.bvScroll){ const r = c.root.querySelector('#bvPasses'); if (r){ const dir = document.documentElement.dir === 'rtl' ? -1 : 1, w = (r.firstElementChild || r).getBoundingClientRect().width + 16; r.scrollBy({ left: +d.bvScroll * w * dir, behavior: 'smooth' }); } return true; }
       if (d.mtCheckin){ const [cart, i] = d.mtCheckin.split('|'); el.disabled = true; const r = await c.post('/api/auth/check-in', { cart, i: +i }); await c.reload();
         c.A.toast(r.ok ? c.t('{name} checked in · {n} sessions left', { name: String(r.d.name || '').split(' ')[0], n: r.d.left }) : c.t(r.d.error || 'Something went wrong. Try again.')); return true; }
       if (d.mtCopy){ try { await navigator.clipboard.writeText(d.mtCopy); } catch (x) {} c.A.toast(c.t('Booking ref copied')); return true; }

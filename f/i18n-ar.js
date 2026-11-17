@@ -325,6 +325,8 @@ window.SFA_AR = {
   "Add each guest's full name.": 'أضف الاسم الكامل لكل ضيف.', "Enter each guest's Saudi mobile number, starting with 5.": 'أدخل رقم جوال سعودي لكل ضيف يبدأ بـ 5.',
   'Only 1 spot is left in this game.': 'بقي مكان واحد فقط في هذه المباراة.',
   // My bookings (live, 2026-11-17)
+  // booking page redesigns (2026-11-17)
+  'Filter by person': 'تصفية حسب الشخص', 'Booked and paid': 'حُجز ودُفع', 'Actions': 'الإجراءات', 'Cancel before then for a full refund.': 'ألغِ قبل ذلك لاسترداد كامل المبلغ.', 'Checked in': 'سُجّل الحضور', 'Missed · still in the balance': 'فائتة · ما زالت في الرصيد', 'Timeline': 'المخطط الزمني', 'Now': 'الآن', 'Enlarge': 'تكبير',
   // program cards (2026-11-17)
   '{n} program cards · each QR works on training days': '{n} بطاقات برنامج · يعمل كل رمز QR في أيام التدريب', 'Your program card · its QR works on training days': 'بطاقة برنامجك · يعمل رمز QR في أيام التدريب',
   '{m} min each': '{m} دقيقة لكل جلسة', 'Program ended': 'انتهى البرنامج', 'No sessions left': 'لا جلسات متبقية', 'Program card': 'بطاقة البرنامج', 'Program cards': 'بطاقات البرنامج', 'Balance': 'الرصيد',
