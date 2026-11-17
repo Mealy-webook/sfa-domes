@@ -1,7 +1,9 @@
+/* Contrast (Ahmed, 2026-11-17): white on the brand orange is 3.1:1, so text on orange is near-black (6.4:1) and orange is
+   never used for small text on white or the pale tint (2.9–3.1:1). */
 /* Offers (f/offers-data.js): the "Available offers" block on court, game and program pages and checkout, the card tag,
    the summary line. DS tokens, square corners. */
 .of{display:grid;gap:10px;margin:0 0 16px;padding:14px 16px;background:var(--color-bg-accent-subtle);border:1px solid color-mix(in srgb,var(--color-brand) 30%,transparent);text-align:start}
-.of-h{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-body-s-bold);color:var(--color-content-accent)}
+.of-h{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-body-s-bold);color:var(--color-content-primary)}
 .of-h svg,.of-tag svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;flex:none}
 .of-l{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .of-l li{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:8px;align-items:start}
@@ -12,10 +14,10 @@
 .of-l li.is-on .of-ic{background:var(--color-brand);border-color:var(--color-brand)}
 .of-t b{display:block;font:var(--ts-body-s-bold);color:var(--color-content-primary)}
 .of-t small{display:block;font:var(--ts-caption-1);color:var(--color-content-secondary)}
-.of-l em{padding:2px 8px;background:var(--color-brand);color:var(--color-content-on-accent);font:var(--ts-caption-1-bold);font-style:normal;white-space:nowrap}
+.of-l em{padding:2px 8px;background:var(--color-brand);color:var(--neutral-950);font:var(--ts-caption-1-bold);font-style:normal;white-space:nowrap}
 .of-next{margin:0;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--color-brand) 25%,transparent);font:var(--ts-body-s-bold);color:var(--color-content-primary)}
 .of-note{margin:0;font:var(--ts-caption-1);color:var(--color-content-secondary)}
-.of-tag{display:inline-flex;align-self:flex-start;justify-self:start;width:max-content;align-items:center;gap:6px;padding:4px 8px;background:var(--color-brand);color:var(--color-content-on-accent);font:var(--ts-caption-1-bold);white-space:nowrap}
+.of-tag{display:inline-flex;align-self:flex-start;justify-self:start;width:max-content;align-items:center;gap:6px;padding:4px 8px;background:var(--color-brand);color:var(--neutral-950);font:var(--ts-caption-1-bold);white-space:nowrap}
 .of-tag svg{width:14px;height:14px}
-.of-line{color:var(--color-content-accent) !important}
+.of-line{color:var(--color-content-primary) !important;font-weight:600}
 .of-was{margin-inline-end:4px;font-size:.7em;font-weight:500;color:var(--color-content-tertiary)}
