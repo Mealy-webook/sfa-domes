@@ -38,7 +38,7 @@
       : active.map(p => p.you ? t('You') : first(p.name)).join(', ');
     const dates = [...new Set(ses.map(s => s.date))].length;
     const count = kind === 'game' ? (n === 1 ? t('1 player') : t('{n} players', { n }))
-      : kind === 'program' ? `${t('{n} sessions', { n: days.length })} · ${n === 1 ? t('1 participant') : t('{n} participants', { n })}`
+      : kind === 'program' ? `${days.length === 1 ? t('1 session') : t('{n} sessions', { n: days.length })} · ${n === 1 ? t('1 participant') : t('{n} participants', { n })}`
       : `${ses.length === 1 ? t('1 time') : t('{n} times', { n: ses.length })}${dates > 1 ? ' · ' + t('{n} days', { n: dates }) : ''}`;
     const todayK = dk(new Date()), isToday = next && next.date === todayK;
     const status = cancelled ? { k: 'off', txt: t('Cancelled') } : past ? { k: 'done', txt: t('Played') }
@@ -48,7 +48,7 @@
     const when = next ? (dd <= 0 ? t('Today') : dd === 1 ? t('Tomorrow') : t('In {n} days', { n: dd })) : '';
     const ref = next || last, d0 = T.toDate((days[0] || ses[0]).date), d1 = T.toDate(last.date);
     const time = `<bdi>${P.time(ref.start)}</bdi> – <bdi>${P.time(ref.end)}</bdi>`;
-    const dateLine = days.length <= 1 && dates <= 1 ? `${P.date(d0, 'full')} · ${time}` : `${P.date(d0, 'short')} – ${P.date(d1, 'short')} · ${time}`;
+    const dateLine = dates <= 1 ? `${P.date(d0, 'full')} · ${days.length > 1 ? `<bdi>${P.time(days[0].start)}</bdi> – <bdi>${P.time(last.end)}</bdi>` : time}` : `${P.date(d0, 'short')} – ${P.date(d1, 'short')} · ${time}`;
     const open = up && T.cancelInfo(b).can;
     const canRemove = p => !p.gone && !p.single && (kind === 'game' || kind === 'program') && n > 1 && open;
     const canSend = p => !p.gone && p.type === 'guest' && !!p.phone && up;
