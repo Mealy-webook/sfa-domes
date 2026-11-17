@@ -36,6 +36,7 @@ window.SFA_AR = {
 
   // ---- homepage: sports carousel
   'Your sport, your court.': 'رياضتك، ملعبك.',
+  'Every game one dome is waiting': 'كل لعبة، وقبة واحدة بانتظارك',
   'Book court': 'احجز ملعبًا',
   'Previous sport': 'الرياضة السابقة', 'Next sport': 'الرياضة التالية', 'Sports photos': 'صور الرياضات', 'Sports at SFA Domes': 'الرياضات في دوم الرياضة للجميع',
   'Sports': 'الرياضات',

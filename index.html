@@ -809,83 +809,6 @@ html[lang=ar] .hero-cue-ring text{font-size:13px;letter-spacing:0}
    through the opening dropdown and slide away, revealing the columns ---------- */
 .cn-wipe{position:absolute;left:0;right:0;top:var(--cn-bar);height:calc(100% - var(--cn-bar));z-index:4;overflow:hidden;pointer-events:none}
 .cn-wipe i{position:absolute;inset:0;transform:translateY(-101%)}
-/* ---------- Sports photo ring (experiment: React Bits CircularCarousel port). The flat photos stay in the DOM but hidden ---------- */
-.sp-photo--ring{overflow:visible}
-.sp-photo--ring > img,.sp-photo--ring > .sp-ph{display:none}
-.cc{--cc-fade:var(--orange-500);position:absolute;inset:-4% -24% -4% -14%;outline:none;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;-webkit-tap-highlight-color:transparent}
-.cc[data-dragging]{cursor:grabbing}
-.cc:focus-visible{box-shadow:none}   /* no lines across the section when the ring has focus */
-.cc-view{position:absolute;inset:0}
-.cc-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .45s ease}
-.cc[data-ready] .cc-stage{opacity:1}
-.cc-camera,.cc-ring,.cc-card{width:0;height:0;transform-style:preserve-3d}
-.cc-camera{position:relative}
-.cc-ring,.cc-card{position:absolute;left:0;top:0}
-.cc-tile{position:absolute;outline:1px solid transparent;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.cc-frame{position:absolute;left:0;top:0;width:100%;overflow:hidden}
-.cc-photo{position:absolute;display:block;max-width:none;object-fit:cover;object-position:50% 40%;pointer-events:none;user-select:none;-webkit-user-drag:none}
-.cc-shade,.cc-inner{position:absolute;inset:0;pointer-events:none}
-.cc-shade{background:var(--cc-fade);opacity:var(--cc-depth,0)}
-.cc-inner{background:var(--black);opacity:.4}
-/* front card: dark fade at the bottom with the sport name and Book court on it */
-.cc-fade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(9,9,11,.82) 0%,rgba(9,9,11,.45) 26%,rgba(9,9,11,0) 52%);opacity:0;transition:opacity .4s ease}
-.cc-label{position:absolute;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:10px;padding:16px;transform:translateZ(1px);backface-visibility:hidden;-webkit-backface-visibility:hidden;pointer-events:none;opacity:0;transition:opacity .35s ease}
-.cc-name{font:var(--ts-title-section);text-transform:var(--type-case-title);color:var(--neutral-0);white-space:nowrap}
-.cc-cta{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 14px;background:var(--neutral-100);color:var(--neutral-950);text-decoration:none;white-space:nowrap;-webkit-user-drag:none;transition:background-color .2s}
-.cc-cta:hover{background:var(--neutral-0)}
-.cc-card.front .cc-fade,.cc-card.front .cc-label{opacity:1}
-.cc-card.front .cc-cta{pointer-events:auto}
-.cc[data-dragging] .cc-cta{pointer-events:none}
-@media (prefers-reduced-motion:reduce){.cc-stage{transition:none}}
-/* ---------- Orange section, centred layout (SFA Domes 4): title, sub text, CTA, then the photo ring in the middle with
-   arrows either side and the front sport's name under it. The sports list stays in the DOM (hidden) and still drives
-   the scroll stepping. ---------- */
-.sp-intro--center{flex-direction:column;justify-content:center;align-items:center;gap:clamp(12px,2vh,20px);text-align:center}
-.sp-intro--center .sp-head{width:auto;max-width:none;white-space:nowrap;text-align:center;font:var(--ts-display-s)}
-.sp-sub{font:var(--ts-body-l);margin:0;max-width:44ch;color:rgba(255,255,255,.88)}
-.sp-intro--center .sp-book{width:auto;height:56px;padding:0 28px;font-size:var(--fs-20)}
-.sp-body{flex-direction:column;align-items:stretch;gap:clamp(10px,2vh,20px)}
-.sp-list{display:none!important}
-.sp-stage{position:relative;flex:1 1 auto;width:min(100%,1040px);margin-inline:auto;min-height:clamp(260px,40vh,460px);display:flex;align-items:center;justify-content:center}
-.sp-stage .sp-photo{position:relative;flex:1 1 auto;width:auto;max-width:none;height:100%;min-height:inherit;aspect-ratio:auto;margin:0 72px}
-.sp-stage .cc{inset:0}
-.sp.pinned .sp-photo{height:100%;width:auto;max-width:none}
-.sp.pinned .sp-body{flex:1 1 0;min-height:0}
-.sp-arrow{position:absolute;top:50%;z-index:3;width:56px;height:56px;margin-top:-28px;display:grid;place-items:center;padding:0;border:1px solid rgba(255,255,255,.55);background:transparent;color:var(--neutral-0);cursor:pointer;transition:background-color .25s,color .25s,border-color .25s,transform .35s cubic-bezier(.22,1,.36,1)}
-.sp-arrow svg{width:24px;height:24px}
-.sp-arrow--prev{left:0}.sp-arrow--next{right:0}
-.sp-arrow:hover{background:var(--neutral-0);color:var(--orange-500);border-color:var(--neutral-0)}
-.sp-arrow--prev:hover{transform:translateX(-3px)}.sp-arrow--next:hover{transform:translateX(3px)}
-.sp-arrow:focus-visible{outline:2px solid var(--neutral-0);outline-offset:3px}
-.sp-cap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:40px;font-family:var(--type-font);font-weight:var(--type-w-label);color:var(--neutral-0)}
-.sp-cap-ico{font-size:var(--fs-28);line-height:1;font-variation-settings:'FILL' 0,'wght' 700,'GRAD' 0,'opsz' 24;text-transform:none}
-.sp-cap-ico img{width:28px;height:28px;display:block}
-/* the front card opens that sport's courts page, even mid-turn; side cards still just turn to the front */
-.cc-card.front .cc-tile{cursor:pointer}
-.cc[data-dragging] .cc-card.front .cc-tile{cursor:grabbing}
-.sp-cap-count{font-size:var(--fs-15);letter-spacing:.06em;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums}
-.sp:not(.sp-in) .sp-arrow,.sp:not(.sp-in) .sp-cap{opacity:0}
-.sp-arrow,.sp-cap{transition:opacity .6s ease .9s,background-color .25s,color .25s,border-color .25s,transform .35s cubic-bezier(.22,1,.36,1)}
-/* the ring's box fills the spare height; move the ring down and the count up by half the empty space each, so the
-   cards and count stay together as one centred group (--cc-slack is set by the ring script) */
-.sp-stage{transform:translateY(calc(var(--cc-slack, 0px) / 2))}
-.sp-cap{transform:translateY(calc(var(--cc-slack, 0px) / -2))}
-/* phones: no arrows (the ring is swiped); the side cards run to the screen edges */
-@media (max-width:560px){.sp-arrow{display:none}.sp-stage .sp-photo{margin:0}}
-@media (max-width:820px){.sp-stage .sp-photo{margin:0 48px}.sp-arrow{width:44px;height:44px;margin-top:-22px}}
-/* ---------- SFA Domes 4: the orange section is exactly one screen tall — title, sub text, CTA, ring and caption all fit;
-   the ring takes whatever height is left. (The menu hides on scroll down, so the full height is usable.) ---------- */
-#sports .sp-pin{height:100svh;min-height:560px;box-sizing:border-box;padding-block:clamp(20px,4vh,48px);gap:clamp(12px,2.4vh,28px);justify-content:flex-start}
-#sports .sp-intro--center{flex:none;gap:clamp(8px,1.4vh,16px)}
-/* the former sub-title is now the heading: big title type, two balanced lines */
-#sports .sp-intro--center .sp-head{white-space:normal;max-width:24ch;text-wrap:balance;font:var(--ts-display-s)}
-/* same style as the tour sub text (.chap .sub) */
-#sports .sp-sub{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);max-width:38ch;color:var(--neutral-0)}
-#sports .sp-intro--center .sp-book{height:clamp(44px,6vh,56px)}
-#sports .sp-body{flex:1 1 0;min-height:0;width:100%}
-#sports .sp-stage{flex:1 1 0;min-height:0;height:auto}
-#sports .sp-stage .sp-photo{height:100%;min-height:0}
-#sports .sp-cap{flex:none;min-height:0}
 /* menu bar slides away while scrolling down, comes back on scroll up */
 .hdr-cn{transition:translate .45s cubic-bezier(.22,1,.36,1)}
 .hdr-cn.hq-away{translate:0 -130%}
@@ -1273,12 +1196,12 @@ html{scroll-padding-top:90px}
   <section class="sp" id="sports" aria-labelledby="spTitle">
    <div class="sp-pin">
     <div class="sp-veil" aria-hidden="true"></div>
-    <div class="sp-intro sp-intro--center">
-      <h2 class="sp-head" id="spTitle">Your sport, your court.</h2>
+    <div class="sp-intro">
+      <a class="sp-book" href="courts.html">Book court</a>
+      <h2 class="sp-head" id="spTitle">Every game one dome is waiting</h2>
     </div>
     <div class="sp-body">
-      <div class="sp-stage"><button class="sp-arrow sp-arrow--prev" type="button" aria-label="Previous sport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button><figure class="sp-photo sp-photo--ring" id="spPhoto"><div class="cc" id="spRing" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Sports photos"></div><div class="sp-ph" aria-hidden="true"></div><img src="f/sports-photos/basketball.jpg" alt="Player dribbling a basketball on a teal court" data-sport="basketball" loading="lazy"><img src="f/sports-photos/volleyball.jpg" alt="Player holding a volleyball on a teal court" data-sport="volleyball" loading="lazy"><img src="f/sports-photos/futsal.jpg" alt="Player volleying a ball on a purple futsal court" data-sport="futsal" loading="lazy"><img src="f/sports-photos/football.jpg" alt="Young player dribbling a ball on turf" data-sport="football" loading="lazy"><img src="f/sports-photos/tennis.jpg" alt="Two players rallying on a blue tennis court" data-sport="tennis" loading="lazy"><img src="f/sports-photos/rugby.jpg" alt="Rugby player carrying the ball past a defender" data-sport="rugby" loading="lazy"><img src="f/sports-photos/badminton.jpg" alt="Player reaching for a shuttlecock on a purple court" data-sport="badminton" loading="lazy"><img src="f/sports-photos/gfx.jpg" alt="Athlete doing a barbell squat" data-sport="gfx" loading="lazy"><img src="f/sports-photos/netball.jpg" alt="Two players jumping for a netball under the hoop" data-sport="netball" loading="lazy"><img src="f/sports-photos/handball.jpg" alt="Handball player leaping to shoot" data-sport="handball" loading="lazy"><img src="f/sports-photos/table-tennis.jpg" alt="Player lunging for a table tennis ball" data-sport="table-tennis" loading="lazy"></figure><button class="sp-arrow sp-arrow--next" type="button" aria-label="Next sport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button></div>
-      <div class="sp-cap" aria-live="polite"><span class="sp-cap-count"></span></div>
+      <figure class="sp-photo" id="spPhoto"><div class="sp-ph" aria-hidden="true"></div><img src="f/sports-photos/basketball.jpg" alt="Player dribbling a basketball on a teal court" data-sport="basketball" loading="lazy"><img src="f/sports-photos/volleyball.jpg" alt="Player holding a volleyball on a teal court" data-sport="volleyball" loading="lazy"><img src="f/sports-photos/futsal.jpg" alt="Player volleying a ball on a purple futsal court" data-sport="futsal" loading="lazy"><img src="f/sports-photos/football.jpg" alt="Young player dribbling a ball on turf" data-sport="football" loading="lazy"><img src="f/sports-photos/tennis.jpg" alt="Two players rallying on a blue tennis court" data-sport="tennis" loading="lazy"><img src="f/sports-photos/rugby.jpg" alt="Rugby player carrying the ball past a defender" data-sport="rugby" loading="lazy"><img src="f/sports-photos/badminton.jpg" alt="Player reaching for a shuttlecock on a purple court" data-sport="badminton" loading="lazy"><img src="f/sports-photos/gfx.jpg" alt="Athlete doing a barbell squat" data-sport="gfx" loading="lazy"><img src="f/sports-photos/netball.jpg" alt="Two players jumping for a netball under the hoop" data-sport="netball" loading="lazy"><img src="f/sports-photos/handball.jpg" alt="Handball player leaping to shoot" data-sport="handball" loading="lazy"><img src="f/sports-photos/table-tennis.jpg" alt="Player lunging for a table tennis ball" data-sport="table-tennis" loading="lazy"></figure>
       <ul class="sp-list" aria-label="Sports at SFA Domes">
         <li><a href="courts.html?sport=basketball" data-sport="basketball">Basketball<span class="sp-ico material-symbols-outlined" aria-hidden="true">sports_basketball</span></a></li>
         <li><a href="courts.html?sport=badminton" data-sport="badminton">Badminton<span class="sp-ico" aria-hidden="true"><img src="f/ico-shuttlecock-white.svg" alt="" width="32" height="32"></span></a></li>
@@ -1764,26 +1687,8 @@ document.getElementById('heroCue')?.addEventListener('click', () => scrollBy({ t
     const key = links[i].dataset.sport;
     imgs.forEach(im => im.classList.toggle('on', im.dataset.sport === key));
     links.forEach((a, j) => a.classList.toggle('on', j === i));
-    sec.dispatchEvent(new CustomEvent('sportchange', { detail: i }));   // the photo ring follows
     run();
   }
-  function pick(i){
-    i = (i + links.length) % links.length;
-    if (pinned){
-      // jump the page to the middle of that sport's scroll step, so the pinned scroll and the ring stay in step
-      const vh = innerHeight / 100, top = sec.getBoundingClientRect().top + scrollY + (i + 0.5) * STEP * vh;
-      scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
-    } else if (i !== active){ show(i); keepInView(i); }
-  }
-  sec.addEventListener('sportpick', e => pick(e.detail));   // a card turned to the front by hand
-  sec.querySelector('.sp-arrow--prev').addEventListener('click', () => pick(active - 1));
-  sec.querySelector('.sp-arrow--next').addEventListener('click', () => pick(active + 1));
-  // caption under the ring: the front sport's count (its name and Book court sit on the front card)
-  const capCount = sec.querySelector('.sp-cap-count');
-  function caption(i){
-    capCount.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(links.length).padStart(2, '0');
-  }
-  sec.addEventListener('sportchange', e => caption(e.detail));
   function keepInView(i){
     if (!pinned){ offTarget = 0; return run(); }
     const li = rows[i], max = list.scrollHeight - list.clientHeight;
@@ -1807,7 +1712,7 @@ document.getElementById('heroCue')?.addEventListener('click', () => scrollBy({ t
   });
 
   function setPin(){
-    pinned = false;   // SFA Domes 4: the orange section scrolls normally (no pinned stepping)
+    pinned = pinMQ.matches;
     sec.classList.toggle('pinned', pinned);
     sec.style.height = pinned ? `calc(100svh + ${links.length * STEP + HOLD}svh)` : '';
     curIdx = -1; keepInView(active); onScroll();
@@ -2438,219 +2343,6 @@ void main() {
 })();
 </script>
 
-<script>
-/* ---------- Sports photo ring — vanilla port of React Bits CircularCarousel (preset "cylinder", intro "rise").
-   The ring follows the sports list (front card = active sport); dragging or clicking a card picks that sport. ---------- */
-(() => {
-  const sec = document.getElementById('sports'), root = document.getElementById('spRing');
-  if (!sec || !root) return;
-  const SPORTS = [...sec.querySelectorAll('.sp-list a[data-sport]')].map(a => ({ key: a.dataset.sport, title: a.childNodes[0].textContent.trim() }));
-  const items = SPORTS.map(s => ({ src: `f/sports-photos/${s.key}.jpg`, alt: s.title }));
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const O = { cardW: 240, aspect: 0.78, gap: 18, tilt: -5, perspective: 2500, curve: 1, parallax: reduce ? 0 : 0.3, stretch: reduce ? 0 : 0.5, depthFade: 0.6, momentum: 0.6,
-    speed: 0, interval: reduce ? 0 : 3.5 };   // snap to the next sport every 3.5s (rests on each one at full size)
-  const TILES = 8, OVERLAP = 2.5, SPRING = 118, TO_RAD = Math.PI / 180, DRAG_THRESHOLD = 5;
-  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  const wrap = d => ((((d + 180) % 360) + 360) % 360) - 180;
-  const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
-  const rotX = (p, d) => { const r = d * TO_RAD, c = Math.cos(r), s = Math.sin(r); return [p[0], p[1] * c - p[2] * s, p[1] * s + p[2] * c]; };
-  const rotY = (p, d) => { const r = d * TO_RAD, c = Math.cos(r), s = Math.sin(r); return [p[0] * c + p[2] * s, p[1], -p[0] * s + p[2] * c]; };
-
-  const n = items.length, step = 360 / n, cardW = O.cardW, cardH = cardW / O.aspect;
-  // extra angle that keeps a clear gap beside the enlarged front card: half its growth + ~18px, as an angle on the ring
-  const pitch = cardW + O.gap;
-  const chord = pitch / (2 * Math.sin(Math.PI / Math.max(n, 3))), arc = (n * pitch) / (2 * Math.PI);
-  const radius = Math.max(chord + (arc - chord) * O.curve, cardW * 0.6);
-  const GROW = 0.342;                                              // front card scale = 1.342
-  const EXT = (cardW / 2) / radius * 180 / Math.PI;                 // degrees per unit of extra scale, per side
-  const taper = w => { const a = Math.abs(w); return a <= 110 ? 1 : Math.max(0, (180 - a) / 70); };   // no pushing across the hidden back
-
-  // curved cards are built from vertical strips bent along the ring
-  const bend = radius / O.curve, len = cardW / TILES;
-  const tiles = Array.from({ length: TILES }, (_, i) => {
-    const start = i * len - (i > 0 ? OVERLAP / 2 : 0), end = (i + 1) * len + (i < TILES - 1 ? OVERLAP / 2 : 0);
-    const center = (start + end) / 2 - cardW / 2, alpha = center / bend;
-    return { i, start, end, size: end - start, move: `translate3d(${bend * Math.sin(alpha)}px, 0px, ${-bend * (1 - Math.cos(alpha))}px) rotateY(${alpha * 180 / Math.PI}deg)` };
-  });
-
-  // DOM
-  root.innerHTML = '<div class="cc-view"><div class="cc-stage"><div class="cc-camera"><div class="cc-ring"></div></div></div></div>';
-  const stage = root.querySelector('.cc-stage'), camera = root.querySelector('.cc-camera'), ring = root.querySelector('.cc-ring');
-  const cards = items.map((it, idx) => {
-    const card = document.createElement('div');
-    card.className = 'cc-card'; card.dataset.idx = idx;
-    card.setAttribute('role', 'group'); card.setAttribute('aria-label', `${it.alt}, ${idx + 1} of ${n}`);
-    const face = back => tiles.map(t => {
-      const strip = back ? TILES - 1 - t.i : t.i, offset = back ? cardW - t.end : t.start;
-      return `<div class="cc-tile" aria-hidden="true" style="left:${-t.size / 2}px;top:${-cardH / 2}px;width:${t.size}px;height:${cardH}px;transform:${t.move}${back ? ' rotateY(180deg)' : ''}">` +
-        `<div class="cc-frame" style="height:${cardH}px"><img class="cc-photo" src="${it.src}" alt="" draggable="false" decoding="async" style="left:${-offset}px;top:0;width:${cardW}px;height:${cardH}px">` +
-        `${back ? '<div class="cc-inner"></div>' : '<div class="cc-fade"></div>'}<div class="cc-shade"></div></div></div>`;
-    }).join('');
-    // the front card shows its sport name and Book court over the dark fade
-    const label = `<div class="cc-label" style="left:${-cardW / 2}px;top:${-cardH / 2}px;width:${cardW}px;height:${cardH}px">` +
-      `<span class="cc-name">${SPORTS[idx].title}</span><a class="cc-cta" href="courts.html?sport=${encodeURIComponent(SPORTS[idx].key)}" tabindex="-1" draggable="false">Book court</a></div>`;
-    card.innerHTML = face(false) + face(true) + label;
-    ring.appendChild(card);
-    return card;
-  });
-
-  const st = { angle: 0, velocity: 0, target: null, press: null, drag: false, hover: false, pointer: { inside: false, x: 0, y: 0 }, yaw: 0, pitch: 0,
-    intro: null, introDone: reduce, holdUntil: 0, fit: 1, shift: 0, drop: 0, last: 0, active: 0, quiet: false };
-  let raf = 0, visible = false;
-
-  function measure(){
-    const r = root.getBoundingClientRect(); if (!r.width || !r.height) return;
-    const width = r.width * 0.96, height = r.height * 0.88, P = O.perspective;   // 12% vertical breathing room
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    const hh = cardH * (1 + GROW) / 2;   // the front card is shown enlarged, so fit to its full height
-    const corners = [[-cardW / 2, -hh], [cardW / 2, -hh], [-cardW / 2, hh], [cardW / 2, hh]];
-    for (let a = -180; a <= 180; a += 7.5) for (const [cx, cy] of corners){
-      let p = rotX(rotY([cx, cy, radius], a), O.tilt); p = [p[0], p[1], p[2] - radius];
-      if (p[2] >= P * 0.95) continue;
-      const k = P / (P - p[2]);
-      minX = Math.min(minX, p[0] * k); maxX = Math.max(maxX, p[0] * k); minY = Math.min(minY, p[1] * k); maxY = Math.max(maxY, p[1] * k);
-    }
-    let fit = Math.min(1, width / Math.max(maxX - minX, 1), height / Math.max(maxY - minY, 1));
-    // phones: fitting the whole ring makes the front card tiny, so size it by the front card instead (about 64% of the
-    // screen) and let the side cards run off the screen edges, under the arrows
-    if (innerWidth <= 560) fit = Math.min(1, (innerWidth * 0.64) / (cardW * (1 + GROW)), height / Math.max(maxY - minY, 1));
-    st.fit = fit; st.shift = -((minY + maxY) / 2) * fit; st.drop = (r.height / fit) * 0.55 + cardH;
-    // empty height under the cards inside the ring's box: the CSS splits it so the count sits right under the cards
-    sec.style.setProperty('--cc-slack', Math.max(0, r.height / 2 - ((maxY - minY) / 2) * fit).toFixed(1) + 'px');
-    stage.style.perspective = `${P}px`;
-    stage.style.transform = `translate3d(0, ${st.shift}px, 0) scale(${fit})`;
-  }
-  const nearest = a => Math.round(a / step) * step;
-
-  function advance(dt, now){
-    if (!st.introDone && root.hasAttribute('data-ready')){
-      if (!st.intro) st.intro = { start: now };
-      if (now - st.intro.start >= 1400){ st.intro = null; st.introDone = true; st.velocity = 0; st.holdUntil = 0; st.stepAt = now + 600; }   // cards are in: first snap right away   // cards are in: start turning straight away, already at full drift speed
-    }
-    let busy = !!st.intro || st.drag;
-    if (st.drag || st.intro){ if (!st.drag) st.velocity = 0; }
-    else if (st.target !== null){
-      let rem = dt; const damp = 2 * Math.sqrt(SPRING);
-      while (rem > 0){ const h = Math.min(rem, 1 / 240); st.velocity += (SPRING * (st.target - st.angle) - damp * st.velocity) * h; st.angle += st.velocity * h; rem -= h; }
-      if (Math.abs(st.target - st.angle) < 0.004 && Math.abs(st.velocity) < 0.03){ st.angle = st.target; st.velocity = 0; st.target = null; }
-      busy = true;
-    } else {
-      // slow drift: paused while hovered, dragged, or for a moment after the user picked a sport
-      const cruise = (!st.hover && !st.drag && now >= st.holdUntil && st.introDone) ? -O.speed : 0;
-      const tau = 0.18 + O.momentum * 1.5;
-      st.velocity += (cruise - st.velocity) * (1 - Math.exp(-dt / tau)); st.angle += st.velocity * dt;
-      if (cruise === 0 && Math.abs(st.velocity) < 9) st.target = nearest(st.angle);
-      busy = busy || cruise !== 0 || Math.abs(st.velocity) > 0.01 || st.target !== null;
-    }
-    if (now < st.holdUntil) busy = true;      // keep the loop alive so the drift resumes when the pause ends
-    // step autoplay: after resting on a sport, spring to the next one
-    if (O.interval && st.introDone && !st.hover && !st.drag && now >= st.holdUntil){
-      if (!st.stepAt) st.stepAt = now + O.interval * 1000;
-      if (now >= st.stepAt && st.target === null && Math.abs(st.velocity) < 1){ st.target = nearest(st.angle) - step; st.quiet = false; st.stepAt = now + O.interval * 1000; }
-      busy = true;
-    } else if (st.hover || st.drag || now < st.holdUntil) st.stepAt = 0;
-    const ease = 1 - Math.exp(-dt / 0.35);
-    const aimYaw = st.pointer.inside ? st.pointer.x * O.parallax * 9 : 0, aimPitch = st.pointer.inside ? -st.pointer.y * O.parallax * 6 : 0;
-    st.yaw += (aimYaw - st.yaw) * ease; st.pitch += (aimPitch - st.pitch) * ease;
-    if (Math.abs(aimYaw - st.yaw) > 0.01 || Math.abs(aimPitch - st.pitch) > 0.01) busy = true;
-    return busy;
-  }
-  function render(now){
-    const elapsed = st.intro ? now - st.intro.start : 0;
-    const R = radius * (1 + O.stretch * 0.12 * Math.min(1, Math.abs(st.velocity) / 420));
-    camera.style.transform = `translate3d(0, 0, ${-R}px) rotateX(${O.tilt + st.pitch}deg) rotateY(${st.yaw}deg)`;
-    ring.style.transform = `rotateY(${st.angle}deg)`;
-    const W = cards.map((c, i) => wrap(i * step + st.angle));
-    const G = W.map(w => 1 + GROW * Math.pow(Math.max(0, Math.cos(w * TO_RAD)), 14));
-    cards.forEach((card, i) => {
-      const base = i * step;
-      let lift = 0;
-      if (st.intro){ const reach = Math.abs(wrap(base + st.angle)); const p = easeOutQuint(clamp((elapsed - (reach / 180) * 480) / 900, 0, 1)); lift = (1 - p) * st.drop; }
-      const world = W[i], grow = G[i], facing = Math.cos(world * TO_RAD);
-      // every enlarged card pushes the cards on each side of it out by its own growth, so gaps stay equal even mid-snap
-      let push = 0; for (let j = 0; j < n; j++) if (j !== i && G[j] > 1.0005) push += Math.sign(world - W[j]) * EXT * (G[j] - 1) * taper(W[j]) * taper(world);
-      card.style.transform = `rotateY(${(base + push).toFixed(3)}deg) translateZ(${R}px)${lift ? ` translateY(${lift}px)` : ''} scale(${grow.toFixed(4)})`;
-      card.style.setProperty('--cc-depth', (O.depthFade * Math.pow((1 - facing) / 2, 1.25)).toFixed(3));
-    });
-    const idx = ((Math.round(-st.angle / step) % n) + n) % n || 0;
-    if (idx !== st.active || !cards[idx].classList.contains('front')){
-      cards.forEach((c, i) => c.classList.toggle('front', i === idx));
-      st.active = idx;
-      // a card the user turned to the front picks that sport in the list (not when the list itself moved the ring)
-      if (!st.quiet) sec.dispatchEvent(new CustomEvent('sportpick', { detail: idx }));
-    }
-    if (st.quiet && st.target === null) st.quiet = false;
-  }
-  function frame(now){
-    raf = 0;
-    const dt = st.last ? Math.min((now - st.last) / 1000, 0.05) : 1 / 60; st.last = now;
-    const busy = advance(dt, now); render(now);
-    if (busy && visible && !document.hidden) raf = requestAnimationFrame(frame); else st.last = 0;
-  }
-  const wake = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame); };
-  function focusIndex(i, quiet){
-    let t = -i * step; t += 360 * Math.round((st.angle - t) / 360);
-    st.target = t; st.quiet = !!quiet; st.holdUntil = performance.now() + 2800; wake();
-  }
-
-  // the sports list moved: turn that sport to the front
-  // the list moved: turn that sport to the front — unless the ring is already heading there (e.g. its own snap)
-  const headingTo = () => ((Math.round(-(st.target !== null ? st.target : st.angle) / step) % n) + n) % n;
-  sec.addEventListener('sportchange', e => { if (e.detail !== headingTo()) focusIndex(e.detail, true); });
-
-  // drag (mouse, pen, touch-horizontal), click a card to bring it to the front, pointer parallax
-  const updatePointer = e => { const r = root.getBoundingClientRect(); st.pointer.x = clamp(((e.clientX - r.left) / r.width) * 2 - 1, -1, 1); st.pointer.y = clamp(((e.clientY - r.top) / r.height) * 2 - 1, -1, 1); };
-  let suppressClick = false;
-  root.addEventListener('pointerdown', e => { suppressClick = false; if (e.button !== 0) return; st.press = { id: e.pointerId, x: e.clientX, y: e.clientY, angle: st.angle, moved: false, origin: 0, samples: [{ time: performance.now(), angle: st.angle }] }; });
-  root.addEventListener('pointermove', e => {
-    if (e.pointerType === 'mouse'){ st.pointer.inside = true; updatePointer(e); }
-    const pr = st.press; if (!pr || pr.id !== e.pointerId){ wake(); return; }
-    const delta = e.clientX - pr.x, cross = e.clientY - pr.y;
-    if (!pr.moved){
-      if (Math.abs(delta) < DRAG_THRESHOLD) return;
-      if (Math.abs(cross) > Math.abs(delta) * 1.2 && e.pointerType !== 'mouse'){ st.press = null; return; }
-      pr.moved = true; pr.origin = delta; st.drag = true; st.target = null; st.velocity = 0; st.quiet = false; root.setAttribute('data-dragging', '');
-      try { root.setPointerCapture(e.pointerId); } catch (err) {}
-    }
-    st.angle = pr.angle + (delta - pr.origin) * (180 / (Math.PI * radius * st.fit));
-    const now = performance.now(); pr.samples.push({ time: now, angle: st.angle });
-    while (pr.samples.length > 2 && now - pr.samples[0].time > 110) pr.samples.shift();
-    wake();
-  });
-  const release = e => {
-    const pr = st.press; if (!pr || pr.id !== e.pointerId) return; st.press = null; if (!pr.moved) return;
-    st.drag = false; root.removeAttribute('data-dragging'); suppressClick = true;
-    const a = pr.samples[0], b = pr.samples[pr.samples.length - 1], span = (b.time - a.time) / 1000;
-    const v = span > 0.008 ? clamp((b.angle - a.angle) / span, -1400, 1400) : 0;
-    st.velocity = v; st.target = Math.round((st.angle + v * (0.18 + O.momentum * 1.5) * 0.55) / step) * step; wake();
-  };
-  root.addEventListener('pointerup', release); root.addEventListener('pointercancel', release);
-  root.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse'){ st.hover = true; wake(); } });
-  root.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse'){ st.hover = false; st.pointer.inside = false; } wake(); });
-  root.addEventListener('click', e => {
-    if (suppressClick){ suppressClick = false; e.preventDefault(); return; }   // a drag, not a click
-    const card = e.target.closest('.cc-card'); if (!card) return;
-    const i = +card.dataset.idx;
-    e.preventDefault();
-    if (i === st.active){ openCourts(i); return; }   // front card: go to its courts
-    focusIndex(i, false); sec.dispatchEvent(new CustomEvent('sportpick', { detail: i }));
-  });
-  const openCourts = i => { location.href = `courts.html?sport=${encodeURIComponent(SPORTS[i].key)}`; };
-  root.addEventListener('keydown', e => {
-    if (e.key === 'Enter'){ e.preventDefault(); openCourts(st.active); return; }
-    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ e.preventDefault(); const i = (st.active + (e.key === 'ArrowRight' ? 1 : -1) + n) % n; focusIndex(i, false); sec.dispatchEvent(new CustomEvent('sportpick', { detail: i })); }
-  });
-
-  new ResizeObserver(() => { measure(); wake(); }).observe(root);
-  new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) wake(); else { cancelAnimationFrame(raf); raf = 0; st.last = 0; } }).observe(root);
-  document.addEventListener('visibilitychange', () => { if (document.hidden){ cancelAnimationFrame(raf); raf = 0; st.last = 0; } else wake(); });
-
-  // reveal (and play the "rise" intro) once the first few photos have loaded and the section is on screen
-  const load = src => new Promise(res => { const im = new Image(); im.onload = im.onerror = res; im.src = src; });
-  Promise.race([Promise.all(items.slice(0, 5).map(i => load(i.src))), new Promise(r => setTimeout(r, 2400))]).then(() => { root.setAttribute('data-ready', ''); wake(); });
-  measure(); render(performance.now());
-})();
-</script>
 
 <!-- the menu bar stays put on scroll (Ahmed: top nav sticky everywhere); it used to hide on scroll down -->
 
