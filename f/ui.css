@@ -27,7 +27,7 @@
 /* ---- 12 · tags ---- */
 .tag,.lvl,.pj-tag,.of-tag,.wh > .lvl,.wh > .of-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;font:var(--ts-caption-1-bold);border-radius:0}
 .pj-tag{background:var(--orange-700);color:var(--neutral-0)}
-.bv-row-i b em,.bv-o-who b em,.bv-rc em,.opt em,.gst em{display:inline-flex;align-items:center;height:24px;padding:0 8px;background:var(--orange-700);color:var(--neutral-0);font:var(--ts-caption-1-bold);font-style:normal}
+.bv-row-i b em,.bv-o-who b em,.bv-rc em,.opt em,.gst em,.gp-list em{display:inline-flex;align-items:center;height:24px;padding:0 8px;background:var(--orange-700);color:var(--neutral-0);font:var(--ts-caption-1-bold);font-style:normal}
 
 /* ---- 13 · cards ---- */
 .kl-card,.gm:not(.mine),.bv-card,.mt-card,.tile,.panel,.ck-card,.o-card{border-color:var(--color-border-primary)}
@@ -51,3 +51,16 @@
 html[dir=rtl] .kl-crumbs svg{transform:scaleX(-1)}
 .kl-crumbs span{color:var(--color-content-secondary)}
 @media (max-width:639px){.kl-crumbs{display:flex !important}.kl-crumbs > :not(a:last-of-type){display:none}.kl-crumbs a:last-of-type::before{content:"← "}html[dir=rtl] .kl-crumbs a:last-of-type::before{content:"→ "}}
+
+/* ---- 14 · status: one "you're all set" box (booking page .bv-stat, confirmation .st-box) ---- */
+.st-box{display:grid;grid-template-columns:44px minmax(0,1fr);gap:16px;align-items:start;padding:20px;border:1px solid var(--color-border-primary);border-inline-start:4px solid var(--green-400);background:var(--color-bg-primary)}
+.st-box-ic{display:grid;place-items:center;width:44px;height:44px;background:var(--color-bg-secondary);color:var(--color-content-primary)}
+.st-box-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2}
+.st-box > div > b{display:block;font:var(--ts-title-body);text-transform:var(--type-case-title)}
+.st-box p{margin:4px 0 0;font:var(--ts-body-default);color:var(--color-content-primary)}
+.st-box p b{font:var(--ts-body-default-bold)}
+
+/* ---- 4 · white pages: the confirmation's grey background is now white (f/result-base.css) ---- */
+
+/* ---- 9 · prices: the unit sits on the same line as the price ("⃁300 / hr"), in the bottom bar too ---- */
+.go-pick strong .go-from:last-child{display:inline;margin-inline-start:4px}

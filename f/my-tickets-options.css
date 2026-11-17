@@ -141,7 +141,7 @@
 .mt-removed b{font:var(--ts-body-s-bold);color:var(--color-content-tertiary);text-decoration:line-through}
 
 /* ---- phones ---- */
-@media (max-width:760px){
+@media (max-width:1023px){
   .mt-card{grid-template-columns:96px minmax(0,1fr);gap:12px}
   .mt-cta{grid-column:1/-1;min-width:0;flex-direction:row}
   .mt-cta > *{flex:1}
@@ -304,13 +304,13 @@
 .mt-today + .mt-todo + section,.mt-type section + section{margin-top:40px}
 .mt-today ~ section{margin-bottom:40px}
 
-@media (max-width:900px){
+@media (max-width:1023px){
   .mt-cal{grid-template-columns:minmax(0,1fr)}
   .mt-cal-d{position:static}
   .mt-res li{grid-template-columns:minmax(0,1fr)}
   .mt-res-s{justify-items:start;grid-auto-flow:column;justify-content:start}
 }
-@media (max-width:760px){
+@media (max-width:1023px){
   .mt-day{min-height:52px;padding:6px 4px}
   .mt-dots i{width:6px;height:6px}
   .mt-sub{grid-template-columns:96px minmax(0,1fr);gap:12px}
@@ -343,7 +343,7 @@
 .mt-tk.is-done{opacity:.7}
 .mt-tix-sec .mt-hist{margin-top:24px}
 .mt-renew{margin:0 0 32px}
-@media (max-width:760px){
+@media (max-width:1023px){
   .mt-bk .mt-bk-n{flex-direction:row;align-items:center}
   .mt-tk{grid-template-columns:52px minmax(0,1fr)}
   .mt-tk-e{grid-column:2;justify-content:flex-start}
@@ -352,14 +352,14 @@
 .panel.mt-full{padding-top:calc(var(--nav) + clamp(24px,4vh,40px))}
 .mt-full .mt-head{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center}
 .mt-full .mt-head .pg-ph{aspect-ratio:16/10}
-@media (max-width:760px){.mt-full .mt-head{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:1023px){.mt-full .mt-head{grid-template-columns:minmax(0,1fr)}}
 /* the type filter sits under Upcoming / Past / Cancelled (2026-11-17) */
 .mt-bar--stack{flex-direction:column;align-items:stretch;gap:12px}
 .mt-bar--stack .seg{align-self:flex-start}
 .mt-kt{display:flex;flex-wrap:wrap;gap:8px}
 .mt-kt-dot{width:8px;height:8px;border-radius:50%;background:var(--k)}
-@media (max-width:760px){.mt-kt{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.mt-kt::-webkit-scrollbar{display:none}.mt-kt .type{flex:none}}
-@media (max-width:760px){.mt-bar .mt-kt{margin-inline:calc(var(--g) * -1)}}   /* the phone row runs edge to edge (its padding comes from .types) */
+@media (max-width:1023px){.mt-kt{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.mt-kt::-webkit-scrollbar{display:none}.mt-kt .type{flex:none}}
+@media (max-width:1023px){.mt-bar .mt-kt{margin-inline:calc(var(--g) * -1)}}   /* the phone row runs edge to edge (its padding comes from .types) */
 
 /* booking details on the booking page (2026-11-17): the confirmation's facts (icons, labels for screen readers only) and payment */
 .mt-det{margin:0 0 clamp(32px,6vh,56px);padding-bottom:clamp(24px,4vh,40px);border-bottom:1px solid var(--color-border-primary)}
@@ -389,8 +389,8 @@
 .mt-pay .mt-pay-t dd{font:var(--ts-display-xs)}
 .mt-pay .mt-pay-r{border:0;padding-top:0}
 .mt-pay .mt-pay-r dd{color:var(--color-danger)}
-@media (max-width:900px){.mt-det-in{grid-template-columns:minmax(0,1fr)}}
-@media (max-width:560px){.mt-facts{grid-template-columns:minmax(0,1fr)}.mt-copy span{display:none}.mt-copy{width:36px;padding:0;justify-content:center}}
+@media (max-width:1023px){.mt-det-in{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:639px){.mt-facts{grid-template-columns:minmax(0,1fr)}.mt-copy span{display:none}.mt-copy{width:36px;padding:0;justify-content:center}}
 
 /* training program card (2026-11-17): one card per participant, one QR, a balance of sessions */
 .mt-pcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:16px}
@@ -426,7 +426,7 @@
 .mt-pc-none{font:var(--ts-body-s);color:var(--color-content-secondary)}
 .mt-pc-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .mt-pc.is-locked .mt-pc-dots i:not(.used){background:var(--color-content-tertiary)}
-@media (max-width:560px){.mt-pc-b{grid-template-columns:minmax(0,1fr);justify-items:center}.mt-pc-bal{width:100%}}
+@media (max-width:639px){.mt-pc-b{grid-template-columns:minmax(0,1fr);justify-items:center}.mt-pc-bal{width:100%}}
 
 /* =====================================================================================================================
    Booking page redesigns (2026-11-17): ?bv=wallet | timeline | split
@@ -574,7 +574,7 @@
   .bv-t-side,.bv-s-l{position:static;max-height:none}
   .bv-w-strip{grid-template-columns:minmax(0,1fr)}
 }
-@media (max-width:640px){
+@media (max-width:639px){
   .bv-w-facts{grid-template-columns:minmax(0,1fr)}
   .bv-t-head{grid-template-columns:72px minmax(0,1fr);gap:14px}
   .bv h1{font:var(--ts-display-xs)}
@@ -729,7 +729,7 @@
 .bv-know span{font:var(--ts-body-s);color:var(--color-content-secondary)}
 .bv-know a{color:inherit;font-weight:600}
 @media (max-width:1023px){.bv-x-two{grid-template-columns:minmax(0,1fr)}}
-@media (max-width:760px){
+@media (max-width:1023px){
   .bv-x-sum{grid-template-columns:minmax(0,1fr);padding:0;border:0;background:none}
   .bv-x-ph{aspect-ratio:16/9}
   .bv-x-kv{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -797,7 +797,7 @@
   .bv-o-ev{grid-template-columns:200px minmax(0,1fr);align-items:start}
   .bv-o-kv{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (max-width:760px){
+@media (max-width:1023px){
   .bv-o-ev{grid-template-columns:minmax(0,1fr)}
   .bv-o-foot{grid-template-columns:minmax(0,1fr);gap:40px}
   /* the attendee table becomes one block per row: name on top, two facts side by side, status, then actions */
@@ -814,7 +814,7 @@
   .bv-o-a .mt-mini{margin:0}
   .bv-o-open{display:block !important;padding:0 !important}
 }
-@media (max-width:640px){
+@media (max-width:639px){
   .bv-hd{grid-template-columns:64px minmax(0,1fr);gap:14px}
   .bv-row{grid-template-columns:40px minmax(0,1fr);padding:14px 0}
   .bv-row .day{width:40px}

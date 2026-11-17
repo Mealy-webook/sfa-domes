@@ -140,7 +140,7 @@ html[dir=rtl] .sp-cap-count{direction:ltr;unicode-bidi:isolate}
 .sfa-cur-menu button b{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);letter-spacing:.03em}
 .sfa-cur-menu button[aria-checked=true]{color:var(--orange-500)}
 .sfa-cur-menu p{font:var(--ts-caption-1);margin:6px 0 0;padding:8px 16px 4px;border-top:1px solid var(--neutral-200);color:var(--neutral-500)}
-@media (max-width:560px){.sfa-prefs{gap:6px}.sfa-prefs__btn{padding:0 8px;min-width:36px;height:40px;font-size:var(--fs-13)}.sfa-prefs__btn svg{display:none}.sfa-prefs__lang{font-size:var(--fs-13)}}`;
+@media (max-width:639px){.sfa-prefs{gap:6px}.sfa-prefs__btn{padding:0 8px;min-width:36px;height:40px;font-size:var(--fs-13)}.sfa-prefs__btn svg{display:none}.sfa-prefs__lang{font-size:var(--fs-13)}}`;
   function setDoc(){
     const h = document.documentElement;
     h.lang = lang; h.dir = lang === 'ar' ? 'rtl' : 'ltr';

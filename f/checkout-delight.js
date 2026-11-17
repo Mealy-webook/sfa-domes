@@ -92,7 +92,7 @@
 /* d · friendly words + a pay bar on phones */
 .cx-d .cx-lead{margin:0 0 clamp(20px,3vh,28px);font:var(--ts-body-l);color:var(--color-content-secondary)}
 .cx-d .cx-bar{display:none}
-@media (max-width:960px){
+@media (max-width:1023px){
   .cx-d .cx-bar{position:fixed;inset:auto 0 0;z-index:50;display:flex;align-items:center;gap:16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--color-bg-primary);border-top:1px solid var(--color-border-primary);box-shadow:0 -8px 24px rgba(9,9,11,.08)}
   .cx-d .cx-bar .t{flex:1;min-width:0;display:grid;gap:2px}
   .cx-d .cx-bar small{font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}

@@ -44,7 +44,7 @@
 .rx-share{display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 20px;border:0;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-body-l-bold);cursor:pointer}
 .rx-share:hover{background:var(--color-bg-accent-hover)}
 .rx-toast{position:fixed;bottom:72px;left:50%;translate:-50% 0;z-index:80;padding:12px 16px;background:var(--color-bg-inverse);color:var(--color-content-inverse);font:var(--ts-body-default-bold)}
-@media (max-width:640px){.rx-cd{grid-template-columns:minmax(0,1fr)}.rx-share{width:100%;justify-content:center}.rx-cd .n{gap:8px}.rx-cd .n span{min-width:48px}}
+@media (max-width:639px){.rx-cd{grid-template-columns:minmax(0,1fr)}.rx-share{width:100%;justify-content:center}.rx-cd .n{gap:8px}.rx-cd .n span{min-width:48px}}
 /* d */
 .rx-chips{display:flex;flex-wrap:wrap;gap:8px;margin:-16px 0 clamp(24px,4vh,40px);animation:up .7s cubic-bezier(.22,1,.36,1) .2s both}
 .rx-chips > span{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);font:var(--ts-body-default-bold)}
@@ -54,8 +54,8 @@
 .rx-bring ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
 .rx-bring li{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--color-bg-secondary);font:var(--ts-body-s)}
 .rx-bring li::before{content:"";width:8px;height:8px;background:var(--color-brand)}
-@media (max-width:560px){.rx-chips{margin-top:-8px}}
-@media (max-width:760px){.rx-b .rx-stamp{top:12px;inset-inline-end:32px;font:var(--ts-body-l-bold)}}   /* the tilted stamp stays inside a phone-width ticket */
+@media (max-width:639px){.rx-chips{margin-top:-8px}}
+@media (max-width:1023px){.rx-b .rx-stamp{top:12px;inset-inline-end:32px;font:var(--ts-body-l-bold)}}   /* the tilted stamp stays inside a phone-width ticket */
 @media (prefers-reduced-motion:reduce){.rx *,.rx *::before,.rx *::after{animation:none!important}}`;
   document.head.appendChild(css);
   document.body.insertAdjacentHTML('beforeend', `<a class="rx-tag" href="result-options.html">Delight ${cx.toUpperCase()} · ${NAMES[cx]}</a>`);

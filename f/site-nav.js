@@ -14,9 +14,27 @@
 
   const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
   const slot = document.querySelector('[data-site-nav]'); if (!slot) return;
+  // focused mode (checkout, Ahmed 2026-11-17: "focused, built from the site header"): the same bar, logo, language and
+  // account buttons, with a back link in place of Menu and no search. <div data-site-nav data-focused data-back="…">
+  const FOCUS = slot.hasAttribute('data-focused') ? { href: slot.dataset.back || 'index.html', label: slot.dataset.backLabel || 'Back' } : null;
   slot.outerHTML = HTML;
 
   const hdr = document.getElementById('siteHeader'), root = document.getElementById('cardNav');
+  if (FOCUS){
+    hdr.classList.add('cn-focused');
+    const a = document.createElement('a'); a.className = 'card-nav__back'; a.id = 'backLink'; a.href = FOCUS.href;
+    a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M19 12H5m6-7-7 7 7 7"/></svg><span>' + FOCUS.label + '</span>';
+    root.querySelector('.card-nav__bar').prepend(a);
+    const fs = document.createElement('style');
+    fs.textContent = '.cn-focused .card-nav__menu,.cn-focused .card-nav__search,.cn-focused .card-nav__content{display:none}'
+      + '.card-nav__back{font:var(--ts-body-default-bold);display:inline-flex;align-items:center;gap:10px;justify-self:start;height:calc(var(--cn-bar) - var(--cn-inset) * 2);padding:0 16px;color:var(--cn-text);text-decoration:none;text-transform:var(--type-case-label);transition:background-color .2s ease}'
+      + '.card-nav__back:hover{background:var(--cn-hover)}.card-nav__back svg{width:20px;height:20px;flex:none}html[dir=rtl] .card-nav__back svg{transform:scaleX(-1)}'
+      + '.cn-focused .card-nav[data-narrow] .card-nav__bar{grid-template-columns:auto auto 1fr}.cn-focused .card-nav[data-narrow] .card-nav__back{grid-column:1;grid-row:1;padding:0 12px}.cn-focused .card-nav[data-narrow] .card-nav__back span{display:none}'
+      + '.cn-focused .card-nav[data-narrow] .card-nav__logo{grid-column:2;grid-row:1}.cn-focused .card-nav[data-narrow] .card-nav__end{grid-column:3;grid-row:1}'
+      // phones move the account button into the menu; focused mode has no menu, so it stays in the bar
+      + '.cn-focused .card-nav[data-narrow] .card-nav__bar .card-nav__cta,.cn-focused .card-nav[data-narrow] .card-nav__bar .sfa-acct{display:inline-flex}';
+    document.head.appendChild(fs);
+  }
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---- CardNav: spring-driven open/close, cards rise in with a stagger (same as the homepage)

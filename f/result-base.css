@@ -2,7 +2,7 @@
 :root{color-scheme:light;--nav:90px;--g:clamp(16px,6.67vw,96px);--ease:cubic-bezier(.22,1,.36,1);--max:1440px;--tk-hole:var(--color-bg-secondary)}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-default);-webkit-font-smoothing:antialiased}
+body{background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-default);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--color-brand);outline-offset:3px}
 .msi{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 24}
@@ -55,6 +55,6 @@ h1{margin:0;font:var(--ts-display-m);text-transform:var(--type-case-display)}
 .tips li::before{content:"";width:8px;height:8px;margin:8px 8px 0;background:var(--color-brand)}
 /* failed / checking: one narrow column */
 .cf.solo .cf-grid{grid-template-columns:minmax(0,560px)}
-@media (max-width:960px){.cf-grid{grid-template-columns:minmax(0,1fr)}.cf-side{position:static}}
-@media (max-width:560px){.cf-head{grid-template-columns:minmax(0,1fr)}.mark{grid-row:auto;width:56px;height:56px}}
+@media (max-width:1023px){.cf-grid{grid-template-columns:minmax(0,1fr)}.cf-side{position:static}}
+@media (max-width:639px){.cf-head{grid-template-columns:minmax(0,1fr)}.mark{grid-row:auto;width:56px;height:56px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

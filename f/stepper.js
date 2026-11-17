@@ -21,7 +21,7 @@
 .sfa-steps .now .n{background:#09090B;border-color:#09090B;color:#fff}
 .sfa-steps .t{overflow:hidden;text-overflow:ellipsis}
 .sfa-steps .bar{display:none}
-@media (max-width:760px){
+@media (max-width:1023px){
   .sfa-steps ol{padding-block:12px}
   .sfa-steps li:not(.now) .t{display:none}
   .sfa-steps li:not(:last-child)::after{margin:0 8px}
@@ -34,8 +34,8 @@ html[lang=ar] .sfa-steps .s{font-family:"Tajawal",sans-serif;letter-spacing:0}
 /* inside a page's top bar: no band of its own, just the steps */
 .sfa-steps--bar{background:none;border:0}
 .sfa-steps--bar ol{max-width:620px;padding:0}
-@media (max-width:1100px){.sfa-steps--bar li:not(.now) .t{display:none}}
-@media (max-width:760px){.sfa-steps--bar ol{max-width:none;padding:6px 0}.sfa-steps--bar li:not(.now) .t{display:none}}`;
+@media (max-width:1023px){.sfa-steps--bar li:not(.now) .t{display:none}}
+@media (max-width:1023px){.sfa-steps--bar ol{max-width:none;padding:6px 0}.sfa-steps--bar li:not(.now) .t{display:none}}`;
   const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
   const t = (s, p) => window.SFA_PREFS ? window.SFA_PREFS.t(s, p) : s.replace(/\{(\w+)\}/g, (m, k) => (p || {})[k] ?? m);
 

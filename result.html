@@ -74,8 +74,8 @@ body[data-state=paid] .cf-grid{display:block}
 .o-rec small{font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
 .o-rec b{font:var(--ts-body-l-bold)}
 .o-rec span{font:var(--ts-body-s);color:var(--color-content-secondary)}
-@media (max-width:1100px){.o-wrap{grid-template-columns:minmax(0,1fr)}.o-side{position:static}}
-@media (max-width:760px){.o-facts{grid-template-columns:minmax(0,1fr);gap:16px}.o-refrow{grid-template-columns:40px minmax(0,1fr) auto!important}.o-refrow dd bdi{font:var(--ts-body-default-bold)}.o-copy{width:40px;padding:0;justify-content:center}.o-copy span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.o-in h1{font:var(--ts-title-screen)}.o-row{grid-template-columns:40px minmax(0,1fr) auto;gap:12px;padding:14px 16px}.o-ic{width:40px;height:40px}.o-pan,[dir=rtl] .o-pan{padding:0 16px 16px}}
+@media (max-width:1023px){.o-wrap{grid-template-columns:minmax(0,1fr)}.o-side{position:static}}
+@media (max-width:1023px){.o-facts{grid-template-columns:minmax(0,1fr);gap:16px}.o-refrow{grid-template-columns:40px minmax(0,1fr) auto!important}.o-refrow dd bdi{font:var(--ts-body-default-bold)}.o-copy{width:40px;padding:0;justify-content:center}.o-copy span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.o-in h1{font:var(--ts-title-screen)}.o-row{grid-template-columns:40px minmax(0,1fr) auto;gap:12px;padding:14px 16px}.o-ic{width:40px;height:40px}.o-pan,[dir=rtl] .o-pan{padding:0 16px 16px}}
 </style>
 <link rel="stylesheet" href="f/ui.css">
 </head>
@@ -123,8 +123,11 @@ window.RESULT_VIEW = {
     const row = (tag, attrs, ic, b, s, lead) => `<${tag} class="o-row${lead ? ' lead' : ''}" ${attrs}><span class="o-ic">${ic}</span><span><b>${b}</b><small>${s}</small></span><span class="o-go" aria-hidden="true"></span></${tag}>`;
     return `<div class="o-wrap"><div class="o-main">
       <section class="o-hero">
-        <div class="o-in"><span class="o-ok">${ICON.check}${t('Booking confirmed')}</span><h1>${t("You're all set")}<span id="oName"></span></h1>
-          <p>${t(m.b.free ? (m.game ? (many ? 'Each player’s first open game is free.' : 'Your first open game is free.') : 'Your free trial is booked.') : "You're booked and paid.")}</p>
+        <div class="o-in"><h1>${t("You're all set")}<span id="oName"></span></h1>
+          ${(() => { // the same status box as the booking page (Ahmed, 2026-11-17: one "you're all set"): what's done + the countdown
+            const s0 = m.days[0], [y, mo, d] = s0.date.split('-').map(Number), dd = Math.round((new Date(y, mo - 1, d) - new Date().setHours(0, 0, 0, 0)) / 864e5);
+            const when = dd <= 0 ? t('Today') : dd === 1 ? t('Tomorrow') : t('In {n} days', { n: dd });
+            return `<div class="st-box"><span class="st-box-ic">${ICON.check}</span><div><b>${t(m.b.free ? (m.game ? (many ? 'Each player’s first open game is free.' : 'Your first open game is free.') : 'Your free trial is booked.') : 'Booked and paid')}</b><p><b>${when}</b> · ${m.date(s0, 'short')} · ${m.time(s0)}</p></div></div>`; })()}
           <p class="o-mail" id="oMail" hidden></p>
           <dl class="o-facts">${facts.map(([ic, k, v, sub]) => `<div><span class="o-fic">${ic}</span><dt>${k}</dt><dd>${v}${sub ? `<small>${sub}</small>` : ''}</dd></div>`).join('')}
             <div class="o-refrow"><span class="o-fic">${HASH}</span><dt>${t('Booking ref')}</dt><dd><bdi id="oRef">${esc(m.b.cartId)}</bdi></dd>

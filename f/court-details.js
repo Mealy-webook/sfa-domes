@@ -173,7 +173,7 @@
     for (let d = 1; d <= days; d++) cells.push(new Date(view.getFullYear(), view.getMonth(), d));
     while (cells.length % 7) cells.push(null);
     // weekday initials in the page language (4 Jan 2026 is a Sunday)
-    let html = [0, 1, 2, 3, 4, 5, 6].map(i => `<span class="cal-dow" aria-hidden="true">${new Date(2026, 0, 4 + i).toLocaleDateString(P.locale, { weekday: P.lang === 'ar' ? 'long' : 'short' }).slice(0, P.lang === 'ar' ? 99 : 2)}</span>`).join('');
+    let html = [0, 1, 2, 3, 4, 5, 6].map(i => `<span class="cal-dow" aria-hidden="true">${new Date(2026, 0, 4 + i).toLocaleDateString(P.locale, { weekday: P.lang === 'ar' ? (innerWidth < 640 ? 'narrow' : 'long') : 'short' }).slice(0, P.lang === 'ar' ? 99 : 2)}</span>`).join('');
     for (let w = 0; w < cells.length; w += 7){
       const week = cells.slice(w, w + 7);
       html += week.map(date => date ? dayCell(date, dk(date)) : '<span aria-hidden="true"></span>').join('');

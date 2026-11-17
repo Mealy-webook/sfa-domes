@@ -85,20 +85,41 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
 .slot:disabled b{text-decoration:line-through}
 .none{margin:0;padding:16px;font:var(--ts-body-s);color:var(--color-content-tertiary)}
 .note{margin:0;font:var(--ts-body-s);color:var(--color-content-secondary)}
-/* the summary bar: shows once a time is picked */
-.bar{position:sticky;bottom:0;z-index:20;margin-top:32px;border-top:1px solid var(--color-border-primary);background:var(--color-bg-primary);box-shadow:0 -8px 24px rgba(9,9,11,.06)}
+/* the month calendar, matching court details' (f/court-details.css .cal-*) */
+.lcal{padding:clamp(16px,2vw,24px);border:1px solid var(--color-border-primary);background:var(--color-bg-primary)}
+.lcal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.lcal-month{margin:0;font:var(--ts-body-default-bold);text-transform:var(--type-case-label)}
+.lcal-nav{display:flex;gap:8px}
+.lcal-arrow{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);cursor:pointer}
+.lcal-arrow svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
+[dir=rtl] .lcal-arrow svg{scale:-1 1}
+.lcal-arrow:disabled{opacity:.4;cursor:default}
+.lcal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.lcal-dow{padding-bottom:4px;text-align:center;font:var(--ts-body-default-bold);color:var(--color-content-tertiary)}
+.lcal-day{position:relative;height:clamp(44px,5.4vw,60px);display:grid;place-items:center;padding:0;border:1px solid transparent;background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-l-bold);cursor:pointer}
+.lcal-day:hover:not(:disabled){border-color:var(--color-content-tertiary)}
+.lcal-day:disabled{background:transparent;color:var(--color-content-disabled);cursor:default}
+.lcal-day.today::after{content:"";position:absolute;inset-inline-start:50%;bottom:6px;width:14px;height:2px;margin-inline-start:-7px;background:currentColor}
+.lcal-day.active{border:2px solid var(--color-content-primary)}
+.lcal-key{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:16px;font:var(--ts-body-s);color:var(--color-content-tertiary)}
+.lcal-key i{display:inline-block;width:12px;height:12px;margin-inline-end:8px;vertical-align:-1px}
+.lcal-key .k-act{border:2px solid var(--color-content-primary)}
+.lcal-key .k-off{background:var(--color-bg-secondary)}
+/* the summary bar: shows once a time is picked; the same bar as court details and programs (fixed, blurred, 88px) */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;border-top:1px solid var(--color-border-primary);background:color-mix(in srgb,var(--color-bg-primary) 96%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+body.has-picks main{padding-bottom:120px}
 .bar[hidden]{display:none}
-.bar-in{max-width:var(--max);margin:0 auto;padding:16px var(--g) calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:24px}
+.bar-in{max-width:var(--max);min-height:88px;margin:0 auto;padding:16px var(--g) calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;gap:16px}
 .bar-t{flex:1;min-width:0;display:grid;gap:4px}
-.bar-t strong{font:var(--ts-body-l-bold)}
-.bar-t span{font:var(--ts-body-s);color:var(--color-content-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-t small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.bar-t strong{font:var(--ts-display-xs)}
 .bar-p{font:var(--ts-title-body)}
-.go{display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 24px;border:0;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-body-l-bold);cursor:pointer}
+.go{flex:none;display:inline-flex;align-items:center;gap:8px;height:56px;padding:0 24px;border:0;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-body-l-bold);cursor:pointer}
 .go:hover{background:var(--color-bg-accent-hover)}
 .go svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:square}
 [dir=rtl] .go svg{scale:-1 1}
-@media (max-width:1080px){.week{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:760px){.week{grid-template-columns:minmax(0,1fr)}.wd{grid-template-columns:96px minmax(0,1fr);min-height:0;align-items:start}.wd > :not(b){grid-column:2}.courts{grid-template-columns:minmax(0,1fr)}
+@media (max-width:1023px){.week{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:1023px){.week{grid-template-columns:minmax(0,1fr)}.wd{grid-template-columns:96px minmax(0,1fr);min-height:0;align-items:start}.wd > :not(b){grid-column:2}.courts{grid-template-columns:minmax(0,1fr)}
   .bar-in{flex-wrap:wrap;gap:12px 16px}.bar-t{flex-basis:calc(100% - 120px)}.go{width:100%;justify-content:center}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -124,9 +145,22 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
   const pad = n => String(n).padStart(2, '0'), dk = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
   const today = new Date(); today.setHours(0, 0, 0, 0);
-  // the next 14 days that have ladies hours
-  const DAYS = []; for (let i = 0; DAYS.length < 14 && i < SCH.RANGE_DAYS; i++){ const d = new Date(today); d.setDate(d.getDate() + i); if (window.SFA_LADIES_WINDOWS(dk(d)).length) DAYS.push(dk(d)); }
-  const st = { sport: SPORTS.includes(q.get('sport')) ? q.get('sport') : 'basketball', day: DAYS[0], court: null, picks: new Set(), taken: {}, note: '' };
+  // every day with ladies hours in the booking range, on the same month calendar as court details (Ahmed, 2026-11-17)
+  const DAYS = []; for (let i = 0; i < SCH.RANGE_DAYS; i++){ const d = new Date(today); d.setDate(d.getDate() + i); if (window.SFA_LADIES_WINDOWS(dk(d)).length) DAYS.push(dk(d)); }
+  const st = { sport: SPORTS.includes(q.get('sport')) ? q.get('sport') : 'basketball', day: DAYS[0], court: null, picks: new Set(), taken: {}, note: '', view: null };
+  const monthOf = k => { const d = toDate(k); return new Date(d.getFullYear(), d.getMonth(), 1); };
+  const firstView = monthOf(DAYS[0]), lastView = monthOf(DAYS[DAYS.length - 1]);
+  // the month calendar: days with a free ladies time open, the rest greyed
+  function cal(){
+    const v = st.view || (st.view = monthOf(st.day)), lead = v.getDay(), n = new Date(v.getFullYear(), v.getMonth() + 1, 0).getDate(), cells = Array(lead).fill(null);
+    for (let d = 1; d <= n; d++) cells.push(new Date(v.getFullYear(), v.getMonth(), d));
+    while (cells.length % 7) cells.push(null);
+    const dow = [0, 1, 2, 3, 4, 5, 6].map(i => `<span class="lcal-dow" aria-hidden="true">${new Date(2026, 0, 4 + i).toLocaleDateString(P.locale, { weekday: P.lang === 'ar' ? (innerWidth < 640 ? 'narrow' : 'long') : 'short' }).slice(0, P.lang === 'ar' ? 99 : 2)}</span>`).join('');
+    return `<div class="lcal"><div class="lcal-head"><p class="lcal-month" aria-live="polite">${P.date(v, 'month')}</p><div class="lcal-nav"><button type="button" class="lcal-arrow" data-cal="-1" aria-label="${t('Previous month')}"${v <= firstView ? ' disabled' : ''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button><button type="button" class="lcal-arrow" data-cal="1" aria-label="${t('Next month')}"${v >= lastView ? ' disabled' : ''}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button></div></div>
+      <div class="lcal-grid" role="group" aria-label="${t('Day')}">${dow}${cells.map(date => { if (!date) return '<span aria-hidden="true"></span>'; const k = dk(date), open = DAYS.includes(k) && freeCount(k) > 0;
+        return `<button type="button" class="lcal-day${k === dk(today) ? ' today' : ''}${k === st.day ? ' active' : ''}" data-day="${k}" aria-pressed="${k === st.day}"${open ? '' : ' disabled'} aria-label="${P.date(date, 'long')}">${date.getDate()}</button>`; }).join('')}</div>
+      <div class="lcal-key" aria-hidden="true"><span><i class="k-act"></i>${t('Your day')}</span><span><i class="k-off"></i>${t('No ladies hours or full')}</span></div></div>`;
+  }
   const icon = sp => sp.img ? `<span class="mi" style="--m:url(${sp.img})"></span>` : `<span class="msi">${sp.icon}</span>`;
   const range = (a, b) => `<bdi>${P.time(a)}</bdi> – <bdi>${P.time(b)}</bdi>`;
   const now = () => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
@@ -149,8 +183,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
   function booking(){
     const sp = S[st.sport], k = st.day;
     return `<div class="step"><h3><i>1</i>${t('Sport')}</h3><div class="chips" role="group" aria-label="${t('Sport')}">${SPORTS.map(x => `<button type="button" class="chip" data-sport="${x}" aria-pressed="${x === st.sport}"><span aria-hidden="true">${icon(S[x])}</span>${esc(t(S[x].name))}</button>`).join('')}</div></div>
-      <div class="step"><h3><i>2</i>${t('Day')}</h3><div class="days" role="group" aria-label="${t('Day')}">${DAYS.map(d => { const n = freeCount(d);
-        return `<button type="button" class="day" data-day="${d}" aria-pressed="${d === k}"${n ? '' : ' disabled'}><small>${P.date(toDate(d), { weekday: 'short' })}</small><b>${P.date(toDate(d), { day: 'numeric', month: 'short' })}</b><span>${n ? (n === 1 ? t('1 time free') : t('{n} times free', { n })) : t('Full')}</span></button>`; }).join('')}</div></div>
+      <div class="step"><h3><i>2</i>${t('Day')}</h3>${cal()}</div>
       <div class="step"><h3><i>3</i>${t('Court and time')}</h3>${st.note ? `<p class="note" role="status">${esc(st.note)}</p>` : ''}
         <div class="courts">${L.courts.map(ci => { const c = sp.courts[ci], list = slotsOf(ci, k);
           return `<section class="ct" aria-labelledby="ct${ci}"><div class="ct-h"><img src="${window.SFA_COURT_IMG(st.sport, c)}" alt=""><div><strong id="ct${ci}">${esc(t(c[0]))}</strong><small>${[c[1], c[3]].filter(Boolean).map(v => esc(t(v))).join(' · ')} · ${P.money(c[5])} ${t('/ hr')}</small></div></div>
@@ -159,10 +192,11 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
   }
   function bar(){
     const b = document.getElementById('bar'); if (!b) return;
-    const n = st.picks.size; b.hidden = !n; if (!n) return;
+    const n = st.picks.size; b.hidden = !n; if (!n){ document.body.classList.remove('has-picks'); return; }
     const c = S[st.sport].courts[st.court], list = [...st.picks].sort((x, y) => x - y);
-    b.querySelector('.bar-t').innerHTML = `<strong>${esc(t(S[st.sport].name))} · ${esc(t(c[0]))}</strong><span>${P.date(toDate(st.day), 'full')} · ${list.map(s => P.time(s)).join(', ')}</span>`;
-    b.querySelector('.bar-p').innerHTML = P.money(price(st.court) * n);
+    b.querySelector('.bar-t').innerHTML = `<small>${esc(t(S[st.sport].name))} · ${esc(t(c[0]))} · ${P.date(toDate(st.day), 'short')} · ${list.map(s => P.time(s)).join(', ')}</small><strong>${P.money(price(st.court) * n)}</strong>`;
+    b.querySelector('#go').innerHTML = `${t('Book · {total}', { total: P.money(price(st.court) * n) })}`;
+    document.body.classList.toggle('has-picks', !!n);
   }
   function paint(focus){
     document.title = `${t('Ladies hours')} · SFA Domes`;
@@ -174,7 +208,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
       ${SHOW_WEEK ? `<section class="sec" aria-labelledby="wk"><div class="head"><h2 id="wk">${t('Every week')}</h2><span>${t('Courts 1 and 2')}</span></div>${week()}
         <p class="where">${t('All indoor multipurpose sports: basketball, volleyball, badminton, tennis, netball, futsal, handball, GFX and table tennis.')}</p></section>` : ''}
       <section class="sec" id="book" aria-labelledby="bk"><div class="head"><h2 id="bk">${t('Book a court')}</h2><span>${t('1.5 hrs per booking')}</span></div><div id="bookIn">${booking()}</div></section>
-      <div class="bar" id="bar" hidden><div class="bar-in"><div class="bar-t"></div><span class="bar-p"></span><button type="button" class="go" id="go">${t('Continue')}${ARROW}</button></div></div>`;
+      <div class="bar" id="bar" hidden><div class="bar-in"><div class="bar-t"></div><button type="button" class="go" id="go"></button></div></div>`;
     bar(); if (focus) root.querySelector(focus)?.focus({ preventScroll: true });
   }
   const repaint = focus => { document.getElementById('bookIn').innerHTML = booking(); bar(); if (focus) root.querySelector(focus)?.focus({ preventScroll: true }); };
@@ -182,6 +216,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
     const b = e.target.closest('button'); if (!b || b.disabled) return;
     if (b.dataset.sport){ st.sport = b.dataset.sport; st.picks.clear(); st.court = null; st.note = ''; history.replaceState(null, '', `?sport=${st.sport}`); await loadTaken(); repaint(`[data-sport="${st.sport}"]`); }
     else if (b.dataset.day){ st.day = b.dataset.day; st.picks.clear(); st.court = null; st.note = ''; repaint(`[data-day="${st.day}"]`); }
+    else if (b.dataset.cal){ const v = st.view; st.view = new Date(v.getFullYear(), v.getMonth() + +b.dataset.cal, 1); repaint(`[data-cal="${b.dataset.cal}"]`); }
     else if (b.dataset.s){ const ci = +b.dataset.ct, s = +b.dataset.s;
       // one court per booking: a time on the other court starts again there
       if (st.court !== null && st.court !== ci){ st.picks.clear(); st.note = t('Switched to {court}. One booking is for one court.', { court: t(S[st.sport].courts[ci][0]) }); } else st.note = '';
@@ -196,7 +231,10 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
   // back from checkout: the picks come back
   try { const o = JSON.parse(sessionStorage.getItem('sfaOrder') || 'null'); if (o && o.ladies && SPORTS.includes(o.sport) && DAYS.includes(o.days[0].date)){ st.sport = o.sport; st.day = o.days[0].date; st.court = o.court; o.days[0].starts.forEach(s => st.picks.add(s)); } } catch (e) {}
   paint();
-  loadTaken().then(() => repaint());
+  // open on the first day that still has a free time (today is often full or over)
+  const firstOpen = () => { if (!st.picks.size && !freeCount(st.day)){ const k = DAYS.find(d => freeCount(d) > 0); if (k){ st.day = k; st.view = monthOf(k); } } };
+  firstOpen();
+  loadTaken().then(() => { firstOpen(); repaint(); });
   addEventListener('sfa:prefs', () => paint());
 })();
 </script>

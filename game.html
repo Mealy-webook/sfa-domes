@@ -79,7 +79,7 @@
 .rows .lines{display:grid;gap:6px}
 .rows .lines span{display:flex;justify-content:space-between;gap:12px}
 .rows .lines s{margin-inline-end:6px;color:var(--color-content-secondary)}
-@media (max-width:560px){.gf{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:639px){.gf{grid-template-columns:minmax(0,1fr)}}
 .rows{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px;margin:0;font:var(--ts-body-s)}
 .rows dt{color:var(--color-content-tertiary)}
 .rows dd{margin:0;text-align:end;overflow-wrap:anywhere}
@@ -111,7 +111,7 @@
 .how b{display:block;color:var(--color-content-primary);font:var(--ts-body-l-bold)}
 .gm-empty{display:grid;justify-items:start;gap:16px;padding:40px;border:1px dashed var(--color-border-secondary);background:var(--color-bg-primary)}
 .gm-empty p{margin:0;font:var(--ts-body-l);color:var(--color-content-secondary)}
-@media (max-width:760px){.gm-photo{height:auto;aspect-ratio:4/3;margin-inline:calc(var(--g,16px) * -1)}.jn{padding:20px}}
+@media (max-width:1023px){.gm-photo{height:auto;aspect-ratio:4/3;margin-inline:calc(var(--g,16px) * -1)}.jn{padding:20px}}
 </style>
 <link rel="stylesheet" href="f/ui.css">
 </head>
@@ -245,9 +245,8 @@
         ${B ? `<dt class="of-line">${OF.line({ id: B.o.id, save: B.save })[0]}</dt><dd class="of-line">${OF.line({ id: B.o.id, save: B.save })[1]}</dd>` : ''}
         <span class="sep" aria-hidden="true"></span><dt class="total">${t('Total')}</dt><dd class="total">${n && price ? P.money(price) : n ? t('Free') : '—'}</dd></dl>
       ${who.some(x => x.free) ? `<p class="note">${t('Each person’s first open game is free.')}</p>` : ''}
-      <label class="terms${err && !agreed ? ' bad' : ''}" id="jTerms"><input type="checkbox" id="jT"${agreed ? ' checked' : ''}><span class="box" aria-hidden="true">${TICK}</span><span>${t('I agree to the terms and conditions and the health waiver.')}</span></label>
       <p class="err" role="alert">${esc(err)}</p>
-      <button type="button" class="book" id="jGo"${!n || busy ? ' disabled' : ''}><span>${busy ? t('One moment…') : !n ? t("Choose who's playing") : price ? t('Pay {total}', { total: P.money(price) }) : t('Join for free')}</span>${n && !busy ? ARROW : ''}</button></div>`;
+      <button type="button" class="book" id="jGo"${!n || busy ? ' disabled' : ''}><span>${busy ? t('One moment…') : !n ? t("Choose who's playing") : t('Continue')}</span>${n && !busy ? ARROW : ''}</button></div>`;
   }
 
   function paint(){
@@ -316,24 +315,16 @@
     const rg = e.target.closest('[data-rmg]'); if (rg){ guests.splice(+rg.dataset.rmg, 1); err = ''; paint(); refocus('[data-gopen]'); requote(); return; }
     if (e.target.closest('[data-signin]')) return window.SFA_AUTH.open({ view: 'login', reason: t('Sign in to join a game.') });
     if (!e.target.closest('#jGo')) return;
-    agreed = root.querySelector('#jT').checked;
-    if (!agreed){ err = t('Accept the terms to continue'); paint(); root.querySelector('#jT').focus(); return; }
     const players = [...picks.map(k => ({ ref: k === 'me' ? 'me' : k.slice(6) })), ...guests.map(x => ({ guest: { name: x.name, phone: x.phone } }))];
     if (!players.length) return;
-    busy = true; err = ''; paint();
-    try {
-      const r = await fetch('/api/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order: { kind: 'game', game: g.id, players }, terms: true, waiver: true }) });
-      const d = await r.json().catch(() => ({}));
-      if (r.status === 401){ busy = false; paint(); return window.SFA_AUTH.open({ view: 'login', reason: t('Sign in to join a game.') }); }
-      if (!r.ok || !d.redirect_url){ busy = false; err = t(d.error || 'Could not start the payment. Try again.'); await load(); return; }
-      location.href = d.redirect_url;
-    } catch (x) { busy = false; err = t('Could not reach the server. Try again.'); paint(); }
+    // terms, the summary, offers and Pay are on the checkout page, the same as courts and programs (Ahmed, 2026-11-17)
+    try { sessionStorage.setItem('sfaOrder', JSON.stringify({ kind: 'game', game: g.id, players })); } catch (x) {}
+    location.href = 'checkout.html';
   });
   // the guest's mobile is typed as 5X XXX XXXX
   root.addEventListener('input', e => { if (e.target.id === 'gfP'){ const v = e.target.value.replace(/\D/g, '').replace(/^0/, '').slice(0, 9); e.target.value = fmtPhone(v); }
     if (gForm && (e.target.id === 'gfP' || e.target.id === 'gfN')){ gForm[e.target.id === 'gfN' ? 'name' : 'phone'] = e.target.value; e.target.closest('.bad')?.classList.remove('bad'); } });
   root.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.target.id === 'gfN' || e.target.id === 'gfP')){ e.preventDefault(); root.querySelector('[data-gadd]')?.click(); } });
-  root.addEventListener('change', e => { if (e.target.id === 'jT'){ agreed = e.target.checked; if (agreed) err = ''; root.querySelector('#jTerms').classList.remove('bad'); } });
 
   async function load(){
     me = await window.SFA_AUTH.me();

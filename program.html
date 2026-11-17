@@ -34,7 +34,7 @@
 .pj-plan .pj-pr.free{font:var(--ts-body-l-bold)}
 .pj-plan .pj-was{font:var(--ts-body-s);color:var(--color-content-tertiary);text-decoration:line-through}
 .pj-tag{position:absolute;top:-11px;inset-inline-end:14px;padding:2px 8px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-caption-1-bold)}
-@media (max-width:760px){.pj-plans{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:1023px){.pj-plans{grid-template-columns:minmax(0,1fr)}}
 
 /* start days: only the days a plan can start on (the next 3 training days), one row of equal tiles; the open day's
    times fold out under the row, its pointer under that tile */
@@ -72,7 +72,7 @@
 .gal-all:hover{background:var(--color-content-primary);color:var(--neutral-0)}
 .gal-all svg{width:16px;height:16px;fill:currentColor}
 .gal-count{display:none}
-@media (max-width:760px){
+@media (max-width:1023px){
   .gal{display:flex;gap:0;height:auto;aspect-ratio:4/3;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
   .gal::-webkit-scrollbar{display:none}
   .gal button.ph{flex:0 0 100%;scroll-snap-align:start}
@@ -98,10 +98,10 @@
 .lb-thumbs button{flex:none;width:88px;aspect-ratio:4/3;padding:0;border:2px solid transparent;background:none;opacity:.55;cursor:pointer}
 .lb-thumbs button[aria-current=true]{border-color:var(--color-brand);opacity:1}
 .lb-thumbs img{display:block;width:100%;height:100%;object-fit:cover}
-@media (max-width:760px){.lb-stage img{max-width:100%}.lb-nav{display:none}.lb-thumbs button{width:64px}}
+@media (max-width:1023px){.lb-stage img{max-width:100%}.lb-nav{display:none}.lb-thumbs button{width:64px}}
 .side-sub{margin:8px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
 
-@media (max-width:760px){
+@media (max-width:1023px){
 }
 </style>
 <link rel="stylesheet" href="f/ui.css">
@@ -139,7 +139,11 @@
             </div>
             <p class="step-note" id="dayNote"></p>
             <div class="panel cal">
-              <div class="cal-grid" id="calGrid" data-days="3" role="group" aria-labelledby="dayTitle"></div>
+              <div class="cal-head">
+                <p class="cal-month" id="calMonth" aria-live="polite"></p>
+                <div class="cal-nav"><button class="arrow" id="calPrev" type="button" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg></button><button class="arrow" id="calNext" type="button" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></button></div>
+              </div>
+              <div class="cal-grid" id="calGrid" data-groups="none" role="group" aria-labelledby="dayTitle"></div>
               <div class="cal-key" aria-hidden="true"><span><i class="k-pick"></i>Your start day</span><span><i class="k-act"></i>Open day</span></div>
             </div>
           </section>
@@ -282,22 +286,36 @@
       return `<button ${on}><span class="pj-tag">${tag}</span><span class="pj-dot"></span><strong>${t(PLAN_NAMES[k])}</strong><span class="pj-pr">${save ? `<s class="pj-was"><span class="sr-only">${t('Was')} </span>${P.money(full)}</s>` : ''}${P.money(price(k))}</span><small>${t(weeks > 10 && P.lang === 'ar' ? '{n} sessions over {w} weeks (11+)' : '{n} sessions over {w} weeks', { n: perMonth * PLANS[k].months, w: weeks })}</small></button>`;
     }).join('');
   }
+  // the same month calendar as court details (Ahmed, 2026-11-17: one day picker); only the next 3 training days open
   const dayCell = date => {
     const k = key(date), cls = ['day', k === key(new Date()) ? 'today' : '', k === st.start ? 'picked' : '', k === active ? 'active' : ''].join(' ');
-    return `<button class="${cls}" type="button" data-k="${k}"${dayOpen(date) ? '' : ' disabled'} aria-expanded="${k === active}" aria-label="${P.date(date, 'long')}"><small>${P.date(date, { weekday: 'short' })}</small><b>${date.getDate()}</b><small>${P.date(date, { month: 'short' })}</small></button>`;
+    return `<button class="${cls}" type="button" data-k="${k}"${dayOpen(date) ? '' : ' disabled'} aria-expanded="${k === active}" aria-label="${P.date(date, 'long')}">${date.getDate()}</button>`;
   };
   function slotsHTML(k){
     const btn = s => { const full = left(s) <= 0, on = st.start === k && st.time === s.time;
       return `<button class="slot${full ? ' booked' : ''}" type="button" data-s="${s.time}" aria-pressed="${on}"${full ? ` disabled aria-label="${fmtSlot(s.time)} · ${t('Full')}"` : ''}>${fmtSlot(s.time)}</button>`; };
     return `<div class="slots-head"><p class="slots-day">${P.date(toDate(k), 'long')}</p></div><div class="slots">${p.slots.map(btn).join('')}</div>`;
   }
+  const monthOf = k => { const d = toDate(k); return new Date(d.getFullYear(), d.getMonth(), 1); };
+  const firstView = monthOf(startDays[0]), lastView = monthOf(startDays[startDays.length - 1]);
+  let calView = monthOf(active || startDays[0]);
   function renderCal(animate){
-    const days = startDays.map(toDate);
-    let html = days.map(dayCell).join('');
-    const at = days.findIndex(d => key(d) === active);
-    if (at > -1) html += `<div class="cal-times${animate ? ' open' : ''}" id="calTimes" role="region" aria-label="${t('Times for {date}', { date: P.date(days[at], 'long') })}" style="--col:${at}">${slotsHTML(active)}</div>`;
+    $('calMonth').textContent = P.date(calView, 'month');
+    $('calPrev').disabled = calView <= firstView; $('calNext').disabled = calView >= lastView;
+    const lead = calView.getDay(), n = new Date(calView.getFullYear(), calView.getMonth() + 1, 0).getDate(), cells = Array(lead).fill(null);
+    for (let d = 1; d <= n; d++) cells.push(new Date(calView.getFullYear(), calView.getMonth(), d));
+    while (cells.length % 7) cells.push(null);
+    let html = [0, 1, 2, 3, 4, 5, 6].map(i => `<span class="cal-dow" aria-hidden="true">${new Date(2026, 0, 4 + i).toLocaleDateString(P.locale, { weekday: P.lang === 'ar' ? (innerWidth < 640 ? 'narrow' : 'long') : 'short' }).slice(0, P.lang === 'ar' ? 99 : 2)}</span>`).join('');
+    for (let w = 0; w < cells.length; w += 7){
+      const week = cells.slice(w, w + 7);
+      html += week.map(date => date ? dayCell(date) : '<span aria-hidden="true"></span>').join('');
+      const open = week.find(date => date && key(date) === active);
+      if (open) html += `<div class="cal-times${animate ? ' open' : ''}" id="calTimes" role="region" aria-label="${t('Times for {date}', { date: P.date(open, 'long') })}" style="--col:${open.getDay()}">${slotsHTML(active)}</div>`;
+    }
     $('calGrid').innerHTML = html;
   }
+  $('calPrev').addEventListener('click', () => { calView = new Date(calView.getFullYear(), calView.getMonth() - 1, 1); renderCal(false); });
+  $('calNext').addEventListener('click', () => { calView = new Date(calView.getFullYear(), calView.getMonth() + 1, 1); renderCal(false); });
   // the bottom bar works like the court page's: before a pick it shows the price and jumps to the calendar; once a day
   // and time are picked it shows them and books (on desktop it only appears then)
   function goBar(){
