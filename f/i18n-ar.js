@@ -325,6 +325,13 @@ window.SFA_AR = {
   "Add each guest's full name.": 'أضف الاسم الكامل لكل ضيف.', "Enter each guest's Saudi mobile number, starting with 5.": 'أدخل رقم جوال سعودي لكل ضيف يبدأ بـ 5.',
   'Only 1 spot is left in this game.': 'بقي مكان واحد فقط في هذه المباراة.',
   // My bookings (live, 2026-11-17)
+  // program cards (2026-11-17)
+  '{n} program cards · each QR works on training days': '{n} بطاقات برنامج · يعمل كل رمز QR في أيام التدريب', 'Your program card · its QR works on training days': 'بطاقة برنامجك · يعمل رمز QR في أيام التدريب',
+  '{m} min each': '{m} دقيقة لكل جلسة', 'Program ended': 'انتهى البرنامج', 'No sessions left': 'لا جلسات متبقية', 'Program card': 'بطاقة البرنامج', 'Program cards': 'بطاقات البرنامج', 'Balance': 'الرصيد',
+  'sessions left': 'جلسات متبقية', 'Used': 'المستخدم', 'Ended': 'انتهى', 'Valid until': 'صالحة حتى', 'Check-ins': 'تسجيلات الحضور', 'No check-ins yet': 'لا تسجيلات حضور بعد', 'Simulate check-in': 'محاكاة تسجيل الحضور',
+  'Checked in today': 'سُجّل الحضور اليوم', 'card': 'بطاقة', 'cards': 'بطاقات', 'Filter cards by person': 'تصفية البطاقات حسب الشخص',
+  'One card per participant: show its QR code at reception on training days. Each check-in uses one session from the balance.': 'بطاقة لكل مشارك: اعرض رمز QR في الاستقبال في أيام التدريب. كل تسجيل حضور يخصم جلسة من الرصيد.',
+  '{name} checked in · {n} sessions left': 'سُجّل حضور {name} · بقيت {n} جلسات', 'The card works on training days only.': 'تعمل البطاقة في أيام التدريب فقط.', 'Already checked in today.': 'سُجّل الحضور اليوم بالفعل.', 'No sessions left on this card.': 'لا جلسات متبقية في هذه البطاقة.',
   'Renewal · 20% off': 'تجديد · خصم 20%', '1 game · 1.5 hr': 'مباراة واحدة · 1.5 ساعة', '1 day': 'يوم واحد', 'A confirmation email was sent to {email}': 'أُرسل بريد التأكيد إلى {email}', 'Booking ref copied': 'نُسخ رقم الحجز',
   'My bookings': 'حجوزاتي', 'Open booking': 'فتح الحجز', 'ticket': 'تذكرة', 'tickets': 'تذاكر', 'QR ready': 'رمز QR جاهز', 'Show ticket': 'عرض التذكرة', 'Filter tickets by person': 'تصفية التذاكر حسب الشخص',
   'This booking was cancelled.': 'أُلغي هذا الحجز.', 'No upcoming tickets in this booking.': 'لا تذاكر قادمة في هذا الحجز.', 'Tickets': 'التذاكر',

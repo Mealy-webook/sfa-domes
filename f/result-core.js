@@ -73,7 +73,8 @@
         when: first.date === last.date ? date(first) : `${P.date(T.toDate(first.date), 'short')} – ${P.date(T.toDate(last.date), 'short')}`,
         game, ladies: !!b.order.ladies, days, pattern, coach: slot ? T.tx(slot.coach) : '', early: prog ? 15 : 10,
         place: t('SFA Domes Dammam'),
-        acts: { tickets: 'profile.html#tickets', ics: T.ics(b), icsName: T.icsName(b), dir: T.DIRECTIONS,
+        acts: { tickets: 'profile.html#tickets/' + encodeURIComponent(b.cartId),   // straight to this booking in My bookings
+          ics: T.ics(b), icsName: T.icsName(b), dir: T.DIRECTIONS,
           more: prog ? (b.order.plan === 'trial' ? { href: `program.html?p=${encodeURIComponent(b.order.program)}#book`, label: t('Subscribe for a month') } : { href: 'programs.html', label: t('Explore training programs') })
             : game ? { href: 'matches.html', label: t('Find another game') } : b.order.ladies ? { href: `ladies-hours.html?sport=${encodeURIComponent(b.order.sport)}#book`, label: t('Book more ladies hours') }
             : { href: `courts.html?sport=${encodeURIComponent(b.order.sport)}`, label: t('Book another court') } },

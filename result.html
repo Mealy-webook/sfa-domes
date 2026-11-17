@@ -128,7 +128,7 @@ window.RESULT_VIEW = {
             <div class="o-refrow"><span class="o-fic">${HASH}</span><dt>${t('Booking ref')}</dt><dd><bdi id="oRef">${esc(m.b.cartId)}</bdi></dd>
               <button type="button" class="o-copy" id="oCopy" aria-label="${t('Copy booking ref')}">${COPY}<span>${t('Copy')}</span></button></div></dl></div></section>
       <ul class="o-list">
-        <li>${row('a', `href="${acts.tickets}"`, ICON.qr, t('View my tickets'), t(tickets > 1 ? '{n} tickets · each QR works on its session day' : 'Your QR code works on the session day', { n: tickets }), 1)}</li>
+        <li>${row('a', `href="${acts.tickets}"`, ICON.qr, t('View my tickets'), (m.prog ? (many ? t('{n} program cards · each QR works on training days', { n: T.people(m.b).length }) : t('Your program card · its QR works on training days')) : t(tickets > 1 ? '{n} tickets · each QR works on its session day' : 'Your QR code works on the session day', { n: tickets })), 1)}</li>
         <li>${row('a', `href="${acts.ics}" download="${acts.icsName}"`, ICON.cal, t('Add to calendar'), t(n > 1 ? 'All {n} sessions in one file' : 'Get a reminder before you play', { n }))}</li>
         ${n > 1 ? `<li>${row('button', 'type="button" aria-expanded="false" aria-controls="oDates"', LIST, t('See your sessions'), m.pattern || t('{n} sessions', { n }))}
           <div class="o-pan" id="oDates" hidden><ol class="o-dates">${m.days.map(s => `<li><small>${t('Session {n}', { n: s.n })}${s.date === todayK ? ' · ' + t('Today') : ''}</small><b>${m.date(s, 'short')}</b><span>${m.time(s)}</span></li>`).join('')}</ol></div></li>` : ''}

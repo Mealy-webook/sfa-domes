@@ -506,6 +506,20 @@ async function authRoute(req, res, url){
       x.sent = Date.now(); save();
       return send(res, 200, { ok: true, to: x.phone, at: x.sent });
     }
+    case '/api/auth/check-in': {
+      // a program card is scanned at reception (Ahmed, 2026-11-17): one QR per participant, one session off its balance per
+      // check-in, on training days only. Prototype: the demo's "Simulate check-in" stands in for the reception scanner.
+      const u = currentUser(req); if (!u) return send(res, 401, { error: 'Please sign in.' });
+      const b = bookings[body.cart]; if (!b || b.userId !== u.id || b.status !== 'paid' || b.order.kind !== 'program') return send(res, 404, { error: 'Booking not found.' });
+      const x = (b.order.participants || [])[+body.i]; if (!x || x.cancelled) return send(res, 404, { error: 'That person is no longer on this booking.' });
+      const today = dk(new Date());
+      if (!b.order.days.some(d => d.date === today)) return send(res, 400, { error: 'The card works on training days only.' });
+      x.checkins = x.checkins || [];
+      if (x.checkins.some(k => k.date === today)) return send(res, 400, { error: 'Already checked in today.' });
+      const total = b.order.days.length; if (x.checkins.length >= total) return send(res, 400, { error: 'No sessions left on this card.' });
+      x.checkins.push({ date: today, at: Date.now() }); save();
+      return send(res, 200, { ok: true, left: total - x.checkins.length, total, name: x.name });
+    }
     // saved courts ("sport|court" keys) on the signed-in account
     case '/api/auth/favorites': {
       const u = currentUser(req); if (!u) return send(res, 401, { error: 'Please sign in.' });

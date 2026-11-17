@@ -33,6 +33,7 @@
       (o.days || []).forEach(d => d.date = shiftKey(d.date, off));
       if (o.start) o.start = shiftKey(o.start, off);
       if (o.kind === 'game' && o.game){ const p = o.game.split('|'); if (p[2]) { p[2] = shiftKey(p[2], off); o.game = p.join('|'); } }
+      (o.participants || []).forEach(x => (x.checkins || []).forEach(k => { k.date = shiftKey(k.date, off); k.at += ms; }));   // program card check-ins move with the dates
       ['createdAt', 'paidAt'].forEach(k => { if (b[k]) b[k] += ms; }); if (o.waiver && o.waiver.at) o.waiver.at += ms;
       db.bookings[id] = b;
     }
@@ -374,6 +375,20 @@
         if (!x || x.cancelled || x.type !== 'guest' || !x.phone) return [400, { error: "Only a guest's ticket can be sent to their mobile." }];
         x.sent = Date.now(); 
         return [200, { ok: true, to: x.phone, at: x.sent }];
+      }
+      case '/api/auth/check-in': {
+        // a program card is scanned at reception (Ahmed, 2026-11-17): one QR per participant, one session off its balance per
+        // check-in, on training days only. Prototype: the demo's "Simulate check-in" stands in for the reception scanner.
+        const u = currentUser(); if (!u) return [401, { error: 'Please sign in.' }];
+        const b = db.bookings[body.cart]; if (!b || b.userId !== u.id || b.status !== 'paid' || b.order.kind !== 'program') return [404, { error: 'Booking not found.' }];
+        const x = (b.order.participants || [])[+body.i]; if (!x || x.cancelled) return [404, { error: 'That person is no longer on this booking.' }];
+        const today = dk(new Date());
+        if (!b.order.days.some(d => d.date === today)) return [400, { error: 'The card works on training days only.' }];
+        x.checkins = x.checkins || [];
+        if (x.checkins.some(k => k.date === today)) return [400, { error: 'Already checked in today.' }];
+        const total = b.order.days.length; if (x.checkins.length >= total) return [400, { error: 'No sessions left on this card.' }];
+        x.checkins.push({ date: today, at: Date.now() }); 
+        return [200, { ok: true, left: total - x.checkins.length, total, name: x.name }];
       }
       case '/api/booked': return [200, [...takenSlots(q.get('sport'), +q.get('court'))]];
       case '/api/games': {

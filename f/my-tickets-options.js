@@ -104,7 +104,7 @@
     return `${back ? `<a class="pg-back" href="#tickets" data-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>${c.t(backLabel || 'My tickets')}</a>` : ''}
       <section class="pg-head mt-head"><span class="pg-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
         <div class="pg-in"><p class="eye">${m.kindTxt}</p><h2>${c.esc(m.D.label)}</h2>
-          <p class="meta">${m.dateLine}</p><p class="meta">${m.count} · ${c.esc(m.names)} · <bdi>${c.esc(b.cartId)}</bdi></p>
+          ${noDetails ? '' : `<p class="meta">${m.dateLine}</p><p class="meta">${m.count} · ${c.esc(m.names)} · <bdi>${c.esc(b.cartId)}</bdi></p>`}
           ${chip(c, m)}
           <div class="dlg-acts">${m.up ? `<a class="ghost sm" href="${c.T.ics(b)}" download="${c.T.icsName(b)}">${c.CAL}${c.t('Add to calendar')}</a><a class="ghost sm" href="${c.T.DIRECTIONS}" target="_blank" rel="noopener">${c.PIN}${c.t('Get directions')}</a>` : ''}${noDetails ? '' : `<a class="ghost sm" href="result.html?cart=${encodeURIComponent(b.cartId)}">${c.t('Booking details')}</a>`}${m.up && c.T.cancelInfo(b).can ? `<button type="button" class="ghost sm danger" data-cancel="${c.esc(b.cartId)}">${c.t(m.n > 1 ? 'Cancel whole booking' : 'Cancel booking')}</button>` : ''}</div>
           ${m.up ? c.cancelLine(b) : ''}${m.cancelled ? `<p class="cx-note off">${c.t('Cancelled')}${b.refund ? ' · ' + c.t('{amount} refunded', { amount: c.P.money(b.refund) }) : ''}</p>` : ''}</div></section>`;
@@ -365,19 +365,19 @@
     const bf = o.bookingFor || { type: 'me' }, many = m.active.length > 1, players = !!o.participants;
     const who = players ? m.active.map(p => esc(p.name)).join(', ') : bf.type === 'other' ? `${esc(bf.name)} · <bdi>${esc(bf.phone || '')}</bdi>` : bf.type === 'child' ? esc(bf.name) : esc(c.user ? c.user.name : t('Myself'));
     const w = o.waiver, by = w && w.guardian ? `${esc(w.acceptedBy)} · ${t('Guardian')}` : '';
+    const info = prog ? [IC.tag, t('Program'), t('{n} sessions', { n }) + (prog.minutes ? ` · ${t('{m} min each', { m: prog.minutes })}` : ''), coach ? esc(coach) : '']
+      : m.kind === 'game' ? [IC.tag, t('Game'), esc(t(o.format || '')), o.who ? t({ adults: 'Adults (18+)', kids: 'Kids 6–17' }[o.who]) : ''] : null;
     const facts = [
-      [IC.tag, t('What'), prog ? esc(m.D.label) : esc(t(sport ? sport.name : '')) + (m.kind === 'game' ? ` · ${t('Open game')}` : o.ladies ? ` · ${t('Ladies hours')}` : ''),
-        prog ? t('{n} sessions', { n }) + (coach ? ` · ${esc(coach)}` : '') : m.kind === 'game' ? `${t(o.format || '')}${o.who ? ' · ' + t({ adults: 'Adults (18+)', kids: 'Kids 6–17' }[o.who]) : ''}` : n > 1 ? t('{n} sessions', { n }) : ''],
       [IC.cal, t('When'), when[0], when[1]],
-      [IC.pin, t('Where'), t('SFA Domes Dammam'), prog ? '' : esc(t(court ? court[0] : ''))],
-      [IC.user, t(prog ? (many ? 'Participants' : 'Participant') : players ? (many ? 'Players' : 'Player') : 'Booked for'), who, by ? t('Booked by {name}', { name: by }) : '']
-    ];
+      [IC.pin, t('Where'), t('SFA Domes Dammam'), prog ? '' : esc(t(court ? court[0] : '')) + (o.ladies ? ` · ${t('Ladies hours')}` : '')],
+      [IC.user, t(prog ? (many ? 'Participants' : 'Participant') : players ? (many ? 'Players' : 'Player') : 'Booked for'), who, by ? t('Booked by {name}', { name: by }) : ''],
+      info
+    ].filter(Boolean);
     const K = window.SFA_PROGRAM_KIT, kit = o.kit;
     const plan = prog ? t({ trial: 'Free trial', month: 'One month', month2: 'Two months', month3: 'Three months' }[o.plan] || 'One month') + (o.renewOf ? ' · ' + t('Renewal · 20% off') : '') : '';
     const sessionsTxt = prog ? t('{n} × {m} min', { n, m: prog.minutes }) : m.kind === 'game' ? t('1 game · 1.5 hr') : `${nDays === 1 ? t('1 day') : t('{n} days', { n: nDays })} · ${t('{n} × 1.5 hr', { n })}`;
     const pay = [
       prog ? [t('Plan'), plan] : null,
-      [t('Sessions'), sessionsTxt],
       kit && K ? [T.tx(K.name), `× ${kit.qty}`] : null,
       b.paidAt && !b.free ? [t('Paid on'), P.date(new Date(b.paidAt), 'full')] : null,
       b.tranRef ? [t(b.test ? 'Test ref' : 'PayTabs ref'), `<bdi>${esc(b.tranRef)}</bdi>`] : null
@@ -391,7 +391,26 @@
         <div class="mt-pay-t"><dt>${t('Paid')}</dt><dd>${b.free || !b.amount ? t('Free of charge') : P.money(b.amount)}</dd></div>
         ${refunded ? `<div class="mt-pay-r"><dt>${t('Refunded')}</dt><dd>− ${P.money(refunded)}</dd></div>` : ''}</dl></aside></div></section>`;
   }
-  const tixCount = m => m.ses.length;
+
+  // ---- training program card (Ahmed, 2026-11-17): one card per participant with one QR code and a balance of sessions.
+  // A scan at reception (check-in) takes one session off; missed sessions stay until the program ends. The QR works on
+  // training days only. The demo has "Simulate check-in" in place of the reception scanner.
+  function programCard(c, m, p){
+    const b = m.b, x = (b.order.participants || [])[p.i] || {}, ck = x.checkins || [], total = m.days.length, left = Math.max(0, total - ck.length);
+    const now = Date.now(), todayK = dk(new Date()), today = m.days.find(s => s.date === todayK), next = m.days.find(s => s.endsAt > now), last = m.days[m.days.length - 1];
+    const ended = !next, inToday = ck.some(k => k.date === todayK), code = `${b.cartId}-C${p.i + 1}`;
+    const live = !m.cancelled && !ended && !!today && left > 0;
+    const lock = m.cancelled ? c.t('Cancelled') : ended ? c.t('Program ended') : left <= 0 ? c.t('No sessions left') : c.t('QR opens {date}', { date: c.P.date(c.T.toDate(next.date), { weekday: 'short', day: 'numeric', month: 'short' }) });
+    return `<article class="mt-pc${live ? '' : ' is-locked'}"><header class="mt-pc-h"><div><small>${c.t('Program card')}</small><b>${c.esc(p.name)}</b></div><span class="mt-pc-no"><bdi>${c.esc(code)}</bdi></span></header>
+      <div class="mt-pc-b"><div class="mt-pc-qr">${live ? `<div class="tk-qr" data-qr="${c.esc(code)}" role="img" aria-label="${c.t('QR code for {ref}', { ref: c.esc(code) })}"></div><small>${c.t('Show this at reception')}</small>` : `<div class="mt-pc-lock">${c.LOCK}<small>${lock}</small></div>`}</div>
+        <div class="mt-pc-bal"><small>${c.t('Balance')}</small><p><b>${left}</b><span>/ ${total} ${c.t('sessions left')}</span></p>
+          <div class="mt-pc-dots" aria-hidden="true">${Array.from({ length: total }, (_, i) => `<i class="${i < ck.length ? 'used' : ''}"></i>`).join('')}</div>
+          <dl><div><dt>${c.t('Used')}</dt><dd>${ck.length}</dd></div><div><dt>${ended ? c.t('Ended') : c.t('Next session')}</dt><dd>${next ? `${c.P.date(c.T.toDate(next.date), { weekday: 'short', day: 'numeric', month: 'short' })} · <bdi>${c.P.time(next.start)}</bdi>` : c.P.date(c.T.toDate(last.date), 'short')}</dd></div><div><dt>${c.t('Valid until')}</dt><dd>${c.P.date(c.T.toDate(last.date), 'short')}</dd></div></dl></div></div>
+      <footer class="mt-pc-f">${ck.length ? `<details class="mt-pc-ck"><summary>${c.t('Check-ins')} <b>${ck.length}</b></summary><ol>${ck.slice().reverse().map(k => `<li>${c.P.date(c.T.toDate(k.date), { weekday: 'short', day: 'numeric', month: 'short' })} · <bdi>${c.P.time(new Date(k.at).getHours() * 60 + new Date(k.at).getMinutes())}</bdi></li>`).join('')}</ol></details>` : `<small class="mt-pc-none">${c.t('No check-ins yet')}</small>`}
+        <div class="mt-pc-acts">${live && !inToday ? `<button type="button" class="mt-mini mt-accent" data-mt-checkin="${c.esc(b.cartId)}|${p.i}"><span>${c.t('Simulate check-in')}</span></button>` : live && inToday ? `<span class="mt-st mt-st--ok"><i></i>${c.t('Checked in today')}</span>` : ''}${personActs(c, m, p)}</div></footer></article>`;
+  }
+  const tixCount = m => m.kind === 'program' ? m.active.length : m.ses.length;   // a program counts cards, the rest tickets
+  const tixWord = (c, m, n) => m.kind === 'program' ? (n === 1 ? c.t('card') : c.t('cards')) : (n === 1 ? c.t('ticket') : c.t('tickets'));
   const BOOK = {
     list(c){
       st.who = 'all';
@@ -408,7 +427,7 @@
           <span class="mt-ph"><img src="${m.D.img}" alt="" loading="lazy" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
           <div class="mt-body"><p class="mt-eye">${m.kindTxt} · <bdi>${c.esc(m.b.cartId)}</bdi></p><strong>${c.esc(m.D.label)}</strong><p class="mt-meta">${m.dateLine}</p>
             <p class="mt-meta mt-who">${m.count} · ${c.esc(m.names)}</p>${chip(c, m)}</div>
-          <div class="mt-cta mt-bk-n"><span class="mt-tix">${QRI}<b>${tixCount(m)}</b><small>${tixCount(m) === 1 ? c.t('ticket') : c.t('tickets')}</small></span><span class="ghost sm mt-view">${c.t('Open booking')}${c.ARROW}</span></div></li>`).join('')}</ol>` : emptyTxt(c));
+          <div class="mt-cta mt-bk-n"><span class="mt-tix">${QRI}<b>${tixCount(m)}</b><small>${tixWord(c, m, tixCount(m))}</small></span><span class="ghost sm mt-view">${c.t('Open booking')}${c.ARROW}</span></div></li>`).join('')}</ol>` : emptyTxt(c));
     },
     view(c, m){
       const b = m.b, multi = !(m.people[0] && m.people[0].single) && m.active.length > 1, now = Date.now();
@@ -430,10 +449,14 @@
       const R = c.renewInfo(b);
       return head(c, m, true, 'My bookings', true) + details(c, m)
         + (R ? `<div class="pg-renew mt-renew"><div><b>${c.t('Renew for another month · 20% off')}</b><p>${c.t('Starts {date} at the same time, for the same participants.', { date: c.P.date(c.T.toDate(R.start), 'short') })}</p></div><button type="button" class="btn sm" data-renew="${c.esc(b.cartId)}">${c.t('Renew program')}</button></div>` : '')
-        + `<section class="mt-tix-sec"><div class="sec"><h2>${c.t('Tickets')}</h2><span>${list.length}</span></div>${chips}${pbar}
+        + (m.kind === 'program' ? (() => { const ps = P0 ? [P0] : m.active, chipsP = multi ? `<div class="types mt-tf" role="group" aria-label="${c.t('Filter cards by person')}"><button type="button" class="type" data-mt-tf="${c.esc(b.cartId)}|all" aria-pressed="${f === 'all'}">${c.t('Everyone')}</button>${m.active.map(p => `<button type="button" class="type" data-mt-tf="${c.esc(b.cartId)}|${p.i}" aria-pressed="${f === p.i}">${c.esc(p.you ? c.t('You') : p.name.split(' ')[0])}</button>`).join('')}</div>` : '';
+            return `<section class="mt-tix-sec"><div class="sec"><h2>${c.t(ps.length === 1 ? 'Program card' : 'Program cards')}</h2><span>${ps.length}</span></div>${chipsP}
+              <p class="pg-note">${c.t('One card per participant: show its QR code at reception on training days. Each check-in uses one session from the balance.')}</p>
+              <div class="mt-pcs">${ps.map(p => programCard(c, m, p)).join('')}</div>${gone.length ? `<ul class="mt-removed">${gone.map(p => `<li><b>${c.esc(p.name)}</b>${goneLine(c, m, p)}</li>`).join('')}</ul>` : ''}</section>`; })()
+        : `<section class="mt-tix-sec"><div class="sec"><h2>${c.t('Tickets')}</h2><span>${list.length}</span></div>${chips}${pbar}
           ${up.length ? `<ol class="mt-tks">${up.map(row).join('')}</ol>` : `<p class="meta">${c.t(m.cancelled ? 'This booking was cancelled.' : 'No upcoming tickets in this booking.')}</p>`}
           ${done.length ? `<details class="mt-hist"${up.length ? '' : ' open'}><summary>${c.t('Played')} <b>${done.length}</b></summary><ol class="mt-tks">${done.map(row).join('')}</ol></details>` : ''}
-          ${gone.length ? `<ul class="mt-removed">${gone.map(p => `<li><b>${c.esc(p.name)}</b>${goneLine(c, m, p)}</li>`).join('')}</ul>` : ''}</section>`;
+          ${gone.length ? `<ul class="mt-removed">${gone.map(p => `<li><b>${c.esc(p.name)}</b>${goneLine(c, m, p)}</li>`).join('')}</ul>` : ''}</section>`);
     }
   };
 
@@ -451,8 +474,10 @@
     },
     // returns true when it handled the click
     async click(v, e, c){
-      const el = e.target.closest('[data-mt-copy],[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
+      const el = e.target.closest('[data-mt-checkin],[data-mt-copy],[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
       const d = el.dataset;
+      if (d.mtCheckin){ const [cart, i] = d.mtCheckin.split('|'); el.disabled = true; const r = await c.post('/api/auth/check-in', { cart, i: +i }); await c.reload();
+        c.A.toast(r.ok ? c.t('{name} checked in · {n} sessions left', { name: String(r.d.name || '').split(' ')[0], n: r.d.left }) : c.t(r.d.error || 'Something went wrong. Try again.')); return true; }
       if (d.mtCopy){ try { await navigator.clipboard.writeText(d.mtCopy); } catch (x) {} c.A.toast(c.t('Booking ref copied')); return true; }
       if (d.mtKt){ st.kt = d.mtKt; c.paint(); c.root.querySelector(`[data-mt-kt="${d.mtKt}"]`)?.focus(); return true; }
       if (d.mtTf){ const [cart, k] = d.mtTf.split('|'); st.tf[cart] = k === 'all' ? 'all' : +k; c.paint(); c.root.querySelector(`[data-mt-tf="${CSS.escape(d.mtTf)}"]`)?.focus(); return true; }
