@@ -104,12 +104,12 @@ img{display:block}
 
   function paint(focus){
     const sport = S[key], courts = sport.courts, n = courts.length, name = esc(t(sport.name));
-    document.title = `${t(sport.name)} · ${t('Courts')} · SFA Domes`;
+    document.title = `${t('Sports courts')} · ${t(sport.name)} · SFA Domes`;   // the page title is Sports courts; the chips pick the sport (Ahmed, 2026-11-17)
     const sub = sport.area === 'field'
       ? t(key === 'rugby' ? 'Played on football fields F4 and F5 joined together.' : '5 indoor football fields: play 5-a-side, or book F4 and F5 together for 7-a-side.')
       : t('{n} indoor multipurpose courts. Pick one to book.', { n });
     root.innerHTML = `<section class="hero" aria-labelledby="sportName">
-        <div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true">${icon(sport)}</span>${t('SFA Domes Dammam')}</p><h1 id="sportName" class="name">${name}</h1><p class="sub">${sub}</p></div></section>
+        <div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true">${icon(sport)}</span>${t('SFA Domes Dammam')}</p><h1 id="sportName" class="name">${t('Sports courts')}</h1><p class="sub">${sub}</p></div></section>
       <section class="list" aria-labelledby="chooseH">
         <div class="flt"><div class="chips" role="group" aria-label="${t('Sport')}">${keys.map(k => `<button type="button" class="chip" data-sport="${k}" aria-pressed="${k === key}"><span aria-hidden="true">${icon(S[k])}</span>${esc(t(S[k].name))}<small>${S[k].courts.length}</small></button>`).join('')}</div>
           <div class="row2"><h2 id="chooseH">${t('Choose a court')}</h2><span class="count" aria-live="polite">${n === 1 ? t('1 court') : t('{n} courts', { n })}</span></div></div>
