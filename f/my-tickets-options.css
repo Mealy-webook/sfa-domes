@@ -322,3 +322,29 @@
   .mt-todo li{grid-template-columns:36px minmax(0,1fr)}
   .mt-todo li > button{grid-column:2;justify-self:start}
 }
+
+/* =====================================================================================================================
+   My bookings (live, 2026-11-17): booking cards with their ticket count; inside, every ticket with a person filter
+   ===================================================================================================================== */
+.mt-bk-n{align-items:flex-end;justify-content:space-between}
+.mt-tix{display:inline-flex;align-items:baseline;gap:6px;color:var(--color-content-secondary)}
+.mt-tix svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;align-self:center}
+.mt-tix b{font:var(--ts-title-section);color:var(--color-content-primary)}
+.mt-tix small{font:var(--ts-body-s)}
+.mt-tix-sec .sec{align-items:center}
+.mt-tf{margin:0 0 16px}
+.mt-tix-sec .mt-for{margin:0 0 16px}
+.mt-tks{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-border-primary)}
+.mt-tk{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--color-border-primary)}
+.mt-tk .day{padding:6px 0}
+.mt-tk-in strong{display:block;font:var(--ts-body-default-bold)}
+.mt-tk-in small{display:block;margin-top:2px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.mt-tk-e{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:12px}
+.mt-tk.is-done{opacity:.7}
+.mt-tix-sec .mt-hist{margin-top:24px}
+.mt-renew{margin:0 0 32px}
+@media (max-width:760px){
+  .mt-bk .mt-bk-n{flex-direction:row;align-items:center}
+  .mt-tk{grid-template-columns:52px minmax(0,1fr)}
+  .mt-tk-e{grid-column:2;justify-content:flex-start}
+}

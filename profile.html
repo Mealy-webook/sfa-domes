@@ -279,7 +279,9 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
   const TABS = ['tickets', 'people', 'account'];   // Saved courts removed at Ahmed's request (2026-11-11)
   let user = null, bookings = [], favs = [], people = [], seg = 'up', kind = 'all', who = 'all', pform = null, removing = null, aform = null;
   // My tickets options (2026-11-17): profile.html?v=a|b|c shows one of three redesigns (f/my-tickets-options.js); no ?v = live
-  const MTO = window.SFA_MT_OPTIONS, MTV = (new URLSearchParams(location.search).get('v') || '').toLowerCase(), MT = !!(MTO && MTO.has(MTV));
+  // My bookings (Ahmed, 2026-11-17) is the live tab: bookings, each a group of its tickets with a person filter inside.
+  // ?v=classic shows the previous My tickets; ?v=a|b|c|type|family|calendar|today the explored options.
+  const MTO = window.SFA_MT_OPTIONS, MTV = (new URLSearchParams(location.search).get('v') || 'bookings').toLowerCase(), MT = !!(MTO && MTO.has(MTV));
   const MT_CTX = () => ({ user, bookings, root, dlg, P, t, T, A, esc, ARROW, CAL, PIN, LOCK, renewInfo, cancelLine, askCancel, openTicket, paint, post, groupId,
     reload: async () => { const b = await fetch('/api/auth/bookings').then(x => x.json()).catch(() => ({})); bookings = b.bookings || bookings; paint(); } });
   const C = window.SFA_CHILD, LOCK = '<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>';
@@ -474,7 +476,7 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
     const since = user.since ? t('Member since {date}', { date: P.date(new Date(user.since), 'month') }) : '';
     root.innerHTML = `<section class="pf-head"><div class="in"><div class="who"><span class="av" aria-hidden="true">${esc(initials(user))}</span>
         <p class="eye">${t('My account')}</p><h1>${esc(user.name)}</h1><p class="meta">${esc(user.email)}${since ? ' · ' + since : ''}</p></div>
-        <div class="tabs" role="tablist" aria-label="${t('My account')}">${[['tickets', 'My tickets', nUp], ['people', 'My children', people.length], ['account', 'My profile']].map(([k, l, n]) =>
+        <div class="tabs" role="tablist" aria-label="${t('My account')}">${[['tickets', MT && MTV === 'bookings' ? 'My bookings' : 'My tickets', nUp], ['people', 'My children', people.length], ['account', 'My profile']].map(([k, l, n]) =>
           `<button type="button" class="tab" role="tab" id="tab-${k}" aria-controls="panel" aria-selected="${k === cur}" data-tab="${k}">${t(l)}${n !== undefined ? `<b>${n}</b>` : ''}</button>`).join('')}</div></div></section>
       <section class="in panel" id="panel" role="tabpanel" aria-labelledby="tab-${cur}">${cur === 'tickets' ? (MT ? MTO.render(MTV, MT_CTX()) : tickets()) : cur === 'people' ? children() : account()}</section>`;
     T.paintQR(root); A.paintFavs?.();

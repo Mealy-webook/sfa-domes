@@ -10,7 +10,7 @@
    C = rows grouped by when, and the booking opens as a ticket wallet with a person switcher (event apps).
    profile.html hands over its state and helpers through ctx (see MT_CTX there). */
 (() => {
-  const st = { seg: 'up', who: 'all', panel: null, pick: {}, open: {}, type: 'court', person: 'all', cal: null };
+  const st = { seg: 'up', who: 'all', panel: null, pick: {}, open: {}, type: 'court', person: 'all', cal: null, tf: {} };
   const KIND = { court: 'Court booking', game: 'Open game', program: 'Training program' };
   const dk = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const SEND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-6 16-3-7z"/></svg>';
@@ -99,9 +99,9 @@
       : `<div class="mt-qr mt-qr--lock">${c.LOCK}<small>${live === 'soon' ? c.t('QR unlocks on {date}', { date: c.P.date(c.T.toDate(s.date), 'short') }) : c.t('This session has ended')}</small></div>`;
   }
   // the booking's own header (A and C full page; B uses a shorter one)
-  function head(c, m, back){
+  function head(c, m, back, backLabel){
     const b = m.b;
-    return `${back ? `<a class="pg-back" href="#tickets" data-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>${c.t('My tickets')}</a>` : ''}
+    return `${back ? `<a class="pg-back" href="#tickets" data-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>${c.t(backLabel || 'My tickets')}</a>` : ''}
       <section class="pg-head mt-head"><span class="pg-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
         <div class="pg-in"><p class="eye">${m.kindTxt}</p><h2>${c.esc(m.D.label)}</h2>
           <p class="meta">${m.dateLine}</p><p class="meta">${m.count} · ${c.esc(m.names)} · <bdi>${c.esc(b.cartId)}</bdi></p>
@@ -336,7 +336,52 @@
     }
   };
 
-  const OPT = { a: A, b: B, c: C, type: { list: TYPE.list, view: A.view }, family: { list: FAMILY.list, view: A.view }, calendar: { list: CAL.list, view: A.view }, today: TODAY };
+
+  // =====================================================================================================================
+  // My bookings (Ahmed, 2026-11-17): "it should be my booking and the booking should be a group of tickets as I booked,
+  // inside it I can filter by user". The list is bookings; a booking opens to every ticket in it, filtered by person.
+  // =====================================================================================================================
+  const tixCount = m => m.ses.length;
+  const BOOK = {
+    list(c){
+      st.who = 'all';
+      const L = lists(c), segs = [['up', 'Upcoming', L.up.length], ['past', 'Past', L.past.length], ['off', 'Cancelled', L.off.length]], l = current(c);
+      return `<div class="mt-bar"><div class="seg" role="group" aria-label="${c.t('My bookings')}">${segs.map(([k, lb, n]) => `<button type="button" data-mt-seg="${k}" aria-pressed="${st.seg === k}">${c.t(lb)} (${n})</button>`).join('')}</div></div>`
+        + (l.length ? `<ol class="mt-cards mt-bk">${l.map((m, i) => `<li class="mt-card${m.up ? '' : ' is-off'}" style="--i:${i}">
+          <button type="button" class="mt-hit" data-mt-open="${c.esc(m.b.cartId)}" aria-label="${c.t('Open booking')}: ${c.esc(m.D.label)}"></button>
+          <span class="mt-ph"><img src="${m.D.img}" alt="" loading="lazy" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
+          <div class="mt-body"><p class="mt-eye">${m.kindTxt} · <bdi>${c.esc(m.b.cartId)}</bdi></p><strong>${c.esc(m.D.label)}</strong><p class="mt-meta">${m.dateLine}</p>
+            <p class="mt-meta mt-who">${m.count} · ${c.esc(m.names)}</p>${chip(c, m)}</div>
+          <div class="mt-cta mt-bk-n"><span class="mt-tix">${QRI}<b>${tixCount(m)}</b><small>${tixCount(m) === 1 ? c.t('ticket') : c.t('tickets')}</small></span><span class="ghost sm mt-view">${c.t('Open booking')}${c.ARROW}</span></div></li>`).join('')}</ol>` : emptyTxt(c));
+    },
+    view(c, m){
+      const b = m.b, multi = !(m.people[0] && m.people[0].single) && m.active.length > 1, now = Date.now();
+      let f = st.tf[b.cartId]; if (f === undefined || (f !== 'all' && !m.active.some(p => p.i === f))) f = st.tf[b.cartId] = 'all';
+      const P0 = f === 'all' ? null : m.people.find(p => p.i === f);
+      const list = (P0 ? m.ticketsOf(P0) : m.ses).slice().sort((x, y) => x.startAt - y.startAt || (x.pi || 0) - (y.pi || 0));
+      const up = list.filter(s => s.endsAt > now), done = list.filter(s => s.endsAt <= now);
+      const nameOf = s => { const p = m.people.find(x => x.i === s.pi); return p ? (p.you ? c.t('You') : p.name) : (m.people[0].you ? c.t('You') : m.people[0].name); };
+      const stat = s => m.cancelled ? `<span class="mt-st mt-st--off"><i></i>${c.t('Cancelled')}</span>` : s.endsAt <= now ? `<span class="mt-st mt-st--done"><i></i>${c.t('Played')}</span>`
+        : c.T.qrLive(s, b) === 'on' ? `<span class="mt-st mt-st--ok"><i></i>${c.t('QR ready')}</span>` : `<span class="mt-st mt-st--lock">${c.LOCK}${c.t('QR opens {date}', { date: c.P.date(c.T.toDate(s.date), { weekday: 'short', day: 'numeric', month: 'short' }) })}</span>`;
+      const row = s => { const d = c.T.toDate(s.date);
+        return `<li class="mt-tk${s.endsAt <= now ? ' is-done' : ''}"><span class="day" aria-hidden="true"><span>${c.P.date(d, { weekday: 'short' })}</span><b>${d.getDate()}</b><small>${c.P.date(d, { month: 'short' })}</small></span>
+          <div class="mt-tk-in"><strong>${multi && !P0 ? c.esc(nameOf(s)) : (s.of > 1 ? c.t('Session {i} of {n}', { i: s.n, n: s.of }) : c.esc(m.D.label))}</strong>
+            <small><bdi>${c.P.time(s.start)}</bdi> – <bdi>${c.P.time(s.end)}</bdi>${multi && !P0 && s.of > 1 ? ' · ' + c.t('Session {i} of {n}', { i: s.n, n: s.of }) : ''} · <bdi>${c.esc(s.id)}</bdi></small></div>
+          <div class="mt-tk-e">${stat(s)}${!m.cancelled ? `<button type="button" class="mt-mini" data-mt-ticket="${c.esc(s.id)}">${QRI}<span>${c.t('Show ticket')}</span></button>` : ''}</div></li>`; };
+      const chips = multi ? `<div class="types mt-tf" role="group" aria-label="${c.t('Filter tickets by person')}"><button type="button" class="type" data-mt-tf="${c.esc(b.cartId)}|all" aria-pressed="${f === 'all'}">${c.t('Everyone')}<b>${m.ses.length}</b></button>${m.active.map(p => `<button type="button" class="type" data-mt-tf="${c.esc(b.cartId)}|${p.i}" aria-pressed="${f === p.i}">${c.esc(p.you ? c.t('You') : p.name.split(' ')[0])}<b>${m.ticketsOf(p).length}</b></button>`).join('')}</div>` : '';
+      const pbar = P0 ? `<div class="mt-for"><div><b>${c.esc(P0.name)}</b><small>${role(c, m, P0)}${P0.free ? ` · <em>${c.t('First game free')}</em>` : ''}</small>${sentLine(c, P0)}</div><div class="mt-for-acts">${personActs(c, m, P0, true)}</div></div>` : '';
+      const gone = m.people.filter(p => p.gone && !p.single);
+      const R = c.renewInfo(b);
+      return head(c, m, true, 'My bookings')
+        + (R ? `<div class="pg-renew mt-renew"><div><b>${c.t('Renew for another month · 20% off')}</b><p>${c.t('Starts {date} at the same time, for the same participants.', { date: c.P.date(c.T.toDate(R.start), 'short') })}</p></div><button type="button" class="btn sm" data-renew="${c.esc(b.cartId)}">${c.t('Renew program')}</button></div>` : '')
+        + `<section class="mt-tix-sec"><div class="sec"><h2>${c.t('Tickets')}</h2><span>${list.length}</span></div>${chips}${pbar}
+          ${up.length ? `<ol class="mt-tks">${up.map(row).join('')}</ol>` : `<p class="meta">${c.t(m.cancelled ? 'This booking was cancelled.' : 'No upcoming tickets in this booking.')}</p>`}
+          ${done.length ? `<details class="mt-hist"${up.length ? '' : ' open'}><summary>${c.t('Played')} <b>${done.length}</b></summary><ol class="mt-tks">${done.map(row).join('')}</ol></details>` : ''}
+          ${gone.length ? `<ul class="mt-removed">${gone.map(p => `<li><b>${c.esc(p.name)}</b>${goneLine(c, m, p)}</li>`).join('')}</ul>` : ''}</section>`;
+    }
+  };
+
+  const OPT = { bookings: BOOK, a: A, b: B, c: C, type: { list: TYPE.list, view: A.view }, family: { list: FAMILY.list, view: A.view }, calendar: { list: CAL.list, view: A.view }, today: TODAY };
   const PANEL = { b: 1, today: 1 };
   // ---- the hooks profile.html calls
   window.SFA_MT_OPTIONS = {
@@ -350,8 +395,9 @@
     },
     // returns true when it handled the click
     async click(v, e, c){
-      const el = e.target.closest('[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
+      const el = e.target.closest('[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
       const d = el.dataset;
+      if (d.mtTf){ const [cart, k] = d.mtTf.split('|'); st.tf[cart] = k === 'all' ? 'all' : +k; c.paint(); c.root.querySelector(`[data-mt-tf="${CSS.escape(d.mtTf)}"]`)?.focus(); return true; }
       if (d.mtType){ st.type = d.mtType; c.paint(); c.root.querySelector(`[data-mt-type="${d.mtType}"]`)?.focus(); return true; }
       if (d.mtPerson){ st.person = d.mtPerson; c.paint(); c.root.querySelector(`.mt-fam-rail [data-mt-person="${CSS.escape(d.mtPerson)}"]`)?.focus(); return true; }
       if (d.mtCal !== undefined){ const n = +d.mtCal, now = new Date(); if (!n){ st.cal = { y: now.getFullYear(), m: now.getMonth(), day: dayK(now) }; } else { const x = new Date(st.cal.y, st.cal.m + n, 1); st.cal.y = x.getFullYear(); st.cal.m = x.getMonth(); } c.paint(); c.root.querySelector(`[data-mt-cal="${d.mtCal}"]`)?.focus(); return true; }

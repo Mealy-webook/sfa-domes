@@ -359,7 +359,7 @@ if (!document.querySelector('script[src$="f/dob-pick.js"]')){ const s = document
     await loadFavs();
     const r = anchor.getBoundingClientRect();
     pop = document.createElement('div'); pop.className = 'sfa-pop'; pop.setAttribute('role', 'menu');
-    pop.innerHTML = `<p><strong>${user.name.replace(/</g, '&lt;')}</strong><small>${user.email.replace(/</g, '&lt;')}</small></p><nav class="sfa-pop__links"><a role="menuitem" href="profile.html#tickets">${tr('My tickets')}</a><a role="menuitem" href="profile.html#account">${tr('My account')}</a></nav><button class="sfa-pop__out" type="button" role="menuitem" data-out>${tr('Sign out')}</button>`;
+    pop.innerHTML = `<p><strong>${user.name.replace(/</g, '&lt;')}</strong><small>${user.email.replace(/</g, '&lt;')}</small></p><nav class="sfa-pop__links"><a role="menuitem" href="profile.html#tickets">${tr('My bookings')}</a><a role="menuitem" href="profile.html#account">${tr('My account')}</a></nav><button class="sfa-pop__out" type="button" role="menuitem" data-out>${tr('Sign out')}</button>`;
     pop.dir = document.documentElement.dir;
     document.body.appendChild(pop);
     paintFavs();

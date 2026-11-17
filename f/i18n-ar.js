@@ -324,6 +324,9 @@ window.SFA_AR = {
   "Choose who's playing.": 'اختر من سيلعب.', 'Guests can join adult games only.': 'يمكن للضيوف الانضمام إلى مباريات البالغين فقط.',
   "Add each guest's full name.": 'أضف الاسم الكامل لكل ضيف.', "Enter each guest's Saudi mobile number, starting with 5.": 'أدخل رقم جوال سعودي لكل ضيف يبدأ بـ 5.',
   'Only 1 spot is left in this game.': 'بقي مكان واحد فقط في هذه المباراة.',
+  // My bookings (live, 2026-11-17)
+  'My bookings': 'حجوزاتي', 'Open booking': 'فتح الحجز', 'ticket': 'تذكرة', 'tickets': 'تذاكر', 'QR ready': 'رمز QR جاهز', 'Show ticket': 'عرض التذكرة', 'Filter tickets by person': 'تصفية التذاكر حسب الشخص',
+  'This booking was cancelled.': 'أُلغي هذا الحجز.', 'No upcoming tickets in this booking.': 'لا تذاكر قادمة في هذا الحجز.', 'Tickets': 'التذاكر',
   // My bookings restructures (2026-11-17)
   'Ticket sent': 'أُرسلت التذكرة', 'Nothing coming up here.': 'لا شيء قادم هنا.', 'Past and cancelled': 'السابقة والملغاة', 'For you': 'لك', 'Manage': 'إدارة', 'Guests': 'الضيوف',
   '1 upcoming session': 'جلسة قادمة واحدة', 'Nothing coming up.': 'لا شيء قادم.', '1 booking': 'حجز واحد', '{n} bookings': '{n} حجوزات', '{n} sessions left': 'بقيت {n} جلسات', 'Not sent yet': 'لم تُرسل بعد',
