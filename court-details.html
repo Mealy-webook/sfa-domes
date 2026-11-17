@@ -44,6 +44,7 @@
             <div class="legend" aria-hidden="true"><span><i></i>Free</span><span><i class="pk"></i>Picked</span><span><i class="bk"></i>Booked</span></div>
           </div>
           <p class="step-note">1.5-hour slots. Tap a day to open its times. Book as many days and slots as you like, up to 3 months ahead.</p>
+          <div id="offers"></div>
           <div class="panel cal">
             <div class="cal-head">
               <p class="cal-month" id="calMonth" aria-live="polite"></p>
@@ -130,7 +131,7 @@
       <aside class="kl-side" aria-label="Price">
         <div class="kl-card">
           <div class="hero-book">
-            <p class="hero-price"><small>From</small><b id="heroPrice"></b></p>
+            <p class="hero-price"><small>From</small><b id="heroPrice"></b></p><span id="heroOffer"></span>
             <div class="hero-actions"><span id="heroFav"></span><button class="share" id="shareBtn" type="button" aria-label="Share" title="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v9h14v-9"/></svg></button><button class="cta" type="button" data-book><span>Check availability</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></button></div>
           </div>
         </div>
@@ -168,7 +169,7 @@
 
 <script src="f/site-nav.js"></script>
 <script src="f/site-footer.js"></script>
-<script src="f/courts-data.js"></script>
+<script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
 <script src="f/auth.js"></script>

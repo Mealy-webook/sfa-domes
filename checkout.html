@@ -457,6 +457,7 @@ button.who-opt:disabled small{color:var(--danger)}
       <h2 class="ck-sum-h" id="revTitle">Booking summary</h2>
       <ul class="days" id="days"></ul>
       <div class="ck-sum">
+        <div id="ckOffers"></div>
         <div class="total"><small>Total</small><strong id="total"></strong></div>
         <p class="charge" id="charge" hidden></p>
       </div>
@@ -529,7 +530,7 @@ button.who-opt:disabled small{color:var(--danger)}
   <a class="btn" href="index.html?from=courts#sports">Choose a sport</a>
 </div>
 
-<script src="f/courts-data.js"></script>
+<script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
@@ -631,7 +632,9 @@ button.who-opt:disabled small{color:var(--danger)}
     // a renewal (from My tickets) is one more month at 20% off; everything else is the plan's own price
     const renewing = !!order.renew && order.plan === 'month';
     const planPrice = renewing ? window.SFA_RENEW_PRICE(p) : window.SFA_PROGRAM_PRICE(p, order.plan), planFull = renewing ? p.month : window.SFA_PROGRAM_FULL_PRICE(p, order.plan);
-    const total = () => heads() * planPrice + kitsOn().length * K.price;
+    // offers (f/offers-data.js): the best one for this many participants comes off the plan (not the kit); the server charges the same
+    const offerP = () => picked().length && planPrice && window.SFA_OFFER_UI ? window.SFA_OFFER_UI.best('program', { sport: p.sport, program: order.program }, picked().length, picked().length * planPrice) : null;
+    const total = () => { const o = offerP(); return Math.round((heads() * planPrice - (o ? o.save : 0) + kitsOn().length * K.price) * 100) / 100; };
     // the program's own terms open from "terms and conditions"
     $('doc-terms').innerHTML = `<ul>${window.SFA_PROGRAM_TERMS.map(x => `<li>${esc(tx(x))}</li>`).join('')}</ul>`;
     let payLabel = '';
@@ -654,7 +657,9 @@ button.who-opt:disabled small{color:var(--danger)}
       const k = kitsOn().length;
       $('days').innerHTML = `<li><b>${plan} · ${t('{n} sessions', { n })}</b><ul>${people}${save}</ul></li>`
         + (k ? `<li><b>${t('Add-ons')}</b><ul><li><span>× ${k} ${esc(tx(K.name))}</span><span class="slot-p">${money(K.price * k)}</span>${rm('kit', 'kit', `${k} × ${tx(K.name)}`)}</li></ul></li>` : '');
-      $('total').innerHTML = total() ? money(total()) : t('Free of charge');
+      const o = offerP();
+      $('ckOffers').innerHTML = planPrice && window.SFA_OFFER_UI ? window.SFA_OFFER_UI.block('program', { sport: p.sport, program: order.program }, picked().length, planPrice) : '';
+      $('total').innerHTML = total() ? (o ? `<s class="of-was">${money(total() + o.save)}</s> ` : '') + money(total()) : t('Free of charge');
       const sar = P.currency === 'SAR'; $('charge').hidden = sar || !total();
       if (!sar && total()) $('charge').innerHTML = t("You'll be charged {amount} in Saudi riyals.", { amount: `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${total().toLocaleString('en-US')}</span>` });
       payLabel = `<span>${total() ? t('Pay {total}', { total: money(total()) }) : t('Book free trial')}</span>${ARROW}`;
@@ -848,8 +853,11 @@ button.who-opt:disabled small{color:var(--danger)}
   // ---- review (the server re-checks and re-prices all of this)
   const [name, kind, surface, format, size, price] = court;
   const slotPrice = price * SLOT / 60;
-  let count = 0, total = 0;
-  const recount = () => { count = order.days.reduce((a, d) => a + d.starts.length, 0); total = slotPrice * count; };
+  let count = 0, total = 0, full = 0, offer = null;
+  // offers (f/offers-data.js): the best one for this many times comes off; the server charges the same
+  const recount = () => { count = order.days.reduce((a, d) => a + d.starts.length, 0); full = slotPrice * count;
+    offer = window.SFA_OFFER_UI ? window.SFA_OFFER_UI.best('court', { sport: order.sport, court: order.court }, count, full) : null;
+    total = offer ? Math.round((full - offer.save) * 100) / 100 : full; };
   recount();
   // a ladies-hours order (ladies-hours.html) goes back there, and only women and girls can be its players
   const LADIES = !!order.ladies, LADY_RULE = 'Ladies hours are for women and girls only.';
@@ -864,7 +872,8 @@ button.who-opt:disabled small{color:var(--danger)}
     // each time shows its own price and a remove (×); the last one left can't be removed, so checkout always has something to pay for
     const x = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
     $('days').innerHTML = order.days.map(d => `<li><b>${fmtDay(d.date)}</b><ul>${d.starts.map(s => `<li><span>${fmtSlot(s)}</span><span class="slot-p">${money(slotPrice)}</span>${count > 1 ? `<button class="rm-slot" type="button" data-date="${d.date}" data-s="${s}" aria-label="${t('Remove {slot}', { slot: `${fmtDay(d.date)} ${fmtSlot(s)}` })}" title="${t('Remove')}">${x}</button>` : ''}</li>`).join('')}</ul></li>`).join('');
-    $('total').innerHTML = money(total);
+    $('ckOffers').innerHTML = window.SFA_OFFER_UI ? window.SFA_OFFER_UI.block('court', { sport: order.sport, court: order.court }, count, slotPrice) : '';
+    $('total').innerHTML = (offer ? `<s class="of-was">${money(full)}</s> ` : '') + money(total);
     // prices may show in USD or AED; PayTabs always charges SAR, so say what will actually be charged
     const sar = P.currency === 'SAR';
     $('charge').hidden = sar;

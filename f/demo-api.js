@@ -231,6 +231,11 @@
       order: { kind: 'game', game: g.id, sport: g.sport, court: g.court, days: [{ date: g.date, starts: [g.start] }], who: g.who, format: g.format, spots: g.spots, price: g.price,
         firstFree: people.some(p => p.free), participants: people, bookingFor: { type: 'me' } } };
   }
+  const r2 = x => Math.round(x * 100) / 100;
+  function withOffer(kind, item, n, base, paid){
+    const B = W.SFA_OFFER_BEST ? W.SFA_OFFER_BEST(kind, item, n, base) : null;
+    return B ? { amount: r2(base - B.save), offer: W.SFA_OFFER_STAMP(B, base, paid, n) } : { amount: base, offer: null };
+  }
   const pub = b => { const { cartId, status, amount, order, tranRef, message, paidAt, createdAt, test, free, cancelledAt, refund } = b; return { cartId, status, amount, order, tranRef, message, paidAt, createdAt, test: !!test, free: !!free, cancelledAt, refund }; };
   const resets = new Map();
 
@@ -363,7 +368,8 @@
         const first = Math.min(...b.order.days.flatMap(d => d.starts.map(s => { const x = parse(d.date); x.setMinutes(s); return x.getTime(); })));
         if (first - Date.now() < 48 * 3600e3) return [400, { error: 'Free cancellation ends 48 hours before the first session.' }];
         const kits = b.order.kit ? b.order.kit.qty * W.SFA_PROGRAM_KIT.price : 0;
-        const share = !b.amount ? 0 : b.order.kind === 'game' ? (x.free ? 0 : (b.order.price ?? (W.SFA_GAME(b.order.game) || {}).price ?? 0)) : Math.round((b.amount - kits) / list.length * 100) / 100;
+        const os = W.SFA_OFFER_SHARE ? W.SFA_OFFER_SHARE(b, +body.i) : null;   // with an offer: re-priced without them
+        const share = os != null ? os : !b.amount ? 0 : b.order.kind === 'game' ? (x.free ? 0 : (b.order.price ?? (W.SFA_GAME(b.order.game) || {}).price ?? 0)) : Math.round((b.amount - kits) / list.length * 100) / 100;
         // demo: nothing is charged, so the refund is only recorded
         x.cancelled = { at: Date.now(), refund: share }; b.refund = (b.refund || 0) + share; 
         return [200, { ok: true, refund: share, name: x.name }];
@@ -399,10 +405,12 @@
         }
         return [200, out];
       }
+      // offers (f/offers-data.js, loaded by the booking pages): the same rules as server.js
       case '/api/games/quote': {
         const user = currentUser(); if (!user) return [401, { error: 'Please sign in to book.' }];
         upgrade(user); const gc = checkGameOrder(body.order, user); if (gc.error) return [gc.status || 400, { error: gc.error }];
-        return [200, { amount: gc.amount, people: gc.people.map(x => ({ type: x.type, ref: x.ref, name: x.name, phone: x.phone, free: x.free })) }];
+        const g = W.SFA_GAME(body.order.game), q = withOffer('game', { sport: g.sport, court: g.court }, gc.people.length, gc.amount, gc.people.filter(x => !x.free).length);
+        return [200, { amount: q.amount, base: gc.amount, offer: q.offer, people: gc.people.map(x => ({ type: x.type, ref: x.ref, name: x.name, phone: x.phone, free: x.free })) }];
       }
       case '/api/config': return [200, { mode: 'test', demo: true }];
       case '/api/checkout': {
@@ -414,16 +422,21 @@
         let amount;
         if (order && order.kind === 'game'){
           const gc = checkGameOrder(order, user); if (gc.error) return [gc.status || 400, { error: gc.error }];
-          order = gc.order; amount = gc.amount; order.waiver = { acceptedBy: user.name, at: Date.now(), for: gc.people.map(x => x.name), guardian: gc.people.some(x => x.type === 'child') };
+          order = gc.order; amount = gc.amount;
+          { const q = withOffer('game', { sport: order.sport, court: order.court }, gc.people.length, gc.amount, gc.people.filter(x => !x.free).length); if (q.offer){ amount = q.amount; order.offer = q.offer; } }
+          order.waiver = { acceptedBy: user.name, at: Date.now(), for: gc.people.map(x => x.name), guardian: gc.people.some(x => x.type === 'child') };
           if (!amount){ db.bookings[cartId] = { cartId, status: 'paid', createdAt: Date.now(), paidAt: Date.now(), amount: 0, order, payer, userId: user.id, free: true }; return [200, { redirect_url: `result.html?cart=${encodeURIComponent(cartId)}`, cartId }]; }
         } else if (order && order.kind === 'program'){
           const pc = checkProgramOrder(order, user); if (pc.error) return [pc.status || 400, { error: pc.error }];
           order = pc.order; amount = pc.amount;
+          { const kt = order.kit ? order.kit.qty * W.SFA_PROGRAM_KIT.price : 0, n = order.participants.length, q = withOffer('program', { sport: order.sport, program: order.program }, n, r2(pc.amount - kt), n); if (q.offer){ amount = r2(q.amount + kt); order.offer = q.offer; } }
           order.waiver = { acceptedBy: user.name, at: Date.now(), for: order.participants.map(x => x.name), guardian: order.participants.some(x => personKey(x) !== personKey(user)) };
           if (!amount){ db.bookings[cartId] = { cartId, status: 'paid', createdAt: Date.now(), paidAt: Date.now(), amount: 0, order, payer, userId: user.id, free: true }; return [200, { redirect_url: `result.html?cart=${encodeURIComponent(cartId)}`, cartId }]; }
         } else {
           const chk = checkOrder(order, user); if (chk.error) return [chk.status || 400, { error: chk.error }];
-          amount = chk.amount; order.waiver = { acceptedBy: user.name, at: Date.now(), for: [order.bookingFor.type === 'me' ? user.name : order.bookingFor.name], guardian: order.bookingFor.type === 'child' };
+          amount = chk.amount;
+          { const q = withOffer('court', { sport: order.sport, court: order.court }, chk.count, chk.amount, chk.count); if (q.offer){ amount = q.amount; order.offer = q.offer; } }
+          order.waiver = { acceptedBy: user.name, at: Date.now(), for: [order.bookingFor.type === 'me' ? user.name : order.bookingFor.name], guardian: order.bookingFor.type === 'child' };
         }
         db.bookings[cartId] = { cartId, status: 'pending', createdAt: Date.now(), amount, order, payer, userId: user.id, tranRef: 'TEST-' + hex(5).toUpperCase(), test: true };
         return [200, { redirect_url: `test-pay.html?cart=${encodeURIComponent(cartId)}`, cartId }];

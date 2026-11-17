@@ -54,7 +54,7 @@
     const canSend = p => !p.gone && p.type === 'guest' && !!p.phone && up;
     const ticketsOf = p => p.single ? ses : ses.filter(s => s.pi === p.i);
     const nextOf = p => { const l = ticketsOf(p); return l.find(s => s.endsAt > now) || l[l.length - 1]; };
-    const share = p => !b.amount ? 0 : kind === 'game' ? (p.free ? 0 : (b.order.price || 0)) : Math.round((b.amount - (b.order.kit ? b.order.kit.qty * (window.SFA_PROGRAM_KIT || { price: 0 }).price : 0)) / people.length * 100) / 100;
+    const share = p => window.SFA_OFFER_SHARE && b.order.offer ? window.SFA_OFFER_SHARE(b, p.i) : !b.amount ? 0 : kind === 'game' ? (p.free ? 0 : (b.order.price || 0)) : Math.round((b.amount - (b.order.kit ? b.order.kit.qty * (window.SFA_PROGRAM_KIT || { price: 0 }).price : 0)) / people.length * 100) / 100;
     const endAt = cancelled ? (b.cancelledAt || 0) : past ? last.endsAt : next.startAt;
     return { b, kind, ses, days, next, last, cancelled, up, past, D, people, active, n, names, count, status, when, dateLine, open, canRemove, canSend, ticketsOf, nextOf, share, endAt, kindTxt: t(KIND[kind] || kind) };
   }
@@ -683,8 +683,10 @@
     const plan = t({ trial: 'Free trial', month: 'One month', month2: 'Two months', month3: 'Three months' }[o.plan] || 'One month');
     if (b.free || !b.amount) L.push([esc(m.D.label), t('Free of charge')]);
     else if (m.kind === 'game') m.people.forEach(p => L.push([`${esc(p.you ? t('You') : p.name)}${p.free ? ` <em>${t('First game free')}</em>` : ''}`, p.free ? P.money(0) : P.money(o.price || 0)]));
-    else if (m.kind === 'program'){ m.people.forEach(p => L.push([`${plan} · ${esc(p.name)}${o.renewOf ? ` <em>${t('Renewal · 20% off')}</em>` : ''}`, P.money(m.share(p))])); if (kit && K) L.push([`${c.T.tx(K.name)} × ${kit.qty}`, P.money(kit.qty * K.price)]); }
-    else L.push([`${esc(m.D.label)} · ${t('{n} × 1.5 hr', { n: m.ses.length })}`, P.money(b.amount)]);
+    else if (m.kind === 'program'){ const f = o.offer, kt = kit && K ? kit.qty * K.price : 0, each = f && f.paid ? f.base / f.paid : (b.amount - kt) / Math.max(1, m.people.length);
+      m.people.forEach(p => L.push([`${plan} · ${esc(p.name)}${o.renewOf ? ` <em>${t('Renewal · 20% off')}</em>` : ''}`, P.money(Math.round(each * 100) / 100)])); if (kt) L.push([`${c.T.tx(K.name)} × ${kit.qty}`, P.money(kt)]); }
+    else L.push([`${esc(m.D.label)} · ${t('{n} × 1.5 hr', { n: m.ses.length })}`, P.money(o.offer ? o.offer.base : b.amount)]);
+    const OL = window.SFA_OFFER_UI && window.SFA_OFFER_UI.line(o.offer); if (OL) L.push([`<span class="of-line">${OL[0]}</span>`, `<span class="of-line">${OL[1]}</span>`]);
     const refunds = m.people.filter(p => p.gone && p.refund).map(p => [t('{name} removed', { name: esc(p.name) }), '− ' + P.money(p.refund)]);
     if (m.cancelled && b.refund) refunds.push([t('Booking cancelled'), '− ' + P.money(b.refund - m.people.reduce((a, p) => a + (p.gone ? p.refund || 0 : 0), 0))]);
     return `<div class="bv-rc"><dl class="bv-rc-l">${L.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
@@ -841,7 +843,7 @@
     const share = m.share(p), n = m.ticketsOf(p).length, dlg = c.dlg;
     dlg.innerHTML = `<div class="dlg-top"><h2 id="dlgH">${c.t('Remove {name}?', { name: c.esc(p.name.split(' ')[0]) })}</h2><button type="button" class="x" data-close aria-label="${c.t('Close')}">${RM}</button></div>
       <div class="dlg-body cx"><p><b>${c.esc(p.name)}</b> · ${c.esc(m.D.label)}</p>
-        <p>${n > 1 ? c.t('Their {n} tickets will be cancelled.', { n }) : c.t('Their ticket will be cancelled.')} ${c.t('Everyone else on the booking keeps their spot.')} ${share ? c.t('{amount} goes back to your card within 5 to 10 working days.', { amount: c.P.money(share) }) : ''} ${c.t('This can’t be undone.')}</p>
+        <p>${n > 1 ? c.t('Their {n} tickets will be cancelled.', { n }) : c.t('Their ticket will be cancelled.')} ${c.t('Everyone else on the booking keeps their spot.')} ${share ? c.t('{amount} goes back to your card within 5 to 10 working days.', { amount: c.P.money(share) }) : ''} ${(() => { const f = m.b.order.offer; return f && m.active.length - 1 < f.min ? c.t('The offer needs {n} or more people, so it no longer applies and the price is worked out again.', { n: f.min }) : ''; })()} ${c.t('This can’t be undone.')}</p>
         <p class="err" id="cxErr" role="alert"></p>
         <div class="dlg-acts"><button type="button" class="btn sm danger" data-mt-rm-yes="${c.esc(key)}">${share ? c.t('Remove and refund {amount}', { amount: c.P.money(share) }) : c.t('Remove {name}', { name: c.esc(p.name.split(' ')[0]) })}</button><button type="button" class="ghost sm" data-close>${c.t('Keep')}</button></div></div>`;
     dlg.dir = document.documentElement.dir; if (!dlg.open) dlg.showModal(); dlg.querySelector('[data-close].ghost')?.focus();

@@ -84,7 +84,7 @@ img{display:block}
 
 <script src="f/site-nav.js"></script>
 <script src="f/site-footer.js"></script>
-<script src="f/courts-data.js"></script>
+<script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
 <script src="f/auth.js"></script>
@@ -114,7 +114,7 @@ img{display:block}
         <div class="flt"><div class="chips" role="group" aria-label="${t('Sport')}">${keys.map(k => `<button type="button" class="chip" data-sport="${k}" aria-pressed="${k === key}"><span aria-hidden="true">${icon(S[k])}</span>${esc(t(S[k].name))}<small>${S[k].courts.length}</small></button>`).join('')}</div>
           <div class="row2"><h2 id="chooseH">${t('Choose a court')}</h2><span class="count" aria-live="polite">${n === 1 ? t('1 court') : t('{n} courts', { n })}</span></div></div>
         <div class="grid">${courts.map((c, i) => `<article class="tile" style="--i:${focus ? 0 : i}">
-          <div class="ph"><img src="${window.SFA_COURT_IMG(key, c)}" alt="" loading="lazy" style="${crop(i)}"><div class="tags">${c[3] ? `<span class="tag">${esc(t(c[3]))}</span>` : ''}${ladies(key, i) ? `<span class="tag w">${t('Ladies hours')}</span>` : ''}</div></div>
+          <div class="ph"><img src="${window.SFA_COURT_IMG(key, c)}" alt="" loading="lazy" style="${crop(i)}"><div class="tags">${c[3] ? `<span class="tag">${esc(t(c[3]))}</span>` : ''}${ladies(key, i) ? `<span class="tag w">${t('Ladies hours')}</span>` : ''}${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('court', { sport: key, court: i }) : ''}</div></div>
           <div class="bd"><p class="sp"><span aria-hidden="true">${icon(sport)}</span>${name} · ${esc(t(c[1]))}</p><h3 class="nm"><a class="lnk" href="${url(i)}" data-i="${i}" aria-label="${t('View court')}: ${esc(t(c[0]))}"></a>${esc(t(c[0]))}</h3>
             <p class="meta">${[t('Indoor'), c[2], c[4]].filter(Boolean).map(v => esc(t(v))).join(' · ')}</p>
             <p class="pr"><small>${t('From')}</small><b>${P.money(c[5])}</b><small>${t('/ hr')}</small><em>${t('90-minute slots')}</em></p></div></article>`).join('')}</div></section>`;

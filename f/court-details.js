@@ -223,7 +223,12 @@
   const sorted = () => [...picks.keys()].sort();
   const count = () => [...picks.values()].reduce((a, s) => a + s.size, 0);
   function summary(){
-    const keys = sorted(), n = count(), total = n * SLOT_PRICE;
+    const keys = sorted(), n = count(), full = n * SLOT_PRICE;
+    // offers (f/offers-data.js): the best one for this many times comes off the total; the block nudges to the next one
+    const OF = window.SFA_OFFER_UI, item = { sport: key, court: ci }, B = OF && n ? OF.best('court', item, n, full) : null;
+    const total = B ? Math.round((full - B.save) * 100) / 100 : full, was = B ? `<s class="of-was">${money(full)}</s> ` : '';
+    if ($('offers')) $('offers').innerHTML = OF ? OF.block('court', item, n, SLOT_PRICE) : '';
+    if ($('heroOffer') && OF) $('heroOffer').innerHTML = OF.tag('court', item);
     $('sumCount').textContent = n ? counts(keys.length, n) : '';
     $('sumDays').innerHTML = !keys.length ? `<p class="sum-empty">${t('No times picked yet. Tap a day, then pick one or more slots.')}</p>` :
       `<ul class="sum-days">${keys.map(k => {
@@ -234,8 +239,8 @@
       }).join('')}</ul>`;
     const hrs = n * SLOT / 60;
     $('sumRows').innerHTML = `<dt>${t('Price')}</dt><dd>${money(price)} ${t('/ hr')} · ${money(SLOT_PRICE)} ${t('/ slot')}</dd><dt>${t('Play time')}</dt><dd>${n ? t('{h} hours', { h: hrs }) : '—'}</dd>`;
-    $('sumTotal').innerHTML = money(total);
-    $('goTotal').innerHTML = n || !goAlways ? money(total) : `<small class="go-from">${t('From')}</small> ${money(price)}`;
+    $('sumTotal').innerHTML = was + money(total);
+    $('goTotal').innerHTML = n || !goAlways ? was + money(total) : `<small class="go-from">${t('From')}</small> ${money(price)}`;
     $('goWhen').textContent = n ? counts(keys.length, n, hrs) : t('{name} · pick days and times', { name: t(name) });
     $('go').classList.toggle('on', n > 0 || goAlways); document.body.classList.toggle('has-picks', n > 0);
     [$('bookBtn'), $('goBtn')].forEach(b => { b.disabled = !n; b.innerHTML = n ? `<span>${t('Book · {total}', { total: money(total) })}</span>` : t('Pick a time'); });

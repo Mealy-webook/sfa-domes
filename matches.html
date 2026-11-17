@@ -132,7 +132,7 @@ dialog::backdrop{background:rgba(9,9,11,.55)}
 <div data-site-footer></div>
 <script src="f/site-nav.js"></script>
 <script src="f/site-footer.js"></script>
-<script src="f/courts-data.js"></script>
+<script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
 <script src="f/games-data.js"></script>
 <script src="f/i18n-ar.js"></script>
@@ -163,7 +163,7 @@ dialog::backdrop{background:rgba(9,9,11,.55)}
     const sp = S[g.sport], c = sp.courts[g.court], n = taken(g), left = g.spots - n, my = mine(g);
     return `<li class="gm${left <= 0 && !my ? ' full' : ''}${my ? ' mine' : ''}" style="--i:${i}">
       <div class="tm"><b>${P.time(g.start)}</b><small>${t('to {time}', { time: P.time(g.start + SLOT) })}</small></div>
-      <div class="wh"><strong><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}</strong><span>${esc(t(c[0]))} · ${esc(t(g.format))}</span><span class="lvl${g.who === 'kids' ? ' kids' : ''}">${t(window.SFA_GAME_WHO[g.who].label)}</span></div>
+      <div class="wh"><strong><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}</strong><span>${esc(t(c[0]))} · ${esc(t(g.format))}</span><span class="lvl${g.who === 'kids' ? ' kids' : ''}">${t(window.SFA_GAME_WHO[g.who].label)}</span>${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('game', { sport: g.sport, court: g.court }) : ''}</div>
       <div class="sp"><div class="sp-t"><span>${my ? t("You're in") : left <= 0 ? t('Full') : left === 1 ? t('1 spot left') : t('{n} spots left', { n: left })}</span><small>${t('{a} of {b} players', { a: n, b: g.spots })}</small></div>
         <div class="sp-bar" style="--n:${g.spots}" aria-hidden="true">${Array.from({ length: g.spots }, (_, k) => `<i class="${k < n ? (my && k === n - 1 ? 'me' : 'on') : ''}"></i>`).join('')}</div></div>
       <div class="act"><span class="pr"><b>${P.money(g.price)}</b><small>${t('per player')}</small></span>

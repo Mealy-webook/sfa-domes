@@ -46,6 +46,13 @@ vm.runInContext(fs.readFileSync(path.join(ROOT, 'f/programs-data.js'), 'utf8'), 
 // open games (f/games-data.js): the venue's own games; one spot per adult, priced per spot
 vm.runInContext(fs.readFileSync(path.join(ROOT, 'f/games-data.js'), 'utf8'), ctx);
 const { SFA_GAME: GAME } = ctx.window;
+// offers (f/offers-data.js): money off for booking more at once; every order is re-checked here and charged the result
+vm.runInContext(fs.readFileSync(path.join(ROOT, 'f/offers-data.js'), 'utf8'), ctx);
+const r2 = x => Math.round(x * 100) / 100;
+function withOffer(kind, item, n, base, paid){   // { amount, offer } after the best offer for n tickets costing base
+  const B = ctx.window.SFA_OFFER_BEST(kind, item, n, base);
+  return B ? { amount: r2(base - B.save), offer: JSON.parse(JSON.stringify(ctx.window.SFA_OFFER_STAMP(B, base, paid, n))) } : { amount: base, offer: null };
+}
 const { SFA_PROGRAMS: PROGRAMS, SFA_PROGRAM_KIT: KIT, SFA_PROGRAM_SESSIONS: PROGRAM_SESSIONS, SFA_PROGRAM_START_DAYS: START_DAYS, SFA_PROGRAM_PLANS: PLANS, SFA_PROGRAM_PRICE: PRICE, SFA_PROGRAM_ELIGIBLE: ELIGIBLE, SFA_PROGRAM_MAX_PEOPLE: MAX_PEOPLE, SFA_CHILD: CHILD, SFA_CHILD_ERRORS: CHILD_ERRORS, SFA_CHILD_AGE_OK: CHILD_AGE_OK, SFA_FULL_NAME: FULL_NAME, SFA_SPLIT_NAME: SPLIT_NAME, SFA_TODAY: TODAY } = ctx.window;
 
 // ---- bookings: a JSON file is plenty for a prototype
@@ -488,7 +495,8 @@ async function authRoute(req, res, url){
       const first = Math.min(...b.order.days.flatMap(d => d.starts.map(s => { const [y, m, dd] = d.date.split('-').map(Number); return new Date(y, m - 1, dd, 0, s).getTime(); })));
       if (first - Date.now() < 48 * 3600e3) return send(res, 400, { error: 'Free cancellation ends 48 hours before the first session.' });
       const kits = b.order.kit ? b.order.kit.qty * KIT.price : 0;
-      const share = !b.amount ? 0 : b.order.kind === 'game' ? (x.free ? 0 : (b.order.price ?? (GAME(b.order.game) || {}).price ?? 0)) : Math.round((b.amount - kits) / list.length * 100) / 100;
+      const os = ctx.window.SFA_OFFER_SHARE(b, +body.i);   // with an offer: re-priced without them (the offer re-checked)
+      const share = os != null ? os : !b.amount ? 0 : b.order.kind === 'game' ? (x.free ? 0 : (b.order.price ?? (GAME(b.order.game) || {}).price ?? 0)) : Math.round((b.amount - kits) / list.length * 100) / 100;
       if (share && !b.test && configured() && b.tranRef){
         const r = await paytabs('request', { profile_id: +PT.profileId, tran_type: 'refund', tran_class: 'ecom', cart_id: b.cartId, cart_currency: 'SAR', cart_amount: share, cart_description: `Player removed · ${x.name}`.slice(0, 120), tran_ref: b.tranRef });
         if ((r.payment_result || {}).response_status !== 'A') return send(res, 502, { error: (r.payment_result || {}).response_message || 'PayTabs could not refund this payment. Try again.' });
@@ -563,7 +571,8 @@ const server = http.createServer(async (req, res) => {
       const user = currentUser(req); if (!user) return send(res, 401, { error: 'Please sign in to book.' });
       const { order } = JSON.parse(await readBody(req) || '{}'), gc = checkGameOrder(order, user);
       if (gc.error) return send(res, gc.status || 400, { error: gc.error });
-      return send(res, 200, { amount: gc.amount, people: gc.people.map(x => ({ type: x.type, ref: x.ref, name: x.name, phone: x.phone, free: x.free })) });
+      const g = GAME(order.game), q = withOffer('game', { sport: g.sport, court: g.court }, gc.people.length, gc.amount, gc.people.filter(x => !x.free).length);
+      return send(res, 200, { amount: q.amount, base: gc.amount, offer: q.offer, people: gc.people.map(x => ({ type: x.type, ref: x.ref, name: x.name, phone: x.phone, free: x.free })) });
     }
 
     if (req.method === 'GET' && url.pathname === '/api/config'){
@@ -581,6 +590,8 @@ const server = http.createServer(async (req, res) => {
       if (order && order.kind === 'game'){
         const gc = checkGameOrder(order, user); if (gc.error) return send(res, gc.status || 400, { error: gc.error });
         order = gc.order; chk = { amount: gc.amount, desc: gc.desc };
+        const q = withOffer('game', { sport: order.sport, court: order.court }, gc.people.length, gc.amount, gc.people.filter(x => !x.free).length);
+        if (q.offer){ chk.amount = q.amount; order.offer = q.offer; }
         order.waiver = { acceptedBy: user.name, at: Date.now(), for: gc.people.map(x => x.name), guardian: gc.people.some(x => x.type === 'child') };
         // a first open game is free: confirmed straight away
         if (!chk.amount){
@@ -591,6 +602,9 @@ const server = http.createServer(async (req, res) => {
       } else if (order && order.kind === 'program'){
         const pc = checkProgramOrder(order, user); if (pc.error) return send(res, pc.status || 400, { error: pc.error });
         order = pc.order; chk = { amount: pc.amount, desc: pc.desc };
+        const kitsTotal = order.kit ? order.kit.qty * KIT.price : 0, n = order.participants.length;
+        const q = withOffer('program', { sport: order.sport, program: order.program }, n, r2(pc.amount - kitsTotal), n);
+        if (q.offer){ chk.amount = r2(q.amount + kitsTotal); order.offer = q.offer; }
         // the program waivers, accepted by the payer (as guardian when a child takes part), with each participant's name
         order.waiver = { acceptedBy: user.name, at: Date.now(), for: order.participants.map(x => x.name), guardian: order.participants.some(x => personKey(x) !== personKey(user)) };
         // nothing to pay (a free trial without the kit): confirmed straight away
@@ -603,6 +617,8 @@ const server = http.createServer(async (req, res) => {
         chk = checkOrder(order, user); if (chk.error) return send(res, chk.status || 400, { error: chk.error });
         order.waiver = { acceptedBy: user.name, at: Date.now(), for: [order.bookingFor.type === 'me' ? user.name : order.bookingFor.name], guardian: order.bookingFor.type === 'child' };
         chk.desc = `${chk.sport.name} · ${chk.court[0]} · ${chk.count} × 1.5 hr · SFA Domes Dammam`;
+        const q = withOffer('court', { sport: order.sport, court: order.court }, chk.count, chk.amount, chk.count);
+        if (q.offer){ chk.amount = q.amount; order.offer = q.offer; }
       }
       if (testMode()){
         const tranRef = 'TEST-' + crypto.randomBytes(5).toString('hex').toUpperCase();

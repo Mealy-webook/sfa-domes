@@ -130,6 +130,7 @@
             <div class="step-head"><h2 id="planTitle">Choose a plan</h2></div>
             <p class="step-note">Try one session for free, or subscribe for one, two or three months.</p>
             <div class="pj-plans" id="plans" role="radiogroup" aria-labelledby="planTitle"></div>
+            <div id="offers"></div>
           </section>
           <section class="step">
             <div class="step-head"><h2 id="dayTitle">Start day and time</h2>
@@ -191,7 +192,7 @@
             <p class="hero-price"><small>From</small><b id="sidePrice"></b></p>
             <div class="hero-actions"><button class="share" id="shareBtn" type="button" aria-label="Share" title="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v9h14v-9"/></svg></button><a class="cta" href="#book"><span>Book now</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg></a></div>
           </div>
-          <p class="side-sub" id="sideSub"></p>
+          <p class="side-sub" id="sideSub"></p><span id="sideOffer"></span>
         </div>
         <p class="kl-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Try one session free before you subscribe.</span></p>
       </aside>
@@ -221,7 +222,7 @@
 
 <script src="f/site-nav.js"></script>
 <script src="f/site-footer.js"></script>
-<script src="f/courts-data.js"></script>
+<script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
@@ -325,6 +326,9 @@
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg><div><a href="#loc">${t('SFA Domes Dammam, Dammam, Saudi Arabia')}</a></div></li>`;
     $('sidePrice').innerHTML = `${P.money(p.month)} <small>${t('/ month')}</small>`;
     $('sideSub').textContent = t('{n} sessions a month · free trial available', { n: perMonth });
+    // offers (f/offers-data.js): booking several participants; who takes part is picked at checkout, where it's applied
+    const OF = window.SFA_OFFER_UI, oi = { sport: p.sport, program: id };
+    if (OF){ $('sideOffer').innerHTML = OF.tag('program', oi); $('offers').innerHTML = OF.block('program', oi, 0, 0, t('Applied at checkout when you add the participants.')); }
     $('learnList').innerHTML = p.learn.map(l => `<li>${chk}<span>${esc(tx(l))}</span></li>`).join('');
     $('aboutLead').textContent = tx(p.about);
     $('stats').innerHTML = [[t('Ages'), ages(p.ages)], [t('Level'), tx(p.level)], [t('Training days'), dayNames()], [t('Session length'), t('{m} minutes', { m: p.minutes })], [t('Group size'), t('Up to {n} players', { n: p.capacity })], [t('Coaches'), [...new Set(p.slots.map(s => tx(s.coach)))].join(' · ')]]

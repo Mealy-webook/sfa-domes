@@ -151,7 +151,7 @@
 </template>
 <script src="f/site-nav.js"></script>
 <script src="f/site-footer.js"></script>
-<script src="f/courts-data.js"></script>
+<script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
 <script src="f/games-data.js"></script>
 <script src="f/i18n-ar.js"></script>
@@ -217,7 +217,10 @@
   function joinBox(sp, c, left){
     const list = people(), ok = list.filter(x => !x.why);
     if (!picks.length && !guests.length && ok.length === 1 && !joinBox.auto){ picks = [ok[0].key]; joinBox.auto = true; requote(); }
-    const who = chosen(), n = who.length, room = left - n, price = who.filter(x => !x.free).length * g.price;
+    const who = chosen(), n = who.length, room = left - n, base = who.filter(x => !x.free).length * g.price;
+    // offers (f/offers-data.js): the best one for this many players comes off what's left after free first games
+    const OF = window.SFA_OFFER_UI, item = { sport: g.sport, court: g.court }, B = OF && n ? OF.best('game', item, n, base) : null;
+    const price = B ? Math.round((base - B.save) * 100) / 100 : base;
     const when = `${P.date(toDate(g.date), 'full')} · <bdi>${P.time(g.start)}</bdi> – <bdi>${P.time(g.start + SLOT)}</bdi>`;
     const closed = started() ? t('This game has already started.') : left <= 0 ? t('This game is full.') : '';
     if (!me) return `<div class="jn"><p class="note">${t('Sign in to join a game.')}</p><button type="button" class="book" data-signin>${t('Sign in')}</button></div>`;
@@ -235,8 +238,10 @@
         ${list.length ? list.map(row).join('') : `<p class="note">${t('Kids’ games are for your children aged 6 to 17. Add them in My children.')} <a href="profile.html#people">${t('My children')}</a></p>`}
         ${guests.map(gRow).join('')}${form}
         ${adults && !gForm ? `<button type="button" class="add-g" data-gopen${room <= 0 ? ' disabled' : ''}>${PLUS}<span>${room <= 0 ? t('No spots left') : t('Add a guest')}</span></button>` : ''}</div>
+      ${OF ? OF.block('game', item, n, g.price, '', base) : ''}
       <dl class="rows"><dt>${t('Game')}</dt><dd>${esc(t(sp.name))} · ${esc(t(g.format))}</dd><dt>${t('When')}</dt><dd>${when}</dd><dt>${t('Where')}</dt><dd>${esc(t(c[0]))} · ${t('SFA Domes Dammam')}</dd>
         <dt>${t(n > 1 ? 'Players' : 'Player')}</dt><dd>${n ? `<span class="lines">${lines}</span>` : '—'}</dd>
+        ${B ? `<dt class="of-line">${OF.line({ id: B.o.id, save: B.save })[0]}</dt><dd class="of-line">${OF.line({ id: B.o.id, save: B.save })[1]}</dd>` : ''}
         <span class="sep" aria-hidden="true"></span><dt class="total">${t('Total')}</dt><dd class="total">${n && price ? P.money(price) : n ? t('Free') : '—'}</dd></dl>
       ${who.some(x => x.free) ? `<p class="note">${t('Each person’s first open game is free.')}</p>` : ''}
       <label class="terms${err && !agreed ? ' bad' : ''}" id="jTerms"><input type="checkbox" id="jT"${agreed ? ' checked' : ''}><span class="box" aria-hidden="true">${TICK}</span><span>${t('I agree to the terms and conditions and the health waiver.')}</span></label>
@@ -273,7 +278,7 @@
             <li><span><b>${t('Play')}</b>${t('A coach splits the teams and runs the game. Bibs and balls are provided.')}</span></li></ol></section>
         ${document.getElementById('locTpl').innerHTML}
       </div>
-      <aside class="kl-side" aria-label="${t('Price')}"><div class="kl-card"><div class="hero-book"><p class="hero-price"><small>${t('From')}</small><b>${P.money(g.price)}</b></p>
+      <aside class="kl-side" aria-label="${t('Price')}"><div class="kl-card"><div class="hero-book"><p class="hero-price"><small>${t('From')}</small><b>${P.money(g.price)}</b></p>${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('game', { sport: g.sport, court: g.court }) : ''}
           <div class="hero-actions"><a class="cta" href="#join"><span>${t('Join game')}</span>${ARROW}</a></div></div><p class="side-sub">${t('per player')} · ${t('First game free')}</p></div>
         <p class="kl-note">${CHK}<span>${t('Each person’s first open game is free.')}</span></p></aside></div>`;
     document.getElementById('goWhen').innerHTML = `${P.date(toDate(g.date), 'short')} · <bdi>${P.time(g.start)}</bdi>`;

@@ -54,6 +54,7 @@
       : `<dt>${t('Court')}</dt><dd>${esc(t(sport?.name || ''))} · ${esc(t(court?.[0] || ''))}</dd>
       <dt>${t(players ? (players.length > 1 ? 'Players' : 'Player') : 'Booked for')}</dt><dd>${players ? players.map(x => esc(x.name)).join('<br>') : bf.type === 'other' ? esc(bf.name) + ' · ' + esc(bf.phone) : who}</dd>${by ? `<dt>${t('Booked by')}</dt><dd>${by}</dd>` : ''}
       <dt>${t('Sessions')}</dt><dd>${sessionsTxt}</dd>`) + `
+      ${(() => { const L = window.SFA_OFFER_UI && window.SFA_OFFER_UI.line(b.order.offer); return L ? `<dt class="of-line">${L[0]}</dt><dd class="of-line">${L[1]}</dd>` : ''; })()}
       ${b.paidAt && !b.free ? `<dt>${t('Paid on')}</dt><dd>${P.date(new Date(b.paidAt), 'full')}</dd>` : ''}
       ${b.tranRef ? `<dt>${t(b.test ? 'Test ref' : 'PayTabs ref')}</dt><dd>${esc(b.tranRef)}</dd>` : ''}
       <dt class="total">${t(b.status === 'paid' ? 'Paid' : b.status === 'cancelled' ? 'Refunded' : 'Total')}</dt><dd class="total">${b.free ? t('Free of charge') : money(b.amount)}</dd></dl>`;

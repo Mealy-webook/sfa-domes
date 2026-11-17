@@ -95,7 +95,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
 <div data-site-footer></div>
 <script src="f/site-nav.js"></script>
 <script src="f/site-footer.js"></script>
-<script src="f/courts-data.js"></script>
+<script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
@@ -148,7 +148,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
         </div>
         ${x && x.dob ? `<p class="forwho">${x.you ? t('Programs you can join, from their next start day.') : t('Programs {name} can join, from their next start day.', { name: esc(x.first) })}</p>` : ''}
         ${list.length ? `<div class="grid">${list.map((id, i) => { const p = PR[id], sp = S[p.sport], img = p.img || window.SFA_COURT_IMG(p.sport, sp.courts[p.court || 0]);
-          return `<article class="tile" style="--i:${keep ? 0 : i}"><div class="ph"><img src="${img}" alt="" loading="lazy" style="object-position:${p.focus || '50% 50%'}"><div class="tags"><span class="tag">${t('Ages {a}', { a: `⁦${p.ages}⁩` })}</span>${p.women ? `<span class="tag w">${t('Women only')}</span>` : ''}${x && x.dob ? `<span class="tag ok">${x.you ? t('You can join') : t('{name} can join', { name: esc(x.first) })}</span>` : ''}</div></div>
+          return `<article class="tile" style="--i:${keep ? 0 : i}"><div class="ph"><img src="${img}" alt="" loading="lazy" style="object-position:${p.focus || '50% 50%'}"><div class="tags"><span class="tag">${t('Ages {a}', { a: `⁦${p.ages}⁩` })}</span>${p.women ? `<span class="tag w">${t('Women only')}</span>` : ''}${x && x.dob ? `<span class="tag ok">${x.you ? t('You can join') : t('{name} can join', { name: esc(x.first) })}</span>` : ''}${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('program', { sport: p.sport, program: id }) : ''}</div></div>
             <div class="bd"><p class="sp"><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))} · ${esc(tx(p.level))}</p><h3 class="nm"><a class="lnk" href="program.html?p=${encodeURIComponent(id)}" aria-label="${esc(tx(p.name))}"></a>${esc(tx(p.name))}</h3>
               <p class="meta">${dayNames(p)} · ${t('{m} minutes', { m: p.minutes })} · ${t('Up to {n} players', { n: p.capacity })}</p>
               <p class="pr"><small>${t('From')}</small><b>${P.money(p.month)}</b><small>${t('/ month')}</small><em>${t('Free trial available')}</em></p></div></article>`; }).join('')}</div>`
