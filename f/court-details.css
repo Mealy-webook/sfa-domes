@@ -111,7 +111,9 @@ html[dir=rtl] .cta svg{scale:-1 1}
 .period{margin:0 0 16px}
 .period:last-child{margin-bottom:0}
 .period h3{font:var(--ts-body-default-bold);text-transform:var(--type-case-label);margin:0 0 8px;color:var(--ink-3)}
-.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px}
+/* a column is never narrower than the longest label ("10:30 AM – 12:00 PM" at 17px ≈ 176px with padding), so labels
+   don't clip between 600 and 1023px (Ahmed, 2026-11-17: "fix the responsive design") */
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,188px),1fr));gap:8px}
 .slot{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 8px;background:var(--bg);border:1px solid var(--line-strong);cursor:pointer;font-variant-numeric:tabular-nums;white-space:nowrap;transition:background-color .2s,border-color .2s,color .2s}
 .slot:hover:not(:disabled){border-color:var(--ink)}
 .slot[aria-pressed="true"]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle);color:var(--color-content-primary)}
@@ -166,7 +168,8 @@ html[dir=rtl] .cta svg{scale:-1 1}
   .go{display:block;position:fixed;transform:translateY(105%);transition:transform .5s var(--ease);left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);box-shadow:0 -12px 32px -24px rgba(9,9,11,.4);padding-bottom:env(safe-area-inset-bottom,0px)}
   .go .inner{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:88px;padding-block:16px}
   .go-pick{min-width:0}
-  .go-pick small{display:block;font-size:var(--fs-13);line-height:18px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* the line above the price wraps to two lines instead of cutting off "pick days and times" on phones */
+  .go-pick small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:var(--fs-13);line-height:18px;color:var(--ink-3)}
   .go-pick strong{font:var(--ts-display-xs);display:block}
   .go .book{width:auto;flex:none;height:56px}
   .go.on{transform:none}

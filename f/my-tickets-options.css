@@ -632,7 +632,7 @@
 .bv-cx p a{color:var(--color-content-primary);font-weight:600}
 .bv-cxb[disabled]{color:var(--color-content-tertiary);border-color:var(--color-border-primary);background:transparent;cursor:not-allowed}
 /* rule 6: people rows */
-.bv-rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-border-primary)}
+.bv-rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--color-border-primary);container-type:inline-size}
 .bv-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto auto;align-items:center;gap:8px 16px;padding:14px 0;border-bottom:1px solid var(--color-border-primary)}
 .bv-row.is-gone,.bv-row.is-done{opacity:.65}
 .bv-row .day{width:48px;padding:4px 0}
@@ -647,6 +647,13 @@
 .bv-sent.is-ok{color:var(--color-content-secondary) !important}
 .bv-sent svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2}
 .bv-row-a{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+/* a person's status and buttons go under their name whenever the list is narrower than 760px (tablets, the rail's
+   left column at 1024–1200px, phones), not only on phone screens */
+@container (max-width:760px){
+  .bv-row{grid-template-columns:40px minmax(0,1fr)}
+  .bv-row .day{width:40px}
+  .bv-row-s,.bv-row-a{grid-column:2/-1;justify-content:flex-start}
+}
 .bv-pcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr));gap:16px}
 /* rule 8: receipt */
 .bv-rc{display:grid;gap:0}
