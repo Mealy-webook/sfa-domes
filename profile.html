@@ -473,6 +473,12 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
       return;
     }
     const cur = tab(), nUp = MT ? MTO.count(MT_CTX()) : upItems(all()).length;
+    // a booking opens as its own full page (Ahmed, 2026-11-17): no account header or tabs, just the booking and its tickets
+    if (MT && MTV === 'bookings' && cur === 'tickets' && groupId() && bookings.some(b => b.cartId === groupId())){
+      root.innerHTML = `<section class="in panel mt-full" id="panel">${MTO.render(MTV, MT_CTX())}</section>`;
+      const h = root.querySelector('.mt-head h2'); if (h) document.title = `${h.textContent} · ${t('My bookings')} · SFA Domes`;
+      T.paintQR(root); return;
+    }
     const since = user.since ? t('Member since {date}', { date: P.date(new Date(user.since), 'month') }) : '';
     root.innerHTML = `<section class="pf-head"><div class="in"><div class="who"><span class="av" aria-hidden="true">${esc(initials(user))}</span>
         <p class="eye">${t('My account')}</p><h1>${esc(user.name)}</h1><p class="meta">${esc(user.email)}${since ? ' · ' + since : ''}</p></div>

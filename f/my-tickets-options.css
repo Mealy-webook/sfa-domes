@@ -348,3 +348,8 @@
   .mt-tk{grid-template-columns:52px minmax(0,1fr)}
   .mt-tk-e{grid-column:2;justify-content:flex-start}
 }
+/* a booking on its own page (2026-11-17): room under the menu bar, a bigger photo and title */
+.panel.mt-full{padding-top:calc(var(--nav) + clamp(24px,4vh,40px))}
+.mt-full .mt-head{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center}
+.mt-full .mt-head .pg-ph{aspect-ratio:16/10}
+@media (max-width:760px){.mt-full .mt-head{grid-template-columns:minmax(0,1fr)}}
