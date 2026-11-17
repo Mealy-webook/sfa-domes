@@ -10,7 +10,7 @@
    C = rows grouped by when, and the booking opens as a ticket wallet with a person switcher (event apps).
    profile.html hands over its state and helpers through ctx (see MT_CTX there). */
 (() => {
-  const st = { seg: 'up', who: 'all', panel: null, pick: {}, open: {}, type: 'court', person: 'all', cal: null, tf: {} };
+  const st = { seg: 'up', who: 'all', panel: null, pick: {}, open: {}, type: 'court', person: 'all', cal: null, tf: {}, kt: 'all' };
   const KIND = { court: 'Court booking', game: 'Open game', program: 'Training program' };
   const dk = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const SEND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-6 16-3-7z"/></svg>';
@@ -345,8 +345,14 @@
   const BOOK = {
     list(c){
       st.who = 'all';
-      const L = lists(c), segs = [['up', 'Upcoming', L.up.length], ['past', 'Past', L.past.length], ['off', 'Cancelled', L.off.length]], l = current(c);
-      return `<div class="mt-bar"><div class="seg" role="group" aria-label="${c.t('My bookings')}">${segs.map(([k, lb, n]) => `<button type="button" data-mt-seg="${k}" aria-pressed="${st.seg === k}">${c.t(lb)} (${n})</button>`).join('')}</div></div>`
+      // type filter under Upcoming / Past / Cancelled (Ahmed, 2026-11-17): All, Courts, Open games, Programs, Ladies hours
+      const L = lists(c), byT = l => st.kt === 'all' ? l : l.filter(m => typeOf(m) === st.kt);
+      const seg = st.seg === 'past' ? L.past : st.seg === 'off' ? L.off : L.up;
+      const kinds = TYPES.filter(([k]) => [...L.up, ...L.past, ...L.off].some(m => typeOf(m) === k));
+      if (st.kt !== 'all' && !kinds.some(([k]) => k === st.kt)) st.kt = 'all';
+      const segs = [['up', 'Upcoming', byT(L.up).length], ['past', 'Past', byT(L.past).length], ['off', 'Cancelled', byT(L.off).length]], l = byT(seg);
+      return `<div class="mt-bar mt-bar--stack"><div class="seg" role="group" aria-label="${c.t('My bookings')}">${segs.map(([k, lb, n]) => `<button type="button" data-mt-seg="${k}" aria-pressed="${st.seg === k}">${c.t(lb)} (${n})</button>`).join('')}</div>
+          ${kinds.length > 1 ? `<div class="types mt-kt" role="group" aria-label="${c.t('Booking type')}">${[['all', 'All'], ...kinds].map(([k, lb]) => `<button type="button" class="type" data-mt-kt="${k}" aria-pressed="${st.kt === k}">${k === 'all' ? '' : `<i class="mt-kt-dot ${KC[k]}" aria-hidden="true"></i>`}${c.t(lb)}<b>${k === 'all' ? seg.length : seg.filter(m => typeOf(m) === k).length}</b></button>`).join('')}</div>` : ''}</div>`
         + (l.length ? `<ol class="mt-cards mt-bk">${l.map((m, i) => `<li class="mt-card${m.up ? '' : ' is-off'}" style="--i:${i}">
           <button type="button" class="mt-hit" data-mt-open="${c.esc(m.b.cartId)}" aria-label="${c.t('Open booking')}: ${c.esc(m.D.label)}"></button>
           <span class="mt-ph"><img src="${m.D.img}" alt="" loading="lazy" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
@@ -395,8 +401,9 @@
     },
     // returns true when it handled the click
     async click(v, e, c){
-      const el = e.target.closest('[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
+      const el = e.target.closest('[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
       const d = el.dataset;
+      if (d.mtKt){ st.kt = d.mtKt; c.paint(); c.root.querySelector(`[data-mt-kt="${d.mtKt}"]`)?.focus(); return true; }
       if (d.mtTf){ const [cart, k] = d.mtTf.split('|'); st.tf[cart] = k === 'all' ? 'all' : +k; c.paint(); c.root.querySelector(`[data-mt-tf="${CSS.escape(d.mtTf)}"]`)?.focus(); return true; }
       if (d.mtType){ st.type = d.mtType; c.paint(); c.root.querySelector(`[data-mt-type="${d.mtType}"]`)?.focus(); return true; }
       if (d.mtPerson){ st.person = d.mtPerson; c.paint(); c.root.querySelector(`.mt-fam-rail [data-mt-person="${CSS.escape(d.mtPerson)}"]`)?.focus(); return true; }
