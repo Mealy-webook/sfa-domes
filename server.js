@@ -66,7 +66,7 @@ function takenSlots(sport, court){
 // online spots held or paid in an open game, and whether this user already has one
 const gameBookings = id => Object.values(bookings).filter(b => b.order.kind === 'game' && b.order.game === id && holding(b));
 // a game booking's players: order.participants (several since 2026-11-17); older bookings hold one, in bookingFor
-const gamePeople = b => b.order.participants || [b.order.bookingFor && b.order.bookingFor.type === 'child' ? { type: 'child', ref: b.order.bookingFor.ref, name: b.order.bookingFor.name } : { type: 'me' }];
+const gamePeople = b => b.order.participants ? b.order.participants.filter(x => !x.cancelled) : [b.order.bookingFor && b.order.bookingFor.type === 'child' ? { type: 'child', ref: b.order.bookingFor.ref, name: b.order.bookingFor.name } : { type: 'me' }];   // a removed player (2026-11-17) no longer holds a spot
 const spotsOf = b => b.order.kind === 'game' ? gamePeople(b).length : 1;
 // who a player is: you or one of your children (per account), or a guest by their mobile
 const pKey = x => x.type === 'guest' ? 'tel:' + x.phone : x.type === 'child' ? 'child:' + (x.ref || x.name) : 'me';
@@ -475,6 +475,36 @@ async function authRoute(req, res, url){
       }
       b.status = 'cancelled'; b.cancelledAt = Date.now(); b.refund = b.amount || 0; save();
       return send(res, 200, { ok: true, refund: b.refund });
+    }
+    case '/api/auth/cancel-person': {
+      // remove one player or participant (Ahmed, 2026-11-17): while free cancellation is open (48 h before the first session)
+      // and someone else stays on the booking (otherwise cancel the booking). Their share is refunded; their tickets go.
+      const u = currentUser(req); if (!u) return send(res, 401, { error: 'Please sign in.' });
+      const b = bookings[body.cart]; if (!b || b.userId !== u.id) return send(res, 404, { error: 'Booking not found.' });
+      if (b.status !== 'paid') return send(res, 400, { error: 'Only confirmed bookings can be changed.' });
+      const list = b.order.participants, x = Array.isArray(list) ? list[+body.i] : null;
+      if (!x || x.cancelled) return send(res, 404, { error: 'That person is no longer on this booking.' });
+      if (list.filter(y => !y.cancelled).length < 2) return send(res, 400, { error: 'They are the only person on this booking: cancel the booking instead.' });
+      const first = Math.min(...b.order.days.flatMap(d => d.starts.map(s => { const [y, m, dd] = d.date.split('-').map(Number); return new Date(y, m - 1, dd, 0, s).getTime(); })));
+      if (first - Date.now() < 48 * 3600e3) return send(res, 400, { error: 'Free cancellation ends 48 hours before the first session.' });
+      const kits = b.order.kit ? b.order.kit.qty * KIT.price : 0;
+      const share = !b.amount ? 0 : b.order.kind === 'game' ? (x.free ? 0 : (b.order.price ?? (GAME(b.order.game) || {}).price ?? 0)) : Math.round((b.amount - kits) / list.length * 100) / 100;
+      if (share && !b.test && configured() && b.tranRef){
+        const r = await paytabs('request', { profile_id: +PT.profileId, tran_type: 'refund', tran_class: 'ecom', cart_id: b.cartId, cart_currency: 'SAR', cart_amount: share, cart_description: `Player removed · ${x.name}`.slice(0, 120), tran_ref: b.tranRef });
+        if ((r.payment_result || {}).response_status !== 'A') return send(res, 502, { error: (r.payment_result || {}).response_message || 'PayTabs could not refund this payment. Try again.' });
+        (b.refundRefs = b.refundRefs || []).push(r.tran_ref);
+      }
+      x.cancelled = { at: Date.now(), refund: share }; b.refund = (b.refund || 0) + share; save();
+      return send(res, 200, { ok: true, refund: share, name: x.name });
+    }
+    case '/api/auth/send-ticket': {
+      // send a guest their own ticket by text (prototype: no SMS provider yet, so the send is recorded and shown, not delivered)
+      const u = currentUser(req); if (!u) return send(res, 401, { error: 'Please sign in.' });
+      const b = bookings[body.cart]; if (!b || b.userId !== u.id || b.status !== 'paid') return send(res, 404, { error: 'Booking not found.' });
+      const x = Array.isArray(b.order.participants) ? b.order.participants[+body.i] : null;
+      if (!x || x.cancelled || x.type !== 'guest' || !x.phone) return send(res, 400, { error: "Only a guest's ticket can be sent to their mobile." });
+      x.sent = Date.now(); save();
+      return send(res, 200, { ok: true, to: x.phone, at: x.sent });
     }
     // saved courts ("sport|court" keys) on the signed-in account
     case '/api/auth/favorites': {

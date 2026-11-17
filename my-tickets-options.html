@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My tickets · options</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="f/fonts.css">
+<link rel="stylesheet" href="f/colors.css">
+<style>
+/* Review page: three directions for My tickets (profile.html?v=a|b|c, f/my-tickets-options.js), from the bookings
+   benchmark. Each works on the demo account's real bookings. Square corners, DS tokens. */
+*{box-sizing:border-box}
+body{margin:0;background:var(--color-bg-secondary);color:var(--color-content-primary);font:var(--ts-body-default);-webkit-font-smoothing:antialiased}
+main{max-width:960px;margin:0 auto;padding:56px 16px 96px}
+h1{margin:0 0 8px;font:var(--ts-display-m);text-transform:var(--type-case-display)}
+.lead{margin:0 0 40px;color:var(--color-content-secondary)}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+li{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:8px 16px;padding:20px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+li > b{display:grid;place-items:center;width:40px;height:40px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-body-default-bold)}
+li.cur > b{background:var(--color-content-primary)}
+li strong{display:block;font:var(--ts-title-body);text-transform:var(--type-case-title)}
+li p{margin:4px 0 0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.go{display:flex;flex-wrap:wrap;gap:8px}
+.go a{display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1px solid var(--color-border-secondary);color:inherit;font:var(--ts-body-default-bold);text-decoration:none;white-space:nowrap}
+.go a:first-child{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
+.go a:hover{border-color:var(--color-brand)}
+.go a:first-child:hover{background:var(--color-brand)}
+@media (max-width:640px){li{grid-template-columns:40px minmax(0,1fr)}.go{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<main>
+<h1>My tickets</h1>
+<p class="lead">Three directions for My tickets, built on the <a href="bookings-benchmark.html">bookings benchmark</a>. All three list one row per booking with a count and who's on it, say its status in words (Ready, QR opens on the day, Played, Cancelled), keep each person's ticket inside the booking, let you remove one player or participant (their share refunded, while free cancellation is open) and send a guest their own ticket. Upcoming, Past and Cancelled have their own tabs. Try them on the demo account: an open game for you and 2 guests, a kids' game for 2 children, a court booked for 3 times and a program for 2 children.</p>
+<ol style="margin-bottom:56px">
+  <li><b>A</b><div><strong>Booking cards</strong><p>Like Klook and GetYourGuide: a card per booking with the photo, the count and names, the status line, View tickets and (with guests) Send guest tickets. Inside, a ticket stub per person side by side, each with its QR and its own Send and Remove.</p></div>
+    <div class="go"><a href="profile.html?v=a#tickets">My tickets</a><a href="profile.html?v=a#tickets/SFA-MVGAME3P-2026">You + 2 guests</a><a href="profile.html?v=a#tickets/SFA-MVGAMEKD-2026">2 children</a><a href="profile.html?v=a#tickets/SFA-MVCOURT3-2026">Court · 3 times</a><a href="profile.html?v=a#tickets/SFA-MW7VFEN0-CF5F">Program · 2 children</a></div></li>
+  <li><b>B</b><div><strong>Rows + side panel</strong><p>Like Cal.com and TravelPerk: compact rows with the date, the count, everyone's initials and the status. A booking opens in a side panel (a sheet on phones) without leaving the list: people listed one per row, each ticket opens in place, Send and Remove beside it.</p></div>
+    <div class="go"><a href="profile.html?v=b#tickets">My tickets</a><a href="profile.html?v=b#tickets/SFA-MVGAME3P-2026">You + 2 guests</a><a href="profile.html?v=b#tickets/SFA-MVGAMEKD-2026">2 children</a><a href="profile.html?v=b#tickets/SFA-MVCOURT3-2026">Court · 3 times</a><a href="profile.html?v=b#tickets/SFA-MW7VFEN0-CF5F">Program · 2 children</a></div></li>
+  <li><b>C</b><div><strong>Ticket wallet</strong><p>Like event apps: bookings grouped by when (Today, This week, Later). Inside, one big ticket at a time with a person switcher (You, Omar, Khalid) and arrows; what you can do for that person sits under their ticket.</p></div>
+    <div class="go"><a href="profile.html?v=c#tickets">My tickets</a><a href="profile.html?v=c#tickets/SFA-MVGAME3P-2026">You + 2 guests</a><a href="profile.html?v=c#tickets/SFA-MVGAMEKD-2026">2 children</a><a href="profile.html?v=c#tickets/SFA-MVCOURT3-2026">Court · 3 times</a><a href="profile.html?v=c#tickets/SFA-MW7VFEN0-CF5F">Program · 2 children</a></div></li>
+</ol>
+<h2 style="margin:0 0 16px;font:var(--ts-title-section);text-transform:var(--type-case-title)">Live now</h2>
+<ol>
+  <li class="cur"><b>Now</b><div><strong>Current My tickets</strong><p>Programs grouped into one row; courts and open games one row per time and per player. Cancel the whole booking only.</p></div>
+    <div class="go"><a href="profile.html#tickets">My tickets</a></div></li>
+</ol>
+</main>
+</body>
+</html>

@@ -29,14 +29,16 @@
   }
 
   // a program booking's participants (older bookings hold one player)
-  const people = b => b.order.participants || (b.order.player ? [b.order.player] : []);
+  const people = b => b.order.participants ? b.order.participants.filter(x => !x.cancelled) : (b.order.player ? [b.order.player] : []);   // someone removed (2026-11-17) has no tickets
   // every session is a ticket; a program booking has one per participant per session (n counts the session)
   function sessions(b){
-    const out = [], prog = b.order.kind === 'program', bf = b.order.bookingFor || {}, who = prog || b.order.participants ? people(b) : [bf.type === 'child' ? { name: bf.name } : null];   // open games with several players: one ticket each (2026-11-17)   // a court booked for a child carries their name
+    // open games with several players: one ticket each (2026-11-17). Everyone ever on the booking keeps their place in the count,
+    // so a ticket's ref doesn't change when someone else is removed; removed people's tickets are dropped at the end
+    const out = [], prog = b.order.kind === 'program', bf = b.order.bookingFor || {}, who = b.order.participants ? b.order.participants : prog ? people(b) : [bf.type === 'child' ? { name: bf.name } : null];   // a court booked for a child carries their name
     const len = prog ? (window.SFA_PROGRAMS[b.order.program] || {}).minutes || SLOT : SLOT;
     let n = 0;
-    [...b.order.days].sort((x, y) => x.date.localeCompare(y.date)).forEach(d => [...d.starts].sort((x, y) => x - y).forEach(s => { n++; who.forEach(w => out.push({ date: d.date, start: s, end: s + len, n, player: w && w.name })); }));
-    return out.map((s, i) => ({ ...s, id: `${b.cartId}-${i + 1}`, cart: b.cartId, of: n, sport: b.order.sport, court: b.order.court }));
+    [...b.order.days].sort((x, y) => x.date.localeCompare(y.date)).forEach(d => [...d.starts].sort((x, y) => x - y).forEach(s => { n++; who.forEach((w, k) => out.push({ date: d.date, start: s, end: s + len, n, player: w && w.name, pi: k, gone: !!(w && w.cancelled) })); }));
+    return out.map((s, i) => ({ ...s, id: `${b.cartId}-${i + 1}`, cart: b.cartId, of: n, sport: b.order.sport, court: b.order.court })).filter(s => !s.gone);
   }
 
   // program QR codes work only on the session day (Ahmed, 2026-11-10): before it the stub shows a lock and the unlock date,

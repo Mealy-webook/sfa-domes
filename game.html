@@ -179,7 +179,7 @@
   const fmtPhone = d => [d.slice(0, 2), d.slice(2, 5), d.slice(5)].filter(Boolean).join(' ');
   const g = window.SFA_GAME(id);
   // who already holds a spot, and who has had a game before (the first is free), from the account's bookings
-  const keysOf = b => (b.order.participants || [b.order.bookingFor && b.order.bookingFor.type === 'child' ? { type: 'child', ref: b.order.bookingFor.ref, name: b.order.bookingFor.name } : { type: 'me' }])
+  const keysOf = b => ((b.order.participants && b.order.participants.filter(x => !x.cancelled)) || [b.order.bookingFor && b.order.bookingFor.type === 'child' ? { type: 'child', ref: b.order.bookingFor.ref, name: b.order.bookingFor.name } : { type: 'me' }])
     .map(x => x.type === 'guest' ? 'tel:' + x.phone : x.type === 'child' ? 'child:' + (x.ref || x.name) : 'me');
   const inGame = k => mine.some(b => b.order.kind === 'game' && b.order.game === id && b.status === 'paid' && keysOf(b).includes(k));
   const hadGame = k => mine.some(b => b.order.kind === 'game' && b.status === 'paid' && keysOf(b).includes(k));
