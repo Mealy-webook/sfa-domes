@@ -165,11 +165,13 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
   }
   function paint(focus){
     document.title = `${t('Ladies hours')} · SFA Domes`;
+    const SHOW_WEEK = false;
     root.innerHTML = `<section class="hero" aria-labelledby="h1"><div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true"><span class="msi">woman</span></span>${t('SFA Domes Dammam')}</p>
         <h1 id="h1">${t('Ladies hours')}</h1><p class="sub">${t('Courts 1 and 2 are kept for women and girls at set times every week. Book a whole court for you and your friends, the same way as any court.')}</p>
         ${L.sample ? `<span class="sample">${t('Sample schedule · the real times are coming')}</span>` : ''}</div></section>
-      <section class="sec" aria-labelledby="wk"><div class="head"><h2 id="wk">${t('Every week')}</h2><span>${t('Courts 1 and 2')}</span></div>${week()}
-        <p class="where">${t('All indoor multipurpose sports: basketball, volleyball, badminton, tennis, netball, futsal, handball, GFX and table tennis.')}</p></section>
+      <!-- "Every week" is hidden (Ahmed, 2026-11-17: "hide"); set SHOW_WEEK = true to bring it back -->
+      ${SHOW_WEEK ? `<section class="sec" aria-labelledby="wk"><div class="head"><h2 id="wk">${t('Every week')}</h2><span>${t('Courts 1 and 2')}</span></div>${week()}
+        <p class="where">${t('All indoor multipurpose sports: basketball, volleyball, badminton, tennis, netball, futsal, handball, GFX and table tennis.')}</p></section>` : ''}
       <section class="sec" id="book" aria-labelledby="bk"><div class="head"><h2 id="bk">${t('Book a court')}</h2><span>${t('1.5 hrs per booking')}</span></div><div id="bookIn">${booking()}</div></section>
       <div class="bar" id="bar" hidden><div class="bar-in"><div class="bar-t"></div><span class="bar-p"></span><button type="button" class="go" id="go">${t('Continue')}${ARROW}</button></div></div>`;
     bar(); if (focus) root.querySelector(focus)?.focus({ preventScroll: true });
