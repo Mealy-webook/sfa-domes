@@ -235,7 +235,7 @@ a{color:inherit}
 .display{font-family:var(--type-font);font-weight:var(--type-w-title);text-transform:var(--type-case-title);line-height:.985;letter-spacing:0;text-wrap:balance;margin:0}
 .d-xl{font:var(--ts-display-l);letter-spacing:0;text-align:start;color:var(--neutral-0);text-transform:var(--type-case-display)}
 .d-xl>span{display:block;white-space:nowrap}
-@media (max-width:600px){.d-xl{font-size:7.34vw}.d-xl>span{white-space:normal}}
+@media (max-width:600px){.d-xl>span{white-space:normal}}   /* Display-L on phones too (Ahmed, 2026-11-17) */
 .d-l{font:var(--ts-display-m);text-transform:var(--type-case-display)}
 .lede{font:var(--ts-body-l);max-width:46ch;margin:0;color:var(--neutral-0);text-wrap:pretty;text-shadow:0 1px 3px rgba(0,0,0,.6),0 2px 18px rgba(0,0,0,.55)}
 .c-hero .lede{margin-inline:auto}
@@ -839,6 +839,19 @@ html[lang=ar] .hero-cue-ring text{font-size:13px;letter-spacing:0}
 /* hero row icons use the same light weight, so the hand-over into the bar is seamless */
 .act-i.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24!important}
 .acts.docking .act-i{visibility:hidden}
+/* hero actions: the icon sits beside its label and is as tall as the two-line label (Ahmed, 2026-11-17) */
+.act{flex-direction:row;align-items:center;gap:16px}
+.act-i.material-symbols-outlined{flex:none;width:56px;height:56px;font-size:56px;line-height:1;overflow:hidden}
+/* four in one row on wide screens: the labels use Display-XS (24/28) so the icon is 56px, two label lines tall (Ahmed's pick) */
+.act-t{font:var(--ts-display-xs);letter-spacing:-.5px}
+/* below 1366px (laptops, tablets): two by two, as "TRAINING PROGRAMS" with its icon needs about 260px */
+@media (max-width:1365px){.acts{flex-wrap:wrap}.acts .stat{flex:1 1 50%;padding:14px 12px 0}.acts .stat:nth-child(odd){padding-left:0;border-left:0}.acts .stat:nth-child(n+3){margin-top:12px;border-top:1px solid rgba(255,255,255,.1)}}
+/* phones: no room beside a two-line label, so the icon goes back above it */
+@media (max-width:760px){.act{flex-direction:column;align-items:flex-start;gap:10px}.act-i.material-symbols-outlined{width:auto;height:auto;font-size:28px}}
+/* Arabic: the arrow sits on the left (it sat on top of the icon on phones) */
+html[dir=rtl] .act-arrow{right:auto;left:24px}
+html[dir=rtl] .act-t{padding-right:0;padding-left:32px}
+@media (max-width:760px){html[dir=rtl] .act-arrow{left:12px}html[dir=rtl] .act-t{padding-left:0}}
 /* tour text sits on the same bottom line as the bar */
 .c-low{bottom:calc(48px + env(safe-area-inset-bottom,0px))}
 /* ---------- One vertical rhythm: every content section has the same space above and below ---------- */
