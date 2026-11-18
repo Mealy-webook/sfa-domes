@@ -901,7 +901,7 @@
         <div class="bvC-st-t"><b>${live ? '<i class="bvC-pulse" aria-hidden="true"></i>' : ''}${S.title}</b><p>${lead}</p>${S.note ? `<small>${S.note}</small>` : ''}
           ${m.cancelled ? '' : `<div class="bvC-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${D.pct}" aria-label="${c.esc(D.label || '')}"><i style="--p:${D.pct}%"></i></div>${D.label ? `<small class="bvC-prog-l">${D.label}</small>` : ''}`}</div></section>
       <section class="bvC-stage" id="bvTix" style="--d:2"><div class="bvC-stage-h"><h2>${peopleTitle(c, m)}</h2><span>${peopleCount(m)}</span></div>${peopleBlock(c, m)}</section>
-      ${m.up || m.past || m.cancelled ? `<div class="bvC-main" style="--d:3">${mainAct(c, m)}</div>` : ''}<div style="--d:4" class="bvC-q">${quickActs(c, m, { cal: m.up && !todayLive(c, m), again: !m.up })}</div>
+      ${!m.up || todayLive(c, m) ? `<div class="bvC-main" style="--d:3">${mainAct(c, m)}</div>` : ''}<div style="--d:4" class="bvC-q">${quickActs(c, m, { again: !m.up })}</div>
       <div class="bvC-accs" style="--d:5">${acc('det', IC.cal, t('Booking details'), factGrid(c, F) + mailLine(c, F), true)}${acc('rc', IC2.doc, t('Receipt'), receipt(c, m))}${m.up ? acc('cx', IC.tag, t('Cancellation'), cancelBlock(c, m)) : ''}${acc('help', IC2.phone, t('Need help?'), helpBox(c, m))}</div></div>`;
   }
 

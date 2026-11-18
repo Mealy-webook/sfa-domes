@@ -66,15 +66,15 @@
   new MutationObserver(fitSoon).observe(document.documentElement, { childList: true, subtree: true });
   document.addEventListener('toggle', fitSoon, true);
 
-  // [data-c3d-stack]: several cards one behind the other (Ahmed, 2026-11-18: "show multiple cards behind each other and the
-  // user can change using arrow"). The front card is live; up to two peek out behind it; arrows, ← → keys and a swipe
+  // [data-c3d-stack]: several cards as a carousel (Ahmed, 2026-11-18: arrows, then "use carousel effect for the cards").
+  // The front card is live; up to two show either side; arrows, ← → keys and a swipe
   // change which one is in front. The position is remembered per stack id, so a re-render keeps it.
   const at3 = new Map();
   function lay(st){
     const cards = [...st.querySelectorAll(':scope > .c3d-stack-c > .c3d')], n = cards.length, id = st.dataset.c3dStack;
     let i = Math.max(0, Math.min(n - 1, at3.get(id) || 0)); at3.set(id, i);
-    cards.forEach((c, k) => { const pos = k - i; c.dataset.pos = pos < 0 ? 'out' : pos > 2 ? 'far' : String(pos); c.style.setProperty('--pos', Math.max(0, Math.min(3, pos)));
-      c.inert = pos !== 0; c.setAttribute('aria-hidden', String(pos !== 0)); });
+    cards.forEach((c, k) => { const pos = k - i, ap = Math.abs(pos); c.dataset.pos = ap > 2 ? 'far' : String(pos); c.style.setProperty('--pos', Math.max(-3, Math.min(3, pos))); c.style.setProperty('--apos', Math.min(3, ap));
+      const inner = c.querySelector('.c3d-card'); if (inner) inner.inert = pos !== 0; c.setAttribute('aria-hidden', String(pos !== 0)); c.toggleAttribute('data-c3d-go', pos !== 0 && ap <= 2); });
     const cnt = st.querySelector('[data-c3d-count]'); if (cnt) cnt.textContent = cnt.dataset.c3dCount.replace('{i}', i + 1).replace('{n}', n);
     const pv = st.querySelector('[data-c3d-prev]'), nx = st.querySelector('[data-c3d-next]'); if (pv) pv.disabled = i === 0; if (nx) nx.disabled = i === n - 1;
     const who = st.querySelector('[data-c3d-who]'); if (who) who.textContent = cards[i] ? (cards[i].getAttribute('aria-label') || '').split(' · ').pop() : '';
@@ -82,6 +82,8 @@
   function go(st, d){ const id = st.dataset.c3dStack, n = st.querySelectorAll(':scope > .c3d-stack-c > .c3d').length, i = (at3.get(id) || 0) + d;
     if (i < 0 || i >= n) return; at3.set(id, i); lay(st); }
   const layAll = root => (root.querySelectorAll ? root.querySelectorAll('[data-c3d-stack]') : []).forEach(lay);
+  // a click on a side card brings it to the front
+  document.addEventListener('click', e => { const card = e.target.closest && e.target.closest('.c3d[data-c3d-go]'); if (!card) return; const st = card.closest('[data-c3d-stack]'); if (st) go(st, +card.style.getPropertyValue('--pos') || 0); });
   document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-c3d-prev],[data-c3d-next]'); if (!b) return;
     const st = b.closest('[data-c3d-stack]'); if (st){ go(st, b.hasAttribute('data-c3d-next') ? 1 : -1); } });
   document.addEventListener('keydown', e => { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; const st = e.target.closest && e.target.closest('[data-c3d-stack]'); if (!st || /input|textarea/i.test(e.target.tagName)) return;

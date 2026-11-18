@@ -129,16 +129,20 @@ html[dir=rtl] .c3d-mini.is-stack::after{transform:translate(12px,-10px)}
 .c3d-renew .btn:disabled{background:var(--color-bg-tertiary);color:var(--color-content-secondary);border-color:transparent;cursor:not-allowed}
 @media (max-width:639px){.c3d-renew{grid-template-columns:minmax(0,1fr)}.c3d-renew .btn{grid-column:1;grid-row:auto;width:100%}}
 
-/* stacked cards with arrows (Ahmed, 2026-11-18): one card in front, up to two peeking out above it */
-.c3d-stack{display:grid;gap:16px;min-width:0}
-.c3d-stack-c{display:grid;padding-top:28px}
-.c3d-stack-c > .c3d{grid-area:1/1;transform-origin:50% 0;transform:translateY(calc(var(--pos, 0) * -14px)) scale(calc(1 - var(--pos, 0) * .06));z-index:calc(10 - var(--pos, 0));
-  transition:transform .45s cubic-bezier(.2,.75,.2,1),opacity .35s,filter .35s}
-.c3d-stack-c > .c3d:not([data-pos="0"]){filter:brightness(.82);pointer-events:none}
+/* the cards as a carousel (Ahmed, 2026-11-18: "use carousel effect for the cards"; it was a stack before): the front
+   card in the middle, its neighbours either side, smaller and turned away; arrows, ← →, a swipe or a click on a side card
+   brings one to the front. f/card3d.js sets --pos (signed), --apos and data-pos on each card. */
+.c3d-stack{display:grid;gap:12px;min-width:0}
+.c3d-stack-c{--dir:1;display:grid;padding:12px 0 28px;perspective:1600px;overflow:hidden}
+html[dir=rtl] .c3d-stack-c{--dir:-1}
+.c3d-stack-c > .c3d{grid-area:1/1;justify-self:center;width:min(300px,76%);transform-origin:50% 50%;
+  transform:translateX(calc(var(--pos, 0) * 74% * var(--dir))) rotateY(calc(var(--pos, 0) * -32deg * var(--dir))) scale(calc(1 - var(--apos, 0) * .14));
+  z-index:calc(10 - var(--apos, 0));transition:transform .55s cubic-bezier(.2,.75,.2,1),opacity .4s,filter .4s}
+.c3d-stack-c > .c3d:not(.c3d--v){width:min(420px,82%)}
+.c3d-stack-c > .c3d:not([data-pos="0"]){filter:brightness(.72) saturate(.85);cursor:pointer}
+.c3d-stack-c > .c3d:not([data-pos="0"]):hover{filter:brightness(.85)}
 .c3d-stack-c > .c3d:not([data-pos="0"]) .c3d-face{box-shadow:0 1px 2px rgba(9,9,11,.12)}
-.c3d-stack-c > .c3d[data-pos="far"]{opacity:0}
-.c3d-stack-c > .c3d[data-pos="out"]{opacity:0;transform:translateX(-36%) rotate(-5deg);z-index:11}
-html[dir=rtl] .c3d-stack-c > .c3d[data-pos="out"]{transform:translateX(36%) rotate(5deg)}
+.c3d-stack-c > .c3d[data-pos="far"]{opacity:0;pointer-events:none}
 .c3d-nav{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:12px}
 .c3d-arrow{display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid var(--color-border-strong);background:var(--color-bg-primary);color:var(--color-content-primary);cursor:pointer}
 .c3d-arrow:hover:not(:disabled){border-color:var(--color-content-primary);background:var(--color-bg-secondary)}
@@ -150,8 +154,8 @@ html[dir=rtl] .c3d-arrow.is-next svg{transform:none}
 .c3d-count{display:grid;justify-items:center;text-align:center;min-width:0}
 .c3d-count b{font:var(--ts-body-default-bold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .c3d-count small{font:var(--ts-body-s);color:var(--color-content-secondary)}
-.c3d-stack--v{max-width:340px}
 @media (prefers-reduced-motion:reduce){.c3d-stack-c > .c3d{transition:none}}
+@media (max-width:639px){.c3d-stack-c > .c3d{width:min(280px,72%)}}
 
 /* every card stands up (Ahmed, 2026-11-18: "all the cards should be vertical"): the list previews too */
 .c3d-mini-c{width:60px;height:84px;padding:8px 7px;align-content:space-between;justify-items:center;text-align:center}
