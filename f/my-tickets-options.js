@@ -834,7 +834,7 @@
     if (m.up && !skip.cal) out.push(`<a class="bvq" href="${c.T.ics(b)}" download="${c.T.icsName(b)}">${IC.cal}<span>${t('Add to calendar')}</span></a>`);
     if (m.up && !skip.dir) out.push(`<a class="bvq" href="${c.T.DIRECTIONS}" target="_blank" rel="noopener">${IC.pin}<span>${t('Get directions')}</span></a>`);
     if (n) out.push(`<button type="button" class="bvq" data-mt-sendall="${esc(b.cartId)}">${SEND}<span>${n === 1 ? t('Send the guest ticket') : t('Send {n} guest tickets', { n })}</span></button>`);
-    if (c.renewInfo(b)) out.push(`<button type="button" class="bvq is-accent" data-renew="${esc(b.cartId)}">${IC.tag}<span>${t('Renew · 20% off')}</span></button>`);
+    // no Renew tile (Ahmed, 2026-11-18: "remove"): renewing lives in the box under the program cards
     out.push(`<a class="bvq" href="result.html?cart=${encodeURIComponent(b.cartId)}">${IC2.doc}<span>${t('View confirmation')}</span></a>`);
     if (!m.up && !skip.again) out.push(`<a class="bvq" href="${againUrl(m)}">${IC.cal}<span>${t('Book again')}</span></a>`);
     return `<div class="bvq-row">${out.join('')}</div>`;
