@@ -95,6 +95,17 @@
   new MutationObserver(list => { for (const m of list) for (const n of m.addedNodes) if (n.nodeType === 1){ if (n.matches && n.matches('[data-c3d-stack]')) lay(n); else layAll(n); } })
     .observe(document.documentElement, { childList: true, subtree: true });
   layAll(document);
+  // carousel options: ?cs=cover|peek|fan|ring|stack picks the look (f/card3d.css); with ?cs a bar switches between them
+  const CS = [['cover', '1 · Coverflow'], ['peek', '2 · Peek'], ['fan', '3 · Fan'], ['ring', '4 · Ring'], ['stack', '5 · Stack']];
+  const cs = (new URLSearchParams(location.search).get('cs') || '').toLowerCase();
+  if (CS.some(([k]) => k === cs)){
+    document.documentElement.dataset.cs = cs;
+    const bar = () => { if (document.querySelector('.c3d-csbar') || !document.body) return; const q = new URLSearchParams(location.search), nav = document.createElement('nav'); nav.className = 'c3d-csbar'; nav.setAttribute('aria-label', 'Carousel options');
+      nav.innerHTML = '<span>Carousel</span>' + CS.map(([k, l]) => { q.set('cs', k); return `<a href="?${q}${location.hash}"${k === cs ? ' aria-current="true"' : ''}>${l}</a>`; }).join('');
+      nav.addEventListener('click', e => { const a = e.target.closest('a'); if (a) a.href = a.getAttribute('href').split('#')[0] + location.hash; });
+      document.body.appendChild(nav); };
+    document.readyState === 'loading' ? addEventListener('DOMContentLoaded', bar) : bar();
+  }
 
   const FLIP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.7M20 4v4.7h-4.7M20 12a8 8 0 0 1-13.7 5.6L4 15.3M4 20v-4.7h4.7"/></svg>';
   const ARR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';

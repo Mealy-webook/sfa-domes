@@ -67,7 +67,7 @@
 .c3d-renew s{color:var(--color-content-tertiary)}
 .c3d-renew .btn{grid-column:2;grid-row:1/3}
 .c3d.is-locked .c3d-front{border-top-color:var(--neutral-600)}
-.c3d.is-off{opacity:.75}
+.c3d.is-off .c3d-face{filter:grayscale(.75)}   /* played or removed: greyed, not see-through (cards overlap in the carousel) */
 
 /* the deck: cards side by side, one column on phones */
 .c3d-deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:20px}
@@ -162,3 +162,30 @@ html[dir=rtl] .c3d-arrow.is-next svg{transform:none}
 .c3d-mini-c small{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:9px;line-height:11px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .c3d-mini-c b{justify-content:center}
 .c3d-mini-c svg{width:22px;height:22px}
+
+/* carousel options (Ahmed, 2026-11-18: "show me options for the carousel"): profile.html?cs=cover|peek|fan|ring|stack
+   (f/card3d.js puts it on <html data-cs>); cover is the default. A bar at the bottom switches between them. */
+html[data-cs=peek] .c3d-stack-c{perspective:none}
+html[data-cs=peek] .c3d-stack-c > .c3d{transform:translateX(calc(var(--pos, 0) * 106% * var(--dir))) scale(calc(1 - var(--apos, 0) * .08))}
+html[data-cs=peek] .c3d-stack-c > .c3d:not([data-pos="0"]){filter:none;opacity:.55}
+html[data-cs=peek] .c3d-stack-c > .c3d:not([data-pos="0"]):hover{opacity:.8}
+
+html[data-cs=fan] .c3d-stack-c{padding:40px 0 36px}
+html[data-cs=fan] .c3d-stack-c > .c3d{transform-origin:50% 130%;transform:rotate(calc(var(--pos, 0) * 11deg * var(--dir))) translateY(calc(var(--apos, 0) * 12px)) scale(calc(1 - var(--apos, 0) * .04))}
+html[data-cs=fan] .c3d-stack-c > .c3d:not([data-pos="0"]){filter:brightness(.8)}
+
+html[data-cs=ring] .c3d-stack-c{perspective:1100px;padding:24px 0 36px}
+html[data-cs=ring] .c3d-stack-c > .c3d{transform:translateZ(-380px) rotateY(calc(var(--pos, 0) * -40deg * var(--dir))) translateZ(380px)}
+html[data-cs=ring] .c3d-stack-c > .c3d:not([data-pos="0"]){filter:brightness(.7)}
+
+html[data-cs=stack] .c3d-stack-c{padding-top:30px}
+html[data-cs=stack] .c3d-stack-c > .c3d{transform-origin:50% 0;transform:translateY(calc(var(--apos, 0) * -14px)) scale(calc(1 - var(--apos, 0) * .06))}
+html[data-cs=stack] .c3d-stack-c > .c3d[data-pos^="-"]{opacity:0;transform:translateX(calc(-40% * var(--dir))) rotate(calc(-6deg * var(--dir)));pointer-events:none;z-index:11}
+html[data-cs=stack] .c3d-stack-c > .c3d:not([data-pos="0"]){filter:brightness(.82)}
+
+.c3d-csbar{position:fixed;inset-inline:0;bottom:16px;z-index:61;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;width:max-content;max-width:calc(100% - 32px);margin:0 auto;padding:6px;background:var(--neutral-950);color:var(--neutral-0);box-shadow:0 12px 30px -12px rgba(9,9,11,.6)}
+.c3d-csbar span{padding:0 10px;font:var(--ts-caption-1-bold);color:rgba(255,255,255,.6)}
+.c3d-csbar a{display:inline-flex;align-items:center;height:36px;padding:0 12px;color:var(--neutral-0);font:var(--ts-body-s-bold);text-decoration:none;white-space:nowrap}
+.c3d-csbar a:hover{background:rgba(255,255,255,.1)}
+.c3d-csbar a[aria-current]{background:var(--neutral-0);color:var(--neutral-950)}
+@media (max-width:639px){.c3d-csbar{bottom:8px;gap:2px}.c3d-csbar span{display:none}.c3d-csbar a{height:32px;padding:0 8px;font:var(--ts-caption-1-bold)}}
