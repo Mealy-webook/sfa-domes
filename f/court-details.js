@@ -245,8 +245,8 @@
     $('goTotal').innerHTML = n || !goAlways ? was + money(total) : `${money(price)} <small class="go-from">${t('/ hr')}</small>`;
     $('goWhen').textContent = n ? counts(keys.length, n, hrs) : t('{name} · pick days and times', { name: t(name) });
     $('go').classList.toggle('on', n > 0 || goAlways); document.body.classList.toggle('has-picks', n > 0);
-    [$('bookBtn'), $('goBtn')].forEach(b => { b.disabled = !n; b.innerHTML = n ? `<span>${t('Book · {total}', { total: money(total) })}</span>` : t('Pick a time'); });
-    if (goAlways && !n){ $('goBtn').disabled = false; $('goBtn').innerHTML = `<span>${t('Book this court')}</span>`; }
+    [$('bookBtn'), $('goBtn')].forEach(b => { b.disabled = !n; b.innerHTML = n ? `<span>${t(window.SFA_FLOW && window.SFA_FLOW.on ? 'Continue · {total}' : 'Book · {total}', { total: money(total) })}</span>` : t('Pick a time'); });
+    if (goAlways && !n && !(window.SFA_FLOW && window.SFA_FLOW.on)){ $('goBtn').disabled = false; $('goBtn').innerHTML = `<span>${t('Book this court')}</span>`; }
     notify();
   }
   $('sumDays').addEventListener('click', e => {

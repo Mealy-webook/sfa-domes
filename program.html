@@ -105,6 +105,7 @@
 }
 </style>
 <link rel="stylesheet" href="f/ui.css">
+<link rel="stylesheet" href="f/flow.css">
 </head>
 <body class="v-q" data-go-always>
 <div data-site-nav></div>
@@ -226,6 +227,7 @@
   </div>
 </div>
 
+<script src="f/flow.js"></script>
 <script src="f/site-nav.js"></script>
 <script src="f/site-footer.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
@@ -323,7 +325,8 @@
     const when = !!(st.start && st.time != null), list = sessions(), price = st.plan === 'trial' ? t('Free of charge') : P.money(window.SFA_PROGRAM_PRICE(p, st.plan));
     $('goWhen').textContent = when ? `${P.date(toDate(st.start), 'short')} · ${P.time(st.time)} · ${t('{n} sessions', { n: list.length })}` : t('{name} · pick a start day and time', { name: tx(p.name) });
     $('goTotal').innerHTML = when ? price : `<small class="go-from">${t('From')}</small> ${P.money(p.month)}`;
-    $('goBtn').innerHTML = `<span>${when ? (st.plan === 'trial' ? t('Book free trial') : t('Book · {total}', { total: price })) : t('Book this program')}</span>`;
+    const FL = window.SFA_FLOW && window.SFA_FLOW.on;
+    $('goBtn').innerHTML = `<span>${when ? (FL ? t('Continue · {total}', { total: price }) : st.plan === 'trial' ? t('Book free trial') : t('Book · {total}', { total: price })) : FL ? t('Pick a start day and time') : t('Book this program')}</span>`;
     $('go').classList.add('on'); document.body.classList.toggle('has-picks', when);
   }
   function booking(){

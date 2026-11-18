@@ -468,6 +468,7 @@ button.who-opt:disabled small{color:var(--danger)}
 .ck-card .total strong{font:var(--ts-display-xs)}
 </style>
 <link rel="stylesheet" href="f/ui.css">
+<link rel="stylesheet" href="f/flow.css">
 </head>
 <body>
 <div data-site-nav data-focused data-back="index.html?from=courts#sports" data-back-label="Edit booking"></div>
@@ -557,6 +558,7 @@ button.who-opt:disabled small{color:var(--danger)}
   <a class="btn" href="index.html?from=courts#sports">Choose a sport</a>
 </div>
 
+<script src="f/flow.js"></script>
 <script src="f/site-nav.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
@@ -741,6 +743,11 @@ button.who-opt:disabled small{color:var(--danger)}
       e.target.closest('.bad')?.classList.remove('bad'); });
     pm.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.target.id === 'gpN' || e.target.id === 'gpP')){ e.preventDefault(); pm.querySelector('[data-gp-add]')?.click(); } });
 
+    // webook-style steps (f/flow.js): Who's playing → Review → Checkout
+    window.SFA_CK = { kind: 'game', steps: ['players', 'review', 'pay'], back: bookUrl,
+      validate: async step => { if (step === 'players' && !order.players.length){ pickErr = t("Choose who's playing"); summary(); $('gpCard')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); return false; } return true; },
+      recap: () => [["Who's playing", (quote ? quote.people : []).map(x => esc(x.type === 'me' ? t('You') : x.name) + (x.type === 'guest' ? ` <small class="ln-mut">· ${t('Guest')}</small>` : '')).join(', ') || '—', 'players'],
+        ['When', `${P.date(toDate(g.date), 'full')} · <bdi>${P.time(g.start)}</bdi>`], ['Where', `${esc(t(c[0]))} · ${t('SFA Domes Dammam')}`]] };
     const gate = () => window.SFA_AUTH.require(t('Sign in to join a game.')).then(u => { if (!u) location.href = bookUrl; else { me = u; load(); } });
     summary(); gate(); addEventListener('sfa:auth', e => { if (!e.detail) gate(); });
     addEventListener('sfa:prefs', summary);
@@ -865,11 +872,11 @@ button.who-opt:disabled small{color:var(--danger)}
       const row = (k, i) => `<li${i ? '' : ' class="on"'}><span class="pk-n">${i + 1}</span><span><b>${P.date(toDate(k), { weekday: 'long', day: 'numeric', month: 'long' })}</b><small>${range(order.time)}</small></span>${i ? '' : `<em>${t('First')}</em>`}</li>`;
       // Your sessions is hidden for now (Ahmed): the summary card still says when it starts and how many sessions. Set
       // SHOW_SESSIONS to bring the card (soonest first + the all-sessions popup) back.
-      main.innerHTML = (SHOW_SESSIONS ? `<section class="step panel ck-card" aria-labelledby="sesTitle"><div class="step-head ck-card-head pk-ses-head"><h2 id="sesTitle">${t('Your sessions')}</h2><a href="${bookUrl}">${t('Change')}</a></div>
+      main.innerHTML = (SHOW_SESSIONS ? `<section class="step panel ck-card" id="sesCard" aria-labelledby="sesTitle"><div class="step-head ck-card-head pk-ses-head"><h2 id="sesTitle">${t('Your sessions')}</h2><a href="${bookUrl}">${t('Change')}</a></div>
           <div class="pk-body"><ol class="pk-next" id="pkSes">${top.map(row).join('')}</ol>
           ${rest.length ? `<p class="pk-rest">${t('+ {n} more sessions until {d}', { n: rest.length, d: P.date(toDate(last), { weekday: 'short', day: 'numeric', month: 'short' }) })}</p><button type="button" class="pk-more" id="pkMore" aria-haspopup="dialog">${t('Show all {n} sessions', { n: list.length })}</button>` : ''}</div></section>` : '') + `
                 <section class="step panel ck-card" id="ppCard" aria-labelledby="ppTitle"><div class="step-head ck-card-head"><h2 id="ppTitle">${t('Participants')}</h2></div><div class="pk-body" id="ppBody"></div></section>
-        ${order.plan === 'trial' ? '' : `<section class="step panel ck-card" aria-labelledby="addTitle"><div class="step-head ck-card-head"><h2 id="addTitle">${t('Add-ons')}</h2></div><div class="pk-body" id="pkKit"></div></section>`}`;
+        ${order.plan === 'trial' ? '' : `<section class="step panel ck-card" id="addCard" aria-labelledby="addTitle"><div class="step-head ck-card-head"><h2 id="addTitle">${t('Add-ons')}</h2></div><div class="pk-body" id="pkKit"></div></section>`}`;
       ppCard();
       kitCard();
     }
@@ -994,6 +1001,12 @@ button.who-opt:disabled small{color:var(--danger)}
     addEventListener('sfa:auth', e => { me = e.detail; ppCard(); kitCard(); summary(); if (e.detail) loadKids(); });
     addEventListener('sfa:prefs', () => { $('doc-terms').innerHTML = `<ul>${window.SFA_PROGRAM_TERMS.map(x => `<li>${esc(tx(x))}</li>`).join('')}</ul>`; cards(); summary(); });
 
+    // webook-style steps (f/flow.js): (Plan & time on the program page) → Add-ons → Participants → Review → Checkout
+    window.SFA_CK = { kind: 'program', trial: order.plan === 'trial', steps: order.plan === 'trial' ? ['people', 'review', 'pay'] : ['upgrade', 'people', 'review', 'pay'], back: bookUrl,
+      validate: async step => { if (step === 'people' && !picked().length){ $('ppCard').classList.add('bad'); $('ppCard').scrollIntoView({ block: 'center', behavior: 'smooth' }); return false; } return true; },
+      recap: () => [['Participants', picked().map(c => esc(c.name || [c.first, c.last].filter(Boolean).join(' '))).join(', ') || '—', 'people'],
+        ...(order.plan === 'trial' ? [] : [['Add-ons', kitsOn().length ? `${kitsOn().length} × ${esc(tx(K.name))}` : t('None'), 'upgrade']]),
+        ['Starts', `${P.date(toDate(order.start), 'full')} · ${range(order.time)}`]] };
     const gate = () => window.SFA_AUTH.require(t('Sign in to book this program.')).then(u => { if (!u) location.href = bookUrl; });
     gate(); addEventListener('sfa:auth', e => { if (!e.detail) gate(); });
     $('pTerms').addEventListener('change', () => $('fTerms').classList.remove('bad'));
@@ -1191,6 +1204,26 @@ button.who-opt:disabled small{color:var(--danger)}
   fetch('/api/config').catch(() => showAlert('Payments need the SFA Domes server (<code>node server.js</code>).', true));
   addEventListener('sfa:prefs', () => { review(); });
 
+  // webook-style steps (f/flow.js): (Date & times on the court page) → Booking for → Review → Checkout
+  const forText = () => { const w = who(); if (w === 'me') return t('Myself');
+    if (w === 'other') return `${esc($('gName').value.trim() || '—')} <small class="ln-mut">· <bdi>+966 ${esc($('gPhone').value)}</bdi></small>`;
+    const c = ck.pick === 'once' ? ck.once : kidList.find(x => x.id === ck.pick); return c ? esc(c.name || [c.first, c.last].filter(Boolean).join(' ')) : '—'; };
+  window.SFA_CK = { kind: 'court', steps: ['who', 'review', 'pay'], back: bookUrl,
+    validate: async step => {
+      if (step !== 'who') return true;
+      const ids = ['gfName', 'gfPhone', 'gfEmail'], bad = ids.filter(id => !checks[id]());
+      ids.forEach(id => $(id).classList.toggle('bad', bad.includes(id)));
+      if (who() === 'child'){
+        if (formShown() && !(await continueKid())) return false;
+        const c = ck.pick === 'once' ? ck.once : kidList.find(x => x.id === ck.pick);
+        if (!c || kidOff(c)){ kids.classList.add('bad'); kids.scrollIntoView({ block: 'center', behavior: 'smooth' }); $('kidDdB')?.focus({ preventScroll: true }); return false; }
+      }
+      if (bad.length){ const f = $(bad[0]).querySelector('input'); f.closest('.field').scrollIntoView({ block: 'center', behavior: 'smooth' }); f.focus({ preventScroll: true }); return false; }
+      order.bookingFor = bookingFor(); try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (e) {}
+      return true;
+    },
+    recap: () => [['Booking for', forText(), 'who'], ['Where', `${esc(t(name))} · ${t('SFA Domes Dammam')}`]] };
+
   // ---- pay: the server creates the PayTabs payment page and we go there
   $('payBtn').addEventListener('click', async () => {
     const bad = Object.keys(checks).filter(id => !checks[id]());
@@ -1218,6 +1251,49 @@ button.who-opt:disabled small{color:var(--danger)}
       btn.disabled = false; btn.innerHTML = payLabel;
     }
   });
+})();
+</script>
+<script>
+/* Checkout as steps (Ahmed, 2026-11-18: follow webook's booking journey; f/flow.js). Each branch above registers
+   window.SFA_CK { kind, steps, back, validate(step), recap() }. One step shows at a time; the step lives in the URL hash so
+   the browser's Back works; Continue checks the step before moving on; Review lists what you're booking, Checkout has
+   the payment method, the terms and Pay. */
+(() => {
+  const C = window.SFA_CK, F = window.SFA_FLOW, P = window.SFA_PREFS; if (!C || !F) return;
+  const $ = id => document.getElementById(id), t = P.t, html = document.documentElement, page = $('page'), main = page.querySelector('.ck-main');
+  html.classList.add('fl-ck');
+  const S = C.steps, kind = C.kind === 'program' ? 'program' : C.kind === 'game' ? 'game' : 'court';
+  const top = document.createElement('div'); top.className = 'fl-top'; page.prepend(top);
+  main.insertAdjacentHTML('afterbegin', `<section class="step panel ck-card" id="ckRecap" aria-labelledby="recapT"><div class="step-head ck-card-head"><h2 id="recapT"></h2></div><dl class="ck-recap" id="recapL"></dl></section>`);
+  page.querySelector('.confirm').insertAdjacentHTML('beforebegin', `<section class="step panel ck-card" id="ckPayM" aria-labelledby="pmT"><div class="step-head ck-card-head"><h2 id="pmT"></h2></div><div class="ck-pm" id="pmBox"></div></section>`);
+  page.querySelector('.confirm').insertAdjacentHTML('afterend', `<div class="fl-next" id="flNext"><div class="fl-next-t"><small id="flNextL"></small><strong id="flNextT"></strong></div><button type="button" class="btn" id="flGo"></button></div>`);
+  let cur = S.includes(location.hash.slice(1)) ? location.hash.slice(1) : S[0];
+  function paint(){
+    html.dataset.ckStep = cur;
+    const i = S.indexOf(cur), prev = S[i - 1];
+    top.innerHTML = F.header({ kind, step: cur, trial: C.trial, back: prev ? '#' + prev : C.back, backLabel: prev ? 'Back' : 'Back to the booking' });
+    $('recapT').textContent = t('What you’re booking');
+    $('recapL').innerHTML = (C.recap ? C.recap() : []).map(([k, v, edit]) => `<div class="ck-recap-row"><dt>${t(k)}</dt><dd>${v}</dd>${edit ? `<a href="#${edit}">${t('Change')}</a>` : ''}</div>`).join('');
+    $('pmT').textContent = t('Payment method');
+    $('pmBox').innerHTML = `<span class="dot" aria-hidden="true"></span><div><b>${t('Card')}</b><small>${t('Visa, Mastercard or mada, paid securely with PayTabs')}</small></div><div class="cards" aria-hidden="true"><span>VISA</span><span>MC</span><span>mada</span></div>`;
+    $('flNextL').textContent = t('Total'); $('flNextT').innerHTML = $('total').innerHTML;
+    $('flGo').innerHTML = `<span>${t(cur === 'review' ? 'Continue to payment' : 'Continue')}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>`;
+    document.title = `${F.label(cur)} · SFA Domes`;
+  }
+  new MutationObserver(() => { $('flNextT').innerHTML = $('total').innerHTML; if (cur === 'review') $('recapL').innerHTML = (C.recap ? C.recap() : []).map(([k, v, edit]) => `<div class="ck-recap-row"><dt>${t(k)}</dt><dd>${v}</dd>${edit ? `<a href="#${edit}">${t('Change')}</a>` : ''}</div>`).join(''); })
+    .observe($('total'), { childList: true, subtree: true, characterData: true });
+  const show = s => { cur = s; paint(); scrollTo({ top: 0, behavior: 'auto' }); top.querySelector('h1')?.setAttribute('tabindex', '-1'); top.querySelector('h1')?.focus({ preventScroll: true }); };
+  $('flGo').addEventListener('click', async () => {
+    const btn = $('flGo'); if (btn.disabled) return; btn.disabled = true;
+    try { if (!(await C.validate(cur))) return; } finally { btn.disabled = false; }
+    const nx = S[S.indexOf(cur) + 1]; if (!nx) return;
+    history.pushState(null, '', '#' + nx); show(nx);
+  });
+  addEventListener('hashchange', () => { const h = location.hash.slice(1); if (S.includes(h) && h !== cur) show(h); });
+  addEventListener('popstate', () => { const h = location.hash.slice(1) || S[0]; if (S.includes(h) && h !== cur) show(h); });
+  addEventListener('sfa:prefs', paint);
+  if (!location.hash) history.replaceState(null, '', '#' + cur);
+  paint();
 })();
 </script>
 </body>
