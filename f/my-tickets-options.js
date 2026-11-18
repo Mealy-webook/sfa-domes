@@ -477,7 +477,7 @@
     },
     view(c, m){
       // Manage rail is the live booking page (Ahmed picked it, 2026-11-17); ?bv=was shows the page it replaced
-      const bv = bvOf() || 'rail'; if (BV[bv]) return `<div class="bv bv-${bv}">${BV[bv](c, m)}</div>`;
+      const bv = bvOf() || 'rail'; if (BV[bv]) return `<div class="bv bv-${bv}">${BV[bv](c, m)}</div>${bvOf() && BV_OPTS.some(([k]) => k === bv) ? optBar(bv) : ''}`;
       const b = m.b, multi = !(m.people[0] && m.people[0].single) && m.active.length > 1, now = Date.now();
       let f = st.tf[b.cartId]; if (f === undefined || (f !== 'all' && !m.active.some(p => p.i === f))) f = st.tf[b.cartId] = 'all';
       const P0 = f === 'all' ? null : m.people.find(p => p.i === f);
@@ -824,7 +824,94 @@
       <div class="bv-o-foot"><section><h2 class="bv-h">${t('Receipt')}</h2>${receipt(c, m)}</section><section><h2 class="bv-h">${t('Need help?')}</h2>${helpBox(c, m)}</section></div>`;
   }
 
-  const BV = { wallet: bvWallet, timeline: bvTimeline, split: bvSplit, rail: bvRail, tabs: bvTabs, order: bvOrder };
+  // ================= Booking page options, round 3 (Ahmed, 2026-11-18: "better UI and layout for my bookings details page,
+  // show me options"). All four use the same pieces as the live page (3D card stack, status, actions, details, receipt,
+  // help); profile.html?bv=hero|bento|focus|journey, with a switcher bar to compare them on one booking. =================
+  const sendN = m => m.people.filter(p => m.canSend(p) && !p.sent).length;
+  // the quick actions as icon tiles (calendar, directions, send, renew, confirmation, book again)
+  function quickActs(c, m, skip = {}){   // skip: { cal, dir } when the big buttons above already offer them
+    const t = c.t, b = m.b, esc = c.esc, out = [], n = sendN(m);
+    if (m.up && !skip.cal) out.push(`<a class="bvq" href="${c.T.ics(b)}" download="${c.T.icsName(b)}">${IC.cal}<span>${t('Add to calendar')}</span></a>`);
+    if (m.up && !skip.dir) out.push(`<a class="bvq" href="${c.T.DIRECTIONS}" target="_blank" rel="noopener">${IC.pin}<span>${t('Get directions')}</span></a>`);
+    if (n) out.push(`<button type="button" class="bvq" data-mt-sendall="${esc(b.cartId)}">${SEND}<span>${n === 1 ? t('Send the guest ticket') : t('Send {n} guest tickets', { n })}</span></button>`);
+    if (c.renewInfo(b)) out.push(`<button type="button" class="bvq is-accent" data-renew="${esc(b.cartId)}">${IC.tag}<span>${t('Renew · 20% off')}</span></button>`);
+    out.push(`<a class="bvq" href="result.html?cart=${encodeURIComponent(b.cartId)}">${IC2.doc}<span>${t('View confirmation')}</span></a>`);
+    if (!m.up) out.push(`<a class="bvq" href="${againUrl(m)}">${IC.cal}<span>${t('Book again')}</span></a>`);
+    return `<div class="bvq-row">${out.join('')}</div>`;
+  }
+  const todayLive = (c, m) => liveTix(c, m).some(s => s.date === dk(new Date()));
+  const cardsSec = (c, m, cls) => `<section class="bv-sec ${cls || ''}" id="bvTix"><div class="sec"><h2>${peopleTitle(c, m)}</h2><span>${peopleCount(m)}</span></div>${peopleBlock(c, m)}</section>`;
+  const statLine = (c, S) => `<div class="bvo-stat bvo-stat--${S.k}"><span class="bv-stat-ic">${S.k === 'off' ? IC2.x : S.k === 'up' ? IC2.clock : IC2.ok}</span><div><b>${S.title}</b>${S.lead ? `<p>${S.lead}</p>` : ''}${S.note ? `<small>${S.note}</small>` : ''}</div></div>`;
+
+  // ---------- A · Pass hero (Apple Wallet event pass, Ticketmaster, airline boarding pass pages) ----------
+  // a grey band with the cards big on one side and the status and actions on the other; the paperwork below
+  function bvHero(c, m){
+    const F = factsOf(c, m), S = statusOf(c, m), t = c.t;
+    return crumbsBk(c, m) + `<section class="bvA-hero"><div class="bvA-cards">${cardsSec(c, m, 'bvA-sec')}</div>
+        <div class="bvA-info"><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-hd-ref"><small>${t('Booking ref')}</small>${refCopy(c, m)}</p>
+          ${statLine(c, S)}${m.up || m.past || m.cancelled ? `<div class="bvA-main">${mainAct(c, m)}${dirAct(c, m)}</div>` : ''}${quickActs(c, m, { cal: !todayLive(c, m), dir: true })}</div></section>
+      <div class="bvA-body"><div class="bvA-l"><section class="bv-sec"><div class="sec"><h2>${t('Booking details')}</h2></div>${factGrid(c, F)}${mailLine(c, F)}</section>
+          <section class="bv-sec"><div class="sec"><h2>${t('Receipt')}</h2></div>${receipt(c, m)}</section></div>
+        <aside class="bvA-r">${m.up ? `<section class="bv-card"><h2>${t('Cancellation')}</h2>${cancelBlock(c, m)}</section>` : ''}<section class="bv-card"><h2>${t('Need help?')}</h2>${helpBox(c, m)}</section></aside></div>`;
+  }
+
+  // ---------- B · Bento (Revolut, Linear, the Airbnb host dashboard) ----------
+  // every part in its own tile on one grid; the cards take the tall tile
+  function bvBento(c, m){
+    const F = factsOf(c, m), S = statusOf(c, m), t = c.t;
+    return crumbsBk(c, m) + `<header class="bv-hd"><span class="bv-hd-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
+        <div><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-hd-ref"><small>${t('Booking ref')}</small>${refCopy(c, m)}</p></div></header>
+      <div class="bvB">
+        <section class="bvB-t bvB-cards">${cardsSec(c, m)}</section>
+        <section class="bvB-t bvB-stat">${statLine(c, S)}</section>
+        <section class="bvB-t bvB-act"><h2>${t('Manage booking')}</h2>${m.up || m.past || m.cancelled ? `<div class="bv-mg-main">${mainAct(c, m)}${dirAct(c, m)}</div>` : ''}${manageList(c, m, todayLive(c, m))}</section>
+        <section class="bvB-t bvB-det"><h2>${t('Booking details')}</h2>${factGrid(c, F)}${mailLine(c, F)}</section>
+        <section class="bvB-t bvB-rc"><h2>${t('Receipt')}</h2>${receipt(c, m)}</section>
+        ${m.up ? `<section class="bvB-t bvB-cx"><h2>${t('Cancellation')}</h2>${cancelBlock(c, m)}</section>` : ''}
+        <section class="bvB-t bvB-help"><h2>${t('Need help?')}</h2>${helpBox(c, m)}</section></div>`;
+  }
+
+  // ---------- C · Focused column (Airbnb trip, Uber, Careem: one column, the pass in the middle) ----------
+  // one centred column like the app: status, the cards, one main button, quick actions, then sections that open
+  function bvFocus(c, m){
+    const F = factsOf(c, m), S = statusOf(c, m), t = c.t;
+    const acc = (id, title, body, open) => `<details class="bvC-acc" ${open ? 'open' : ''}><summary><span>${title}</span>${CHEV}</summary><div class="bvC-accb">${body}</div></details>`;
+    return `<div class="bvC">${crumbsBk(c, m)}<header class="bvC-hd"><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-hd-ref"><small>${t('Booking ref')}</small>${refCopy(c, m)}</p></header>
+      ${statLine(c, S)}${cardsSec(c, m, 'bvC-cards')}
+      ${m.up || m.past || m.cancelled ? `<div class="bvC-main">${mainAct(c, m)}</div>` : ''}${quickActs(c, m, { cal: !todayLive(c, m) })}
+      <div class="bvC-accs">${acc('det', t('Booking details'), factGrid(c, F) + mailLine(c, F), true)}${acc('rc', t('Receipt'), receipt(c, m))}${m.up ? acc('cx', t('Cancellation'), cancelBlock(c, m)) : ''}${acc('help', t('Need help?'), helpBox(c, m))}</div></div>`;
+  }
+
+  // ---------- D · Timeline (Booking.com and Agoda trip pages, FedEx tracking) ----------
+  // the cards on the left; on the right the booking as a story: booked → free cancellation → the day → ends, then details
+  function bvJourney(c, m){
+    const F = factsOf(c, m), S = statusOf(c, m), t = c.t, b = m.b, now = Date.now(), C = c.T.cancelInfo(b), prog = m.kind === 'program';
+    const when = d => `${c.P.date(d, 'short')} · <bdi>${c.P.time(d.getHours() * 60 + d.getMinutes())}</bdi>`, sday = s => `${shortDay(c, s.date)} · <bdi>${c.P.time(s.start)}</bdi>`;
+    const steps = [];
+    steps.push({ k: 'done', title: t(b.free || !b.amount ? 'Booked' : 'Booked and paid'), sub: `${c.P.date(new Date(b.paidAt || b.createdAt), 'full')}${b.amount ? ' · ' + c.P.money(b.amount) : ''}`, body: `<a class="bvD-link" href="#bvRc">${t('Receipt')}</a>` });
+    const left = (b.amount || 0) - (b.refund || 0);
+    if (!m.cancelled && C.by) steps.push({ k: C.can ? 'next' : 'done', title: t(C.can ? 'Free cancellation until {when}' : 'Free cancellation ended {when}', { when: when(C.by) }),
+      sub: C.can ? (left > 0 ? t('Cancel before then for a full refund of {amount}.', { amount: c.P.money(left) }) : t('Cancel before then and your spot goes back on sale.')) : m.up ? t('Bookings can’t be cancelled in the 48 hours before the first session.') : '',
+      body: m.up && C.can ? `<div class="bvD-acts"><button type="button" class="bv-cxb" data-cancel="${c.esc(b.cartId)}">${t(m.n > 1 ? 'Cancel whole booking' : 'Cancel booking')}</button></div>` : '' });
+    if (m.cancelled) steps.push({ k: 'off', title: t('Booking cancelled'), sub: b.refund ? t('{amount} refunded', { amount: c.P.money(b.refund) }) : '' });
+    else if (m.up) steps.push({ k: 'now', title: prog ? `${t('Next session')} · ${sday(m.next)}` : sday(m.next), sub: S.note || '', body: `<div class="bvD-acts">${mainAct(c, m)}${dirAct(c, m)}</div>` });
+    if (prog && !m.cancelled){ const played = m.days.filter(d => d.endsAt <= now).length; steps.push({ k: m.past ? 'done' : 'next', title: t('{p} of {n} sessions played', { p: played, n: m.days.length }), sub: `${t('Last session')} · ${sday(m.last)}`, body: renewBoxOnce(c, m) }); }
+    else if (!m.cancelled) steps.push({ k: m.past ? 'done' : 'next', title: t(m.past ? 'Played' : 'Game day'), sub: m.past ? sday(m.last) : t('Arrive 10 minutes early and check in at reception.') });
+    return crumbsBk(c, m) + `<header class="bv-hd"><span class="bv-hd-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
+        <div><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-hd-ref"><small>${t('Booking ref')}</small>${refCopy(c, m)}</p></div></header>
+      <div class="bv-r bv-split"><div class="bv-split-l" data-c3d-sticky>${cardsSec(c, m)}</div>
+        <div class="bv-split-r"><section class="bv-sec"><div class="sec"><h2>${t('Your booking')}</h2></div><ol class="bvD-tl">${steps.map(x => `<li class="bvD-s bvD-s--${x.k}"><span class="bvD-dot" aria-hidden="true"></span><div><b>${x.title}</b>${x.sub ? `<small>${x.sub}</small>` : ''}${x.body || ''}</div></li>`).join('')}</ol></section>
+          <section class="bv-sec"><div class="sec"><h2>${t('Booking details')}</h2></div>${factGrid(c, F)}${mailLine(c, F)}</section>
+          <section class="bv-sec" id="bvRc"><div class="sec"><h2>${t('Receipt')}</h2></div>${receipt(c, m)}</section>
+          <section class="bv-card"><h2>${t('Need help?')}</h2>${helpBox(c, m)}</section></div></div>`;
+  }
+  const renewBoxOnce = () => '';   // the renew box already sits under the program cards
+
+  // the switcher bar: shown when the page is opened with ?bv=, to compare the layouts on one booking
+  const BV_OPTS = [['rail', 'Live · Split'], ['hero', 'A · Pass hero'], ['bento', 'B · Bento'], ['focus', 'C · Focused'], ['journey', 'D · Timeline']];
+  const optBar = cur => `<nav class="bvo-bar" aria-label="Layout options"><span>Layout options</span>${BV_OPTS.map(([k, l]) => `<a href="?bv=${k}${location.hash}"${k === cur ? ' aria-current="true"' : ''}>${l}</a>`).join('')}</nav>`;
+
+  const BV = { wallet: bvWallet, timeline: bvTimeline, split: bvSplit, rail: bvRail, tabs: bvTabs, order: bvOrder, hero: bvHero, bento: bvBento, focus: bvFocus, journey: bvJourney };
 
   const OPT = { bookings: BOOK, a: A, b: B, c: C, type: { list: TYPE.list, view: A.view }, family: { list: FAMILY.list, view: A.view }, calendar: { list: CAL.list, view: A.view }, today: TODAY };
   const PANEL = { b: 1, today: 1 };
