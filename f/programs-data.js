@@ -180,7 +180,9 @@
     const at = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }, add = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
     const today = key(now), last = at(lastDate), from = key(add(last, -6)), until = key(add(last, 7));
     let d = add(lastDate > today ? last : at(today), 1); while (p.days.length && !p.days.includes(d.getDay())) d = add(d, 1);
-    return { open: today >= from && today <= until, from, until, start: key(d) };
+    // renew any time while the program runs and up to a week after it ends (Ahmed, 2026-11-18: "allow any time"; it
+    // used to open 6 days before the last session). `from` stays for older callers.
+    return { open: today <= until, from, until, start: key(d) };
   };
   // the most participants one booking can hold
   window.SFA_PROGRAM_MAX_PEOPLE = 6;

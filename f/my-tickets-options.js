@@ -444,7 +444,7 @@
     return D3.card({ id: s.id + (r.p ? '|' + r.p.i : ''), front, back, cls: (live ? '' : 'is-locked') + (r.done || r.gone ? ' is-off' : ''), label: `${kind} · ${r.name}` });
   }
   // renew a program for another month at 20% off (Ahmed, 2026-11-18: "add option for renew program subscription and show
-  // the discount"): shown on every running monthly program; the button works in the renewal window (the last week)
+  // the discount"): shown on every running monthly program; open any time until a week after it ends (2026-11-18)
   function renewBox(c, m){
     if (m.kind !== 'program' || m.cancelled) return '';
     const R = c.renewSoon && c.renewSoon(m.b); if (!R) return '';

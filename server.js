@@ -251,7 +251,7 @@ function checkProgramOrder(order, user){
     if (!ob || ob.userId !== user.id || ob.status !== 'paid' || ob.order.kind !== 'program' || ob.order.program !== order.program || ob.order.plan === 'trial') return fail("That program can't be renewed.");
     if (Object.values(bookings).some(b => b.order.renewOf === ob.cartId && b.status === 'paid')) return fail('This program has already been renewed.', 409);
     const R = ctx.window.SFA_PROGRAM_RENEW(p, ob.order.days.map(d => d.date).sort().pop());
-    if (!R.open) return fail('Renewal opens in the last week of the program and closes 7 days after it ends.');
+    if (!R.open) return fail('Renewal closed 7 days after the program ended.');
     if (order.plan !== 'month' || order.start !== R.start || order.time !== ob.order.time) return fail('A renewal is one more month at the same time, from the next training day.');
     renew = ob;
   }
