@@ -164,7 +164,7 @@ html[dir=rtl] .c3d-arrow.is-next svg{transform:none}
 .c3d-mini-c svg{width:22px;height:22px}
 
 /* carousel options (Ahmed, 2026-11-18: "show me options for the carousel"): profile.html?cs=cover|peek|fan|ring|stack
-   (f/card3d.js puts it on <html data-cs>); cover is the default. A bar at the bottom switches between them. */
+   (f/card3d.js puts it on <html data-cs>); Peek is the default (Ahmed picked it, 2026-11-18). A bar at the bottom switches between them. */
 html[data-cs=peek] .c3d-stack-c{perspective:none}
 html[data-cs=peek] .c3d-stack-c > .c3d{transform:translateX(calc(var(--pos, 0) * 106% * var(--dir))) scale(calc(1 - var(--apos, 0) * .08))}
 html[data-cs=peek] .c3d-stack-c > .c3d:not([data-pos="0"]){filter:none;opacity:.55}

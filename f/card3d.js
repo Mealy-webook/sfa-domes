@@ -96,10 +96,10 @@
     .observe(document.documentElement, { childList: true, subtree: true });
   layAll(document);
   // carousel options: ?cs=cover|peek|fan|ring|stack picks the look (f/card3d.css); with ?cs a bar switches between them
-  const CS = [['cover', '1 · Coverflow'], ['peek', '2 · Peek'], ['fan', '3 · Fan'], ['ring', '4 · Ring'], ['stack', '5 · Stack']];
+  const CS = [['cover', '1 · Coverflow'], ['peek', '2 · Peek (live)'], ['fan', '3 · Fan'], ['ring', '4 · Ring'], ['stack', '5 · Stack']];
   const cs = (new URLSearchParams(location.search).get('cs') || '').toLowerCase();
+  document.documentElement.dataset.cs = CS.some(([k]) => k === cs) ? cs : 'peek';   // Peek is the live look (Ahmed picked it, 2026-11-18)
   if (CS.some(([k]) => k === cs)){
-    document.documentElement.dataset.cs = cs;
     const bar = () => { if (document.querySelector('.c3d-csbar') || !document.body) return; const q = new URLSearchParams(location.search), nav = document.createElement('nav'); nav.className = 'c3d-csbar'; nav.setAttribute('aria-label', 'Carousel options');
       nav.innerHTML = '<span>Carousel</span>' + CS.map(([k, l]) => { q.set('cs', k); return `<a href="?${q}${location.hash}"${k === cs ? ' aria-current="true"' : ''}>${l}</a>`; }).join('');
       nav.addEventListener('click', e => { const a = e.target.closest('a'); if (a) a.href = a.getAttribute('href').split('#')[0] + location.hash; });
