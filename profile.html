@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="f/colors.css">
 <link rel="stylesheet" href="f/tickets.css">
 <link rel="stylesheet" href="f/my-tickets-options.css">
+<link rel="stylesheet" href="f/card3d.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
 <style>
 /* My account: the signed-in player's tickets (next one up front with its QR, then upcoming and past sessions; each
@@ -268,6 +269,7 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
 <script src="f/prefs.js"></script>
 <script src="f/auth.js"></script>
 <script src="f/tickets.js"></script>
+<script src="f/card3d.js"></script>
 <script src="f/my-tickets-options.js"></script>
 <script>
 (() => {
@@ -283,7 +285,7 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
   // My bookings (Ahmed, 2026-11-17) is the live tab: bookings, each a group of its tickets with a person filter inside.
   // ?v=classic shows the previous My tickets; ?v=a|b|c|type|family|calendar|today the explored options.
   const MTO = window.SFA_MT_OPTIONS, MTV = (new URLSearchParams(location.search).get('v') || 'bookings').toLowerCase(), MT = !!(MTO && MTO.has(MTV));
-  const MT_CTX = () => ({ user, bookings, root, dlg, P, t, T, A, esc, ARROW, CAL, PIN, LOCK, renewInfo, cancelLine, askCancel, openTicket, paint, post, groupId,
+  const MT_CTX = () => ({ user, bookings, root, dlg, P, t, T, A, esc, ARROW, CAL, PIN, LOCK, renewInfo, renewSoon, cancelLine, askCancel, openTicket, paint, post, groupId,
     reload: async () => { const b = await fetch('/api/auth/bookings').then(x => x.json()).catch(() => ({})); bookings = b.bookings || bookings; paint(); } });
   const C = window.SFA_CHILD, LOCK = '<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>';
   // booking types: courts, training programs, and any other kind the system adds (named from its key until it has a label)
@@ -379,6 +381,10 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
   const renewed = b => bookings.some(x => x.order.renewOf === b.cartId && x.status === 'paid');
   const renewInfo = b => { if (b.order.kind !== 'program' || b.order.plan === 'trial' || renewed(b)) return null; const p = window.SFA_PROGRAMS[b.order.program]; if (!p) return null;
     const R = window.SFA_PROGRAM_RENEW(p, b.order.days.map(d => d.date).sort().pop()); return R.open ? { ...R, p } : null; };
+  // the renewal for every running monthly program, also before its window opens, so the 20% off shows early (Ahmed, 2026-11-18)
+  const renewSoon = b => { if (b.order.kind !== 'program' || b.order.plan === 'trial' || b.status !== 'paid' || renewed(b)) return null; const p = window.SFA_PROGRAMS[b.order.program]; if (!p) return null;
+    const R = window.SFA_PROGRAM_RENEW(p, b.order.days.map(d => d.date).sort().pop()), n = new Date(), k = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+    return k > R.until ? null : { ...R, p }; };
   const whenBy = d => `${P.date(d, 'short')} · <bdi>${P.time(d.getHours() * 60 + d.getMinutes())}</bdi>`;
   function cancelLine(b){
     const C = T.cancelInfo(b);

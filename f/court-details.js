@@ -228,6 +228,8 @@
     const OF = window.SFA_OFFER_UI, item = { sport: key, court: ci }, B = OF && n ? OF.best('court', item, n, full) : null;
     const total = B ? Math.round((full - B.save) * 100) / 100 : full, was = B ? `<s class="of-was">${money(full)}</s> ` : '';
     if ($('offers')) $('offers').innerHTML = OF ? OF.block('court', item, n, SLOT_PRICE) : '';
+    // on desktop the offers sit under the Check availability card (Ahmed, 2026-11-18); f/offers.css shows one or the other
+    if ($('offersSide')) $('offersSide').innerHTML = $('offers') ? $('offers').innerHTML : '';
     if ($('heroOffer') && OF) $('heroOffer').innerHTML = OF.tag('court', item);
     $('sumCount').textContent = n ? counts(keys.length, n) : '';
     $('sumDays').innerHTML = !keys.length ? `<p class="sum-empty">${t('No times picked yet. Tap a day, then pick one or more slots.')}</p>` :

@@ -26,8 +26,8 @@
 
 /* ---- 12 · tags ---- */
 .tag,.lvl,.pj-tag,.of-tag,.wh > .lvl,.wh > .of-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;font:var(--ts-caption-1-bold);border-radius:0}
-.pj-tag{background:var(--orange-700);color:var(--neutral-0)}
-.bv-row-i b em,.bv-o-who b em,.bv-rc em,.opt em,.gst em,.gp-list em{display:inline-flex;align-items:center;height:24px;padding:0 8px;background:var(--orange-700);color:var(--neutral-0);font:var(--ts-caption-1-bold);font-style:normal}
+.pj-tag{background:var(--color-bg-accent-subtle);color:var(--orange-800)}   /* discount tags: light orange, not button-like (Ahmed, 2026-11-18) */
+.bv-row-i b em,.bv-o-who b em,.bv-rc em,.opt em,.gst em,.gp-list em,.gp-opt em{display:inline-flex;align-items:center;height:24px;padding:0 8px;background:var(--color-bg-accent-subtle);color:var(--orange-800);font:var(--ts-caption-1-bold);font-style:normal}
 
 /* ---- 13 · cards ---- */
 .kl-card,.gm:not(.mine),.bv-card,.mt-card,.tile,.panel,.ck-card,.o-card{border-color:var(--color-border-primary)}

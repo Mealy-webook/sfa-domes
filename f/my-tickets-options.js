@@ -403,16 +403,55 @@
   function programCard(c, m, p){
     const b = m.b, x = (b.order.participants || [])[p.i] || {}, ck = x.checkins || [], total = m.days.length, left = Math.max(0, total - ck.length);
     const now = Date.now(), todayK = dk(new Date()), today = m.days.find(s => s.date === todayK), next = m.days.find(s => s.endsAt > now), last = m.days[m.days.length - 1];
-    const ended = !next, inToday = ck.some(k => k.date === todayK), code = `${b.cartId}-C${p.i + 1}`;
+    const ended = !next, inToday = ck.some(k => k.date === todayK), code = `${b.cartId}-C${p.i + 1}`, t = c.t, D3 = window.SFA_CARD3D;
     const live = !m.cancelled && !ended && !!today && left > 0;
-    const lock = m.cancelled ? c.t('Cancelled') : ended ? c.t('Program ended') : left <= 0 ? c.t('No sessions left') : c.t('QR opens {date}', { date: c.P.date(c.T.toDate(next.date), { weekday: 'short', day: 'numeric', month: 'short' }) });
-    return `<article class="mt-pc${live ? '' : ' is-locked'}"><header class="mt-pc-h"><div><small>${c.t('Program card')}</small><b>${c.esc(p.name)}</b></div><span class="mt-pc-no"><bdi>${c.esc(code)}</bdi></span></header>
-      <div class="mt-pc-b"><div class="mt-pc-qr">${live ? `<div class="tk-qr" data-qr="${c.esc(code)}" role="img" aria-label="${c.t('QR code for {ref}', { ref: c.esc(code) })}"></div><small>${c.t('Show this at reception')}</small>` : `<div class="mt-pc-lock">${c.LOCK}<small>${lock}</small></div>`}</div>
-        <div class="mt-pc-bal"><small>${c.t('Balance')}</small><p><b>${left}</b><span>/ ${total} ${c.t('sessions left')}</span></p>
-          <div class="mt-pc-dots" aria-hidden="true">${Array.from({ length: total }, (_, i) => `<i class="${i < ck.length ? 'used' : ''}"></i>`).join('')}</div>
-          <dl><div><dt>${c.t('Used')}</dt><dd>${ck.length}</dd></div><div><dt>${ended ? c.t('Ended') : c.t('Next session')}</dt><dd>${next ? `${c.P.date(c.T.toDate(next.date), { weekday: 'short', day: 'numeric', month: 'short' })} · <bdi>${c.P.time(next.start)}</bdi>` : c.P.date(c.T.toDate(last.date), 'short')}</dd></div><div><dt>${c.t('Valid until')}</dt><dd>${c.P.date(c.T.toDate(last.date), 'short')}</dd></div></dl></div></div>
-      <footer class="mt-pc-f">${ck.length ? `<details class="mt-pc-ck"><summary>${c.t('Check-ins')} <b>${ck.length}</b></summary><ol>${ck.slice().reverse().map(k => `<li>${c.P.date(c.T.toDate(k.date), { weekday: 'short', day: 'numeric', month: 'short' })} · <bdi>${c.P.time(new Date(k.at).getHours() * 60 + new Date(k.at).getMinutes())}</bdi></li>`).join('')}</ol></details>` : `<small class="mt-pc-none">${c.t('No check-ins yet')}</small>`}
-        <div class="mt-pc-acts">${live && !inToday ? `<button type="button" class="mt-mini mt-accent" data-mt-checkin="${c.esc(b.cartId)}|${p.i}"><span>${c.t('Simulate check-in')}</span></button>` : live && inToday ? `<span class="mt-st mt-st--ok"><i></i>${c.t('Checked in today')}</span>` : ''}${personActs(c, m, p)}</div></footer></article>`;
+    const short = d => c.P.date(c.T.toDate(d), { weekday: 'short', day: 'numeric', month: 'short' });
+    const lock = m.cancelled ? t('Cancelled') : ended ? t('Program ended') : left <= 0 ? t('No sessions left') : t('QR opens {date}', { date: short(next.date) });
+    // 3D (Ahmed, 2026-11-18: "make it 3d card"): the front is what reception scans, the back has the details and actions
+    const head = `<header class="c3d-h"><div><small>${t('Program card')}</small><b>${c.esc(p.name)}</b></div><span class="c3d-no"><bdi>${c.esc(code)}</bdi></span></header>`;
+    const front = head + `<div class="c3d-m"><div class="c3d-q">${live ? `<div class="tk-qr" data-qr="${c.esc(code)}" role="img" aria-label="${t('QR code for {ref}', { ref: c.esc(code) })}"></div>` : `<div class="c3d-lock">${c.LOCK}<small>${lock}</small></div>`}</div>
+        <div class="c3d-k"><small>${t('Balance')}</small><p class="c3d-big"><b>${left}</b><span>/ ${total} ${t('sessions left')}</span></p>
+          <div class="c3d-dots" aria-hidden="true">${Array.from({ length: total }, (_, i) => `<i class="${i < ck.length ? 'used' : ''}"></i>`).join('')}</div>
+          <p class="c3d-sub">${c.esc(m.D.label)}</p></div></div>
+      <footer class="c3d-f"><small>${live ? t('Show this at reception') : next ? `${t('Next session')} · ${short(next.date)} · <bdi>${c.P.time(next.start)}</bdi>` : ''}</small>${D3.flip(t('Details'))}</footer>`;
+    const back = `<header class="c3d-h"><div><small>${t('Program card')}</small><b>${c.esc(p.name)}</b></div>${D3.flip(t('Card'), true)}</header>
+      <div class="c3d-bk"><dl><div><dt>${t('Card number')}</dt><dd><bdi>${c.esc(code)}</bdi></dd></div><div><dt>${t('Sessions left')}</dt><dd>${left} / ${total}</dd></div><div><dt>${t('Used')}</dt><dd>${ck.length}</dd></div>
+          <div><dt>${ended ? t('Ended') : t('Next session')}</dt><dd>${next ? `${short(next.date)} · <bdi>${c.P.time(next.start)}</bdi>` : c.P.date(c.T.toDate(last.date), 'short')}</dd></div><div><dt>${t('Valid until')}</dt><dd>${c.P.date(c.T.toDate(last.date), 'short')}</dd></div></dl>
+        ${ck.length ? `<details class="mt-pc-ck"><summary>${t('Check-ins')} <b>${ck.length}</b></summary><ol>${ck.slice().reverse().map(k => `<li>${short(k.date)} · <bdi>${c.P.time(new Date(k.at).getHours() * 60 + new Date(k.at).getMinutes())}</bdi></li>`).join('')}</ol></details>` : `<small class="mt-pc-none">${t('No check-ins yet')}</small>`}</div>
+      <footer class="c3d-f"><div class="c3d-acts">${live && !inToday ? `<button type="button" class="mt-mini mt-accent" data-mt-checkin="${c.esc(b.cartId)}|${p.i}"><span>${t('Simulate check-in')}</span></button>` : live && inToday ? `<span class="mt-st mt-st--ok"><i></i>${t('Checked in today')}</span>` : ''}${personActs(c, m, p)}</div></footer>`;
+    return D3.card({ id: code, front, back, cls: 'c3d--v' + (live ? '' : ' is-locked'), label: `${t('Program card')} · ${p.name}` });
+  }
+  // court and open-game tickets as the same 3D card (Ahmed, 2026-11-18): a court has one card per time, a game one per player
+  function ticketCard(c, m, r){
+    const t = c.t, D3 = window.SFA_CARD3D, s = r.s, b = m.b, now = Date.now();
+    if (!s) return '';
+    const live = !m.cancelled && !r.gone && s.endsAt > now && c.T.qrLive(s, b) === 'on', d = c.T.toDate(s.date);
+    const kind = m.kind === 'game' ? t('Open game') : b.order.ladies ? t('Ladies hours') : t('Court booking');
+    const title = r.time ? c.esc(m.D.label) : r.name, who = r.time ? (m.people[0] && !m.people[0].you ? c.esc(m.people[0].name) : t('You')) : r.type;
+    const lockTxt = r.gone ? t('Removed') : r.st[1];
+    const when = `${c.P.date(d, { weekday: 'short', day: 'numeric', month: 'short' })} · <bdi>${c.P.time(s.start)}</bdi> – <bdi>${c.P.time(s.end)}</bdi>`;
+    const front = `<header class="c3d-h"><div><small>${kind}</small><b>${title}</b></div><span class="c3d-no"><bdi>${c.esc(r.no || s.id)}</bdi></span></header>
+      <div class="c3d-m"><div class="c3d-q">${live ? `<div class="tk-qr" data-qr="${c.esc(s.id)}" role="img" aria-label="${t('QR code for {ref}', { ref: c.esc(s.id) })}"></div>` : `<div class="c3d-lock">${c.LOCK}<small>${lockTxt}</small></div>`}</div>
+        <div class="c3d-k"><small>${c.P.date(d, { weekday: 'long' })}</small><p class="c3d-big"><b>${d.getDate()}</b><span>${c.P.date(d, { month: 'long' })}</span></p>
+          <p class="c3d-sub"><bdi>${c.P.time(s.start)}</bdi> – <bdi>${c.P.time(s.end)}</bdi></p><p class="c3d-sub">${r.time ? who : c.esc(m.D.label)}${!r.time && who ? ' · ' + who : ''}</p>
+          ${r.free ? `<div class="c3d-tags"><span class="pj-tag">${t('First game free')}</span></div>` : ''}</div></div>
+      <footer class="c3d-f"><small>${live ? t('Show this at reception') : ''}</small>${D3.flip(t('Details'))}</footer>`;
+    const back = `<header class="c3d-h"><div><small>${kind}</small><b>${title}</b></div>${D3.flip(t('Card'), true)}</header>
+      <div class="c3d-bk"><dl><div><dt>${t('When')}</dt><dd>${when}</dd></div><div><dt>${t('Where')}</dt><dd>${c.esc(m.D.label)} · ${t('SFA Domes Dammam')}</dd></div>
+          ${!r.time ? `<div><dt>${t('Player')}</dt><dd>${r.name}${r.phone ? ` · <bdi>${c.esc(r.phone)}</bdi>` : ''}</dd></div>` : ''}<div><dt>${t('Ticket')}</dt><dd><bdi>${c.esc(s.id)}</bdi></dd></div><div><dt>${t('Booking ref')}</dt><dd><bdi>${c.esc(b.cartId)}</bdi></dd></div>
+          <div><dt>${t('Status')}</dt><dd>${stTag(c, r.st)}</dd></div></dl>${r.sent ? `<small class="bv-sent${r.sentOk ? ' is-ok' : ''}">${SEND}${r.sent}</small>` : ''}</div>
+      <footer class="c3d-f"><div class="c3d-acts">${rowActs(c, m, r)}</div></footer>`;
+    return D3.card({ id: s.id + (r.p ? '|' + r.p.i : ''), front, back, cls: (live ? '' : 'is-locked') + (r.done || r.gone ? ' is-off' : ''), label: `${kind} · ${r.name}` });
+  }
+  // renew a program for another month at 20% off (Ahmed, 2026-11-18: "add option for renew program subscription and show
+  // the discount"): shown on every running monthly program; the button works in the renewal window (the last week)
+  function renewBox(c, m){
+    if (m.kind !== 'program' || m.cancelled) return '';
+    const R = c.renewSoon && c.renewSoon(m.b); if (!R) return '';
+    const t = c.t, n = m.active.length, was = R.p.month * n, now = window.SFA_RENEW_PRICE(R.p) * n, d = k => c.P.date(c.T.toDate(k), 'short');
+    return `<div class="c3d-renew bv-renew"><b>${t('Renew for another month')} <em>${t('20% off')}</em></b>
+      <small><s>${c.P.money(was)}</s> <strong>${c.P.money(now)}</strong> · ${t('Starts {date} at the same time, for the same participants.', { date: d(R.start) })} ${R.open ? t('Renewal is open until {date}.', { date: d(R.until) }) : t('Renewal opens {date}.', { date: d(R.from) })}</small>
+      <button type="button" class="btn sm"${R.open ? ` data-renew="${c.esc(m.b.cartId)}"` : ' disabled'}>${R.open ? t('Renew program') : t('Opens {date}', { date: d(R.from) })}</button></div>`;
   }
   const tixCount = m => m.kind === 'program' ? m.active.length : m.ses.length;   // a program counts cards, the rest tickets
   const tixWord = (c, m, n) => m.kind === 'program' ? (n === 1 ? c.t('card') : c.t('cards')) : (n === 1 ? c.t('ticket') : c.t('tickets'));
@@ -432,7 +471,7 @@
           <span class="mt-ph"><img src="${m.D.img}" alt="" loading="lazy" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
           <div class="mt-body"><p class="mt-eye">${m.kindTxt} · <bdi>${c.esc(m.b.cartId)}</bdi></p><strong>${c.esc(m.D.label)}</strong><p class="mt-meta">${m.dateLine}</p>
             <p class="mt-meta mt-who">${m.count} · ${c.esc(m.names)}</p>${chip(c, m)}</div>
-          <div class="mt-cta mt-bk-n"><span class="mt-tix">${QRI}<b>${tixCount(m)}</b><small>${tixWord(c, m, tixCount(m))}</small></span><span class="ghost sm mt-view">${c.t('Open booking')}${c.ARROW}</span></div></li>`).join('')}</ol>` : emptyTxt(c));
+          <div class="mt-cta mt-bk-n"><span class="mt-tix">${window.SFA_CARD3D ? window.SFA_CARD3D.mini({ kind: m.kind === 'program' ? c.t('Program card') : c.t('Ticket'), n: tixCount(m), locked: !m.up, icon: QRI }) : QRI}<b>${tixCount(m)}</b><small>${tixWord(c, m, tixCount(m))}</small></span><span class="ghost sm mt-view">${c.t('Open booking')}${c.ARROW}</span></div></li>`).join('')}</ol>` : emptyTxt(c));
     },
     view(c, m){
       // Manage rail is the live booking page (Ahmed picked it, 2026-11-17); ?bv=was shows the page it replaced
@@ -667,14 +706,14 @@
   }
   // the people (or times) as a list, for the rail and tabs layouts; programs show their cards
   function peopleBlock(c, m){
-    if (m.kind === 'program') return `<div class="bv-pcs">${m.active.map(p => programCard(c, m, p)).join('')}</div>${removedList(c, m)}`;
+    if (m.kind === 'program') return `<div class="c3d-deck c3d-deck--v">${m.active.map(p => programCard(c, m, p)).join('')}</div>${renewBox(c, m)}${removedList(c, m)}`;
     const R = rowsOf(c, m), now = Date.now(), up = R.filter(r => !r.done), done = R.filter(r => r.done);
     const li = r => `<li class="bv-row${r.gone ? ' is-gone' : ''}${r.done ? ' is-done' : ''}">
         ${r.time ? `<span class="day" aria-hidden="true"><span>${c.P.date(c.T.toDate(r.s.date), { weekday: 'short' })}</span><b>${c.T.toDate(r.s.date).getDate()}</b><small>${c.P.date(c.T.toDate(r.s.date), { month: 'short' })}</small></span>` : `<span class="bv-av${r.p.you ? ' is-you' : ''}" aria-hidden="true">${ini(r.p.name)}</span>`}
         <div class="bv-row-i"><b>${r.name}${r.free ? `<em>${c.t('First game free')}</em>` : ''}</b><small>${[r.type, r.phone ? `<bdi>${c.esc(r.phone)}</bdi>` : '', r.no && !r.gone ? `<bdi>${c.esc(r.no)}</bdi>` : ''].filter(Boolean).join(' · ')}</small>
           ${r.sent ? `<small class="bv-sent${r.sentOk ? ' is-ok' : ''}">${SEND}${r.sent}</small>` : ''}</div>
         <div class="bv-row-s">${stTag(c, r.st)}</div><div class="bv-row-a">${rowActs(c, m, r)}</div></li>`;
-    return `<ol class="bv-rows">${(up.length ? up : done).map(li).join('')}</ol>${up.length && done.length ? `<details class="mt-hist"><summary>${c.t('Played')} <b>${done.length}</b></summary><ol class="bv-rows">${done.map(li).join('')}</ol></details>` : ''}
+    return `<div class="c3d-deck">${(up.length ? up : done).map(r => ticketCard(c, m, r)).join('')}</div>${up.length && done.length ? `<details class="mt-hist"><summary>${c.t('Played')} <b>${done.length}</b></summary><div class="c3d-deck">${done.map(r => ticketCard(c, m, r)).join('')}</div></details>` : ''}
       ${m.people.some(p => m.canRemove(p)) ? `<p class="pg-note">${c.t('You can remove one person until free cancellation ends; their share is refunded and everyone else keeps their spot.')}</p>` : ''}`;
   }
   const peopleTitle = (c, m) => m.kind === 'program' ? c.t(m.active.length === 1 ? 'Program card' : 'Program cards') : m.people[0] && m.people[0].single ? c.t('Tickets') : c.t('Players and tickets');

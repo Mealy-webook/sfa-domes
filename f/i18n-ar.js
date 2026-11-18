@@ -316,7 +316,7 @@ window.SFA_AR = {
   // open games: several players and guests (2026-11-17)
   'Book spots for your children': 'احجز أماكن لأطفالك', 'Book spots for yourself and guests': 'احجز أماكن لك ولضيوفك',
   'Each player’s first open game is free.': 'أول مباراة مفتوحة لكل لاعب مجانية.',
-  'Players': 'اللاعبون', 'Guest': 'ضيف', 'Add a guest': 'أضف ضيفًا', 'Add guest': 'أضف الضيف', 'No spots left': 'لا توجد أماكن متبقية',
+  'Players': 'اللاعبون', 'Guest': 'ضيف', 'Add a guest': 'أضف ضيفًا', 'Card number': 'رقم البطاقة', 'Sessions left': 'الجلسات المتبقية', 'Renew for another month': 'جدّد لشهر آخر', '20% off': 'خصم 20%', 'Renewal opens {date}.': 'يفتح التجديد في {date}.', 'Opens {date}': 'يفتح في {date}',  'You choose who’s playing at checkout.': 'تختار من سيلعب عند الدفع.', 'Offer applied': 'العرض المطبّق', 'Add guest': 'أضف الضيف', 'No spots left': 'لا توجد أماكن متبقية',
   "Guest's full name": 'الاسم الكامل للضيف', "Guest's mobile": 'جوال الضيف', 'e.g. Omar Al-Harbi': 'مثال: عمر الحربي',
   'Tick yourself and add guests: each one gets their own spot and ticket.': 'حدّد نفسك وأضف ضيوفًا: لكل شخص مكانه وتذكرته.',
   'Tick each of your children who is playing: each one gets their own spot and ticket.': 'حدّد كل طفل من أطفالك سيلعب: لكل طفل مكانه وتذكرته.',

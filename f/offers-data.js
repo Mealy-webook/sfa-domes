@@ -84,6 +84,13 @@
             return `<li class="${hit ? 'is-on' : ''}"><span class="of-ic" aria-hidden="true">${hit ? OK : TAG}</span><span class="of-t"><b>${x.title}</b><small>${x.until}</small></span>${hit ? `<em>${tt('Applied')} · −${money(on.save)}</em>` : ''}</li>`; }).join('')}</ul>
           ${nx ? `<p class="of-next">${up(kind, nx)}</p>` : ''}${note ? `<p class="of-note">${note}</p>` : ''}</section>`;
       },
+      // checkout (Ahmed, 2026-11-18: "remove Available offers from checkout, show only the applied"): just the offer that
+      // applies to these n tickets, or nothing
+      applied(kind, item, n, unit, base){
+        const on = n ? best(kind, item, n, base == null ? unit * n : base) : null; if (!on) return '';
+        const x = text(on.o, tt, money, date);
+        return `<section class="of of--on" aria-label="${tt('Offer applied')}"><ul class="of-l"><li class="is-on"><span class="of-ic" aria-hidden="true">${OK}</span><span class="of-t"><b>${x.title}</b><small>${x.until}</small></span><em>${tt('Applied')} · −${money(on.save)}</em></li></ul></section>`;
+      },
       // the card tag: "Up to 30% off", or "Save up to SAR 100" when every offer is an amount
       tag(kind, item){
         const list = active(kind, item); if (!list.length) return '';

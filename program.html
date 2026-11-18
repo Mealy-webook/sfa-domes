@@ -199,6 +199,7 @@
           </div>
           <p class="side-sub" id="sideSub"></p><span id="sideOffer"></span>
         </div>
+        <div id="offersSide" class="kl-offers"></div>
         <p class="kl-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Try one session free before you subscribe.</span></p>
       </aside>
     </div>
@@ -347,7 +348,7 @@
     $('sideSub').textContent = t('{n} sessions a month · free trial available', { n: perMonth });
     // offers (f/offers-data.js): booking several participants; who takes part is picked at checkout, where it's applied
     const OF = window.SFA_OFFER_UI, oi = { sport: p.sport, program: id };
-    if (OF){ $('sideOffer').innerHTML = OF.tag('program', oi); $('offers').innerHTML = OF.block('program', oi, 0, 0, t('Applied at checkout when you add the participants.')); }
+    if (OF){ $('sideOffer').innerHTML = OF.tag('program', oi); $('offers').innerHTML = OF.block('program', oi, 0, 0, t('Applied at checkout when you add the participants.')); if ($('offersSide')) $('offersSide').innerHTML = $('offers').innerHTML; }
     $('learnList').innerHTML = p.learn.map(l => `<li>${chk}<span>${esc(tx(l))}</span></li>`).join('');
     $('aboutLead').textContent = tx(p.about);
     $('stats').innerHTML = [[t('Ages'), ages(p.ages)], [t('Level'), tx(p.level)], [t('Training days'), dayNames()], [t('Session length'), t('{m} minutes', { m: p.minutes })], [t('Group size'), t('Up to {n} players', { n: p.capacity })], [t('Coaches'), [...new Set(p.slots.map(s => tx(s.coach)))].join(' · ')]]

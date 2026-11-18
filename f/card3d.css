@@ -1,0 +1,130 @@
+/* 3D cards (Ahmed, 2026-11-18: "Program card, make it 3d card", then the same for court and open-game tickets).
+   A physical-looking card: it tilts toward the pointer with a light sheen (f/card3d.js sets --rx/--ry/--px/--py/--mx/--my),
+   and flips to its back for details and actions. Square corners, DS tokens. Flat and still with reduced motion. */
+.c3d{--rx:0deg;--ry:0deg;--px:0;--py:0;--mx:50%;--my:50%;position:relative;perspective:1100px;min-width:0}
+.c3d-card{display:grid;transform-style:preserve-3d;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .6s cubic-bezier(.2,.75,.2,1)}
+.c3d.is-tilting .c3d-card{transition:transform .1s linear}
+.c3d.is-flipped .c3d-card{transform:rotateX(var(--rx)) rotateY(calc(180deg + var(--ry)))}
+.c3d-face{grid-area:1/1;position:relative;display:grid;grid-template-rows:auto 1fr auto;min-width:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  box-shadow:0 1px 2px rgba(9,9,11,.12),0 18px 36px -20px rgba(9,9,11,.55)}
+.c3d.is-tilting .c3d-face{box-shadow:0 1px 2px rgba(9,9,11,.12),calc(var(--px) * -14px) calc(18px + var(--py) * -10px) 44px -18px rgba(9,9,11,.55)}
+/* front: a dark membership card with the brand stripe; back: the white side with the details */
+.c3d-front{background:var(--neutral-950);color:var(--neutral-0);border-top:4px solid var(--color-brand)}
+.c3d-front::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.07),transparent 42%),repeating-linear-gradient(115deg,transparent 0 22px,rgba(255,255,255,.025) 22px 23px)}
+.c3d-back{transform:rotateY(180deg);background:var(--color-bg-primary);color:var(--color-content-primary);border:1px solid var(--color-border-primary);border-top:4px solid var(--neutral-950)}
+.c3d-shine{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.26),rgba(255,255,255,0) 46%);mix-blend-mode:soft-light;opacity:0;transition:opacity .35s}
+.c3d-back .c3d-shine{background:radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.7),rgba(255,255,255,0) 50%);mix-blend-mode:normal;opacity:0}
+.c3d.is-tilting .c3d-shine{opacity:1}
+.c3d.is-tilting .c3d-back .c3d-shine{opacity:.5}
+
+.c3d-h{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 20px 0}
+.c3d-h small{display:block;font:var(--ts-caption-1-bold);color:var(--orange-400, var(--color-brand))}
+.c3d-back .c3d-h small{color:var(--color-content-secondary)}
+.c3d-h b{display:block;margin-top:2px;font:var(--ts-title-body);overflow-wrap:anywhere}
+.c3d-no{flex:none;font:var(--ts-caption-1);opacity:.7;white-space:nowrap}
+.c3d-m{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center;padding:16px 20px}
+/* the QR panel and the big number float a little above the card (a small parallax as it tilts) */
+.c3d-q{display:grid;justify-items:center;gap:6px;width:132px;transform:translate3d(calc(var(--px) * 5px),calc(var(--py) * 5px),0);transition:transform .1s linear}
+.c3d-q .tk-qr{width:132px;height:132px;padding:6px;background:#fff}
+.c3d-q .tk-qr svg{display:block;width:100%;height:100%}
+.c3d-lock{display:grid;place-items:center;align-content:center;gap:8px;width:132px;height:132px;padding:12px;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.28);color:rgba(255,255,255,.85);text-align:center}
+.c3d-lock svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8}
+.c3d-lock small{font:var(--ts-caption-1-bold)}
+.c3d-k{min-width:0;transform:translate3d(calc(var(--px) * 3px),calc(var(--py) * 3px),0);transition:transform .1s linear}
+.c3d-k > small{display:block;font:var(--ts-caption-1-bold);color:rgba(255,255,255,.7)}
+.c3d-big{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
+.c3d-big b{font:var(--ts-display-m)}
+.c3d-big span{font:var(--ts-body-s);color:rgba(255,255,255,.75)}
+.c3d-sub{margin:0;font:var(--ts-body-s);color:rgba(255,255,255,.8);overflow-wrap:anywhere}
+.c3d-dots{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.c3d-dots i{width:12px;height:12px;background:var(--color-brand)}
+.c3d-dots i.used{background:rgba(255,255,255,.18)}
+.c3d .mt-st{color:inherit}
+.c3d-front .mt-st{color:var(--neutral-0)}
+.c3d-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.c3d-f{position:relative;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px 20px 16px;border-top:1px solid rgba(255,255,255,.12)}
+.c3d-back .c3d-f{border-top-color:var(--color-border-primary)}
+.c3d-f > small{font:var(--ts-caption-1);color:rgba(255,255,255,.7)}
+.c3d-acts{display:flex;flex-wrap:wrap;gap:8px}
+/* the flip button, on both faces */
+.c3d-flip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;margin-inline-start:auto;border:1px solid rgba(255,255,255,.35);background:transparent;color:inherit;font:var(--ts-body-s-bold);cursor:pointer}
+.c3d-flip:hover{background:rgba(255,255,255,.1)}
+.c3d-back .c3d-flip{border-color:var(--color-border-strong)}
+.c3d-back .c3d-flip:hover{background:var(--color-bg-secondary)}
+.c3d-flip svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
+.c3d-flip:focus-visible{outline:2px solid var(--color-brand);outline-offset:2px}
+/* back: details as a list, check-ins, renewal */
+.c3d-bk{display:grid;align-content:start;gap:12px;padding:12px 20px 16px}
+.c3d-bk dl{display:grid;gap:6px;margin:0}
+.c3d-bk dl div{display:flex;justify-content:space-between;gap:12px;font:var(--ts-body-s)}
+.c3d-bk dt{color:var(--color-content-secondary)}
+.c3d-bk dd{margin:0;font:var(--ts-body-s-bold);text-align:end;overflow-wrap:anywhere}
+.c3d-bk .mt-pc-ck summary{font:var(--ts-body-s-bold)}
+.c3d-renew{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 12px;padding:12px;background:var(--color-bg-accent-subtle);border:1px solid color-mix(in srgb,var(--color-brand) 35%,transparent)}
+.c3d-renew b{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font:var(--ts-body-s-bold)}
+.c3d-renew b em{display:inline-flex;align-items:center;height:24px;padding:0 8px;background:var(--color-bg-accent-subtle);color:var(--orange-800);font:var(--ts-caption-1-bold);font-style:normal}
+.c3d-renew small{grid-column:1;font:var(--ts-caption-1);color:var(--color-content-secondary)}
+.c3d-renew s{color:var(--color-content-tertiary)}
+.c3d-renew .btn{grid-column:2;grid-row:1/3}
+.c3d.is-locked .c3d-front{border-top-color:var(--neutral-600)}
+.c3d.is-off{opacity:.75}
+
+/* the deck: cards side by side, one column on phones */
+.c3d-deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:20px}
+
+/* a small preview on the My bookings list: the card (a stack when there are several) with the count */
+.c3d-mini{--rx:0deg;--ry:0deg;--px:0;--py:0;--mx:50%;--my:50%;position:relative;display:inline-grid;perspective:600px;flex:none}
+.c3d-mini-c{position:relative;display:grid;align-content:space-between;width:92px;height:60px;padding:8px 10px;background:var(--neutral-950);color:var(--neutral-0);border-top:3px solid var(--color-brand);
+  transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .5s cubic-bezier(.2,.75,.2,1);box-shadow:0 10px 18px -10px rgba(9,9,11,.6);overflow:hidden}
+.c3d-mini.is-tilting .c3d-mini-c{transition:transform .1s linear}
+.c3d-mini-c small{font:var(--ts-caption-2-bold, var(--ts-caption-1-bold));color:rgba(255,255,255,.7);white-space:nowrap}
+.c3d-mini-c b{display:flex;align-items:center;justify-content:space-between;font:var(--ts-title-body)}
+.c3d-mini-c svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+.c3d-mini-c .c3d-shine{opacity:0}
+.c3d-mini.is-tilting .c3d-shine{opacity:1}
+.c3d-mini.is-stack::before,.c3d-mini.is-stack::after{content:"";position:absolute;inset:0;background:var(--neutral-800);transform:translate(-6px,-5px);z-index:-1}
+.c3d-mini.is-stack::after{background:var(--neutral-600);transform:translate(-12px,-10px);z-index:-2}
+.c3d-mini{isolation:isolate}
+.mt-tix .c3d-mini-c b,.c3d-mini-c b{color:var(--neutral-0);font:var(--ts-title-body)}
+.mt-tix .c3d-mini-c svg{align-self:auto}
+.mt-tix:has(.c3d-mini){align-items:center;gap:10px}
+.c3d-mini.is-locked .c3d-mini-c{border-top-color:var(--neutral-600)}
+html[dir=rtl] .c3d-mini.is-stack::before{transform:translate(6px,-5px)}
+html[dir=rtl] .c3d-mini.is-stack::after{transform:translate(12px,-10px)}
+
+@media (max-width:639px){
+  .c3d-m{gap:14px;padding:14px 16px}.c3d-h{padding:14px 16px 0}.c3d-f{padding:10px 16px 14px}.c3d-bk{padding:12px 16px 14px}
+  .c3d-q,.c3d-q .tk-qr,.c3d-lock{width:112px}.c3d-q .tk-qr,.c3d-lock{height:112px}
+  .c3d-big b{font:var(--ts-title-screen)}
+}
+@media (prefers-reduced-motion:reduce){
+  .c3d-card,.c3d-mini-c,.c3d-q,.c3d-k{transition:none;transform:none !important}
+  .c3d.is-flipped .c3d-card{transform:none}
+  .c3d-back{transform:none;visibility:hidden}
+  .c3d.is-flipped .c3d-front{visibility:hidden}
+  .c3d.is-flipped .c3d-back{visibility:visible}
+  .c3d-shine{display:none}
+}
+
+.c3d-deck + .c3d-renew,.c3d-deck + .mt-removed{margin-top:16px}
+
+/* the program card stands up (Ahmed, 2026-11-18: "make the program card vertical"): a portrait card, QR on top, the balance
+   under it; cards sit side by side, about 320px wide */
+.c3d-deck--v{grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),320px))}
+.c3d--v .c3d-h{flex-direction:column;align-items:flex-start;gap:2px}
+.c3d--v .c3d-front .c3d-h{padding-top:18px}
+.c3d--v .c3d-m{grid-template-columns:minmax(0,1fr);justify-items:center;gap:18px;padding:20px 20px 16px;text-align:center}
+.c3d--v .c3d-q,.c3d--v .c3d-q .tk-qr,.c3d--v .c3d-lock{width:176px}
+.c3d--v .c3d-q .tk-qr,.c3d--v .c3d-lock{height:176px}
+.c3d--v .c3d-k{display:grid;justify-items:center}
+.c3d--v .c3d-big{justify-content:center}
+.c3d--v .c3d-dots{justify-content:center}
+.c3d--v .c3d-f{flex-direction:column;align-items:stretch;text-align:center}
+.c3d--v .c3d-f > small{text-align:center}
+.c3d--v .c3d-flip{margin-inline:auto}
+.c3d--v .c3d-back .c3d-h{flex-direction:row;align-items:flex-start}
+.c3d--v .c3d-back .c3d-flip{margin-inline:auto 0}
+.c3d--v .c3d-back .c3d-f{align-items:flex-start}
+@media (max-width:639px){.c3d-deck--v{grid-template-columns:minmax(0,340px);justify-content:center}.c3d--v .c3d-q,.c3d--v .c3d-q .tk-qr,.c3d--v .c3d-lock{width:160px}.c3d--v .c3d-q .tk-qr,.c3d--v .c3d-lock{height:160px}}
+.c3d-renew .btn:disabled{background:var(--color-bg-tertiary);color:var(--color-content-secondary);border-color:transparent;cursor:not-allowed}
+@media (max-width:639px){.c3d-renew{grid-template-columns:minmax(0,1fr)}.c3d-renew .btn{grid-column:1;grid-row:auto;width:100%}}

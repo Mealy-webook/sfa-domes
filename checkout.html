@@ -339,8 +339,38 @@ h1{font:var(--ts-title-screen);margin:0;text-transform:var(--type-case-title)}
 @media (max-width:639px){.pk-next li{gap:12px}.pk-kit{grid-template-columns:56px minmax(0,1fr)}.pk-ic{width:56px}.pk-kit .pk-pr{grid-column:2}.pk-add{grid-column:1/-1}}
 .ck-main .ck-who[hidden]{display:none}
 #ckCrumbs{grid-area:crumbs}
-.gp-list{list-style:none;margin:0;padding:0 24px 8px}.gp-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:14px 0;border-top:1px solid var(--color-border-primary)}.gp-list li:first-child{border-top:0}.gp-list b{font:var(--ts-body-default-bold)}.gp-list span{grid-column:1;font:var(--ts-body-s);color:var(--color-content-secondary)}.gp-list em{grid-column:2;grid-row:1/3;align-self:center}
-@media (max-width:639px){.gp-list{padding:0 16px 8px}}
+.gp-list{list-style:none;margin:0;padding:0 24px 8px}.gp-list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:2px 12px;padding:14px 0;border-top:1px solid var(--color-border-primary)}.gp-list li:first-child{border-top:0}.gp-list b{font:var(--ts-body-default-bold)}.gp-list span{grid-column:1;font:var(--ts-body-s);color:var(--color-content-secondary)}.gp-list em{grid-column:2;grid-row:1/3;align-self:center}.gp-list .gp-x{grid-column:3;grid-row:1/3}
+/* who's playing, picked here (Ahmed, 2026-11-18): tick rows, guests, add a guest; the same look as game.html had */
+.gp-left{font:var(--ts-body-s-bold);color:var(--color-content-secondary)}
+.gp-body{display:grid;gap:8px;padding:0 24px 24px}
+.gp-hint{margin:0 0 4px;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.ck-card > .gp-hint{padding:0 24px 24px}
+.gp-opt{position:relative;display:grid;grid-template-columns:20px minmax(0,1fr) auto;align-items:center;gap:12px;padding:16px 18px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);text-align:start;font:inherit;color:inherit;cursor:pointer}
+.gp-opt:hover:not(:disabled){border-color:var(--color-content-primary)}
+.gp-opt:disabled{cursor:not-allowed}
+.gp-opt:disabled b{opacity:.5}
+.gp-opt:disabled small{color:var(--danger)}
+.gp-opt .box{display:grid;place-items:center;width:20px;height:20px;border:2px solid var(--color-border-strong);background:var(--color-bg-primary)}
+.gp-opt .box svg{width:14px;height:14px;opacity:0}
+.gp-opt[aria-checked=true],.gp-gst{padding:15px 17px;border:2px solid var(--color-brand);background:var(--color-bg-accent-subtle)}
+.gp-opt[aria-checked=true] .box,.gp-gst .box{border-color:var(--color-brand);background:var(--color-brand)}
+.gp-opt[aria-checked=true] .box svg,.gp-gst .box svg{opacity:1}
+.gp-opt b{display:block;font:var(--ts-body-l-bold)}
+.gp-opt small{display:block;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.gp-gst{grid-template-columns:20px minmax(0,1fr) auto auto;cursor:default}
+.gp-x{display:grid;place-items:center;width:32px;height:32px;margin:-6px -8px;padding:0;border:0;background:none;color:var(--color-content-primary);cursor:pointer}
+.gp-x svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
+.gp-x:hover{color:var(--danger)}
+.gp-add-b{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:52px;border:1px dashed var(--color-border-strong);background:var(--color-bg-primary);font:var(--ts-body-default-bold);color:var(--color-content-primary);cursor:pointer}
+.gp-add-b:hover:not(:disabled){border-color:var(--color-content-primary)}
+.gp-add-b:disabled{cursor:not-allowed;color:var(--color-content-disabled)}
+.gp-add-b svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+.gp-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:16px;border:1px solid var(--color-border-secondary)}
+.gp-form .full{grid-column:1/-1}
+.gp-form-acts{display:flex;gap:8px}
+.gp-err{margin:0;font:var(--ts-body-s);color:var(--danger)}
+.ck-card.bad{border-color:var(--danger)}
+@media (max-width:639px){.gp-list{padding:0 16px 8px}.gp-body{padding:0 16px 16px}.ck-card > .gp-hint{padding:0 16px 16px}.gp-form{grid-template-columns:minmax(0,1fr)}}
 .missing{max-width:560px;margin:calc(90px + 12vh) auto;padding:32px;text-align:center}
 .missing h1{font:var(--ts-title-screen);text-transform:var(--type-case-title)}
 .missing p{color:var(--color-content-secondary)}
@@ -588,50 +618,135 @@ button.who-opt:disabled small{color:var(--danger)}
   if (order && order.kind === 'program') return programCheckout(order);
   if (order && order.kind === 'game') return gameCheckout(order);
 
-  // ---- open game checkout (Ahmed, 2026-11-17: "all through checkout"): the players are picked on game.html; here the
-  //      same summary, offers, terms and Pay as courts and programs. The server works out who plays free and the offer.
+  // ---- open game checkout (Ahmed, 2026-11-17: "all through checkout"; 2026-11-18: "make selecting Who's playing? in the
+  //      checkout page" — the game page only has Join game now). Who's playing is picked here: tick yourself (adult games)
+  //      or your children (kids' games), and add guests to adult games (full name + Saudi mobile). Then the same summary,
+  //      offer, terms and Pay as courts and programs. The server re-checks everyone and works out who plays free.
   function gameCheckout(order){
     const g = window.SFA_GAME && window.SFA_GAME(order.game), sp = g && window.SFA_SPORTS[g.sport], c = sp && sp.courts[g.court];
-    if (!g || !Array.isArray(order.players) || !order.players.length){ $('missing').hidden = false; return; }
+    if (!g){ $('missing').hidden = false; return; }
     $('page').hidden = false;
     const CH = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
-    const bookUrl = `game.html?id=${encodeURIComponent(g.id)}`, item = { sport: g.sport, court: g.court };
+    const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="square" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+    const XI = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>', PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+    const bookUrl = `game.html?id=${encodeURIComponent(g.id)}`, item = { sport: g.sport, court: g.court }, adults = g.who !== 'kids';
     const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+    const fmtPhone = d => [d.slice(0, 2), d.slice(2, 5), d.slice(5)].filter(Boolean).join(' ');
     $('backLink').href = bookUrl;
     $('ckCrumbs').innerHTML = `<a href="index.html">${t('Home')}</a>${CH}<a href="matches.html">${t('Open games')}</a>${CH}<a href="${bookUrl}">${esc(t(sp.name))} · ${esc(t(g.format))}</a>${CH}<span>${t('Checkout')}</span>`;
     document.querySelector('.ck-who').hidden = true;
-    // who's playing, in the main column where courts show "Booking for"; changed on the game page
-    const pm = $('progMain'); pm.hidden = false;
-    const players = () => `<section class="step panel ck-card" aria-labelledby="gpH"><div class="step-head ck-card-head"><h2 id="gpH">${t("Who's playing?")}</h2><a class="doc-link" href="${bookUrl}">${t('Change')}</a></div>
-      <ul class="gp-list">${(quote ? quote.people : []).map(x => `<li><b>${esc(x.name || t('You'))}</b><span>${x.type === 'me' ? t('You') : x.type === 'guest' ? `${t('Guest')} · <bdi>${esc(x.phone || '')}</bdi>` : t('Child')}</span>${x.free ? `<em>${t('First game free')}</em>` : ''}</li>`).join('') || `<li><span>${t('One moment…')}</span></li>`}</ul></section>`;
     $('cImg').src = window.SFA_COURT_IMG(g.sport, c);
     $('cSport').textContent = `${t(sp.name)} · ${t('Open game')}`;
     $('cName').textContent = t(c[0]);
     $('cSpecs').textContent = `${t(g.format)} · ${t(window.SFA_GAME_WHO[g.who].label)}`;
     $('cWhen').hidden = false; $('cWhen').innerHTML = `${P.date(toDate(g.date), 'full')} · <bdi>${P.time(g.start)}</bdi> – <bdi>${P.time(g.start + SLOT)}</bdi>`;
-    let quote = null, payLabel = '';
+    const pm = $('progMain'); pm.hidden = false;
+
+    // who's picked: account people by key ('me', 'child:<id>'), then guests added here. order.players is kept in step.
+    let me = null, mine = [], online = {}, loaded = false, quote = null, qSeq = 0, payLabel = '', gForm = null, pickErr = '';
+    const picks = [], guests = [];
+    for (const x of order.players || []) if (x && x.guest) guests.push({ name: x.guest.name, phone: x.guest.phone }); else if (x && x.ref) picks.push(x.ref === 'me' ? 'me' : 'child:' + x.ref);
+    const sync = () => { order.players = [...picks.map(k => ({ ref: k === 'me' ? 'me' : k.slice(6) })), ...guests.map(x => ({ guest: { name: x.name, phone: x.phone } }))];
+      try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (e) {} };
+    // who already holds a spot, and who has had a game before (the first is free), from the account's bookings
+    const keysOf = b => ((b.order.participants && b.order.participants.filter(x => !x.cancelled)) || [{ type: 'me' }]).map(x => x.type === 'guest' ? 'tel:' + x.phone : x.type === 'child' ? 'child:' + (x.ref || x.name) : 'me');
+    const inGame = k => mine.some(b => b.order.kind === 'game' && b.order.game === g.id && b.status === 'paid' && keysOf(b).includes(k));
+    const hadGame = k => mine.some(b => b.order.kind === 'game' && b.status === 'paid' && keysOf(b).includes(k));
+    const spotsLeft = () => Math.max(0, g.spots - g.base - ((online[g.id] || {}).taken || 0));
+    function people(){
+      if (!me) return [];
+      const you = { key: 'me', name: me.name, dob: me.dob, you: true }, kids = (me.participants || []).map(x => ({ key: 'child:' + x.id, name: x.name, dob: x.dob }));
+      return (adults ? [you] : kids).map(x => { const age = x.dob ? window.SFA_AGE(x.dob, g.date) : null;
+        const why = inGame(x.key) ? t('Already in this game') : x.you && !x.dob ? t('Add your date of birth in My account') : window.SFA_GAME_FITS(g, x) ? (adults ? t('Adults (18+) only') : t('Must be 6 to 17 on the day')) : '';
+        return { ...x, age, why, free: !hadGame(x.key) }; });
+    }
+    const freeOf = key => { const q = quote ? quote.people : [], hit = q.find(x => (x.type === 'guest' ? 'tel:' + x.phone : x.type === 'child' ? 'child:' + x.ref : 'me') === key); return hit ? hit.free : !hadGame(key); };
+
+    const players = () => {
+      if (!loaded) return `<section class="step panel ck-card" aria-labelledby="gpH"><div class="step-head ck-card-head"><h2 id="gpH">${t("Who's playing?")}</h2></div><p class="gp-hint">${t('One moment…')}</p></section>`;
+      const list = people(), n = picks.length + guests.length, left = spotsLeft(), room = left - n, F = gForm || {}, B = F.bad || {};
+      const row = x => { const on = picks.includes(x.key), off = !!x.why || (!on && room <= 0);
+        return `<button type="button" class="gp-opt" role="checkbox" aria-checked="${on}" data-gp-pick="${esc(x.key)}"${off ? ' disabled' : ''}><span class="box" aria-hidden="true">${TICK}</span>
+          <span><b>${esc(x.you ? t('Myself') : x.name)}</b><small>${x.why || (!on && room <= 0 ? t('No spots left') : x.age != null ? t('Age {n}', { n: x.age }) : '')}</small></span>${!x.why && freeOf(x.key) ? `<em>${t('First game free')}</em>` : '<span></span>'}</button>`; };
+      const gRow = x => `<div class="gp-opt gp-gst"><span class="box" aria-hidden="true">${TICK}</span><span><b>${esc(x.name)}</b><small><bdi>+966 ${esc(fmtPhone(x.phone.slice(4)))}</bdi> · ${t('Guest')}</small></span>${freeOf('tel:' + x.phone) ? `<em>${t('First game free')}</em>` : '<span></span>'}<button type="button" class="gp-x" data-gp-rm="${esc(x.phone)}" aria-label="${t('Remove {name}', { name: esc(x.name) })}">${XI}</button></div>`;
+      const form = gForm ? `<div class="gp-form" id="gpForm">
+          <div class="field full${B.name ? ' bad' : ''}"><label for="gpN">${t("Guest's full name")}</label><div class="input"><input id="gpN" type="text" autocomplete="off" value="${esc(F.name || '')}" placeholder="${t('e.g. Omar Al-Harbi')}"></div><p class="err">${t('Enter their full name.')}</p></div>
+          <div class="field full${B.phone ? ' bad' : ''}"><label for="gpP">${t("Guest's mobile")}</label><div class="input"><span class="pre">+966</span><input id="gpP" type="tel" inputmode="numeric" autocomplete="off" maxlength="11" value="${esc(F.phone || '')}" placeholder="5X XXX XXXX"></div><p class="err">${esc(B.phone || '')}</p></div>
+          ${F.err ? `<p class="gp-err full" role="alert">${esc(F.err)}</p>` : ''}
+          <div class="gp-form-acts full"><button type="button" class="btn sm" data-gp-add${F.busy ? ' disabled' : ''}>${F.busy ? t('One moment…') : t('Add guest')}</button><button type="button" class="ghost sm" data-gp-cancel>${t('Cancel')}</button></div></div>` : '';
+      return `<section class="step panel ck-card${pickErr ? ' bad' : ''}" id="gpCard" aria-labelledby="gpH"><div class="step-head ck-card-head"><h2 id="gpH">${t("Who's playing?")}</h2><span class="gp-left">${left === 1 ? t('1 spot left') : t('{n} spots left', { n: left })}</span></div>
+        <div class="gp-body"><p class="gp-hint">${adults ? t('Tick yourself and add guests: each one gets their own spot and ticket.') : t('Tick each of your children who is playing: each one gets their own spot and ticket.')}</p>
+          ${list.length ? list.map(row).join('') : `<p class="gp-hint">${t('Kids’ games are for your children aged 6 to 17. Add them in My children.')} <a href="profile.html#people">${t('My children')}</a></p>`}
+          ${guests.map(gRow).join('')}${form}
+          ${adults && !gForm ? `<button type="button" class="gp-add-b" data-gp-open${room <= 0 ? ' disabled' : ''}>${PLUS}<span>${room <= 0 ? t('No spots left') : t('Add a guest')}</span></button>` : ''}
+          ${pickErr ? `<p class="gp-err" role="alert">${esc(pickErr)}</p>` : ''}</div></section>`;
+    };
     function summary(){
-      const ppl = quote ? quote.people : [], base = quote ? quote.base : 0, amount = quote ? quote.amount : 0;
-      $('days').innerHTML = `<li><b>${t(ppl.length > 1 ? 'Players' : 'Player')}</b><ul>${ppl.map(x => `<li><span>${esc(x.type === 'me' ? t('You') : x.name)}${x.type === 'guest' ? ` <small class="ln-mut">· ${t('Guest')}</small>` : ''}</span><span class="slot-p">${x.free ? `<s>${money(g.price)}</s> ${t('Free')}` : money(g.price)}</span></li>`).join('')}</ul></li>`
-        + (ppl.some(x => x.free) ? `<li><span class="ln-mut">${t('Each person’s first open game is free.')}</span></li>` : '');
-      $('ckOffers').innerHTML = window.SFA_OFFER_UI ? window.SFA_OFFER_UI.block('game', item, ppl.length, g.price, '', base) : '';
-      pm.innerHTML = players();
-      $('total').innerHTML = !quote ? '—' : amount ? (quote.offer ? `<s class="of-was">${money(base)}</s> ` : '') + money(amount) : t('Free of charge');
+      const ppl = quote && (picks.length + guests.length) ? quote.people : [], base = quote ? quote.base : 0, amount = quote ? quote.amount : 0;
+      $('days').innerHTML = ppl.length ? `<li><b>${t(ppl.length > 1 ? 'Players' : 'Player')}</b><ul>${ppl.map(x => `<li><span>${esc(x.type === 'me' ? t('You') : x.name)}${x.type === 'guest' ? ` <small class="ln-mut">· ${t('Guest')}</small>` : ''}</span><span class="slot-p">${x.free ? `<s>${money(g.price)}</s> ${t('Free')}` : money(g.price)}</span></li>`).join('')}</ul></li>`
+        + (ppl.some(x => x.free) ? `<li><span class="ln-mut">${t('Each person’s first open game is free.')}</span></li>` : '')
+        : `<li><b>${t('Players')}</b><ul><li><span class="ln-mut">${t("Choose who's playing")}</span><span class="slot-p">${money(g.price)} ${t('/ player')}</span></li></ul></li>`;
+      $('ckOffers').innerHTML = window.SFA_OFFER_UI && ppl.length ? window.SFA_OFFER_UI.applied('game', item, ppl.length, g.price, base) : '';
+      const focused = document.activeElement && pm.contains(document.activeElement) ? (document.activeElement.id ? '#' + document.activeElement.id : document.activeElement.dataset.gpPick ? `[data-gp-pick="${CSS.escape(document.activeElement.dataset.gpPick)}"]` : null) : null;
+      pm.innerHTML = players(); if (focused) pm.querySelector(focused)?.focus();
+      $('total').innerHTML = !ppl.length ? '—' : amount ? (quote.offer ? `<s class="of-was">${money(base)}</s> ` : '') + money(amount) : t('Free of charge');
       $('charge').hidden = true;
-      payLabel = `<span>${quote && !amount ? t('Join for free') : t('Pay {total}', { total: money(amount) })}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>`;
+      payLabel = `<span>${ppl.length && !amount ? t('Join for free') : ppl.length ? t('Pay {total}', { total: money(amount) }) : t("Choose who's playing")}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>`;
       if (!$('payBtn').disabled) $('payBtn').innerHTML = payLabel;
     }
     const alertBox = $('alert');
-    async function requote(){
+    async function requote(quiet){   // quiet: return the error instead of showing it (a guest being added)
+      sync(); const n = ++qSeq;
+      if (!order.players.length){ quote = null; summary(); return null; }
       try { const r = await fetch('/api/games/quote', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ order: { kind: 'game', game: g.id, players: order.players } }) });
-        const d = await r.json().catch(() => ({})); if (r.ok){ quote = d; alertBox.innerHTML = ''; } else if (r.status !== 401) alertBox.innerHTML = `<p class="alert">${esc(t(d.error || 'Something went wrong. Try again.'))}</p>`; } catch (e) {}
-      summary();
+        const d = await r.json().catch(() => ({})); if (n !== qSeq) return null;
+        if (r.ok){ quote = d; alertBox.innerHTML = ''; summary(); return null; }
+        if (quiet) return t(d.error || 'Something went wrong. Try again.');
+        if (r.status !== 401) alertBox.innerHTML = `<p class="alert">${esc(t(d.error || 'Something went wrong. Try again.'))}</p>`; } catch (e) { if (quiet) return t('Could not reach the server. Is node server.js running?'); }
+      summary(); return null;
     }
-    const gate = () => window.SFA_AUTH.require(t('Sign in to join a game.')).then(u => { if (!u) location.href = bookUrl; else requote(); });
+    async function load(){
+      const [b, o] = await Promise.all([fetch('/api/auth/bookings').then(r => r.json()).catch(() => ({})), fetch('/api/games?days=' + g.date, { cache: 'no-store' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))]);
+      mine = b.bookings || []; online = o || {}; loaded = true;
+      // drop picks that can't play; with one person who can, tick them for you
+      const ok = people().filter(x => !x.why);
+      for (let i = picks.length - 1; i >= 0; i--) if (!ok.some(x => x.key === picks[i])) picks.splice(i, 1);
+      if (!picks.length && !guests.length && ok.length === 1) picks.push(ok[0].key);
+      requote();
+    }
+    const focus = sel => pm.querySelector(sel)?.focus();
+    pm.addEventListener('click', async e => {
+      const o = e.target.closest('[data-gp-pick]');
+      if (o && !o.disabled){ const k = o.dataset.gpPick, i = picks.indexOf(k); if (i < 0) picks.push(k); else picks.splice(i, 1); pickErr = ''; summary(); focus(`[data-gp-pick="${CSS.escape(k)}"]`); requote(); return; }
+      if (e.target.closest('[data-gp-open]')){ gForm = { name: '', phone: '' }; summary(); focus('#gpN'); return; }
+      if (e.target.closest('[data-gp-cancel]')){ gForm = null; summary(); focus('[data-gp-open]'); return; }
+      const rm = e.target.closest('[data-gp-rm]');
+      if (rm){ const i = guests.findIndex(x => x.phone === rm.dataset.gpRm); if (i >= 0) guests.splice(i, 1); summary(); focus('[data-gp-open]'); requote(); return; }
+      if (!e.target.closest('[data-gp-add]') || !gForm || gForm.busy) return;
+      const name = pm.querySelector('#gpN').value.trim().replace(/\s+/g, ' '), digits = pm.querySelector('#gpP').value.replace(/\D/g, '').replace(/^0/, ''), phone = '+966' + digits, bad = {};
+      if (name.split(' ').length < 2) bad.name = true;
+      if (!/^5\d{8}$/.test(digits)) bad.phone = t('Enter a Saudi mobile number starting with 5.');
+      else if (me && phone === me.phone) bad.phone = t('That mobile number is yours: tick Myself instead.');
+      else if (guests.some(x => x.phone === phone)) bad.phone = t('This guest is already on the list.');
+      if (bad.name || bad.phone){ gForm = { name, phone: fmtPhone(digits), bad }; summary(); focus(bad.name ? '#gpN' : '#gpP'); return; }
+      gForm = { name, phone: fmtPhone(digits), busy: true }; summary();
+      guests.push({ name, phone });
+      const er = await requote(true);   // the server checks spots left and anyone already in the game
+      if (er){ guests.pop(); sync(); gForm = { name, phone: fmtPhone(digits), err: er }; summary(); focus('#gpN'); return; }
+      gForm = null; pickErr = ''; summary(); focus('[data-gp-open]');
+    });
+    pm.addEventListener('input', e => { if (!gForm) return;
+      if (e.target.id === 'gpP'){ e.target.value = fmtPhone(e.target.value.replace(/\D/g, '').replace(/^0/, '').slice(0, 9)); gForm.phone = e.target.value; }
+      if (e.target.id === 'gpN') gForm.name = e.target.value;
+      e.target.closest('.bad')?.classList.remove('bad'); });
+    pm.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.target.id === 'gpN' || e.target.id === 'gpP')){ e.preventDefault(); pm.querySelector('[data-gp-add]')?.click(); } });
+
+    const gate = () => window.SFA_AUTH.require(t('Sign in to join a game.')).then(u => { if (!u) location.href = bookUrl; else { me = u; load(); } });
     summary(); gate(); addEventListener('sfa:auth', e => { if (!e.detail) gate(); });
     addEventListener('sfa:prefs', summary);
     $('pTerms').addEventListener('change', () => $('fTerms').classList.remove('bad'));
     $('payBtn').addEventListener('click', async () => {
+      if (!order.players.length){ pickErr = t("Choose who's playing"); summary(); $('gpCard')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
       if (!$('pTerms').checked){ $('fTerms').classList.add('bad'); $('fTerms').scrollIntoView({ block: 'center', behavior: 'smooth' }); $('pTerms').focus({ preventScroll: true }); return; }
       const btn = $('payBtn'); btn.disabled = true; btn.innerHTML = `<span class="spin" aria-hidden="true"></span><span>${t(quote && quote.amount ? 'Opening payment…' : 'One moment…')}</span>`; alertBox.innerHTML = '';
       try {
@@ -720,7 +835,7 @@ button.who-opt:disabled small{color:var(--danger)}
       $('days').innerHTML = `<li><b>${plan} · ${t('{n} sessions', { n })}</b><ul>${people}${save}</ul></li>`
         + (k ? `<li><b>${t('Add-ons')}</b><ul><li><span>× ${k} ${esc(tx(K.name))}</span><span class="slot-p">${money(K.price * k)}</span>${rm('kit', 'kit', `${k} × ${tx(K.name)}`)}</li></ul></li>` : '');
       const o = offerP();
-      $('ckOffers').innerHTML = planPrice && window.SFA_OFFER_UI ? window.SFA_OFFER_UI.block('program', { sport: p.sport, program: order.program }, picked().length, planPrice) : '';
+      $('ckOffers').innerHTML = planPrice && window.SFA_OFFER_UI ? window.SFA_OFFER_UI.applied('program', { sport: p.sport, program: order.program }, picked().length, planPrice) : '';
       $('total').innerHTML = total() ? (o ? `<s class="of-was">${money(total() + o.save)}</s> ` : '') + money(total()) : t('Free of charge');
       const sar = P.currency === 'SAR'; $('charge').hidden = sar || !total();
       if (!sar && total()) $('charge').innerHTML = t("You'll be charged {amount} in Saudi riyals.", { amount: `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${total().toLocaleString('en-US')}</span>` });
@@ -935,7 +1050,7 @@ button.who-opt:disabled small{color:var(--danger)}
     // each time shows its own price and a remove (×); the last one left can't be removed, so checkout always has something to pay for
     const x = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
     $('days').innerHTML = order.days.map(d => `<li><b>${fmtDay(d.date)}</b><ul>${d.starts.map(s => `<li><span>${fmtSlot(s)}</span><span class="slot-p">${money(slotPrice)}</span>${count > 1 ? `<button class="rm-slot" type="button" data-date="${d.date}" data-s="${s}" aria-label="${t('Remove {slot}', { slot: `${fmtDay(d.date)} ${fmtSlot(s)}` })}" title="${t('Remove')}">${x}</button>` : ''}</li>`).join('')}</ul></li>`).join('');
-    $('ckOffers').innerHTML = window.SFA_OFFER_UI ? window.SFA_OFFER_UI.block('court', { sport: order.sport, court: order.court }, count, slotPrice) : '';
+    $('ckOffers').innerHTML = window.SFA_OFFER_UI ? window.SFA_OFFER_UI.applied('court', { sport: order.sport, court: order.court }, count, slotPrice) : '';
     $('total').innerHTML = (offer ? `<s class="of-was">${money(full)}</s> ` : '') + money(total);
     // prices may show in USD or AED; PayTabs always charges SAR, so say what will actually be charged
     const sar = P.currency === 'SAR';
