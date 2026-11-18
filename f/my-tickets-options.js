@@ -743,21 +743,22 @@
   const placeOf = c => c.t('SFA Domes Dammam');
 
   // ---------- 1 · Manage rail (GetYourGuide, Navan, Kayak, Turo on web) ----------
-  // content on the left; a sticky Manage booking card on the right with the main action, the deadline over Cancel, then
-  // help. On phones the card comes right after the tickets.
+  // split screen (Ahmed, 2026-11-18): the cards on the left, staying in view while they fit the window; the status, Manage
+  // booking (main action, the deadline over Cancel), details, receipt and help on the right. Phones and tablets stack them:
+  // status, cards, manage, details, receipt, help.
   function bvRail(c, m){
     const F = factsOf(c, m), S = statusOf(c, m), t = c.t;
     return crumbsBk(c, m) + `<header class="bv-hd"><span class="bv-hd-ph"><img src="${m.D.img}" alt="" style="object-position:${m.D.program ? m.D.program.focus : '50% 50%'}"></span>
         <div><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-hd-ref"><small>${t('Booking ref')}</small>${refCopy(c, m)}</p></div></header>
-      <div class="bv-r"><div class="bv-r-main">
-        <div class="bv-o1">${statusBox(c, m, S)}</div>
-        <section class="bv-sec bv-o2" id="bvTix"><div class="sec"><h2>${peopleTitle(c, m)}</h2><span>${peopleCount(m)}</span></div>${peopleBlock(c, m)}</section>
-        <section class="bv-sec bv-o4"><div class="sec"><h2>${t('Booking details')}</h2></div>${factGrid(c, F)}${mailLine(c, F)}</section>
-        <section class="bv-sec bv-o5"><div class="sec"><h2>${t('Receipt')}</h2></div>${receipt(c, m)}</section>
-      </div><aside class="bv-r-side">
-        <section class="bv-card bv-mg bv-o3"><h2>${t('Manage booking')}</h2>${m.up || m.past || m.cancelled ? `<div class="bv-mg-main">${mainAct(c, m)}${dirAct(c, m)}</div>` : ''}${manageList(c, m, !!liveTix(c, m).filter(s => s.date === dk(new Date())).length)}${cancelBlock(c, m)}</section>
-        <section class="bv-card bv-o6"><h2>${t('Need help?')}</h2>${helpBox(c, m)}</section>
-      </aside></div>`;
+      <div class="bv-r bv-split">
+        <div class="bv-split-l" data-c3d-sticky><section class="bv-sec bv-o2" id="bvTix"><div class="sec"><h2>${peopleTitle(c, m)}</h2><span>${peopleCount(m)}</span></div>${peopleBlock(c, m)}</section></div>
+        <div class="bv-split-r">
+          <div class="bv-o1">${statusBox(c, m, S)}</div>
+          <section class="bv-card bv-mg bv-o3"><h2>${t('Manage booking')}</h2>${m.up || m.past || m.cancelled ? `<div class="bv-mg-main">${mainAct(c, m)}${dirAct(c, m)}</div>` : ''}${manageList(c, m, !!liveTix(c, m).filter(s => s.date === dk(new Date())).length)}${cancelBlock(c, m)}</section>
+          <section class="bv-sec bv-o4"><div class="sec"><h2>${t('Booking details')}</h2></div>${factGrid(c, F)}${mailLine(c, F)}</section>
+          <section class="bv-sec bv-o5"><div class="sec"><h2>${t('Receipt')}</h2></div>${receipt(c, m)}</section>
+          <section class="bv-card bv-o6"><h2>${t('Need help?')}</h2>${helpBox(c, m)}</section>
+        </div></div>`;
   }
 
   // ---------- 2 · Tabbed record (Turo, Agoda, Kayak in their apps) ----------

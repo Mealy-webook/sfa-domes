@@ -454,7 +454,6 @@ html[lang=ar] .hero-cue-ring text{font-size:13px;letter-spacing:0}
 .sp.pinned .sp-list li{transform:translateY(calc(var(--off, 0px) * -1))}
 .sp-intro,.sp-body{width:100%;max-width:1440px;padding-inline:clamp(20px,6.67vw,96px);box-sizing:border-box}
 .sp-intro{display:flex;align-items:center;justify-content:space-between;gap:32px}
-.sp-offer .of-tag{padding:8px 12px;background:var(--neutral-950) !important;color:var(--neutral-0) !important;font:var(--ts-body-s-bold)}   /* on the orange band a dark-orange tag would blend in */
 .sp-book{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);display:inline-flex;align-items:center;justify-content:center;width:274px;height:73px;padding:12px 16px;box-sizing:border-box;background:var(--neutral-100);color:var(--neutral-950);text-decoration:none;white-space:nowrap;flex:none;transition:background .2s}
 .sp-book:hover{background:var(--neutral-0)}
 .sp-head{font:var(--ts-display-s);margin:0;width:652px;max-width:100%;text-align:right;color:var(--neutral-0);text-transform:var(--type-case-display)}
@@ -487,7 +486,6 @@ html[lang=ar] .hero-cue-ring text{font-size:13px;letter-spacing:0}
 .sp-ico img{display:block;width:100%;height:100%}
 @media (max-width:1023px){
   .sp-intro{flex-direction:column-reverse;align-items:flex-end}
-  .sp-offer{order:-1;margin-top:-20px}   /* phones: the offer tag sits under Book court, not between it and the heading */
   .sp-body{flex-direction:column;align-items:stretch}
   .sp-photo{width:100%;max-width:none}
   .sp-list{height:auto;overflow:visible}
@@ -1214,7 +1212,7 @@ html{scroll-padding-top:90px}
    <div class="sp-pin">
     <div class="sp-veil" aria-hidden="true"></div>
     <div class="sp-intro">
-      <a class="sp-book" href="courts.html">Book court</a><span class="sp-offer" id="spOffer"></span>
+      <a class="sp-book" href="courts.html">Book court</a>
       <h2 class="sp-head" id="spTitle">Every game one dome is waiting</h2>
     </div>
     <div class="sp-body">
@@ -2455,11 +2453,6 @@ void main() {
     }); };
   paint(); addEventListener('sfa:prefs', () => setTimeout(paint));
 })();
-</script>
-<script>
-/* offers (f/offers-data.js): one tag by "Book court" for the court offers running now (Ahmed, 2026-11-17) */
-(() => { const paint = () => { const el = document.getElementById('spOffer'); if (el && window.SFA_OFFER_UI && window.SFA_PREFS) el.innerHTML = window.SFA_OFFER_UI.tag('court', {}); };
-  paint(); addEventListener('sfa:prefs', paint); })();
 </script>
 <link rel="stylesheet" href="f/ui.css">
 </body></html>

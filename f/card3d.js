@@ -57,6 +57,14 @@
   new MutationObserver(list => { for (const m of list) for (const n of m.addedNodes) if (n.nodeType === 1){ if (n.matches && n.matches('.c3d[data-c3d]')) restore(n.parentNode || n); else restore(n); } })
     .observe(document.documentElement, { childList: true, subtree: true });
   restore(document);
+  // [data-c3d-sticky]: a column of cards that stays in view while scrolling, but only when it fits the window (a taller
+  // one would hide its last cards)
+  const fit = () => document.querySelectorAll('[data-c3d-sticky]').forEach(el => { el.classList.remove('is-sticky'); const top = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav')) || 90;
+    if (el.offsetHeight && el.offsetHeight <= innerHeight - top - 32) el.classList.add('is-sticky'); });
+  let fitT = 0; const fitSoon = () => { clearTimeout(fitT); fitT = setTimeout(fit, 60); };
+  addEventListener('resize', fitSoon); addEventListener('load', fitSoon);
+  new MutationObserver(fitSoon).observe(document.documentElement, { childList: true, subtree: true });
+  document.addEventListener('toggle', fitSoon, true);
 
   const FLIP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.7M20 4v4.7h-4.7M20 12a8 8 0 0 1-13.7 5.6L4 15.3M4 20v-4.7h4.7"/></svg>';
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);

@@ -698,9 +698,17 @@
 .bv-r-main{display:grid;gap:40px;min-width:0}
 .bv-r-side{position:sticky;top:calc(var(--nav) + 16px);display:grid;gap:12px}
 .bv-sec .sec{margin-bottom:16px}
+/* split screen: cards left, everything else right (Ahmed, 2026-11-18) */
+.bv-split{grid-template-columns:minmax(340px,460px) minmax(0,1fr);gap:clamp(32px,4vw,64px)}
+.bv-split-l{min-width:0}
+.bv-split-l.is-sticky{position:sticky;top:calc(var(--nav) + 16px)}
+.bv-split-l .c3d-deck{grid-template-columns:minmax(0,1fr)}
+.bv-split-l .c3d-deck--v{grid-template-columns:minmax(0,340px)}
+.bv-split-r{display:grid;gap:40px;min-width:0}
+.bv-split-r > .bv-card{margin:0}
 @media (max-width:1023px){
   .bv-r{display:flex;flex-direction:column;align-items:stretch;gap:32px}
-  .bv-r-main,.bv-r-side{display:contents}
+  .bv-r-main,.bv-r-side,.bv-split-l,.bv-split-r{display:contents}
   .bv-o1{order:1}.bv-o2{order:2}.bv-o3{order:3}.bv-o4{order:4}.bv-o5{order:5}.bv-o6{order:6}
 }
 
