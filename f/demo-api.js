@@ -3,7 +3,8 @@
    password), My children, saved courts, court / program / open-game checkout with the test payment page, the
    confirmation, My tickets and booked slots. Nothing leaves the browser: the data lives in this browser's localStorage
    (key sfaDemoDB). No real payments; PayTabs is never called.
-   On only at *.github.io, or after opening any page with ?demo=1 (sticky; ?demo=0 turns it off). ?demo-reset=1 starts over.
+   On everywhere except localhost (github.io, a Claude artifact…); on localhost after opening any page with ?demo=1 (sticky;
+   ?demo=0 turns it off). ?demo-reset=1 starts over.
    Seed: window.SFA_DEMO_SEED (f/demo-seed.js, written by the publish script) — Sara, her children and the bookings the
    review pages link to, with their dates moved by whole weeks to the current week so weekdays and "today" still line up.
    The data files (courts, programs, games) are loaded on demand when a page doesn't have them. */
@@ -11,7 +12,9 @@
   const qs = new URLSearchParams(location.search);
   try { if (qs.get('demo') === '1') localStorage.setItem('sfaDemo', '1'); if (qs.get('demo') === '0') localStorage.removeItem('sfaDemo'); } catch (e) {}
   let flag = false; try { flag = localStorage.getItem('sfaDemo') === '1'; } catch (e) {}
-  if (!/\.github\.io$/i.test(location.hostname) && !flag) return;
+  // on everywhere except a local dev host, where node server.js answers /api (2026-11-18: so the site also runs as a
+  // Claude artifact, which has no server and whose links can't carry ?demo=1)
+  if (/^(localhost|127\.0\.0\.1|\[::1\]|.+\.localhost)$/i.test(location.hostname) && !flag) return;
   window.SFA_DEMO = true;
 
   const KEY = 'sfaDemoDB', W = window;
