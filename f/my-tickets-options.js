@@ -443,6 +443,8 @@
       <footer class="c3d-f"><div class="c3d-acts">${rowActs(c, m, r)}</div></footer>`;
     return D3.card({ id: s.id + (r.p ? '|' + r.p.i : ''), front, back, cls: (live ? '' : 'is-locked') + (r.done || r.gone ? ' is-off' : ''), label: `${kind} · ${r.name}` });
   }
+  // several cards one behind the other, changed with the arrows (f/card3d.js)
+  const stackOf = (c, m, cards, cls) => window.SFA_CARD3D.stack({ id: m.b.cartId, cards, cls, t: { prev: c.t('Previous card'), next: c.t('Next card'), count: c.t('Card {i} of {n}') } });
   // renew a program for another month at 20% off (Ahmed, 2026-11-18: "add option for renew program subscription and show
   // the discount"): shown on every running monthly program; open any time until a week after it ends (2026-11-18)
   function renewBox(c, m){
@@ -706,14 +708,15 @@
   }
   // the people (or times) as a list, for the rail and tabs layouts; programs show their cards
   function peopleBlock(c, m){
-    if (m.kind === 'program') return `<div class="c3d-deck c3d-deck--v">${m.active.map(p => programCard(c, m, p)).join('')}</div>${renewBox(c, m)}${removedList(c, m)}`;
+    if (m.kind === 'program') return (m.active.length > 1 ? stackOf(c, m, m.active.map(p => programCard(c, m, p)), 'c3d-stack--v') : `<div class="c3d-deck c3d-deck--v">${m.active.map(p => programCard(c, m, p)).join('')}</div>`) + `${renewBox(c, m)}${removedList(c, m)}`;
     const R = rowsOf(c, m), now = Date.now(), up = R.filter(r => !r.done), done = R.filter(r => r.done);
     const li = r => `<li class="bv-row${r.gone ? ' is-gone' : ''}${r.done ? ' is-done' : ''}">
         ${r.time ? `<span class="day" aria-hidden="true"><span>${c.P.date(c.T.toDate(r.s.date), { weekday: 'short' })}</span><b>${c.T.toDate(r.s.date).getDate()}</b><small>${c.P.date(c.T.toDate(r.s.date), { month: 'short' })}</small></span>` : `<span class="bv-av${r.p.you ? ' is-you' : ''}" aria-hidden="true">${ini(r.p.name)}</span>`}
         <div class="bv-row-i"><b>${r.name}${r.free ? `<em>${c.t('First game free')}</em>` : ''}</b><small>${[r.type, r.phone ? `<bdi>${c.esc(r.phone)}</bdi>` : '', r.no && !r.gone ? `<bdi>${c.esc(r.no)}</bdi>` : ''].filter(Boolean).join(' · ')}</small>
           ${r.sent ? `<small class="bv-sent${r.sentOk ? ' is-ok' : ''}">${SEND}${r.sent}</small>` : ''}</div>
         <div class="bv-row-s">${stTag(c, r.st)}</div><div class="bv-row-a">${rowActs(c, m, r)}</div></li>`;
-    return `<div class="c3d-deck">${(up.length ? up : done).map(r => ticketCard(c, m, r)).join('')}</div>${up.length && done.length ? `<details class="mt-hist"><summary>${c.t('Played')} <b>${done.length}</b></summary><div class="c3d-deck">${done.map(r => ticketCard(c, m, r)).join('')}</div></details>` : ''}
+    const main = (up.length ? up : done).map(r => ticketCard(c, m, r)).filter(Boolean);
+    return `${main.length > 1 ? stackOf(c, m, main) : `<div class="c3d-deck">${main.join('')}</div>`}${up.length && done.length ? `<details class="mt-hist"><summary>${c.t('Played')} <b>${done.length}</b></summary><div class="c3d-deck">${done.map(r => ticketCard(c, m, r)).join('')}</div></details>` : ''}
       ${m.people.some(p => m.canRemove(p)) ? `<p class="pg-note">${c.t('You can remove one person until free cancellation ends; their share is refunded and everyone else keeps their spot.')}</p>` : ''}`;
   }
   const peopleTitle = (c, m) => m.kind === 'program' ? c.t(m.active.length === 1 ? 'Program card' : 'Program cards') : m.people[0] && m.people[0].single ? c.t('Tickets') : c.t('Players and tickets');

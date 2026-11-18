@@ -66,7 +66,36 @@
   new MutationObserver(fitSoon).observe(document.documentElement, { childList: true, subtree: true });
   document.addEventListener('toggle', fitSoon, true);
 
+  // [data-c3d-stack]: several cards one behind the other (Ahmed, 2026-11-18: "show multiple cards behind each other and the
+  // user can change using arrow"). The front card is live; up to two peek out behind it; arrows, ← → keys and a swipe
+  // change which one is in front. The position is remembered per stack id, so a re-render keeps it.
+  const at3 = new Map();
+  function lay(st){
+    const cards = [...st.querySelectorAll(':scope > .c3d-stack-c > .c3d')], n = cards.length, id = st.dataset.c3dStack;
+    let i = Math.max(0, Math.min(n - 1, at3.get(id) || 0)); at3.set(id, i);
+    cards.forEach((c, k) => { const pos = k - i; c.dataset.pos = pos < 0 ? 'out' : pos > 2 ? 'far' : String(pos); c.style.setProperty('--pos', Math.max(0, Math.min(3, pos)));
+      c.inert = pos !== 0; c.setAttribute('aria-hidden', String(pos !== 0)); });
+    const cnt = st.querySelector('[data-c3d-count]'); if (cnt) cnt.textContent = cnt.dataset.c3dCount.replace('{i}', i + 1).replace('{n}', n);
+    const pv = st.querySelector('[data-c3d-prev]'), nx = st.querySelector('[data-c3d-next]'); if (pv) pv.disabled = i === 0; if (nx) nx.disabled = i === n - 1;
+    const who = st.querySelector('[data-c3d-who]'); if (who) who.textContent = cards[i] ? (cards[i].getAttribute('aria-label') || '').split(' · ').pop() : '';
+  }
+  function go(st, d){ const id = st.dataset.c3dStack, n = st.querySelectorAll(':scope > .c3d-stack-c > .c3d').length, i = (at3.get(id) || 0) + d;
+    if (i < 0 || i >= n) return; at3.set(id, i); lay(st); }
+  const layAll = root => (root.querySelectorAll ? root.querySelectorAll('[data-c3d-stack]') : []).forEach(lay);
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-c3d-prev],[data-c3d-next]'); if (!b) return;
+    const st = b.closest('[data-c3d-stack]'); if (st){ go(st, b.hasAttribute('data-c3d-next') ? 1 : -1); } });
+  document.addEventListener('keydown', e => { if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return; const st = e.target.closest && e.target.closest('[data-c3d-stack]'); if (!st || /input|textarea/i.test(e.target.tagName)) return;
+    const fwd = (e.key === 'ArrowRight') !== (document.documentElement.dir === 'rtl'); e.preventDefault(); go(st, fwd ? 1 : -1); });
+  let sw = null;   // a sideways swipe on a phone
+  document.addEventListener('pointerdown', e => { if (e.pointerType !== 'touch') return; const st = e.target.closest && e.target.closest('[data-c3d-stack]'); sw = st ? { st, x: e.clientX, y: e.clientY } : null; }, { passive: true });
+  document.addEventListener('pointerup', e => { if (!sw) return; const dx = e.clientX - sw.x, dy = e.clientY - sw.y, st = sw.st; sw = null;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) go(st, (dx < 0) !== (document.documentElement.dir === 'rtl') ? 1 : -1); }, { passive: true });
+  new MutationObserver(list => { for (const m of list) for (const n of m.addedNodes) if (n.nodeType === 1){ if (n.matches && n.matches('[data-c3d-stack]')) lay(n); else layAll(n); } })
+    .observe(document.documentElement, { childList: true, subtree: true });
+  layAll(document);
+
   const FLIP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.7M20 4v4.7h-4.7M20 12a8 8 0 0 1-13.7 5.6L4 15.3M4 20v-4.7h4.7"/></svg>';
+  const ARR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   // the markup, for pages that draw cards: front and back are HTML, flip labels in the page's language
   window.SFA_CARD3D = {
@@ -74,6 +103,10 @@
       <div class="c3d-face c3d-front">${front}<i class="c3d-shine" aria-hidden="true"></i></div>
       <div class="c3d-face c3d-back" inert>${back}<i class="c3d-shine" aria-hidden="true"></i></div></div></article>`,
     flip: (text, back) => `<button type="button" class="c3d-flip" data-c3d-flip aria-expanded="${!!back}">${FLIP}<span>${esc(text)}</span></button>`,
+    // cards: [html]; t: { prev, next, count: 'Card {i} of {n}' } in the page's language. One card: just the card.
+    stack: ({ id, cards, cls = '', t }) => cards.length < 2 ? cards.join('') : `<div class="c3d-stack ${cls}" data-c3d-stack="${esc(id)}" role="group" aria-roledescription="carousel">
+      <div class="c3d-stack-c">${cards.join('')}</div>
+      <div class="c3d-nav"><button type="button" class="c3d-arrow" data-c3d-prev aria-label="${esc(t.prev)}">${ARR}</button><span class="c3d-count" aria-live="polite"><b data-c3d-who></b><small data-c3d-count="${esc(t.count)}"></small></span><button type="button" class="c3d-arrow is-next" data-c3d-next aria-label="${esc(t.next)}">${ARR}</button></div></div>`,
     mini: ({ kind, n, locked, icon = '' }) => `<span class="c3d-mini${n > 1 ? ' is-stack' : ''}${locked ? ' is-locked' : ''}" aria-hidden="true"><span class="c3d-mini-c"><small>${esc(kind)}</small><b>${icon}</b><i class="c3d-shine"></i></span></span>`
   };
 })();
