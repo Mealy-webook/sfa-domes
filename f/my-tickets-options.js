@@ -476,8 +476,8 @@
           <div class="mt-cta mt-bk-n"><span class="mt-tix">${window.SFA_CARD3D ? window.SFA_CARD3D.mini({ kind: m.kind === 'program' ? c.t('Program card') : c.t('Ticket'), n: tixCount(m), locked: !m.up, icon: QRI }) : QRI}<b>${tixCount(m)}</b><small>${tixWord(c, m, tixCount(m))}</small></span><span class="ghost sm mt-view">${c.t('Open booking')}${c.ARROW}</span></div></li>`).join('')}</ol>` : emptyTxt(c));
     },
     view(c, m){
-      // Manage rail is the live booking page (Ahmed picked it, 2026-11-17); ?bv=was shows the page it replaced
-      const bv = bvOf() || 'rail'; if (BV[bv]) return `<div class="bv bv-${bv}">${BV[bv](c, m)}</div>${bvOf() && BV_OPTS.some(([k]) => k === bv) ? optBar(bv) : ''}`;
+      // C · Focused column is the live booking page (Ahmed picked it, 2026-11-18; before: Manage rail / split, ?bv=rail)
+      const bv = bvOf() || 'focus'; if (BV[bv]) return `<div class="bv bv-${bv}">${BV[bv](c, m)}</div>${bvOf() && BV_OPTS.some(([k]) => k === bv) ? optBar(bv) : ''}`;
       const b = m.b, multi = !(m.people[0] && m.people[0].single) && m.active.length > 1, now = Date.now();
       let f = st.tf[b.cartId]; if (f === undefined || (f !== 'all' && !m.active.some(p => p.i === f))) f = st.tf[b.cartId] = 'all';
       const P0 = f === 'all' ? null : m.people.find(p => p.i === f);
@@ -836,7 +836,7 @@
     if (n) out.push(`<button type="button" class="bvq" data-mt-sendall="${esc(b.cartId)}">${SEND}<span>${n === 1 ? t('Send the guest ticket') : t('Send {n} guest tickets', { n })}</span></button>`);
     if (c.renewInfo(b)) out.push(`<button type="button" class="bvq is-accent" data-renew="${esc(b.cartId)}">${IC.tag}<span>${t('Renew · 20% off')}</span></button>`);
     out.push(`<a class="bvq" href="result.html?cart=${encodeURIComponent(b.cartId)}">${IC2.doc}<span>${t('View confirmation')}</span></a>`);
-    if (!m.up) out.push(`<a class="bvq" href="${againUrl(m)}">${IC.cal}<span>${t('Book again')}</span></a>`);
+    if (!m.up && !skip.again) out.push(`<a class="bvq" href="${againUrl(m)}">${IC.cal}<span>${t('Book again')}</span></a>`);
     return `<div class="bvq-row">${out.join('')}</div>`;
   }
   const todayLive = (c, m) => liveTix(c, m).some(s => s.date === dk(new Date()));
@@ -871,15 +871,38 @@
         <section class="bvB-t bvB-help"><h2>${t('Need help?')}</h2>${helpBox(c, m)}</section></div>`;
   }
 
-  // ---------- C · Focused column (Airbnb trip, Uber, Careem: one column, the pass in the middle) ----------
-  // one centred column like the app: status, the cards, one main button, quick actions, then sections that open
+  // ---------- C · Focused column (Airbnb trip, Uber, Careem: one column, the pass in the middle) — LIVE (Ahmed, 2026-11-18) ----------
+  // one centred column like the app: a countdown, the cards on a lit stage, one main button, quick actions, then sections
+  // that open. Polish + delight (Ahmed: "more polish in ui and make it delight"): the countdown and progress, the cards
+  // dealt in on first open, tiles that lift, sections that open smoothly with a hint of what's inside, copy and calendar
+  // feedback. Still with reduced motion.
+  const seenC = new Set();
+  const startOf = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x.getTime(); };
+  function countdown(c, m){
+    const t = c.t, b = m.b, now = Date.now(), prog = m.kind === 'program';
+    if (m.cancelled) return { big: '—', unit: t('Cancelled'), pct: 0, k: 'off' };
+    if (m.past) return { big: CHECK, unit: t('Played'), pct: 100, k: 'done', label: prog ? t('{p} of {n} sessions played', { p: m.days.filter(d => d.endsAt <= now).length, n: m.days.length }) : '' };
+    const days = Math.round((startOf(c.T.toDate(m.next.date)) - startOf(now)) / 864e5);
+    const from = b.paidAt || b.createdAt || now, to = m.next.startAt || now, pct = prog ? Math.round(m.days.filter(d => d.endsAt <= now).length / m.days.length * 100) : Math.max(4, Math.min(100, Math.round((now - from) / Math.max(1, to - from) * 100)));
+    return { big: days <= 0 ? t('Today') : String(days), unit: days <= 0 ? '' : days === 1 ? t('day to go') : t('days to go'), pct, k: days <= 0 ? 'today' : 'up',
+      label: prog ? t('{p} of {n} sessions played', { p: m.days.filter(d => d.endsAt <= now).length, n: m.days.length }) : t('Booked {date}', { date: c.P.date(new Date(from), 'short') }) };
+  }
   function bvFocus(c, m){
-    const F = factsOf(c, m), S = statusOf(c, m), t = c.t;
-    const acc = (id, title, body, open) => `<details class="bvC-acc" ${open ? 'open' : ''}><summary><span>${title}</span>${CHEV}</summary><div class="bvC-accb">${body}</div></details>`;
-    return `<div class="bvC">${crumbsBk(c, m)}<header class="bvC-hd"><p class="eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-hd-ref"><small>${t('Booking ref')}</small>${refCopy(c, m)}</p></header>
-      ${statLine(c, S)}${cardsSec(c, m, 'bvC-cards')}
-      ${m.up || m.past || m.cancelled ? `<div class="bvC-main">${mainAct(c, m)}</div>` : ''}${quickActs(c, m, { cal: !todayLive(c, m) })}
-      <div class="bvC-accs">${acc('det', t('Booking details'), factGrid(c, F) + mailLine(c, F), true)}${acc('rc', t('Receipt'), receipt(c, m))}${m.up ? acc('cx', t('Cancellation'), cancelBlock(c, m)) : ''}${acc('help', t('Need help?'), helpBox(c, m))}</div></div>`;
+    const F = factsOf(c, m), S = statusOf(c, m), t = c.t, b = m.b, prog = m.kind === 'program', C = m.up ? c.T.cancelInfo(b) : null, D = countdown(c, m);
+    const enter = !seenC.has(b.cartId); seenC.add(b.cartId);
+    const lead = m.cancelled ? S.lead : m.past ? S.lead : `${prog ? t('Next session') + ' · ' : ''}${dayTime(c, m.next)}`;
+    const meta = { det: `${shortDay(c, m.next ? m.next.date : m.last.date)} · ${c.esc(m.D.label)}`, rc: b.free || !b.amount ? t('Free of charge') : c.P.money(b.amount - (b.refund || 0)),
+      cx: C ? (C.can ? t('Free until {when}', { when: c.P.date(C.by, 'short') }) : t('Ended')) : '', help: `<bdi>${HELP.telTxt}</bdi>` };
+    const acc = (id, ic, title, body, open) => `<details class="bvC-acc" data-acc="${id}" ${open ? 'open' : ''}><summary><span class="bvC-acc-ic" aria-hidden="true">${ic}</span><span class="bvC-acc-t">${title}</span><small>${meta[id] || ''}</small>${CHEV}</summary><div class="bvC-accb">${body}</div></details>`;
+    const live = S.k === 'ok';
+    return `<div class="bvC${enter ? ' is-enter' : ''}">${crumbsBk(c, m)}
+      <header class="bvC-hd" style="--d:0"><p class="bvC-eye">${m.kindTxt}</p><h1>${c.esc(m.D.label)}</h1><p class="bv-hd-ref"><small>${t('Booking ref')}</small>${refCopy(c, m)}</p></header>
+      <section class="bvC-st bvC-st--${D.k}" style="--d:1"><div class="bvC-cd"><b>${D.big}</b>${D.unit ? `<small>${D.unit}</small>` : ''}</div>
+        <div class="bvC-st-t"><b>${live ? '<i class="bvC-pulse" aria-hidden="true"></i>' : ''}${S.title}</b><p>${lead}</p>${S.note ? `<small>${S.note}</small>` : ''}
+          ${m.cancelled ? '' : `<div class="bvC-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${D.pct}" aria-label="${c.esc(D.label || '')}"><i style="--p:${D.pct}%"></i></div>${D.label ? `<small class="bvC-prog-l">${D.label}</small>` : ''}`}</div></section>
+      <section class="bvC-stage" id="bvTix" style="--d:2"><div class="bvC-stage-h"><h2>${peopleTitle(c, m)}</h2><span>${peopleCount(m)}</span></div>${peopleBlock(c, m)}</section>
+      ${m.up || m.past || m.cancelled ? `<div class="bvC-main" style="--d:3">${mainAct(c, m)}</div>` : ''}<div style="--d:4" class="bvC-q">${quickActs(c, m, { cal: m.up && !todayLive(c, m), again: !m.up })}</div>
+      <div class="bvC-accs" style="--d:5">${acc('det', IC.cal, t('Booking details'), factGrid(c, F) + mailLine(c, F), true)}${acc('rc', IC2.doc, t('Receipt'), receipt(c, m))}${m.up ? acc('cx', IC.tag, t('Cancellation'), cancelBlock(c, m)) : ''}${acc('help', IC2.phone, t('Need help?'), helpBox(c, m))}</div></div>`;
   }
 
   // ---------- D · Timeline (Booking.com and Agoda trip pages, FedEx tracking) ----------
@@ -908,7 +931,7 @@
   const renewBoxOnce = () => '';   // the renew box already sits under the program cards
 
   // the switcher bar: shown when the page is opened with ?bv=, to compare the layouts on one booking
-  const BV_OPTS = [['rail', 'Live · Split'], ['hero', 'A · Pass hero'], ['bento', 'B · Bento'], ['focus', 'C · Focused'], ['journey', 'D · Timeline']];
+  const BV_OPTS = [['rail', 'Before · Split'], ['hero', 'A · Pass hero'], ['bento', 'B · Bento'], ['focus', 'C · Focused (live)'], ['journey', 'D · Timeline']];
   const optBar = cur => `<nav class="bvo-bar" aria-label="Layout options"><span>Layout options</span>${BV_OPTS.map(([k, l]) => `<a href="?bv=${k}${location.hash}"${k === cur ? ' aria-current="true"' : ''}>${l}</a>`).join('')}</nav>`;
 
   const BV = { wallet: bvWallet, timeline: bvTimeline, split: bvSplit, rail: bvRail, tabs: bvTabs, order: bvOrder, hero: bvHero, bento: bvBento, focus: bvFocus, journey: bvJourney };
@@ -927,6 +950,7 @@
     },
     // returns true when it handled the click
     async click(v, e, c){
+      if (e.target.closest('.bvC a[download]')){ setTimeout(() => c.A.toast(c.t('Calendar file saved: open it to add the booking.')), 150); return false; }   // the download goes ahead
       const el = e.target.closest('[data-bv-tab],[data-bv-go],[data-bv-card],[data-bv-sel],[data-bv-selall],[data-bv-bulk],[data-bv-scroll],[data-mt-checkin],[data-mt-copy],[data-mt-kt],[data-mt-tf],[data-mt-type],[data-mt-person],[data-mt-cal],[data-mt-day],[data-mt-seg],[data-mt-who],[data-mt-open],[data-mt-close],[data-mt-toggle],[data-mt-pick],[data-mt-ticket],[data-mt-send],[data-mt-sendall],[data-mt-remove]'); if (!el) return false;
       const d = el.dataset;
       if (d.bvTab){ const [cart, k] = d.bvTab.split('|'); st.bt[cart] = k; c.paint(); c.root.querySelector(`[data-bv-tab="${CSS.escape(d.bvTab)}"]`)?.focus(); return true; }
@@ -941,7 +965,7 @@
       if (d.bvScroll){ const r = c.root.querySelector('#bvPasses'); if (r){ const dir = document.documentElement.dir === 'rtl' ? -1 : 1, w = (r.firstElementChild || r).getBoundingClientRect().width + 16; r.scrollBy({ left: +d.bvScroll * w * dir, behavior: 'smooth' }); } return true; }
       if (d.mtCheckin){ const [cart, i] = d.mtCheckin.split('|'); el.disabled = true; const r = await c.post('/api/auth/check-in', { cart, i: +i }); await c.reload();
         c.A.toast(r.ok ? c.t('{name} checked in · {n} sessions left', { name: String(r.d.name || '').split(' ')[0], n: r.d.left }) : c.t(r.d.error || 'Something went wrong. Try again.')); return true; }
-      if (d.mtCopy){ try { await navigator.clipboard.writeText(d.mtCopy); } catch (x) {} c.A.toast(c.t('Booking ref copied')); return true; }
+      if (d.mtCopy){ try { await navigator.clipboard.writeText(d.mtCopy); } catch (x) {} c.A.toast(c.t('Booking ref copied')); const sp = el.querySelector('span'), was = sp && sp.textContent; el.classList.add('is-ok'); if (sp) sp.textContent = c.t('Copied'); setTimeout(() => { el.classList.remove('is-ok'); if (sp) sp.textContent = was; }, 1600); return true; }
       if (d.mtKt){ st.kt = d.mtKt; c.paint(); c.root.querySelector(`[data-mt-kt="${d.mtKt}"]`)?.focus(); return true; }
       if (d.mtTf){ const [cart, k] = d.mtTf.split('|'); st.tf[cart] = k === 'all' ? 'all' : +k; c.paint(); c.root.querySelector(`[data-mt-tf="${CSS.escape(d.mtTf)}"]`)?.focus(); return true; }
       if (d.mtType){ st.type = d.mtType; c.paint(); c.root.querySelector(`[data-mt-type="${d.mtType}"]`)?.focus(); return true; }

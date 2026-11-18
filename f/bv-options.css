@@ -53,25 +53,99 @@
 .bvB-cx .bv-cx{margin:0}
 @media (max-width:1023px){.bvB,.bvB:not(:has(.bvB-cx)){grid-template-columns:minmax(0,1fr);grid-template-areas:"stat" "cards" "act" "det" "rc" "cx" "help"}.bvB-t{padding:20px 16px}}
 
-/* C · Focused column */
+/* C · Focused column — LIVE (Ahmed, 2026-11-18), with polish + delight */
 .bvC{display:grid;gap:24px;max-width:680px;margin:0 auto}
 .bvC .kl-crumbs{margin:0}
-.bvC-hd{display:grid;gap:4px;text-align:center;justify-items:center}
-.bvC-hd h1,.bvC-hd .eye{margin:0}
-.bvC-hd .bv-hd-ref{justify-content:center}
-.bvC-cards .sec{justify-content:center;gap:8px}
-.bvC-cards .c3d-deck,.bvC-cards .c3d-deck--v{justify-content:center}
-.bvC-cards .c3d-stack{margin:0 auto;width:100%}
-.bvC-cards .c3d-stack:not(.c3d-stack--v){max-width:460px}
+.bvC-hd{display:grid;gap:6px;text-align:center;justify-items:center}
+.bvC-hd h1{margin:0}
+.bvC-eye{display:inline-flex;align-items:center;height:24px;margin:0;padding:0 8px;background:var(--color-bg-secondary);font:var(--ts-caption-1-bold);color:var(--color-content-secondary)}
+.bvC-hd .bv-hd-ref{justify-content:center;margin:6px 0 0}
+.mt-copy.is-ok{border-color:var(--green-400);color:var(--color-content-primary)}
+.mt-copy.is-ok svg{color:var(--green-400)}
+
+/* the countdown: a dark square with the days to go, the status beside it, a bar toward the day */
+.bvC-st{display:grid;grid-template-columns:112px minmax(0,1fr);gap:20px;align-items:center;padding:20px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.bvC-cd{display:grid;place-items:center;align-content:center;gap:2px;width:112px;height:112px;background:var(--neutral-950);color:var(--neutral-0);border-top:4px solid var(--color-brand);text-align:center}
+.bvC-cd b{font:var(--ts-display-m);line-height:1}
+.bvC-cd small{font:var(--ts-caption-1-bold);color:rgba(255,255,255,.7)}
+.bvC-cd svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:2.4}
+.bvC-st--today .bvC-cd{background:var(--color-brand);border-top-color:var(--neutral-950)}
+.bvC-st--today .bvC-cd b{font:var(--ts-title-section)}
+.bvC-st--off .bvC-cd{background:var(--color-bg-tertiary);color:var(--color-content-secondary);border-top-color:var(--color-danger)}
+.bvC-st--done .bvC-cd{background:var(--color-bg-secondary);color:var(--color-content-primary);border-top-color:var(--neutral-400)}
+.bvC-st-t{display:grid;gap:4px;min-width:0}
+.bvC-st-t > b{display:flex;align-items:center;gap:8px;font:var(--ts-title-body)}
+.bvC-st-t p{margin:0;font:var(--ts-body-default)}
+.bvC-st-t small{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.bvC-prog{height:6px;margin-top:8px;background:var(--color-bg-tertiary);overflow:hidden}
+.bvC-prog i{display:block;height:100%;width:var(--p);background:var(--color-brand);transform-origin:0 50%}
+html[dir=rtl] .bvC-prog i{transform-origin:100% 50%}
+.bvC-prog-l{font:var(--ts-caption-1)!important}
+.bvC-pulse{position:relative;width:10px;height:10px;border-radius:50%;background:var(--green-400);flex:none}
+.bvC-pulse::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--green-400);animation:bvPulse 1.6s ease-out infinite}
+@keyframes bvPulse{to{transform:scale(2.6);opacity:0}}
+
+/* the stage: the cards under a soft light */
+.bvC-stage{position:relative;display:grid;gap:16px;padding:24px 24px 28px;background:radial-gradient(120% 70% at 50% 0%,color-mix(in srgb,var(--color-brand) 14%,var(--color-bg-secondary)) 0%,var(--color-bg-secondary) 58%);overflow:hidden}
+.bvC-stage::before{content:"";position:absolute;inset:auto 10% 18px;height:24px;background:radial-gradient(closest-side,rgba(9,9,11,.18),transparent);filter:blur(6px);pointer-events:none}
+.bvC-stage-h{position:relative;display:flex;justify-content:center;align-items:baseline;gap:8px}
+.bvC-stage-h h2{margin:0;font:var(--ts-body-default-bold)}
+.bvC-stage-h span{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.bvC-stage .c3d-deck,.bvC-stage .c3d-deck--v{justify-content:center}
+.bvC-stage .c3d-stack{position:relative;margin:0 auto;width:100%}
+.bvC-stage .c3d-stack:not(.c3d-stack--v){max-width:460px}
+.bvC-stage .c3d-renew{position:relative;margin-top:0}
+.bvC-stage .mt-hist,.bvC-stage .mt-removed{position:relative}
 .bvC-main > *{width:100%}
+
+/* quick actions: tiles that lift */
+.bvC .bvq{transition:transform .2s cubic-bezier(.2,.75,.2,1),box-shadow .2s,border-color .2s}
+.bvC .bvq svg{transition:transform .25s cubic-bezier(.2,.75,.2,1)}
+.bvC .bvq:hover{transform:translateY(-2px);box-shadow:0 10px 20px -14px rgba(9,9,11,.45)}
+.bvC .bvq:hover svg{transform:translateY(-1px) scale(1.08)}
+.bvC .bvq:active{transform:translateY(0) scale(.98)}
+.bvC .bvq:focus-visible{outline:2px solid var(--color-brand);outline-offset:2px}
+
+/* sections that open smoothly, with a hint of what's inside */
 .bvC-accs{display:grid;border-top:1px solid var(--color-border-primary)}
-.bvC-acc{border-bottom:1px solid var(--color-border-primary)}
-.bvC-acc summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;font:var(--ts-title-body);cursor:pointer;list-style:none}
+.bvC-acc{border-bottom:1px solid var(--color-border-primary);interpolate-size:allow-keywords}
+.bvC-acc summary{display:grid;grid-template-columns:40px minmax(0,1fr) auto 20px;align-items:center;gap:12px;min-height:72px;cursor:pointer;list-style:none}
 .bvC-acc summary::-webkit-details-marker{display:none}
-.bvC-acc summary svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;transform:rotate(90deg);transition:transform .2s}
-.bvC-acc[open] summary svg{transform:rotate(-90deg)}
+.bvC-acc summary:hover .bvC-acc-ic{background:var(--color-bg-tertiary)}
+.bvC-acc summary:focus-visible{outline:2px solid var(--color-brand);outline-offset:-2px}
+.bvC-acc-ic{display:grid;place-items:center;width:40px;height:40px;background:var(--color-bg-secondary);transition:background .2s}
+.bvC-acc-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8}
+.bvC-acc-t{font:var(--ts-title-body)}
+.bvC-acc summary small{font:var(--ts-body-s);color:var(--color-content-secondary);text-align:end;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.bvC-acc summary > svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;transform:rotate(90deg);transition:transform .25s cubic-bezier(.2,.75,.2,1)}
+html[dir=rtl] .bvC-acc summary > svg{transform:rotate(90deg) scaleY(-1)}
+.bvC-acc[open] summary > svg{transform:rotate(-90deg)}
+.bvC-acc[open] summary small{opacity:0}
+.bvC-acc::details-content{height:0;overflow:clip;transition:height .3s cubic-bezier(.2,.75,.2,1),content-visibility .3s allow-discrete}
+.bvC-acc[open]::details-content{height:auto}
 .bvC-accb{padding:0 0 24px}
 .bvC-accb .bv-cx{margin:0}
+
+/* first open: the page settles in, the cards are dealt from below */
+@keyframes bvUp{from{opacity:0;transform:translateY(14px)}}
+@keyframes bvDeal{from{opacity:0;transform:translateY(60px) rotateX(28deg) scale(.94)}}
+@keyframes bvFill{from{transform:scaleX(0)}}
+.bvC.is-enter > *{animation:bvUp .5s cubic-bezier(.2,.75,.2,1) both;animation-delay:calc(var(--d, 0) * 70ms)}
+.bvC.is-enter .c3d-stack-c > .c3d,.bvC.is-enter .bvC-stage .c3d-deck > .c3d{animation:bvDeal .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(220ms + var(--pos, 0) * 90ms)}
+.bvC.is-enter .bvC-prog i{animation:bvFill 1s cubic-bezier(.2,.75,.2,1) .35s both}
+@media (prefers-reduced-motion:reduce){
+  .bvC.is-enter > *,.bvC.is-enter .c3d-stack-c > .c3d,.bvC.is-enter .bvC-stage .c3d-deck > .c3d,.bvC.is-enter .bvC-prog i{animation:none}
+  .bvC-pulse::after{animation:none}.bvC .bvq,.bvC .bvq svg,.bvC-acc::details-content{transition:none}
+}
+@media (max-width:639px){
+  .bvC{gap:20px}
+  .bvC-st{grid-template-columns:88px minmax(0,1fr);gap:16px;padding:16px}
+  .bvC-cd{width:88px;height:88px}.bvC-cd b{font:var(--ts-title-screen)}
+  .bvC-stage{margin-inline:-16px;padding:20px 16px 24px}
+  .bvC-acc summary{grid-template-columns:36px minmax(0,1fr) auto 18px;min-height:64px}
+  .bvC-acc-ic{width:36px;height:36px}
+  .bvC-acc summary small{max-width:120px}
+}
 
 /* D · Timeline */
 .bvD-tl{list-style:none;margin:0;padding:0;display:grid}
@@ -91,3 +165,4 @@
 .bvD-acts > *{flex:1 1 200px}
 .bvD-link{justify-self:start;font:var(--ts-body-s-bold);color:var(--color-content-primary)}
 .bvD-acts .bv-cxb{flex:0 0 auto}
+.bvC .bvq-row{grid-template-columns:repeat(auto-fit,minmax(112px,1fr))}
