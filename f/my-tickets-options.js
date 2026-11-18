@@ -441,7 +441,7 @@
           ${!r.time ? `<div><dt>${t('Player')}</dt><dd>${r.name}${r.phone ? ` · <bdi>${c.esc(r.phone)}</bdi>` : ''}</dd></div>` : ''}<div><dt>${t('Ticket')}</dt><dd><bdi>${c.esc(s.id)}</bdi></dd></div><div><dt>${t('Booking ref')}</dt><dd><bdi>${c.esc(b.cartId)}</bdi></dd></div>
           <div><dt>${t('Status')}</dt><dd>${stTag(c, r.st)}</dd></div></dl>${r.sent ? `<small class="bv-sent${r.sentOk ? ' is-ok' : ''}">${SEND}${r.sent}</small>` : ''}</div>
       <footer class="c3d-f"><div class="c3d-acts">${rowActs(c, m, r)}</div></footer>`;
-    return D3.card({ id: s.id + (r.p ? '|' + r.p.i : ''), front, back, cls: (live ? '' : 'is-locked') + (r.done || r.gone ? ' is-off' : ''), label: `${kind} · ${r.name}` });
+    return D3.card({ id: s.id + (r.p ? '|' + r.p.i : ''), front, back, cls: 'c3d--v' + (live ? '' : ' is-locked') + (r.done || r.gone ? ' is-off' : ''), label: `${kind} · ${r.name}` });   // upright like the program card (Ahmed, 2026-11-18: "all the cards should be vertical")
   }
   // several cards one behind the other, changed with the arrows (f/card3d.js)
   const stackOf = (c, m, cards, cls) => window.SFA_CARD3D.stack({ id: m.b.cartId, cards, cls, t: { prev: c.t('Previous card'), next: c.t('Next card'), count: c.t('Card {i} of {n}') } });
@@ -716,7 +716,7 @@
           ${r.sent ? `<small class="bv-sent${r.sentOk ? ' is-ok' : ''}">${SEND}${r.sent}</small>` : ''}</div>
         <div class="bv-row-s">${stTag(c, r.st)}</div><div class="bv-row-a">${rowActs(c, m, r)}</div></li>`;
     const main = (up.length ? up : done).map(r => ticketCard(c, m, r)).filter(Boolean);
-    return `${main.length > 1 ? stackOf(c, m, main) : `<div class="c3d-deck">${main.join('')}</div>`}${up.length && done.length ? `<details class="mt-hist"><summary>${c.t('Played')} <b>${done.length}</b></summary><div class="c3d-deck">${done.map(r => ticketCard(c, m, r)).join('')}</div></details>` : ''}
+    return `${main.length > 1 ? stackOf(c, m, main, 'c3d-stack--v') : `<div class="c3d-deck c3d-deck--v">${main.join('')}</div>`}${up.length && done.length ? `<details class="mt-hist"><summary>${c.t('Played')} <b>${done.length}</b></summary><div class="c3d-deck c3d-deck--v">${done.map(r => ticketCard(c, m, r)).join('')}</div></details>` : ''}
       ${m.people.some(p => m.canRemove(p)) ? `<p class="pg-note">${c.t('You can remove one person until free cancellation ends; their share is refunded and everyone else keeps their spot.')}</p>` : ''}`;
   }
   const peopleTitle = (c, m) => m.kind === 'program' ? c.t(m.active.length === 1 ? 'Program card' : 'Program cards') : m.people[0] && m.people[0].single ? c.t('Tickets') : c.t('Players and tickets');

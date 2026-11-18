@@ -152,3 +152,9 @@ html[dir=rtl] .c3d-arrow.is-next svg{transform:none}
 .c3d-count small{font:var(--ts-body-s);color:var(--color-content-secondary)}
 .c3d-stack--v{max-width:340px}
 @media (prefers-reduced-motion:reduce){.c3d-stack-c > .c3d{transition:none}}
+
+/* every card stands up (Ahmed, 2026-11-18: "all the cards should be vertical"): the list previews too */
+.c3d-mini-c{width:60px;height:84px;padding:8px 7px;align-content:space-between;justify-items:center;text-align:center}
+.c3d-mini-c small{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:9px;line-height:11px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.c3d-mini-c b{justify-content:center}
+.c3d-mini-c svg{width:22px;height:22px}
