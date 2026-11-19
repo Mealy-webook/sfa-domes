@@ -37,7 +37,9 @@
     const names = guests ? `${mine.length ? mine.map(p => p.you ? t('You') : first(p.name)).join(', ') + ' + ' : ''}${guests === 1 ? t('1 guest') : t('{n} guests', { n: guests })}`
       : active.map(p => p.you ? t('You') : first(p.name)).join(', ');
     const dates = [...new Set(ses.map(s => s.date))].length;
-    const count = kind === 'game' ? (n === 1 ? t('1 player') : t('{n} players', { n }))
+    const LT = !!(b.order.ladies && b.order.tickets), nt = b.order.tickets;   // ladies-hours tickets (2026-11-19)
+    const count = LT ? (nt === 1 ? t('1 ticket') : t('{n} tickets', { n: nt })) + (b.order.kit ? ` · ${b.order.kit} × ${t('Training Kit')}` : '')
+      : kind === 'game' ? (n === 1 ? t('1 player') : t('{n} players', { n }))
       : kind === 'program' ? `${days.length === 1 ? t('1 session') : t('{n} sessions', { n: days.length })} · ${n === 1 ? t('1 participant') : t('{n} participants', { n })}`
       : `${ses.length === 1 ? t('1 time') : t('{n} times', { n: ses.length })}${dates > 1 ? ' · ' + t('{n} days', { n: dates }) : ''}`;
     const todayK = dk(new Date()), isToday = next && next.date === todayK;
@@ -56,7 +58,7 @@
     const nextOf = p => { const l = ticketsOf(p); return l.find(s => s.endsAt > now) || l[l.length - 1]; };
     const share = p => window.SFA_OFFER_SHARE && b.order.offer ? window.SFA_OFFER_SHARE(b, p.i) : !b.amount ? 0 : kind === 'game' ? (p.free ? 0 : (b.order.price || 0)) : Math.round((b.amount - (b.order.kit ? b.order.kit.qty * (window.SFA_PROGRAM_KIT || { price: 0 }).price : 0)) / people.length * 100) / 100;
     const endAt = cancelled ? (b.cancelledAt || 0) : past ? last.endsAt : next.startAt;
-    return { b, kind, ses, days, next, last, cancelled, up, past, D, people, active, n, names, count, status, when, dateLine, open, canRemove, canSend, ticketsOf, nextOf, share, endAt, kindTxt: t(KIND[kind] || kind) };
+    return { b, kind, ses, days, next, last, cancelled, up, past, D, people, active, n, names, count, status, when, dateLine, open, canRemove, canSend, ticketsOf, nextOf, share, endAt, kindTxt: b.order.ladies ? t('Ladies hours') : t(KIND[kind] || kind) };
   }
 
   const all = c => c.bookings.filter(b => (b.status === 'paid' || b.status === 'cancelled') && b.order.days && b.order.days.length).map(b => model(c, b));

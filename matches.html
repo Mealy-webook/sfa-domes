@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="f/fonts.css">
 <link rel="stylesheet" href="f/colors.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,groups,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=calendar_month,exercise,fitness_center,groups,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
 <style>
 /* Open games ("Book a match"): games SFA Domes runs (f/games-data.js, a SAMPLE schedule for now), each for adults (18+)
    or kids (6–17); levels were removed (Ahmed, 2026-11-11). Filter by sport and day; each game opens its own page
@@ -50,7 +50,32 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
 .day span{font:var(--ts-body-s);color:var(--color-content-secondary)}
 .day[aria-pressed=true]{border-color:var(--color-brand);box-shadow:inset 0 0 0 1px var(--color-brand);background:var(--color-bg-accent-subtle)}
 .day.none span{color:var(--color-content-tertiary)}
-.lh{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 16px}
+/* the day strip ends in a Calendar button that opens a month view of the bookable days (Ahmed, 2026-11-19) */
+.dayrow{position:relative;display:flex;align-items:center;gap:8px;min-width:0}
+.dayrow > .hs{flex:1 1 auto}
+.calbtn{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);font:var(--ts-body-default-bold);cursor:pointer}
+.calbtn .msi{font-size:var(--fs-20)}
+.calbtn:hover,.calbtn[aria-expanded=true]{border-color:var(--color-content-primary)}
+.cal-pop{position:absolute;z-index:20;top:calc(100% + 8px);inset-inline-end:0;width:360px;max-width:100%;display:grid;gap:12px;padding:16px;border:1px solid var(--color-border-primary);background:var(--color-bg-primary);box-shadow:0 18px 40px -16px rgba(0,0,0,.3)}
+.cal-pop[hidden]{display:none}
+.cal-hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cal-hd b{font:var(--ts-body-default-bold)}
+.cal-hd div{display:flex;gap:8px}
+.cal-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-dow{padding-bottom:4px;font:var(--ts-caption-1-bold);color:var(--color-content-tertiary);text-align:center}
+.cal-d{display:grid;place-items:center;align-content:center;gap:4px;height:48px;min-width:0;padding:0;border:0;background:var(--color-bg-secondary);font:var(--ts-body-default-bold);color:var(--color-content-primary);cursor:pointer}
+.cal-d i{display:block;width:6px;height:6px;background:var(--color-brand)}
+.cal-d:hover:not(:disabled){box-shadow:inset 0 0 0 1px var(--color-border-strong)}
+.cal-d:disabled{background:none;color:var(--color-content-disabled);cursor:default}
+.cal-d[aria-pressed=true]{background:var(--color-bg-accent-subtle);box-shadow:inset 0 0 0 2px var(--color-border-accent)}
+.cal-key{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.cal-key i{flex:none;width:6px;height:6px;background:var(--color-brand)}
+/* Previous / Next day beside the date heading */
+.lh-r{display:flex;align-items:center;gap:16px}
+.dnav{display:flex;gap:8px}
+.lh{flex-wrap:wrap}.lh-r span{white-space:nowrap}
+@media (max-width:639px){.calbtn{width:44px;padding:0}.calbtn .lbl{display:none}.lh-r{flex:1 1 100%;justify-content:space-between}}
+.lh{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 16px}
 .lh h2{margin:0;font:var(--ts-title-section);text-transform:var(--type-case-title)}
 .lh span{font:var(--ts-body-default-bold);color:var(--color-content-tertiary)}
 .games{list-style:none;margin:0;padding:0;display:grid;gap:8px}
@@ -131,7 +156,7 @@ dialog::backdrop{background:rgba(9,9,11,.55)}
 <div data-site-nav></div>
 <main id="page"></main>
 <div data-site-footer></div>
-<script src="f/site-nav.js"></script>
+<script src="f/site-nav.js"></script><script src="f/city.js"></script>
 <script src="f/site-footer.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
@@ -139,21 +164,26 @@ dialog::backdrop{background:rgba(9,9,11,.55)}
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
 <script src="f/auth.js"></script>
+<script src="f/hscroll.js"></script>
 <script>
 (() => {
   const P = window.SFA_PREFS, t = P.t, S = window.SFA_SPORTS, GS = window.SFA_GAME_SPORTS, SLOT = window.SFA_SCHEDULE.SLOT;
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const root = document.getElementById('page'), q = new URLSearchParams(location.search);
+  // a city without a dome open yet shows its 'opening soon' state instead of the listings (f/city.js, Ahmed 2026-11-19)
+  if (window.SFA_CITY && !window.SFA_CITY.open()){ const soon = () => { root.innerHTML = window.SFA_CITY.soonPage(t('Open games')); document.title = `${t('Open games')} · SFA Domes`; }; soon(); addEventListener('sfa:prefs', soon); return; }
   const DAYS = window.SFA_GAME_DAYS(14), TODAY = DAYS[0];
   const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
   const nowMin = () => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
   const upcoming = d => window.SFA_GAMES_ON(d).filter(g => d !== TODAY || g.start > nowMin());
-  const f = { sport: GS[q.get('sport')] ? q.get('sport') : '', day: DAYS.includes(q.get('day')) ? q.get('day') : '' };
+  // sport chips follow the system's list: volleyball games sit under Other sports (f/courts-data.js, 2026-11-19)
+  const TOPS = window.SFA_TOP_SPORTS(Object.keys(GS)), qs = q.get('sport'), qTop = qs && (window.SFA_SPORT_GROUP(qs) || qs);
+  const f = { sport: TOPS.includes(qTop) ? qTop : '', day: DAYS.includes(q.get('day')) ? q.get('day') : '' };
   let online = {};
   const icon = sp => sp.img ? `<span class="mi" style="--m:url(${sp.img})"></span>` : `<span class="msi">${sp.icon}</span>`;
   const X = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
   const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="square" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
-  const fits = g => !f.sport || g.sport === f.sport;
+  const fits = g => !f.sport || window.SFA_SPORT_MEMBERS(f.sport).includes(g.sport);
   const taken = g => g.base + ((online[g.id] || {}).taken || 0), mine = g => !!(online[g.id] || {}).mine;
   // the first day with a matching game opens unless one was picked
   const firstDay = () => DAYS.find(d => upcoming(d).some(fits)) || TODAY;
@@ -171,29 +201,74 @@ dialog::backdrop{background:rgba(9,9,11,.55)}
         <a class="join${my ? ' in' : ''}${left <= 0 && !my ? ' off' : ''}" href="game.html?id=${encodeURIComponent(g.id)}">${my ? t("You're in") : left <= 0 ? t('Full') : t('View game')}</a></div>
       <a class="rowlnk" href="game.html?id=${encodeURIComponent(g.id)}" tabindex="-1" aria-hidden="true"></a></li>`;
   }
+  // the sport chips and the day strip scroll sideways with arrows and drag (f/hscroll.js); a redraw keeps where each row was
+  const ROWS = ['.chips', '.days'];
   function paint(focus){
+    const keep = ROWS.map(sel => root.querySelector(sel)?.scrollLeft || 0);
     document.title = `${t('Open games')} · SFA Domes`;
     const day = f.day || firstDay(), list = upcoming(day).filter(fits);
     root.innerHTML = `<section class="hero" aria-labelledby="h1"><div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true"><span class="msi">groups</span></span>${t('SFA Domes Dammam')}</p>
         <h1 id="h1">${t('Open games')}</h1><p class="sub">${t('Join a game we run: turn up, play with others, and pay for your own spot only. No team needed.')}</p></div></section>
       <section class="sec" aria-labelledby="lh">
         <div class="flt">
-          <div class="chips" role="group" aria-label="${t('Sport')}"><button type="button" class="chip" data-sport="" aria-pressed="${!f.sport}">${t('All sports')}</button>${Object.keys(GS).map(k => `<button type="button" class="chip" data-sport="${k}" aria-pressed="${f.sport === k}"><span aria-hidden="true">${icon(S[k])}</span>${esc(t(S[k].name))}</button>`).join('')}</div>
-          <div class="days" role="group" aria-label="${t('Day')}">${DAYS.map(d => { const n = upcoming(d).filter(fits).length;
+          <div class="chips" role="group" aria-label="${t('Sport')}"><button type="button" class="chip" data-sport="" aria-pressed="${!f.sport}">${t('All sports')}</button>${TOPS.map(k => { const sp = window.SFA_SPORT_INFO(k); return `<button type="button" class="chip" data-sport="${k}" aria-pressed="${f.sport === k}"><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}</button>`; }).join('')}</div>
+          <div class="dayrow"><div class="days" role="group" aria-label="${t('Day')}">${DAYS.map(d => { const n = upcoming(d).filter(fits).length;
             return `<button type="button" class="day${n ? '' : ' none'}" data-day="${d}" aria-pressed="${d === day}"><small>${d === TODAY ? t('Today') : P.date(toDate(d), { weekday: 'short' })}</small><b>${P.date(toDate(d), { day: 'numeric', month: 'short' })}</b><span>${n ? (n === 1 ? t('1 game') : t('{n} games', { n })) : t('No games')}</span></button>`; }).join('')}</div>
+            <button type="button" class="calbtn" data-cal aria-haspopup="dialog" aria-expanded="false" aria-controls="calPop" aria-label="${t('Calendar')}"><span class="msi" aria-hidden="true">calendar_month</span><span class="lbl">${t('Calendar')}</span></button>
+            <div class="cal-pop" id="calPop" role="dialog" aria-label="${t('Choose a day')}" hidden></div></div>
         </div>
-        <div class="lh"><h2 id="lh">${P.date(toDate(day), 'long')}</h2><span>${list.length === 1 ? t('1 game') : t('{n} games', { n: list.length })}</span></div>
+        <div class="lh"><h2 id="lh">${P.date(toDate(day), 'long')}</h2><div class="lh-r"><span>${list.length === 1 ? t('1 game') : t('{n} games', { n: list.length })}</span>
+          <div class="dnav"><button type="button" class="hs-arr" data-step="-1" aria-label="${t('Previous day')}"${DAYS.indexOf(day) <= 0 ? ' disabled' : ''}><span class="hs-i" aria-hidden="true"></span></button><button type="button" class="hs-arr fwd" data-step="1" aria-label="${t('Next day')}"${DAYS.indexOf(day) >= DAYS.length - 1 ? ' disabled' : ''}><span class="hs-i" aria-hidden="true"></span></button></div></div></div>
         ${list.length ? `<ol class="games">${list.map(gameRow).join('')}</ol>` : `<div class="empty"><p>${t('No games match on this day. Try another day, or clear the filters.')}</p>${f.sport ? `<button type="button" data-clear>${t('Clear filters')}</button>` : ''}</div>`}
       </section>`;
+    ROWS.forEach((sel, i) => { const row = root.querySelector(sel); window.SFA_HSCROLL(row, { prev: t('Previous'), next: t('Next') }); row.scrollLeft = keep[i]; });
+    renderCal();
     if (focus) root.querySelector(focus)?.focus({ preventScroll: true });
   }
+
+  // ---- the month view behind the Calendar button: only the bookable days (DAYS) can be picked, a square marks days with games
+  const cal = { open: false, m: null };
+  const ym = d => d.getFullYear() * 12 + d.getMonth();
+  function renderCal(){
+    const pop = root.querySelector('#calPop'), btn = root.querySelector('.calbtn'); if (!pop) return;
+    btn.setAttribute('aria-expanded', String(cal.open)); pop.hidden = !cal.open;
+    if (!cal.open){ pop.innerHTML = ''; return; }
+    const day = f.day || firstDay(), first = toDate(DAYS[0]), last = toDate(DAYS[DAYS.length - 1]);
+    const v = cal.m, y = v.getFullYear(), mo = v.getMonth(), lead = new Date(y, mo, 1).getDay(), len = new Date(y, mo + 1, 0).getDate();
+    const key = d => `${y}-${String(mo + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    let g = [0, 1, 2, 3, 4, 5, 6].map(i => `<span class="cal-dow" aria-hidden="true">${new Date(2026, 0, 4 + i).toLocaleDateString(P.locale, { weekday: P.lang === 'ar' ? 'narrow' : 'short' }).slice(0, P.lang === 'ar' ? 99 : 2)}</span>`).join('');
+    g += '<span></span>'.repeat(lead);
+    for (let d = 1; d <= len; d++){
+      const k = key(d), ok = DAYS.includes(k), n = ok ? upcoming(k).filter(fits).length : 0;
+      const lbl = `${P.date(toDate(k), 'long')}${ok ? (P.lang === 'ar' ? '، ' : ', ') + (n ? (n === 1 ? t('1 game') : t('{n} games', { n })) : t('No games')) : ''}`;
+      g += `<button type="button" class="cal-d" data-cday="${k}" aria-label="${esc(lbl)}"${ok ? ` aria-pressed="${k === day}"` : ' disabled'}>${d}${n ? '<i aria-hidden="true"></i>' : ''}</button>`;
+    }
+    pop.innerHTML = `<div class="cal-hd"><b aria-live="polite">${P.date(v, { month: 'long', year: 'numeric' })}</b>${ym(first) === ym(last) ? '' : `<div>
+        <button type="button" class="hs-arr" data-calm="-1" aria-label="${t('Previous month')}"${ym(v) <= ym(first) ? ' disabled' : ''}><span class="hs-i" aria-hidden="true"></span></button>
+        <button type="button" class="hs-arr fwd" data-calm="1" aria-label="${t('Next month')}"${ym(v) >= ym(last) ? ' disabled' : ''}><span class="hs-i" aria-hidden="true"></span></button></div>`}</div>
+      <div class="cal-g">${g}</div><p class="cal-key"><i aria-hidden="true"></i>${t('Games on this day. You can join games up to {n} days ahead.', { n: DAYS.length })}</p>`;
+  }
+  // after stepping or picking from the calendar, bring the chosen day into view in the strip
+  function reveal(){
+    const row = root.querySelector('.days'), b = row && row.querySelector('[aria-pressed=true]'); if (!b) return;
+    const rr = row.getBoundingClientRect(), br = b.getBoundingClientRect();
+    if (br.left < rr.left || br.right > rr.right) row.scrollBy({ left: (br.left + br.width / 2) - (rr.left + rr.width / 2), behavior: 'smooth' });
+  }
+  const pick = (k, focus) => { f.day = k; sync(); paint(focus); reveal(); };
 
   root.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b || b.disabled) return;
     if (b.dataset.sport !== undefined){ f.sport = b.dataset.sport; sync(); paint(`.chip[data-sport="${f.sport}"]`); }
     else if (b.dataset.day){ f.day = b.dataset.day; sync(); paint(`[data-day="${f.day}"]`); }
     else if (b.dataset.clear !== undefined){ f.sport = ''; sync(); paint('.chip[data-sport=""]'); }
+    else if (b.dataset.step){ const i = DAYS.indexOf(f.day || firstDay()) + +b.dataset.step; if (DAYS[i]) pick(DAYS[i], `[data-step="${b.dataset.step}"]:not(:disabled)`); }
+    else if (b.dataset.cal !== undefined){ cal.open = !cal.open; if (cal.open){ const d = toDate(f.day || firstDay()); cal.m = new Date(d.getFullYear(), d.getMonth(), 1); } renderCal(); if (cal.open) root.querySelector('.cal-d[aria-pressed=true]')?.focus(); }
+    else if (b.dataset.calm){ cal.m = new Date(cal.m.getFullYear(), cal.m.getMonth() + +b.dataset.calm, 1); renderCal(); (root.querySelector(`[data-calm="${b.dataset.calm}"]:not(:disabled)`) || root.querySelector('.cal-d:not(:disabled)'))?.focus(); }
+    else if (b.dataset.cday){ cal.open = false; pick(b.dataset.cday, '.calbtn'); }
   });
+  // the calendar closes on a click outside it or Escape (a month arrow is redrawn before this runs, so a detached target was inside)
+  document.addEventListener('click', e => { if (cal.open && e.target.isConnected && !e.target.closest('.cal-pop, .calbtn')){ cal.open = false; renderCal(); } });
+  document.addEventListener('keydown', e => { if (cal.open && e.key === 'Escape'){ cal.open = false; renderCal(); root.querySelector('.calbtn')?.focus(); } });
   paint();
   loadOnline().then(() => paint());
   addEventListener('sfa:auth', async () => { await loadOnline(); paint(); });

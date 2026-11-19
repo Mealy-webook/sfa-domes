@@ -11,7 +11,8 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const build = () => {
     const S = window.SFA_SPORTS; if (!S) return;
-    const list = Object.entries(S).map(([k, s]) => `<a href="courts.html?sport=${k}" data-k="${k}">${s.name}</a>`).join('');
+    const keys = window.SFA_TOP_SPORTS ? window.SFA_TOP_SPORTS(Object.keys(S)) : Object.keys(S);   // the system's sport list, Other sports last (2026-11-19)
+    const list = keys.map(k => `<a href="courts.html?sport=${k}" data-k="${k}">${(window.SFA_SPORT_INFO ? window.SFA_SPORT_INFO(k) : S[k]).name}</a>`).join('');
     rows.forEach(r => { r.innerHTML = list + list + list; });
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();
@@ -32,7 +33,8 @@
   box.addEventListener('pointermove', e => {
     const r = f.getBoundingClientRect(); tx = e.clientX - r.left; ty = e.clientY - r.top;
     const a = e.target.closest('a[data-k]');
-    if (a){
+    if (a && window.SFA_SPORT_GROUPS && window.SFA_SPORT_GROUPS[a.dataset.k]){ peek.classList.remove('on'); }   // a group (Other sports) has no photo
+    else if (a){
       if (peek.dataset.k !== a.dataset.k){ peek.dataset.k = a.dataset.k; peek.querySelector('img').src = `f/courts/${a.dataset.k}.jpg`; peek.querySelector('b').textContent = a.textContent; }
       if (!follow){ cx = tx; cy = ty; follow = true; glide(); } peek.classList.add('on');
     } else peek.classList.remove('on');
@@ -46,7 +48,7 @@
     let raf = 0;
     const lift = () => {
       raf = 0;
-      const hidden = new DOMMatrix(getComputedStyle(go).transform).m42 > 1, over = innerHeight - f.getBoundingClientRect().top;
+      const hidden = new DOMMatrix(getComputedStyle(go).transform).m42 > 1, over = f.getClientRects().length ? innerHeight - f.getBoundingClientRect().top : 0;   // a hidden footer (the booking flow) doesn't count
       go.style.translate = !hidden && over > 0 ? `0 ${-Math.round(over)}px` : '';
     };
     const ask = () => { if (!raf) raf = requestAnimationFrame(lift); };

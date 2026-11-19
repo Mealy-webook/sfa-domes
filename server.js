@@ -65,11 +65,18 @@ const holding = b => b.status === 'paid' || (b.status === 'pending' && Date.now(
 // slots held or paid on this court, or on a court linked to it (football 7-a-side uses fields F4 + F5)
 function takenSlots(sport, court){
   const set = new Set(), courts = [court, ...(((LINKS[sport] || {})[court]) || [])];
-  for (const b of Object.values(bookings)) if (b.order.sport === sport && courts.includes(b.order.court) && holding(b))
+  for (const b of Object.values(bookings)) if (b.order.sport === sport && courts.includes(b.order.court) && holding(b) && !LADY_TICKETS(b.order))
     for (const d of b.order.days) for (const s of d.starts) set.add(`${d.date}|${s}`);
   return set;
 }
 
+// ladies-hours tickets (2026-11-19): a ticket order doesn't hold the court; each session holds up to SFA_LADIES.capacity
+const LADY_TICKETS = o => !!(o && o.ladies && o.tickets);
+function ladiesHeld(sport, date, start){
+  let n = 0;
+  for (const b of Object.values(bookings)) if (LADY_TICKETS(b.order) && holding(b) && b.order.sport === sport && b.order.days[0].date === date && b.order.days[0].starts[0] === start) n += b.order.tickets;
+  return n;
+}
 // online spots held or paid in an open game, and whether this user already has one
 const gameBookings = id => Object.values(bookings).filter(b => b.order.kind === 'game' && b.order.game === id && holding(b));
 // a game booking's players: order.participants (several since 2026-11-17); older bookings hold one, in bookingFor
@@ -161,6 +168,9 @@ function checkOrder(order, user){
   const fail = msg => ({ error: msg });
   if (!order || typeof order !== 'object') return fail('No order.');
   const sport = SPORTS[order.sport]; if (!sport) return fail('Unknown sport.');
+  if (LADY_TICKETS(order)){ order.court = ctx.window.SFA_LADIES.courts[0]; const d = (order.days || [])[0] || {};
+    const lc = ctx.window.SFA_LADIES_CHECK(order, ladiesHeld(order.sport, d.date, (d.starts || [])[0]), new Date()); if (lc.error) return lc;
+    order.tickets = lc.tickets; order.kit = lc.kit; order.ticketPrice = ctx.window.SFA_LADIES.ticket; order.kitPrice = KIT.price; }
   const court = sport.courts[order.court]; if (!Number.isInteger(order.court) || !court) return fail('Unknown court.');
   if (!Array.isArray(order.days) || !order.days.length) return fail('Pick at least one slot.');
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -168,7 +178,7 @@ function checkOrder(order, user){
   const now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes();
   const taken = takenSlots(order.sport, order.court), seen = new Set();
   let count = 0;
-  for (const d of order.days){
+  if (!LADY_TICKETS(order)) for (const d of order.days){
     if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date || '')) return fail('Bad date.');
     const [y, m, dd] = d.date.split('-').map(Number), date = new Date(y, m - 1, dd);
     if (dk(date) !== d.date || date < today || date > last) return fail(`${d.date} can't be booked.`);
@@ -207,6 +217,7 @@ function checkOrder(order, user){
     order.bookingFor = { type: 'other', name, phone: bf.phone, email };
   }
   else return fail('Choose who the booking is for.');
+  if (LADY_TICKETS(order)) return { sport, court, count: order.tickets, amount: ctx.window.SFA_LADIES_PRICE(order.tickets, order.kit), tickets: true };
   const slotPrice = court[5] * SCHEDULE.SLOT / 60;
   return { sport, court, count, amount: Math.round(slotPrice * count * 100) / 100 };
 }
@@ -557,6 +568,13 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, [...takenSlots(url.searchParams.get('sport'), +url.searchParams.get('court'))]);
     }
 
+    // ladies hours: tickets held or paid per session of a sport, { 'YYYY-MM-DD|start': n }
+    if (req.method === 'GET' && url.pathname === '/api/ladies'){
+      const sport = url.searchParams.get('sport'), out = {};
+      for (const b of Object.values(bookings)) if (LADY_TICKETS(b.order) && holding(b) && b.order.sport === sport){ const k = `${b.order.days[0].date}|${b.order.days[0].starts[0]}`; out[k] = (out[k] || 0) + b.order.tickets; }
+      return send(res, 200, out);
+    }
+
     // open games: online spots taken per game on these days (?days=YYYY-MM-DD,…), and which ones you're in
     if (req.method === 'GET' && url.pathname === '/api/games'){
       const days = new Set(String(url.searchParams.get('days') || '').split(',')), me = currentUser(req), out = {};
@@ -616,9 +634,12 @@ const server = http.createServer(async (req, res) => {
       } else {
         chk = checkOrder(order, user); if (chk.error) return send(res, chk.status || 400, { error: chk.error });
         order.waiver = { acceptedBy: user.name, at: Date.now(), for: [order.bookingFor.type === 'me' ? user.name : order.bookingFor.name], guardian: order.bookingFor.type === 'child' };
-        chk.desc = `${chk.sport.name} · ${chk.court[0]} · ${chk.count} × 1.5 hr · SFA Domes Dammam`;
-        const q = withOffer('court', { sport: order.sport, court: order.court }, chk.count, chk.amount, chk.count);
-        if (q.offer){ chk.amount = q.amount; order.offer = q.offer; }
+        if (chk.tickets) chk.desc = `Ladies hours · ${chk.sport.name} · ${order.tickets} ticket${order.tickets === 1 ? '' : 's'}${order.kit ? ` + ${order.kit} × ${KIT.name.en}` : ''} · SFA Domes Dammam`;
+        else {
+          chk.desc = `${chk.sport.name} · ${chk.court[0]} · ${chk.count} × 1.5 hr · SFA Domes Dammam`;
+          const q = withOffer('court', { sport: order.sport, court: order.court }, chk.count, chk.amount, chk.count);
+          if (q.offer){ chk.amount = q.amount; order.offer = q.offer; }
+        }
       }
       if (testMode()){
         const tranRef = 'TEST-' + crypto.randomBytes(5).toString('hex').toUpperCase();

@@ -184,3 +184,10 @@ html[dir=rtl] .kl-more-nav svg{transform:scaleX(-1)}
   body.v-q .go.on{transform:none}
   body.v-q.has-picks .faq{padding-bottom:140px}
 }
+
+/* "You might also like": the same card size as the home page's programme cards (Ahmed, 2026-11-19): 4 per view on desktop,
+   3 on tablets, 2 on phones, square photos */
+.kl-more-row{grid-auto-columns:calc((100% - 3 * 16px) / 4)}
+.kl-mc-img{aspect-ratio:1/1}
+@media (max-width:1023px){.kl-more-row{grid-auto-columns:calc((100% - 2 * 16px) / 3)}}
+@media (max-width:639px){.kl-more-row{grid-auto-columns:calc((100% - 16px) / 2);margin-inline:0;padding-inline:0}}

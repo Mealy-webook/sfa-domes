@@ -20,7 +20,7 @@
    program.html?p=football-6-8. Design-system tokens only; square corners (radio dots are round, like radios). */
 /* the booking section uses the court page's steps and calendar (f/court-details.css): a plan step above it */
 .v-q .booking > .step + .step{margin-top:clamp(28px,4vh,40px)}
-.pj-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 8px;padding-top:12px}
+.pj-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 8px}
 /* every card: the dot, title and price share line 1; the description runs the full width under them (line 2), and the
    content sits at the top, so the gaps are the same in every card even when cards in a row stretch to one height */
 .pj-plan{position:relative;display:grid;grid-template-columns:20px minmax(0,1fr) auto;grid-template-rows:minmax(24px,auto);align-items:center;align-content:start;gap:4px 12px;padding:16px 18px 18px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:inherit;text-align:start;cursor:pointer;transition:border-color .2s,background-color .2s}
@@ -33,7 +33,8 @@
 .pj-plan .pj-pr{grid-row:1;grid-column:3;display:flex;align-items:baseline;height:24px;gap:8px;font:var(--ts-title-body);white-space:nowrap}
 .pj-plan .pj-pr.free{font:var(--ts-body-l-bold)}
 .pj-plan .pj-was{font:var(--ts-body-s);color:var(--color-content-tertiary);text-decoration:line-through}
-.pj-tag{position:absolute;top:-11px;inset-inline-end:14px;padding:2px 8px;background:var(--color-brand);color:var(--neutral-0);font:var(--ts-caption-1-bold)}
+.pj-plan strong{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.pj-tag{flex:none}   /* the tag sits inside the card, beside the plan name (Ahmed, 2026-11-19: "keep the tags inside the select item") */
 @media (max-width:1023px){.pj-plans{grid-template-columns:minmax(0,1fr)}}
 
 /* start days: only the days a plan can start on (the next 3 training days), one row of equal tiles; the open day's
@@ -105,6 +106,8 @@
 }
 </style>
 <link rel="stylesheet" href="f/ui.css">
+<link rel="stylesheet" href="f/flow.css">
+<link rel="stylesheet" href="f/court-flow.css">
 </head>
 <body class="v-q" data-go-always>
 <div data-site-nav></div>
@@ -226,12 +229,14 @@
   </div>
 </div>
 
-<script src="f/site-nav.js"></script>
+<script src="f/flow.js"></script>
+<script src="f/site-nav.js"></script><script src="f/city.js"></script>
 <script src="f/site-footer.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
+<script src="f/court-flow.js"></script>
 <script src="f/auth.js"></script>
 <script>
 (() => {
@@ -283,8 +288,9 @@
       const on = `type="button" class="pj-plan" role="radio" aria-checked="${st.plan === k}" data-plan="${k}"`;
       if (k === 'trial') return `<button ${on}><span class="pj-dot"></span><strong>${t('Free trial')}</strong><span class="pj-pr free">${t('Free of charge')}</span><small>${t('One {m}-minute session', { m: p.minutes })}</small></button>`;
       const full = window.SFA_PROGRAM_FULL_PRICE(p, k), save = full - price(k), weeks = PLANS[k].months * 4;
-      const tag = k === 'month' ? t('Most popular') : t('Save {amount}', { amount: P.money(save) });
-      return `<button ${on}><span class="pj-tag">${tag}</span><span class="pj-dot"></span><strong>${t(PLAN_NAMES[k])}</strong><span class="pj-pr">${save ? `<s class="pj-was"><span class="sr-only">${t('Was')} </span>${P.money(full)}</s>` : ''}${P.money(price(k))}</span><small>${t(weeks > 10 && P.lang === 'ar' ? '{n} sessions over {w} weeks (11+)' : '{n} sessions over {w} weeks', { n: perMonth * PLANS[k].months, w: weeks })}</small></button>`;
+      const num = n => n.toLocaleString('en-US', { maximumFractionDigits: 2 });   // plain numbers on the tag and the struck price (Figma 145:9511)
+      const tag = k === 'month' ? t('Most popular') : t('Save {amount}', { amount: num(save) });
+      return `<button ${on}><span class="pj-dot"></span><strong>${t(PLAN_NAMES[k])}<span class="pj-tag">${tag}</span></strong><span class="pj-pr">${save ? `<s class="pj-was"><span class="sr-only">${t('Was')} </span>${num(full)}</s>` : ''}${P.money(price(k))}</span><small>${t(weeks > 10 && P.lang === 'ar' ? '{n} sessions over {w} weeks (11+)' : '{n} sessions over {w} weeks', { n: perMonth * PLANS[k].months, w: weeks })}</small></button>`;
     }).join('');
   }
   // the same month calendar as court details (Ahmed, 2026-11-17: one day picker); only the next 3 training days open
@@ -322,10 +328,69 @@
   function goBar(){
     const when = !!(st.start && st.time != null), list = sessions(), price = st.plan === 'trial' ? t('Free of charge') : P.money(window.SFA_PROGRAM_PRICE(p, st.plan));
     $('goWhen').textContent = when ? `${P.date(toDate(st.start), 'short')} · ${P.time(st.time)} · ${t('{n} sessions', { n: list.length })}` : t('{name} · pick a start day and time', { name: tx(p.name) });
-    $('goTotal').innerHTML = when ? price : `<small class="go-from">${t('From')}</small> ${P.money(p.month)}`;
-    $('goBtn').innerHTML = `<span>${when ? (st.plan === 'trial' ? t('Book free trial') : t('Book · {total}', { total: price })) : t('Book this program')}</span>`;
+    $('goTotal').innerHTML = when || CF ? price : `<small class="go-from">${t('From')}</small> ${P.money(p.month)}`;
+    const FL = window.SFA_FLOW && window.SFA_FLOW.on;
+    $('goBtn').innerHTML = `<span>${when ? (FL ? t('Continue · {total}', { total: price }) : st.plan === 'trial' ? t('Book free trial') : t('Book · {total}', { total: price })) : FL ? t('Pick a start day and time') : t('Book this program')}</span>`;
     $('go').classList.add('on'); document.body.classList.toggle('has-picks', when);
+    if (CF) cfSum();
   }
+  // ---- the booking flow, step 1 (Figma 145:9511, Ahmed 2026-11-19): the checkout header (Date & time → Participants &
+  //      add-ons → Checkout), a Back title, then two cards: "Select start date & time" (the start days as a strip of day
+  //      buttons, the chosen day's times in the grey panel under it) and "Select Subscription" (the plan cards), with the
+  //      summary card beside them. Continue goes to checkout.html (step 2). f/court-flow.css (.cf-pdays, .cf-ptimes).
+  const CF = !!(window.SFA_FLOW && window.SFA_FLOW.on && window.SFA_CF);
+  const infoUrl = `program.html?p=${encodeURIComponent(id)}`;
+  function cfDays(){
+    const box = $('cfDays'); if (!box) return;
+    const today = key(new Date());
+    box.innerHTML = `<div class="cf-pdays" role="group" aria-label="${t('Start day')}">${startDays.map(k => { const d = toDate(k), wd = P.date(d, { weekday: 'short' });
+        return `<button type="button" class="cf-pday" data-pk="${k}" aria-pressed="${k === active}"${dayOpen(d) ? '' : ' disabled'} aria-label="${P.date(d, 'long')}"><small>${k === today ? t('{day} (Today)', { day: wd }) : wd}</small><b>${P.date(d, { day: 'numeric', month: 'short' })}</b></button>`; }).join('')}</div>
+      ${active ? `<div class="cf-ptimes" role="region" aria-label="${t('Times for {date}', { date: P.date(toDate(active), 'long') })}"><div class="cf-pslots">${p.slots.map(x => { const full = left(x) <= 0, on = st.start === active && st.time === x.time;
+          return `<button type="button" class="cf-pslot" data-ps="${x.time}" aria-pressed="${on}"${full ? ` disabled aria-label="${fmtSlot(x.time)} · ${t('Full')}"` : ''}>${fmtSlot(x.time)}</button>`; }).join('')}</div></div>` : ''}`;
+  }
+  function cfFrame(){
+    const CFX = window.SFA_CF;
+    let root = document.querySelector('.cf-root');
+    if (!root){ root = document.createElement('div'); root.className = 'cf-root'; document.body.prepend(root); document.documentElement.classList.add('cf'); }
+    const plansEl = $('plans');
+    let park = $('cfPark'); if (!park){ park = document.createElement('div'); park.id = 'cfPark'; park.hidden = true; document.body.append(park); }
+    park.append(plansEl, $('calMonth'), $('calPrev'), $('calNext'), $('calGrid'));   // the details page's calendar isn't used here; the plans move into their card
+    root.innerHTML = `${CFX.header(0, infoUrl, CFX.PROGRAM_STEPS)}
+      <main class="cf-page"><div class="cf-title">${CFX.back(infoUrl).replace('<span>', '<h1>').replace('</span>', '</h1>')}</div>
+        <div class="cf-cols"><div class="cf-stack">
+            <section class="cf-card" aria-labelledby="cfH"><header class="cf-card-h"><h2 id="cfH">${t('Select start date & time')}</h2>
+                <ul class="cf-legend"><li><i class="sw"></i>${t('Free')}</li><li><i class="sw pk"></i>${t('Picked')}</li><li><i class="sw bk"></i>${t('Booked')}</li></ul></header>
+              <div class="cf-body" id="cfDays"></div></section>
+            <section class="cf-card" aria-labelledby="cfPH"><header class="cf-card-h"><h2 id="cfPH">${t('Select Subscription')}</h2></header><div class="cf-body"><div id="cfPlans"></div></div></section>
+          </div>
+          <aside class="cf-sum" id="cfSum" aria-label="${t('Booking summary')}"></aside></div></main>`;
+    $('cfPlans').append(plansEl);
+    cfDays(); cfSum();
+  }
+  function cfSum(){
+    const box = $('cfSum'); if (!box) return;
+    const when = !!(st.start && st.time != null), list = sessions(), trial = st.plan === 'trial', amount = trial ? 0 : window.SFA_PROGRAM_PRICE(p, st.plan);
+    const planName = trial ? t('Free trial') : t(PLAN_NAMES[st.plan]);
+    const head = when ? P.date(toDate(st.start), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : t('Pick a start day and time');
+    box.innerHTML = `<div class="cf-photo"><img src="${img}" alt="" style="object-position:${p.focus || '50% 50%'}"><span class="cf-scrim" aria-hidden="true"></span>
+        <div class="cf-ph-t"><small>${esc(t(sp.name))} · ${t('Training program')}</small><b>${esc(tx(p.name))}</b></div></div>
+      <div class="cf-lines"><div class="cf-day"><p class="cf-date">${head}</p>
+        <div class="cf-row"><span class="cf-time">${planName}${when ? ` · ${t('{n} sessions', { n: list.length })}` : ''}</span><span class="cf-p">${trial ? t('Free of charge') : P.money(amount)}</span></div>
+        ${when ? `<div class="cf-row"><span class="cf-time">${t('Starts')} · ${range(st.time)}</span><button type="button" class="cf-rm" data-cf-clear aria-label="${t('Clear the start day and time')}">${window.SFA_CF.icon('f/flow/close-sm.svg', 10.8284, 10.8284)}</button></div>` : ''}</div></div>
+      <div class="cf-total"><span>${t('Total')} <small class="cf-each">${t('per participant')}</small></span><strong>${trial ? t('Free of charge') : P.money(amount)}</strong></div>
+      <div class="cf-go"><button type="button" class="cf-btn" id="cfGo"${when ? '' : ' disabled'}>${t(when ? 'Continue' : 'Pick a time')}</button></div>`;
+  }
+  document.addEventListener('click', e => {
+    if (!CF) return;
+    if (e.target.closest('#cfGo')) return toCheckout();
+    if (e.target.closest('[data-cf-clear]')){ st.start = null; st.time = null; renderCal(false); cfDays(); goBar(); return; }
+    const d = e.target.closest('.cf-pday');
+    if (d && !d.disabled){ active = d.dataset.pk; cfDays(); $('cfDays').querySelector(`[data-pk="${active}"]`)?.focus(); return; }
+    const sl = e.target.closest('.cf-pslot');
+    if (sl && !sl.disabled){ const x = +sl.dataset.ps;
+      if (st.start === active && st.time === x){ st.start = null; st.time = null; } else { st.start = active; st.time = x; }   // tapping your pick again clears it
+      renderCal(false); cfDays(); goBar(); $('cfDays').querySelector(`[data-ps="${x}"]`)?.focus(); }
+  });
   function booking(){
     plans();
     $('dayNote').textContent = t('Training days are {days}. Start on one of the next 3: pick a day, then a time.', { days: dayNames() });
@@ -361,6 +426,7 @@
         `<span class="kl-mc-body"><small>${esc(t(s2.name))}</small><b>${esc(tx(o.name))}</b><span>${t('Ages {a}', { a: ages(o.ages) })} · ${esc(tx(o.level))}</span><em><span>${t('From')}</span> ${P.money(o.month)} <span>${t('/ month')}</span></em></span></a></li>`; }).join('');
     moreArrows();
     booking();
+    if (CF) cfFrame();
   }
 
   // ---- gallery and viewer
@@ -416,7 +482,7 @@
     location.href = 'checkout.html';
   }
   // the bottom bar: until a day and time are picked it takes you to the calendar
-  $('goBtn').addEventListener('click', () => { if (st.start && st.time != null) return toCheckout(); $('calGrid').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' }); });
+  $('goBtn').addEventListener('click', () => { if (st.start && st.time != null) return toCheckout(); (CF ? $('cfDays') : $('calGrid')).scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' }); });
 
   // ---- terms: the first 5, the rest behind Show all
   const termsLabel = () => { const all = $('terms').classList.contains('all'); $('termsMore').textContent = all ? t('Show fewer') : t('Show all {n} terms', { n: window.SFA_PROGRAM_TERMS.length }); $('termsMore').setAttribute('aria-expanded', all); };

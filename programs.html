@@ -87,6 +87,13 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
 @media (max-width:1023px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:639px){.grid{grid-template-columns:minmax(0,1fr)}.who{min-width:0;width:100%}.count{margin-inline-start:0;width:100%;justify-content:space-between}.empty{padding:24px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* cards follow the home page's programme cards (Ahmed, 2026-11-19): 4 across on desktop ("4 cards per row everywhere"),
+   3 on tablets, 2 on phones, square photos, 16px padding */
+.grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ph{aspect-ratio:1/1}
+.bd{padding:16px}
+@media (max-width:1023px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:639px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <link rel="stylesheet" href="f/ui.css">
 </head>
@@ -94,7 +101,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
 <div data-site-nav></div>
 <main id="page"></main>
 <div data-site-footer></div>
-<script src="f/site-nav.js"></script>
+<script src="f/site-nav.js"></script><script src="f/city.js"></script>
 <script src="f/site-footer.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
@@ -107,9 +114,12 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const tx = o => o && (P.lang === 'ar' ? o.ar : o.en);
   const root = document.getElementById('page'), q = new URLSearchParams(location.search);
-  const f = { sport: q.get('sport') || '', who: q.get('who') || '', women: q.get('women') === '1' };
+  // a city without a dome open yet shows its 'opening soon' state instead of the listings (f/city.js, Ahmed 2026-11-19)
+  if (window.SFA_CITY && !window.SFA_CITY.open()){ const soon = () => { root.innerHTML = window.SFA_CITY.soonPage(t('Training programs')); document.title = `${t('Training programs')} · SFA Domes`; }; soon(); addEventListener('sfa:prefs', soon); return; }
+  const f = { sport: q.get('sport') ? (window.SFA_SPORT_GROUP(q.get('sport')) || q.get('sport')) : '', who: q.get('who') || '', women: q.get('women') === '1' };
   let me = null;   // the signed-in account: "who" can be me or one of the children
-  const ids = Object.keys(PR), sports = [...new Set(ids.map(id => PR[id].sport))];
+  // sport chips follow the system's list: volleyball programs sit under Other sports (f/courts-data.js, 2026-11-19)
+  const ids = Object.keys(PR), sports = window.SFA_TOP_SPORTS([...new Set(ids.map(id => PR[id].sport))]), inSport = (p, k) => window.SFA_SPORT_MEMBERS(k).includes(p.sport);
   const icon = sp => sp.img ? `<span class="mi" style="--m:url(${sp.img})"></span>` : `<span class="msi">${sp.icon}</span>`;
   const CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
   const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="square" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
@@ -121,7 +131,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
   const person = () => people().find(x => x.key === f.who);
   function fits(id){
     const p = PR[id], start = window.SFA_PROGRAM_START_DAYS(p)[0], r = window.SFA_PROGRAM_AGES(p);
-    if (f.sport && p.sport !== f.sport) return false;
+    if (f.sport && !inSport(p, f.sport)) return false;
     if (f.women && !p.women) return false;
     const x = person();
     if (x) return x.dob ? !window.SFA_PROGRAM_ELIGIBLE(p, x, start) : true;
@@ -142,7 +152,7 @@ h1{margin:0;font:var(--ts-display-l);text-transform:var(--type-case-display)}
         <h1 id="h1">${t('Training programs')}</h1><p class="sub">${t('Coach-led programs for children, teens and women. Start on any training day, and try one session free before you subscribe.')}</p></div></section>
       <section class="list" aria-labelledby="lh"><h2 id="lh" class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">${t('Programs')}</h2>
         <div class="flt">
-          <div class="chips" role="group" aria-label="${t('Sport')}"><button type="button" class="chip" data-sport="" aria-pressed="${!f.sport}">${t('All sports')}<small>${ids.length}</small></button>${sports.map(k => `<button type="button" class="chip" data-sport="${k}" aria-pressed="${f.sport === k}"><span aria-hidden="true">${icon(S[k])}</span>${esc(t(S[k].name))}<small>${ids.filter(id => PR[id].sport === k).length}</small></button>`).join('')}</div>
+          <div class="chips" role="group" aria-label="${t('Sport')}"><button type="button" class="chip" data-sport="" aria-pressed="${!f.sport}">${t('All sports')}<small>${ids.length}</small></button>${sports.map(k => { const sp = window.SFA_SPORT_INFO(k); return `<button type="button" class="chip" data-sport="${k}" aria-pressed="${f.sport === k}"><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}<small>${ids.filter(id => inSport(PR[id], k)).length}</small></button>`; }).join('')}</div>
           <div class="row2"><div class="who"><label for="who">${t("Who's it for?")}</label><select id="who">${opts.join('')}</select>${CHEV}</div>
             <button type="button" class="tog" role="checkbox" aria-checked="${f.women}" id="women"><span class="box" aria-hidden="true">${TICK}</span>${t('Women and girls only')}</button>
             <div class="count" aria-live="polite"><span>${list.length === 1 ? t('1 program') : t('{n} programs', { n: list.length })}</span>${f.sport || f.who || f.women ? `<button type="button" class="clear" data-clear>${t('Clear filters')}</button>` : ''}</div></div>

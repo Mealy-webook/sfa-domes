@@ -9,12 +9,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="f/fonts.css">
 <link rel="stylesheet" href="f/colors.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=exercise,fitness_center,location_on,pickleball,sports,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball&display=block">
 <style>
 /* Courts: the same layout and cards as Training programs (programs.html), Ahmed 2026-11-11. A text-only hero with the
    sport's name, a row of sport chips (each with its court count; the sport comes from ?sport= and stays in the URL), the
    court count on the right, then white cards: photo with tags, sport · court type, the court's name, its
-   details and the price per hour. No "All sports" chip: every sport is its own set of courts on the same floor.
+   details and the price per 1.5-hour session (the hourly price × 1.5; Ahmed, 2026-11-19). An "All" chip first lists every sport's courts together, and arrows scroll the chip row (Ahmed, 2026-11-19).
+   Picking a chip keeps the hero and chips in place and only swaps the subtitle, icon, count and cards.
    Design-system tokens only (f/fonts.css text styles, f/colors.css); square corners. */
 :root{color-scheme:light;--nav:90px;--g:clamp(16px,6.67vw,96px);--ease:cubic-bezier(.22,1,.36,1);--max:1440px}
 *{box-sizing:border-box}
@@ -48,6 +49,9 @@ img{display:block}
 .chip small{font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
 .chip[aria-pressed=true]{background:var(--color-content-primary);border-color:var(--color-content-primary);color:var(--neutral-0)}
 .chip[aria-pressed=true] small{color:inherit;opacity:.7}
+/* the dome row: picking a dome switches the same city as the menu-bar picker (f/city.js), so the whole site follows it */
+.domes .chip .msi{font-size:var(--fs-20)}
+.cs .domes-in{margin-top:8px}
 .row2{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
 .row2 h2{margin:0;font:var(--ts-title-section);text-transform:var(--type-case-title)}
 .count{margin-inline-start:auto;font:var(--ts-body-default-bold);color:var(--color-content-tertiary)}
@@ -64,7 +68,7 @@ img{display:block}
 .tag.w{background:var(--color-programme-women);color:var(--neutral-0)}
 .bd{display:grid;align-content:start;gap:8px;padding:20px}
 .sp{display:flex;align-items:center;gap:8px;margin:0;font:var(--ts-caption-1-bold);color:var(--color-content-tertiary)}
-.sp .msi{font:var(--ts-body-l);color:var(--color-content-accent)}
+.sp .msi{font-size:var(--fs-18);color:var(--color-content-accent)}   /* size only: the font shorthand dropped the icon font, so the icon showed as its name */
 .nm{margin:0;font:var(--ts-title-body);text-transform:var(--type-case-title)}
 .meta{margin:0;font:var(--ts-body-s);color:var(--color-content-secondary)}
 .pr{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin-top:8px;padding-top:16px;border-top:1px solid var(--color-border-primary)}
@@ -75,6 +79,13 @@ img{display:block}
 @media (max-width:1023px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:639px){.grid{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+/* cards follow the home page's programme cards (Ahmed, 2026-11-19): 4 across on desktop ("4 cards per row everywhere"),
+   3 on tablets, 2 on phones, square photos, 16px padding */
+.grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ph{aspect-ratio:1/1}
+.bd{padding:16px}
+@media (max-width:1023px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:639px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <link rel="stylesheet" href="f/ui.css">
 </head>
@@ -83,59 +94,103 @@ img{display:block}
 <main id="page"></main>
 <div data-site-footer></div>
 
-<script src="f/site-nav.js"></script>
+<script src="f/site-nav.js"></script><script src="f/city.js"></script>
 <script src="f/site-footer.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
 <script src="f/auth.js"></script>
+<script src="f/hscroll.js"></script>
 <script>
 (() => {
   const S = window.SFA_SPORTS, P = window.SFA_PREFS, t = P.t, L = window.SFA_LADIES;
   const params = new URLSearchParams(location.search);
-  let key = S[params.get('sport')] ? params.get('sport') : 'basketball';
-  const root = document.getElementById('page'), keys = Object.keys(S);
+  // All is the default chip, and Football comes right after it (Ahmed, 2026-11-19); the other sports keep their order
+  // the chips follow the system's sport list (f/courts-data.js SFA_TOP_SPORTS): volleyball, netball, GFX and table tennis
+  // sit under "Other sports", whose chip shows each of their courts (Ahmed, 2026-11-19)
+  const G = window.SFA_SPORT_GROUPS, top = window.SFA_TOP_SPORTS(Object.keys(S)), tops = ['football', ...top.filter(k => k !== 'football')];
+  const members = k => window.SFA_SPORT_MEMBERS(k), info = k => window.SFA_SPORT_INFO(k);
+  const pk = params.get('sport');
+  let key = G[pk] ? pk : S[pk] ? (window.SFA_SPORT_GROUP(pk) || pk) : 'all';
+  const root = document.getElementById('page'), keys = tops.flatMap(members);
+  // a city without a dome open yet shows its 'opening soon' state instead of the listings (f/city.js, Ahmed 2026-11-19)
+  // dome chips (Ahmed, 2026-11-19: "add domes filter"): one per city in f/city.js, the chosen one pressed; city.js's own
+  // [data-city-set] click handler switches the city and reloads, exactly like the menu-bar picker
+  const C = window.SFA_CITY;
+  const domes = () => C ? `<div class="chips domes" id="domes" role="group" aria-label="${t('Dome')}">${C.list.map(c => `<button type="button" class="chip" data-city-set="${c.id}" aria-pressed="${c.id === C.id}"><span class="msi" aria-hidden="true">location_on</span>${t(c.name)}${c.open ? '' : `<small>${t('Opening soon')}</small>`}</button>`).join('')}</div>` : '';
+  const domesHS = () => window.SFA_HSCROLL(root.querySelector('#domes'), { prev: t('Previous'), next: t('Next') });
+  if (C && !C.open()){ const soon = () => { root.innerHTML = C.soonPage(t('Sports courts'), `<div class="domes-in">${domes()}</div>`); domesHS(); document.title = `${t('Sports courts')} · SFA Domes`; }; soon(); addEventListener('sfa:prefs', soon); return; }
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const icon = sp => sp.img ? `<span class="mi" style="--m:url(${sp.img})"></span>` : `<span class="msi">${sp.icon}</span>`;
   // the same photo on several courts gets a different framing on each (zoomed into another part), so cards don't look identical
   const CROPS = [['50% 50%', 1], ['12% 72%', 1.45], ['88% 62%', 1.45], ['50% 92%', 1.6], ['22% 30%', 1.5], ['78% 80%', 1.5]];
   const crop = i => `transform-origin:${CROPS[i % CROPS.length][0]};scale:${CROPS[i % CROPS.length][1]}`;
-  const url = i => `court-details.html?sport=${encodeURIComponent(key)}&court=${i}`;
+  const url = (k, i) => `court-details.html?sport=${encodeURIComponent(k)}&court=${i}`;
   const ladies = (k, i) => S[k].area === 'mp' && L && L.courts.includes(i);
 
-  function paint(focus){
-    const sport = S[key], courts = sport.courts, n = courts.length, name = esc(t(sport.name));
-    document.title = `${t('Sports courts')} · ${t(sport.name)} · SFA Domes`;   // the page title is Sports courts; the chips pick the sport (Ahmed, 2026-11-17)
-    const sub = sport.area === 'field'
-      ? t(key === 'rugby' ? 'Played on football fields F4 and F5 joined together.' : '5 indoor football fields: play 5-a-side, or book F4 and F5 together for 7-a-side.')
-      : t('{n} indoor multipurpose courts. Pick one to book.', { n });
+  const ALL = 'all', isAll = () => key === ALL;
+  const ALL_SPORT = { name: 'All', icon: 'sports' };
+  const total = keys.reduce((a, k) => a + S[k].courts.length, 0);
+  // the cards for the chosen chip: one sport's courts, or every sport's courts in turn for All
+  const multi = () => isAll() || !!G[key];   // cards from several sports, so each card names its sport and Back needs it
+  const items = () => (isAll() ? keys : members(key)).flatMap(k => S[k].courts.map((c, i) => ({ k, c, i })));
+  const subFor = () => {
+    if (isAll()) return t('{c} courts for {s} sports. Pick one to book.', { c: total, s: keys.length });   // as live: 10 sports, 28 courts
+    if (G[key]) return t('Volleyball, netball, GFX and table tennis, on the 4 indoor multipurpose courts. Pick one to book.');
+    const sport = S[key], n = sport.courts.length;
+    if (sport.area === 'padel') return t('{n} padel courts. Pick one to book.', { n });
+    return sport.area === 'field'
+      ? t(key === 'rugby' ? 'Played on football Court 7.' : 'Play 5-a-side on Courts 5, 6, 7a, 7b and 8, or book Court 7 for 7-a-side.')
+      : n === 1 ? t('1 indoor multipurpose court. Pick it to book.') : t('{n} indoor multipurpose courts. Pick one to book.', { n });
+  };
+
+  // the frame is drawn once (and again only when the language changes); picking a chip only calls update()
+  function frame(){
     root.innerHTML = `<section class="hero" aria-labelledby="sportName">
-        <div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true">${icon(sport)}</span>${t('SFA Domes Dammam')}</p><h1 id="sportName" class="name">${t('Sports courts')}</h1><p class="sub">${sub}</p></div></section>
+        <div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true" id="heroIco"></span>${C ? t('SFA Domes {city}', { city: t(C.city().name) }) : t('SFA Domes Dammam')}</p><h1 id="sportName" class="name">${t('Sports courts')}</h1><p class="sub" id="heroSub"></p></div></section>
       <section class="list" aria-labelledby="chooseH">
-        <div class="flt"><div class="chips" role="group" aria-label="${t('Sport')}">${keys.map(k => `<button type="button" class="chip" data-sport="${k}" aria-pressed="${k === key}"><span aria-hidden="true">${icon(S[k])}</span>${esc(t(S[k].name))}<small>${S[k].courts.length}</small></button>`).join('')}</div>
-          <div class="row2"><h2 id="chooseH">${t('Choose a court')}</h2><span class="count" aria-live="polite">${n === 1 ? t('1 court') : t('{n} courts', { n })}</span></div></div>
-        <div class="grid">${courts.map((c, i) => `<article class="tile" style="--i:${focus ? 0 : i}">
-          <div class="ph"><img src="${window.SFA_COURT_IMG(key, c)}" alt="" loading="lazy" style="${crop(i)}"><div class="tags">${c[3] ? `<span class="tag">${esc(t(c[3]))}</span>` : ''}${ladies(key, i) ? `<span class="tag w">${t('Ladies hours')}</span>` : ''}${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('court', { sport: key, court: i }) : ''}</div></div>
-          <div class="bd"><p class="sp"><span aria-hidden="true">${icon(sport)}</span>${name} · ${esc(t(c[1]))}</p><h3 class="nm"><a class="lnk" href="${url(i)}" data-i="${i}" aria-label="${t('View court')}: ${esc(t(c[0]))}"></a>${esc(t(c[0]))}</h3>
-            <p class="meta">${[t('Indoor'), c[2], c[4]].filter(Boolean).map(v => esc(t(v))).join(' · ')}</p>
-            <p class="pr"><b>${P.money(c[5])}</b><small>${t('/ hr')}</small><em>${t('90-minute slots')}</em></p></div></article>`).join('')}</div></section>`;
-    // back from the details page: the court you opened stays marked
-    const pre = root.querySelector(`.lnk[data-i="${params.get('court')}"]`);
-    if (params.has('court') && pre && params.get('sport') === key) pre.closest('.tile').classList.add('picked');
+        <div class="flt">${domes()}<div class="chips" id="chips" role="group" aria-label="${t('Sport')}">${[ALL, ...tops].map(k => { const sp = k === ALL ? ALL_SPORT : info(k); return `<button type="button" class="chip" data-sport="${k}" aria-pressed="false"><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}<small>${k === ALL ? total : members(k).reduce((a, m) => a + S[m].courts.length, 0)}</small></button>`; }).join('')}</div>
+          <div class="row2"><h2 id="chooseH">${t('Choose a court')}</h2><span class="count" id="count" aria-live="polite"></span></div></div>
+        <div class="grid" id="grid"></div></section>`;
     shrink();
-    if (focus) root.querySelector(focus)?.focus({ preventScroll: true });
   }
+  function update(quick){
+    const sport = isAll() ? ALL_SPORT : info(key), list = items(), n = list.length;
+    document.title = `${t('Sports courts')} · ${t(sport.name)} · SFA Domes`;   // the page title is Sports courts; the chips pick the sport (Ahmed, 2026-11-17)
+    root.querySelector('#heroIco').innerHTML = icon(sport);
+    root.querySelector('#heroSub').textContent = subFor();
+    root.querySelectorAll('#chips .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.sport === key));
+    root.querySelector('#count').textContent = n === 1 ? t('1 court') : t('{n} courts', { n });
+    root.querySelector('#grid').innerHTML = list.map(({ k, c, i }, j) => `<article class="tile" style="--i:${quick ? Math.min(j, 5) : j}">
+          <div class="ph"><img src="${window.SFA_COURT_IMG(k, c)}" alt="" loading="lazy" style="${crop(i)}"><div class="tags">${S[k].sample ? `<span class="tag">${t('Sample')}</span>` : ''}${c[3] ? `<span class="tag">${esc(t(c[3]))}</span>` : ''}${ladies(k, i) ? `<span class="tag w">${t('Ladies hours')}</span>` : ''}${window.SFA_OFFER_UI ? window.SFA_OFFER_UI.tag('court', { sport: k, court: i }) : ''}</div></div>
+          <div class="bd"><p class="sp"><span aria-hidden="true">${icon(S[k])}</span>${esc(t(S[k].name))} · ${esc(t(c[1]))}</p><h3 class="nm"><a class="lnk" href="${url(k, i)}" data-k="${k}" data-i="${i}" aria-label="${t('View court')}: ${esc(t(c[0]))}"></a>${esc(t(c[0]))}</h3>
+            ${[c[2], c[4]].some(Boolean) ? `<p class="meta">${[c[2], c[4]].filter(Boolean).map(v => esc(t(v))).join(' · ')}</p>` : ''}
+            <p class="pr"><b>${P.money(c[5] * window.SFA_SCHEDULE.SLOT / 60)}</b><small>${t('/ session')}</small><em>${t('90-minute slots')}</em></p></div></article>`).join('');
+    // back from the details page: the court you opened stays marked
+    if (params.has('court') && params.get('sport') === key){
+      const cs = multi() ? params.get('cs') : key;
+      root.querySelector(`.lnk[data-k="${cs}"][data-i="${params.get('court')}"]`)?.closest('.tile').classList.add('picked');
+    }
+    arrows();
+  }
+  let hs = { update(){} };
+  const arrows = () => hs.update();
+  // bring the picked chip into the row's view (sideways only, so the page itself never jumps)
+  const reveal = smooth => { const c = root.querySelector('#chips .chip[aria-pressed="true"]'), row = root.querySelector('#chips'); if (!c || !row) return;
+    const r = row.getBoundingClientRect(), b = c.getBoundingClientRect(), d = b.left < r.left ? b.left - r.left - 4 : b.right > r.right ? b.right - r.right + 4 : 0;
+    if (d) row.scrollBy({ left: d, behavior: smooth ? 'smooth' : 'instant' }); };
+  function paint(){ frame(); domesHS(); hs = window.SFA_HSCROLL(root.querySelector('#chips'), { prev: t('Previous'), next: t('Next') }); update(); requestAnimationFrame(() => { reveal(); arrows(); }); }
   // a long sport name (Basketball, Table Tennis) shrinks until it fits the width, so it never spills off a phone
   const shrink = () => { const h = root.querySelector('.name'); if (!h) return; h.style.fontSize = ''; const k = h.clientWidth / h.scrollWidth; if (k < 1) h.style.fontSize = parseFloat(getComputedStyle(h).fontSize) * k * .98 + 'px'; };
   root.addEventListener('click', e => {
     const b = e.target.closest('[data-sport]');
-    if (b){ key = b.dataset.sport; params.delete('court'); history.replaceState(null, '', `?sport=${encodeURIComponent(key)}`); paint(`[data-sport="${key}"]`); return; }
+    if (b){ if (b.dataset.sport === key) return; key = b.dataset.sport; params.delete('court'); history.replaceState(null, '', `?sport=${encodeURIComponent(key)}`); update(true); reveal(true); return; }
     // remember which court was opened, so Back lands on this page with it marked
-    const a = e.target.closest('.lnk'); if (a) history.replaceState(null, '', `?sport=${encodeURIComponent(key)}&court=${a.dataset.i}`);
+    const a = e.target.closest('.lnk'); if (a) history.replaceState(null, '', `?sport=${encodeURIComponent(key)}&court=${a.dataset.i}${multi() ? `&cs=${encodeURIComponent(a.dataset.k)}` : ''}`);
   });
   paint();
   addEventListener('sfa:prefs', () => paint());
-  addEventListener('resize', shrink); document.fonts?.ready.then(shrink);
+  addEventListener('resize', () => { shrink(); arrows(); }); document.fonts?.ready.then(shrink);
 })();
 </script>
 </body>

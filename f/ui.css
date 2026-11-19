@@ -26,7 +26,7 @@
 
 /* ---- 12 · tags ---- */
 .tag,.lvl,.pj-tag,.of-tag,.wh > .lvl,.wh > .of-tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px;font:var(--ts-caption-1-bold);border-radius:0}
-.pj-tag{background:var(--color-bg-accent-subtle);color:var(--orange-800)}   /* discount tags: light orange, not button-like (Ahmed, 2026-11-18) */
+.pj-tag{background:var(--color-bg-accent-tag);color:var(--orange-800)}   /* discount tags: light orange, not button-like (Ahmed, 2026-11-18) */
 .bv-row-i b em,.bv-o-who b em,.bv-rc em,.opt em,.gst em,.gp-list em,.gp-opt em{display:inline-flex;align-items:center;height:24px;padding:0 8px;background:var(--color-bg-accent-subtle);color:var(--orange-800);font:var(--ts-caption-1-bold);font-style:normal}
 
 /* ---- 13 · cards ---- */
@@ -76,3 +76,21 @@ html[dir=rtl] .kl-crumbs svg{transform:scaleX(-1)}
 /* the header's account button ("Hi, Sara" / Login) */
 .card-nav{--cn-cta:var(--orange-700)}
 .card-nav__cta:hover{background:var(--orange-800);filter:none}
+
+/* Sideways filter rows with arrows and drag (f/hscroll.js; courts.html sport chips, matches.html chips and days), Ahmed 2026-11-19 */
+.hs{display:flex;align-items:center;gap:8px;min-width:0}
+.hs > :not(.hs-arr){flex:1 1 auto;min-width:0}
+.hs-arr{flex:none;display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);cursor:pointer;transition:border-color .2s,opacity .2s}
+.hs-arr:hover:not(:disabled){border-color:var(--color-content-primary)}
+.hs-arr:disabled{opacity:.35;cursor:default}
+.hs:not(.ovf) .hs-arr{display:none}
+.hs-i{display:block;width:8px;height:14px;background:currentColor;-webkit-mask:url(flow/chevron-left.svg) center/contain no-repeat;mask:url(flow/chevron-left.svg) center/contain no-repeat}
+.hs-arr.fwd .hs-i,[dir=rtl] .hs-arr:not(.fwd) .hs-i{scale:-1 1}
+[dir=rtl] .hs-arr.fwd .hs-i{scale:none}
+.hs-drag{cursor:grabbing;user-select:none;-webkit-user-select:none;scroll-behavior:auto!important}
+.hs-drag *{cursor:grabbing}
+
+/* One section-title style everywhere (Ahmed, 2026-11-19: "titles style should be unified everywhere"): Display S, uppercase,
+   as "Every game one dome is waiting" on the home page. Home programme rows, the list headings on Courts / Open games /
+   Ladies hours, and the section headings on the court, program and game pages. Hero titles and card titles keep theirs. */
+html :is(.pg-title, .kl-h, .row2 h2, .lh h2, .sec > .head h2, #dayTitle, #planTitle){font:var(--ts-display-s)!important;text-transform:var(--type-case-display)!important;letter-spacing:normal}

@@ -1,0 +1,302 @@
+/* Court booking · step 1 (Figma 142:9464; f/court-flow.js). DS3 tokens; the checkout header's steps use Figtree as in
+   the design. Desktop as drawn; phones and tablets stack the summary under the calendar and keep the bottom bar. */
+
+/* the page around it steps aside: the site header, the court page itself, the flow's own step header, the footer */
+.cf [data-site-nav],.cf .hdr-cn,.cf:not(.cf-ck) body > main:not(.cf-page),.cf .fl-top,.cf [data-site-footer]{display:none !important}
+.cf body{background:var(--color-bg-secondary)}
+
+/* ---- checkout header: logo, steps in the middle, close ---- */
+.cf-hd{position:relative;display:flex;align-items:center;justify-content:space-between;height:90px;padding:0 80px;background:var(--color-bg-primary);border-bottom:1px solid var(--color-border-primary)}
+.cf-logo{display:block;flex:none;line-height:0}
+.cf-logo img{width:73px;height:58px}
+.cf-steps{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;margin:0;padding:0;list-style:none}
+.cf-steps li{display:flex;align-items:center;gap:8px}
+.cf-line{display:block;width:40px;height:2px;margin:0 12px;border-radius:2px;background:rgba(0,0,0,.2)}
+.cf-steps li.done .cf-line,.cf-steps li.now .cf-line{background:var(--color-brand)}
+.cf-n{display:grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;border:1px solid rgba(0,0,0,.2);font:700 12px/16px Figtree,var(--type-font);letter-spacing:.12px;color:var(--color-content-disabled)}
+.cf-steps li.done .cf-n,.cf-steps li.now .cf-n{border-color:var(--color-brand);background:var(--color-brand);color:var(--color-content-on-accent)}
+.cf-n img{width:14px;height:14px}
+.cf-l{font:600 13px/20px Figtree,var(--type-font);letter-spacing:.1625px;color:var(--color-content-disabled);white-space:nowrap}
+.cf-steps li.done .cf-l,.cf-steps li.now .cf-l{color:var(--color-content-primary)}
+/* round 40px buttons (close, back): 5% ink, as in the design */
+.cf-x,.cf-back{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.05);text-decoration:none}
+.cf-x:hover,.cf-back:hover{background:rgba(0,0,0,.1)}
+.cf-x img{width:11.6667px;height:11.6667px}
+.cf-back img{width:6.66667px;height:11.6667px}
+.cf-x:focus-visible,.cf-back:focus-visible,.cf-btn:focus-visible,.cf-rm:focus-visible{outline:2px solid var(--color-brand);outline-offset:2px}
+
+/* ---- page ---- */
+.cf-page{display:grid;gap:32px;padding:48px 96px 80px}
+.cf-title{display:flex;align-items:center;gap:16px}
+.cf-title h1{margin:0;font:var(--ts-title-screen);letter-spacing:-.15px;text-transform:var(--type-case-title)}
+.cf-cols{display:flex;align-items:flex-start;gap:56px}
+
+/* the "Select date & time" card */
+.cf-card{flex:1;min-width:0;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.cf-card-h{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px;padding:16px 24px;border-bottom:1px solid var(--color-border-primary)}
+.cf-card-h h2{margin:0;font:var(--ts-title-body);letter-spacing:-.09px;text-transform:var(--type-case-title)}
+.cf-legend,.cf-key{display:flex;gap:16px;margin:0;padding:0;list-style:none}
+.cf-legend li,.cf-key li{display:flex;align-items:center;gap:8px;font:var(--ts-body-s);letter-spacing:.13px;color:var(--color-content-tertiary);white-space:nowrap}
+.sw{display:block;flex:none;width:12px;height:12px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary)}
+.sw.pk{border:2px solid var(--color-border-accent);background:var(--color-bg-accent-subtle)}
+.sw.bk{background:var(--color-bg-tertiary)}
+.sw.op{border:2px solid var(--color-border-strong)}
+.cf-body{display:grid;gap:16px;padding:16px 24px 24px}
+.cf-key{padding-top:8px}
+.cf-month{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px}
+.cf-month #calMonth{margin:0;font:var(--ts-body-default-bold);letter-spacing:.1875px;color:var(--color-content-primary);text-transform:none}
+.cf-arrows{display:flex;gap:8px}
+.cf-arrows .arrow{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);cursor:pointer}
+.cf-arrows .arrow:hover:not(:disabled){background:var(--color-content-primary)}
+.cf-arrows .arrow:hover:not(:disabled) img{filter:invert(1)}
+.cf-arrows .arrow:disabled{opacity:.35;cursor:not-allowed}
+.cf-arrows .arrow img{display:block}
+
+/* the month: weekdays, then weeks of day tiles; the open day's times fold out under its week */
+.cf #calGrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:0;padding:0;border:0;background:none}
+.cf #calGrid .cal-dow{display:block;margin-bottom:8px;font:var(--ts-caption-1-bold);letter-spacing:.12px;text-align:center;color:var(--color-content-tertiary);text-transform:none}
+.cf #calGrid .day{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:56px;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:var(--color-bg-secondary);font:var(--ts-body-l-bold);color:var(--color-content-primary);cursor:pointer;box-shadow:none}
+.cf #calGrid .day:hover:not(:disabled){box-shadow:inset 0 0 0 1px var(--color-border-strong)}
+.cf #calGrid .day small{display:none}
+.cf #calGrid .day:disabled{background:none;color:var(--color-content-disabled);cursor:default}
+.cf #calGrid .day.active{box-shadow:inset 0 0 0 2px var(--color-border-strong)}
+.cf #calGrid .day.picked{background:var(--color-bg-accent-subtle);box-shadow:inset 0 0 0 2px var(--color-border-accent)}
+.cf #calGrid .day.today:not(.active):not(.picked)::after{content:none}
+.cf #calGrid .cal-times{grid-column:1/-1;display:grid;gap:12px;margin:0;padding:16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-secondary);animation:none}
+.cf #calGrid .cal-times::before{content:none}
+.cf #calGrid .slots-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0}
+.cf #calGrid .slots-day{margin:0;font:var(--ts-body-l-bold);color:var(--color-content-primary);text-transform:none}
+.cf #calGrid .slots{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.cf #calGrid .slot{position:relative;display:flex;align-items:center;justify-content:center;width:184px;max-width:100%;height:52px;margin:0;padding:0 8px;border:1px solid var(--color-border-secondary);border-radius:0;background:var(--color-bg-primary);font:var(--ts-body-l-bold);color:var(--color-content-primary);white-space:nowrap;cursor:pointer;box-shadow:none}
+.cf #calGrid .slot:hover:not(:disabled){border-color:var(--color-border-strong)}
+.cf #calGrid .slot[aria-pressed=true]{border:2px solid var(--color-border-accent);background:var(--color-bg-accent-subtle)}
+.cf #calGrid .slot:disabled{border-color:var(--color-border-primary);background:var(--color-bg-secondary);color:var(--color-content-disabled);cursor:not-allowed}
+.cf #calGrid .slot:disabled::after{content:"";position:absolute;left:15px;right:15px;top:calc(50% + .5px);height:1px;background:var(--color-content-disabled)}
+.cf #calGrid .slot .lad-tag{display:none}
+.cf #calGrid .empty{margin:0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+
+/* ---- the booking summary card ---- */
+.cf-sum{flex:none;width:400px;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.cf-photo{position:relative;height:224px;overflow:hidden}
+.cf-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cf-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,9,11,.05) 30%,rgba(9,9,11,.75))}
+.cf-ph-t{position:absolute;left:16px;right:16px;bottom:16px;display:grid;gap:4px;color:var(--color-content-on-accent)}
+html[dir=rtl] .cf-ph-t{text-align:right}
+.cf-ph-t small{font:var(--ts-caption-1);letter-spacing:.12px}
+.cf-ph-t b{font:var(--ts-title-section);letter-spacing:-.11px;text-transform:var(--type-case-title)}
+.cf-lines{display:grid;gap:16px;padding:16px}
+.cf-day{display:grid;gap:12px}
+.cf-day + .cf-day{padding-top:16px;border-top:1px solid var(--color-border-primary)}
+.cf-date{margin:0;font:var(--ts-body-l-bold);color:var(--color-content-primary)}
+.cf-row{display:flex;align-items:center;gap:16px}
+.cf-time{flex:1;min-width:0;font:var(--ts-body-s);letter-spacing:.13px;color:var(--color-content-secondary)}
+.cf-p{font:var(--ts-body-default-bold);letter-spacing:.1875px;color:var(--color-content-primary);white-space:nowrap}
+.cf-rm{display:grid;place-items:center;width:16px;height:16px;margin:0;padding:0;border:0;background:none;cursor:pointer}
+.cf-rm img{width:10.8284px;height:10.8284px}
+.cf-rm:hover{opacity:.6}
+.cf-empty{margin:0;font:var(--ts-body-s);color:var(--color-content-secondary)}
+.cf-line-of{display:flex;justify-content:space-between;gap:16px;padding:0 16px 16px;font:var(--ts-body-s-bold);color:var(--color-content-primary)}
+.cf-total{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px;border-top:1px solid var(--color-border-primary)}
+.cf-total span{font:var(--ts-body-l-bold);color:var(--color-content-primary)}
+.cf-total strong{font:var(--ts-display-xs);letter-spacing:-.5px;color:var(--color-content-primary);white-space:nowrap}
+.cf-total strong s{margin-inline-end:6px;font:var(--ts-body-s);color:var(--color-content-tertiary)}
+.cf-go{padding:16px}
+.cf-btn{display:flex;align-items:center;justify-content:center;width:100%;height:56px;padding:0 24px;border:0;background:var(--orange-700);color:var(--color-content-on-accent);font:var(--ts-body-l-bold);cursor:pointer}
+.cf-btn:hover:not(:disabled){background:var(--orange-800)}
+.cf-btn:disabled{background:var(--color-bg-tertiary);color:var(--color-content-disabled);cursor:not-allowed}
+html[dir=rtl] .cf-flip{transform:scaleX(-1)}
+
+/* the bottom bar only on phones and tablets (desktop has Continue in the summary card) */
+@media (min-width:1024px){.cf .go{display:none !important}}
+
+/* ---- tablets and phones: one column, the summary under the calendar ---- */
+@media (max-width:1023px){
+  .cf-hd{padding:0 24px}
+  .cf-page{padding:32px 24px calc(120px + env(safe-area-inset-bottom,0px))}
+  .cf-cols{flex-direction:column;align-items:stretch;gap:24px}
+  .cf-sum{width:auto}
+  .cf-go{display:none}
+}
+@media (max-width:639px){
+  .cf-hd{height:72px;padding:0 16px}
+  .cf-logo img{width:58px;height:46px}
+  .cf-steps .cf-l{display:none}
+  .cf-steps li.now .cf-l{display:inline}
+  .cf-line{width:20px;margin:0 8px}
+  .cf-page{gap:24px;padding:24px 16px calc(120px + env(safe-area-inset-bottom,0px))}
+  .cf-title h1{font:var(--ts-title-section)}
+  .cf-card-h{height:auto;flex-wrap:wrap;padding:14px 16px}
+  .cf-legend{gap:12px}
+  .cf-body{padding:16px}
+  .cf #calGrid{gap:6px}
+  .cf #calGrid .day{height:44px;font:var(--ts-body-default-bold)}
+  .cf #calGrid .slot{width:calc(50% - 4px)}
+  .cf #calGrid .cal-times{padding:12px}
+}
+/* the site's price markup takes the size and weight of where it sits */
+.cf-sum .sfa-money{font:inherit;letter-spacing:inherit}
+.cf-card-h h2{white-space:nowrap}
+.cf-card-h{flex-wrap:wrap;height:auto;min-height:56px}
+/* phones: the steps sit between the logo and close (numbers, the current one named), times in two columns */
+@media (max-width:639px){
+  .cf-hd{gap:12px}
+  .cf-steps{position:static;transform:none;flex:1;justify-content:center;min-width:0}
+  .cf-steps li.now .cf-l{display:none}
+  .cf-logo img{width:50px;height:40px}
+  .cf #calGrid .slot{font:var(--ts-body-default-bold);padding:0 4px}
+}
+@media (max-width:379px){.cf #calGrid .slot{font:var(--ts-body-s-bold)}}
+@media (max-width:639px){.cf #calGrid .slot{font:var(--ts-body-s-bold)}}
+
+/* ================= step 2 · Details (checkout.html for courts; Figma 142:9278) ================= */
+.cf-ck #page{max-width:none;margin:0;padding:48px 96px 80px;grid-template-columns:minmax(0,1fr) 400px;grid-template-areas:"head head" "main side";gap:32px 56px}
+.cf-ck #ckCrumbs{display:none !important}
+.cf-ck .ck-h{display:flex;align-items:center;gap:16px;margin:0;font:var(--ts-title-screen);letter-spacing:-.15px;text-transform:var(--type-case-title)}
+.cf-ck .ck-main{display:grid;gap:40px}
+/* the Booking for card */
+.cf-ck .ck-main .ck-who{margin:0;padding:0;background:var(--color-bg-primary);border:1px solid var(--color-border-primary)}
+.cf-ck .ck-who > .step-head{display:flex;align-items:center;justify-content:space-between;height:56px;margin:0;padding:16px 24px;border-bottom:1px solid var(--color-border-primary)}
+.cf-ck .ck-who > .step-head h2{margin:0;font:var(--ts-title-body);letter-spacing:-.09px;text-transform:var(--type-case-title)}
+.cf-ck .ck-who-body{padding:16px 24px 24px}
+.cf-ck .who{grid-template-columns:minmax(0,1fr);gap:8px}
+.cf-ck .who-opt{min-height:84px;gap:16px;padding:16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);box-shadow:none}
+.cf-ck .who-opt:hover{border-color:var(--color-content-primary)}
+.cf-ck .who-opt:has(input:checked){padding:15px;border:2px solid var(--color-border-accent);background:var(--color-bg-accent-subtle);box-shadow:none}
+.cf-ck .who-opt.off{opacity:.55}
+.cf-ck .who-mark{width:20px;height:20px;border:0;background:url(flow/radio-off.svg) center/20px 20px no-repeat}
+.cf-ck .who-mark svg{display:none}
+.cf-ck .who-opt:has(input:checked) .who-mark{background:url(flow/radio-on.svg) center/20px 20px no-repeat}
+.cf-ck .who-opt strong{font:var(--ts-body-l-bold);text-transform:none}
+.cf-ck .who-opt small{margin-top:4px;font:var(--ts-body-s);letter-spacing:.13px;color:var(--color-content-secondary)}
+.cf-ck .ck-who .guest .panel{margin-top:8px}
+.cf-ck .lady-note{margin:12px 0 0}
+/* agree & pay */
+.cf-ck .confirm{display:grid;gap:16px;margin:0}
+.cf-ck .agree{margin:0}
+.cf-ck .terms{letter-spacing:.13px}
+.cf-ck #payBtn{display:inline-flex;align-items:center;justify-self:start;gap:8px;height:56px;padding:0 24px;font:var(--ts-body-l-bold)}
+.cf-ck #payBtn .cf-arr{display:block;width:14.9142px;height:14.4951px;margin:0 2.6px 0 3.1px}
+/* the summary card */
+.cf-ck .pay{position:sticky;top:24px;max-height:none}
+.cf-ck .pay .ck-card{border:1px solid var(--color-border-primary);background:var(--color-bg-primary);box-shadow:none}
+.cf-ck .pay .ck-photo{height:224px;aspect-ratio:auto}
+.cf-ck .pay .ck-photo img{width:100%;height:100%;object-fit:cover}
+.cf-ck .pay .ck-photo > div{left:16px;right:16px;bottom:16px;gap:4px}
+.cf-ck .pay .ck-photo .eb{font:var(--ts-caption-1);letter-spacing:.12px;text-transform:none;color:var(--color-content-on-accent)}
+.cf-ck .pay .ck-photo strong{font:var(--ts-title-section);letter-spacing:-.11px;text-transform:var(--type-case-title);color:var(--color-content-on-accent)}
+.cf-ck .pay .ck-photo small,.cf-ck:not(.cf-prog) .pay .ck-photo .ck-when{display:none !important}
+.cf-prog .pay .ck-photo .ck-when{margin-top:4px;font:var(--ts-body-s-bold);color:var(--color-content-on-accent)}
+.cf-ck #revTitle{display:none}
+.cf-ck .pay .ck-card .days{padding:8px 24px;overflow:visible;max-height:none}
+.cf-ck .pay .ck-card .days > li{display:grid;gap:8px;padding:16px 0;margin:0;border:0}
+.cf-ck .pay .ck-card .days > li + li{margin:0;border-top:1px solid var(--color-border-primary)}
+.cf-ck .pay .ck-card .days > li > b{font:var(--ts-body-l-bold);color:var(--color-content-primary)}
+.cf-ck .pay .ck-card .days ul{display:grid;gap:8px;margin:0}
+.cf-ck .pay .ck-card .days ul li{display:flex;align-items:center;gap:16px;min-height:0}
+.cf-ck .pay .ck-card .days ul li > span:first-child{flex:1;min-width:0;font:var(--ts-body-s);letter-spacing:.13px;color:var(--color-content-secondary)}
+.cf-ck .pay .ck-card .days .slot-p{font:var(--ts-body-default-bold);letter-spacing:.1875px;color:var(--color-content-primary)}
+.cf-ck .pay .ck-card .days .slot-p .sfa-money{font:inherit}
+.cf-ck .pay .ck-card .days .rm-slot{display:grid;place-items:center;width:16px;height:16px;margin:0;padding:0;color:inherit}
+.cf-ck .pay .ck-card .days .rm-slot img{width:10.8284px;height:10.8284px}
+.cf-ck .pay .ck-card .ck-sum{padding:16px 24px 24px;border:0}
+.cf-ck .pay .ck-card .total{display:flex;align-items:center;justify-content:space-between;margin:0;padding:16px 0;border-top:1px solid var(--color-border-primary)}
+.cf-ck .pay .ck-card .total small{font:var(--ts-body-l-bold);text-transform:none;color:var(--color-content-primary)}
+.cf-ck .pay .ck-card .total strong{font:var(--ts-display-xs);letter-spacing:-.5px}
+.cf-ck .pay .ck-card .total strong .sfa-money{font:inherit}
+.cf-ck #ckOffers .of{margin:0 0 16px}
+@media (max-width:1023px){
+  .cf-ck #page{padding:32px 24px 48px;grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "main" "side";gap:24px}
+  .cf-ck .pay{position:static}
+}
+@media (max-width:639px){
+  .cf-ck #page{padding:24px 16px 40px}
+  .cf-ck .ck-h{font:var(--ts-title-section)}
+  .cf-ck .ck-who > .step-head{padding:14px 16px}
+  .cf-ck .ck-who-body{padding:16px}
+  .cf-ck #payBtn{justify-self:stretch;justify-content:center}
+  .cf-ck .pay .ck-card .days{padding:8px 16px}
+  .cf-ck .pay .ck-card .ck-sum{padding:16px 16px 20px}
+}
+/* Ladies hours step 1 (ladies-hours.html in the flow): sport chips on top, the day's times grouped by court */
+.cf .lf-sports{display:flex;flex-wrap:nowrap;gap:8px;margin:0 0 8px;overflow-x:auto;scrollbar-width:none}
+.cf .lf-sports .chip{flex:none}
+.cf .lf-court{display:grid;gap:8px}
+.cf .lf-court + .lf-court{padding-top:12px;border-top:1px solid var(--color-border-primary)}
+.cf .lf-court-h{margin:0;font:var(--ts-body-default-bold);color:var(--color-content-primary)}
+.cf .lf-court-h small{font:var(--ts-body-s);color:var(--color-content-secondary)}
+.cf .lf-note{margin:0;padding:8px 12px;background:var(--color-bg-primary);border-inline-start:3px solid var(--color-brand);font:var(--ts-body-s)}
+.cf .cf-page .bar{z-index:30}
+@media (min-width:1024px){.cf .cf-page .bar{display:none !important}}
+.cf:not(.cf-ck) main#page{display:none !important}
+.cf #calGrid .slots{padding:0;margin:0;grid-template-columns:none}
+/* training programs: plans on top of the step-1 card; on Details the participants and Training Kit cards */
+.cf #cfPlans .pj-plans{margin:0 0 8px;grid-template-columns:minmax(0,1fr)}   /* one under the other (Ahmed, 2026-11-18: "make them vertical") */
+.cf-each{font:var(--ts-caption-1);color:var(--color-content-secondary)}
+.cf-total span .cf-each{display:block}
+.cf-ck #progMain{display:grid;gap:40px;margin:0}
+.cf-ck #progMain[hidden]{display:none}
+.cf-ck #progMain > .ck-card{margin:0;background:var(--color-bg-primary);border:1px solid var(--color-border-primary);box-shadow:none}
+.cf-ck #progMain > .ck-card > .step-head{display:flex;align-items:center;justify-content:space-between;height:56px;margin:0;padding:16px 24px;border-bottom:1px solid var(--color-border-primary)}
+.cf-ck #progMain > .ck-card > .step-head h2{margin:0;font:var(--ts-title-body);letter-spacing:-.09px;text-transform:var(--type-case-title)}
+@media (max-width:639px){.cf-ck #progMain > .ck-card > .step-head{padding:14px 16px}}
+.cf #footer,.cf footer.ft{display:none !important}
+/* tablets and small laptops: the 4-step program header can't sit centred over the logo, so the steps sit between the
+   logo and close; only the current step is named below 1280px (Ahmed, 2026-11-18: "fix in responsive") */
+@media (max-width:1279px){
+  .cf-hd{gap:24px}
+  .cf-steps{position:static;transform:none;flex:1;justify-content:center;min-width:0}
+}
+@media (min-width:640px) and (max-width:1279px){
+  .cf-steps:has(li:nth-child(4)) li:not(.now) .cf-l{display:none}
+  .cf-steps:has(li:nth-child(4)) .cf-line{width:32px}
+}
+
+/* offers in the step they count: times under the summary card (Date & time), participants / players inside their card */
+.cf-side{flex:none;width:400px;display:grid;gap:16px;align-content:start}
+.cf-side > .cf-sum{width:auto}
+.cf-of:empty{display:none}
+.cf-of .of,.ck-of .of{margin:0}
+.ck-of{margin-top:16px}
+@media (max-width:1023px){.cf-side{width:auto}}
+
+/* ---------- Program booking step 1 (Figma 145:9511, Ahmed 2026-11-19): "Select start date & time" + "Select Subscription"
+   stacked in the main column. Start days as "Count day" buttons (112 wide; picked = the plan-card style), the chosen day's
+   times in a grey panel ("Time slot", 184 × 52; picked = plan-card style; full = struck through on grey). ---------- */
+.cf-stack{flex:1;min-width:0;display:grid;gap:24px}
+.cf-stack > .cf-card{flex:none}
+.cf-pdays{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.cf-pdays::-webkit-scrollbar{display:none}
+.cf-pday{flex:none;display:grid;justify-items:start;gap:2px;width:112px;padding:12px 16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);text-align:start;cursor:pointer}
+.cf-pday small{font:var(--ts-caption-1);letter-spacing:.12px;color:var(--color-content-secondary);white-space:nowrap}
+.cf-pday b{font:var(--ts-body-l-bold);white-space:nowrap}
+.cf-pday:hover:not(:disabled){border-color:var(--color-content-primary)}
+.cf-pday[aria-pressed=true]{padding:11px 15px;border:2px solid var(--color-border-accent);background:var(--color-bg-accent-subtle)}
+.cf-pday:disabled{cursor:not-allowed;background:var(--color-bg-tertiary);color:var(--color-content-disabled)}
+.cf-pday:disabled small{color:inherit}
+.cf-ptimes{padding:16px;border:1px solid var(--color-border-secondary);background:var(--color-bg-secondary)}
+.cf-pslots{display:flex;flex-wrap:wrap;gap:8px}
+.cf-pslot{display:flex;align-items:center;justify-content:center;width:184px;height:52px;padding:0 8px;border:1px solid var(--color-border-secondary);background:var(--color-bg-primary);color:var(--color-content-primary);font:var(--ts-body-l-bold);white-space:nowrap;cursor:pointer}
+.cf-pslot:hover:not(:disabled){border-color:var(--color-content-primary)}
+.cf-pslot[aria-pressed=true]{border:2px solid var(--color-border-accent);background:var(--color-bg-accent-subtle)}
+.cf-pslot:disabled{cursor:not-allowed;color:var(--color-content-disabled);background:var(--color-bg-tertiary);text-decoration:line-through}
+@media (max-width:639px){.cf-pslot{width:calc(50% - 4px);font:var(--ts-body-default-bold)}.cf-pday{width:auto;min-width:96px}}
+/* Ladies hours: the second row under "Other sports" (volleyball, netball, GFX, table tennis), set off by an accent rule */
+.lf-sub{margin-top:8px;padding-inline-start:12px;border-inline-start:2px solid var(--color-border-accent)}
+
+/* ---- tablets and phones (Ahmed, 2026-11-19: "remove this section in responsive, keep the bar and make it clickable to show
+   the summary"): the summary card leaves the page; tapping the bottom bar's total opens it as a sheet above the bar,
+   without the photo. A scrim behind it closes it. ---- */
+@media (max-width:1023px){
+  html.fl-on .cf-sum{display:none}
+  html.fl-on.cf-sheet .cf-sum{display:block;position:fixed;left:0;right:0;bottom:var(--cf-bar,88px);z-index:29;width:auto;max-height:calc(100svh - var(--cf-bar,88px) - 24px);overflow:auto;margin:0;border:0;border-top:1px solid var(--color-border-primary);box-shadow:0 -18px 40px -16px rgba(0,0,0,.3);animation:cfSheet .35s cubic-bezier(.22,1,.36,1)}
+  html.cf-sheet .cf-sum .cf-photo{display:none}
+  [data-cf-sheet]{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:12px;cursor:pointer}
+  [data-cf-sheet] > *{grid-column:1}
+  [data-cf-sheet]::after{content:"";grid-column:2;grid-row:1 / span 3;width:8px;height:14px;background:currentColor;-webkit-mask:url(flow/chevron-left.svg) center/contain no-repeat;mask:url(flow/chevron-left.svg) center/contain no-repeat;rotate:90deg;transition:rotate .25s}
+  html.cf-sheet [data-cf-sheet]::after{rotate:-90deg}
+  [data-cf-sheet]:focus-visible{outline:2px solid var(--color-brand);outline-offset:4px}
+  .cf-sheet-scrim{position:fixed;inset:0;z-index:28;background:rgba(9,9,11,.5);opacity:0;pointer-events:none;transition:opacity .25s}
+  html.cf-sheet .cf-sheet-scrim{opacity:1;pointer-events:auto}
+}
+@keyframes cfSheet{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){html.cf-sheet .cf-sum{animation:none}}

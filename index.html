@@ -1,5 +1,5 @@
 <!doctype html><html data-mode="dark"><head>
-<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=exercise,fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball,stadium,woman&display=block">
+<script src="f/demo-seed.js"></script><script src="f/demo-api.js"></script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=arrow_forward,exercise,fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball,stadium,woman&display=block">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:var(--neutral-0);color:var(--black)}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>SFA Domes</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -453,7 +453,7 @@ html[lang=ar] .hero-cue-ring text{font-size:13px;letter-spacing:0}
 .sp.pinned .sp-list{height:100%;overflow:hidden}
 .sp.pinned .sp-list li{transform:translateY(calc(var(--off, 0px) * -1))}
 .sp-intro,.sp-body{width:100%;max-width:1440px;padding-inline:clamp(20px,6.67vw,96px);box-sizing:border-box}
-.sp-intro{display:flex;align-items:center;justify-content:space-between;gap:32px}
+.sp-intro{display:flex;align-items:center;justify-content:flex-end;gap:32px}
 .sp-book{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);display:inline-flex;align-items:center;justify-content:center;width:274px;height:73px;padding:12px 16px;box-sizing:border-box;background:var(--neutral-100);color:var(--neutral-950);text-decoration:none;white-space:nowrap;flex:none;transition:background .2s}
 .sp-book:hover{background:var(--neutral-0)}
 .sp-head{font:var(--ts-display-s);margin:0;width:652px;max-width:100%;text-align:right;color:var(--neutral-0);text-transform:var(--type-case-display)}
@@ -567,12 +567,12 @@ html[lang=ar] .hero-cue-ring text{font-size:13px;letter-spacing:0}
 .mq:hover .mq-track{animation-play-state:paused}
 @keyframes mq{to{transform:translateX(-50%)}}
 .mq-set{display:flex;flex:none}
-.mq-tile{display:flex;flex-direction:column;justify-content:space-between;gap:12px;width:613px;height:clamp(220px,20.5vw,295px);padding:24px 48px;box-sizing:border-box;border:1px solid rgba(24,24,27,.1);margin-left:-1px}
+.mq-tile{display:flex;flex-direction:column;justify-content:center;gap:8px;width:613px;height:auto;padding:28px 40px;box-sizing:border-box;border:1px solid rgba(24,24,27,.1);margin-left:-1px}
 .mq-lbl{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);margin:0;color:rgba(9,9,11,.7)}
 .mq-row{display:flex;align-items:center;justify-content:space-between;gap:24px}
 .mq-num{font:var(--ts-display-m);white-space:nowrap;font-variant-numeric:tabular-nums}
-.mq-row img{width:120px;height:120px;flex:none;display:block}
-@media (max-width:639px){.mq-tile{width:86vw;padding:20px 24px}.mq-row img{width:72px;height:72px}.mq-lbl{font:var(--ts-body-l)}}
+.mq-row img{width:80px;height:80px;flex:none;display:block}
+@media (max-width:639px){.mq-tile{width:86vw;padding:20px 24px}.mq-row img{width:56px;height:56px}.mq-lbl{font:var(--ts-body-l)}}
 @media (prefers-reduced-motion:reduce){.mq{overflow-x:auto}.mq-track{animation:none}.mq-set[aria-hidden]{display:none}}
 /* ---------- Why SFA Domes (Figma 96:5911): big headline + four feature cards ---------- */
 .ws{position:relative;z-index:3;background:var(--neutral-0);color:var(--neutral-950);display:flex;flex-direction:column;align-items:center;gap:60px;padding:96px clamp(20px,6.67vw,96px)}
@@ -862,8 +862,9 @@ html{scroll-padding-top:90px}
 #sports.pinned .sp-pin{padding-block:calc(90px + var(--sec-pad)) var(--sec-pad)}
 .pg{padding-block:calc(var(--sec-pad) - 48px)}   /* each row already has 48px of its own padding */
 .vn,.ws{padding-block:var(--sec-pad)}
-/* ---------- Programme cards: the five cards share the row width so they always fit on one line ---------- */
-.pg-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:24px 16px}
+/* ---------- Programme cards: four per row on desktop (2026-11-19), three on tablets, two on phones ---------- */
+.pg-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px 16px}   /* 4 per row (Ahmed, 2026-11-19) */
+@media (min-width:1024px){.pg-cards > .pg-card:nth-child(n+5){display:none}}   /* one clean row of 4 on desktop; See all lists the rest */
 .pg-card{width:auto;min-width:0}
 .pg-media{height:auto;aspect-ratio:1/1}
 @media (max-width:1023px){.pg-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -874,6 +875,47 @@ html{scroll-padding-top:90px}
 .pg-card{opacity:0;transform:translateY(48px) scale(.9);transform-origin:50% 100%;transition:opacity .25s linear,transform .55s cubic-bezier(.34,1.56,.64,1),border-color .2s}
 .pg-row.open .pg-card{opacity:1;transform:none;transition-delay:calc(.1s + var(--k,0) * 55ms)}
 @media (prefers-reduced-motion:reduce){.pg-card{transition:none;transform:none}}
+/* ---------- Programme rows match the sports list (Ahmed, 2026-11-19): label-style titles, 20px rows ---------- */
+.pg-head{padding-block:20px}
+.pg-title,.pg.pg .pg-title{font:var(--ts-body-l-bold);text-transform:var(--type-case-label);line-height:inherit;white-space:normal}
+.pg{padding-block:calc(var(--sec-pad) - 20px)}
+@media (max-width:639px){.pg-head{padding-block:20px}}
+/* ---------- Sports as an icon grid (option H in sports-options.html, picked by Ahmed 2026-11-19): every live sport with
+   its icon and court count, no photos. Pointing at one turns it dark and shows an arrow. Ten sports: 5 × 2 on desktop,
+   2 columns on tablets, a list on phones. ---------- */
+.sp-intro{justify-content:flex-start}
+.sp-head{text-align:start}
+.sp-body{display:block}
+.sp-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin:0;padding:0;list-style:none;border-top:1px solid rgba(255,255,255,.3);border-inline-start:1px solid rgba(255,255,255,.3)}
+.sp-grid li{border-bottom:1px solid rgba(255,255,255,.3);border-inline-end:1px solid rgba(255,255,255,.3);transition:opacity .7s ease var(--dl,0s),translate 1s cubic-bezier(.22,1,.36,1) var(--dl,0s)}
+.sp:not(.sp-in) .sp-grid li{opacity:0;translate:0 32px}
+.sp-grid a{position:relative;display:grid;align-content:space-between;gap:32px;height:100%;min-height:clamp(180px,22vh,220px);box-sizing:border-box;padding:24px;color:var(--neutral-0);text-decoration:none;transition:background-color .25s}
+.sp-grid .ic{display:grid;place-items:center;width:64px;height:64px;border:1px solid rgba(255,255,255,.5);transition:background-color .25s,border-color .25s}
+.sp-grid .msi{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+.sp-grid .ic .msi{font-size:var(--fs-32)}
+.sp-grid .ic .mi{display:block;width:32px;height:32px;background:currentColor;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+.sp-grid b{display:block;font:var(--ts-title-body);text-transform:var(--type-case-title)}
+.sp-grid .cnt{display:block;margin-top:4px;font:var(--ts-caption-1-bold);text-transform:var(--type-case-label);opacity:.8}
+.sp-grid .go{position:absolute;top:24px;inset-inline-end:24px;font-size:var(--fs-24);opacity:0;transform:translateX(-8px);transition:opacity .25s,transform .35s cubic-bezier(.22,1,.36,1)}
+[dir=rtl] .sp-grid .go{scale:-1 1;transform:translateX(8px)}
+.sp-grid a:hover,.sp-grid a:focus-visible{background:var(--neutral-950)}
+.sp-grid a:focus-visible{outline:2px solid var(--neutral-0);outline-offset:-2px}
+.sp-grid a:hover .ic,.sp-grid a:focus-visible .ic{background:var(--color-brand);border-color:var(--color-brand)}
+.sp-grid a:hover .go,.sp-grid a:focus-visible .go{opacity:1;transform:none}
+#sports .sp-pin{align-items:stretch;justify-content:center;min-height:100svh;box-sizing:border-box}   /* a full screen, so the programmes slide-over starts only as this section leaves */
+#sports .sp-intro,#sports .sp-body{margin-inline:auto}
+@media (max-width:1100px){
+  .sp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sp-grid a{grid-template-columns:auto minmax(0,1fr) auto;align-items:center;align-content:center;gap:20px;min-height:0;padding:20px 24px}
+  .sp-grid .go{position:static;opacity:1;transform:none}
+}
+@media (max-width:639px){
+  .sp-grid{grid-template-columns:minmax(0,1fr)}
+  .sp-grid a{gap:16px;padding:16px}
+  .sp-grid .ic{width:48px;height:48px}
+  .sp-grid .ic .msi{font-size:var(--fs-24)}.sp-grid .ic .mi{width:24px;height:24px}
+}
+@media (prefers-reduced-motion:reduce){.sp-grid li,.sp-grid a,.sp-grid .ic,.sp-grid .go{transition:none!important}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1142,7 +1184,7 @@ html{scroll-padding-top:90px}
     <div class="card-nav__content" id="cardNavContent" aria-hidden="true">
       <div class="card-nav__cards">
         <div class="card-nav__card"><div class="card-nav__card-head"><span class="card-nav__label">Explore</span></div><ul class="card-nav__links"><li><a class="card-nav__link" href="#sports" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Sports</a></li><li><a class="card-nav__link" href="ladies-hours.html" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Ladies hours</a></li><li><a class="card-nav__link" href="programs.html" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Training programs</a></li><li><a class="card-nav__link" href="matches.html" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Matches</a></li></ul></div>
-        <div class="card-nav__card"><div class="card-nav__card-head"><span class="card-nav__label">About</span></div><ul class="card-nav__links"><li><a class="card-nav__link" href="#" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>About us</a></li><li><a class="card-nav__link" href="#" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Corporate event</a></li><li><a class="card-nav__link" href="#locations" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Locations</a></li></ul></div>
+        <div class="card-nav__card"><div class="card-nav__card-head"><span class="card-nav__label">About</span></div><ul class="card-nav__links"><li><a class="card-nav__link" href="about.html" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>About us</a></li><li><a class="card-nav__link" href="#" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Corporate event</a></li><li><a class="card-nav__link" href="#locations" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Locations</a></li></ul></div>
         <div class="card-nav__card"><div class="card-nav__card-head"><span class="card-nav__label">Contact</span></div><ul class="card-nav__links"><li><a class="card-nav__link" href="#footer" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Contact us</a></li><li><a class="card-nav__link" href="tel:+966537448666" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>+966 53 744 8666</a></li><li><a class="card-nav__link" href="mailto:Domes.info@sfa.sa" tabindex="-1"><span class="card-nav__arrow" aria-hidden="true"><svg class="card-nav__arrow-icon card-nav__arrow-icon--out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg><svg class="card-nav__arrow-icon card-nav__arrow-icon--in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>Domes.info@sfa.sa</a></li></ul></div>
       </div>
       <div class="card-nav__wide"><a class="card-nav__cta card-nav__cta--wide" href="#" tabindex="-1" data-auth-open="login">Login / Signup</a></div>
@@ -1208,48 +1250,36 @@ html{scroll-padding-top:90px}
     </div>
   </section>
 
+  <script src="f/city.js"></script>
+  <!-- a city without a dome open yet: this panel replaces the sports and programmes (f/city.js, Ahmed 2026-11-19) -->
+  <section class="cs cs-home" id="citySoon" aria-label="Opening soon" hidden></section>
+  <script>(() => { const C = window.SFA_CITY; if (!C || C.open()) return; const box = document.getElementById('citySoon'); box.hidden = false;
+    document.documentElement.classList.add('city-soon'); const fill = () => { box.innerHTML = `<div class="cs-in">${C.soonBox()}</div>`; }; fill(); document.addEventListener('DOMContentLoaded', fill); addEventListener('sfa:prefs', fill); })();</script>
   <section class="sp" id="sports" aria-labelledby="spTitle">
    <div class="sp-pin">
     <div class="sp-veil" aria-hidden="true"></div>
     <div class="sp-intro">
-      <a class="sp-book" href="courts.html">Book court</a>
       <h2 class="sp-head" id="spTitle">Every game one dome is waiting</h2>
     </div>
     <div class="sp-body">
-      <figure class="sp-photo" id="spPhoto"><div class="sp-ph" aria-hidden="true"></div><img src="f/sports-photos/basketball.jpg" alt="Player dribbling a basketball on a teal court" data-sport="basketball" loading="lazy"><img src="f/sports-photos/volleyball.jpg" alt="Player holding a volleyball on a teal court" data-sport="volleyball" loading="lazy"><img src="f/sports-photos/futsal.jpg" alt="Player volleying a ball on a purple futsal court" data-sport="futsal" loading="lazy"><img src="f/sports-photos/football.jpg" alt="Young player dribbling a ball on turf" data-sport="football" loading="lazy"><img src="f/sports-photos/tennis.jpg" alt="Two players rallying on a blue tennis court" data-sport="tennis" loading="lazy"><img src="f/sports-photos/rugby.jpg" alt="Rugby player carrying the ball past a defender" data-sport="rugby" loading="lazy"><img src="f/sports-photos/badminton.jpg" alt="Player reaching for a shuttlecock on a purple court" data-sport="badminton" loading="lazy"><img src="f/sports-photos/gfx.jpg" alt="Athlete doing a barbell squat" data-sport="gfx" loading="lazy"><img src="f/sports-photos/netball.jpg" alt="Two players jumping for a netball under the hoop" data-sport="netball" loading="lazy"><img src="f/sports-photos/handball.jpg" alt="Handball player leaping to shoot" data-sport="handball" loading="lazy"><img src="f/sports-photos/table-tennis.jpg" alt="Player lunging for a table tennis ball" data-sport="table-tennis" loading="lazy"></figure>
-      <ul class="sp-list" aria-label="Sports at SFA Domes">
-        <li><a href="courts.html?sport=basketball" data-sport="basketball">Basketball<span class="sp-ico material-symbols-outlined" aria-hidden="true">sports_basketball</span></a></li>
-        <li><a href="courts.html?sport=badminton" data-sport="badminton">Badminton<span class="sp-ico" aria-hidden="true"><img src="f/ico-shuttlecock-white.svg" alt="" width="32" height="32"></span></a></li>
-        <li><a href="courts.html?sport=football" data-sport="football">Football<span class="sp-ico material-symbols-outlined" aria-hidden="true">sports_soccer</span></a></li>
-        <li><a href="courts.html?sport=futsal" data-sport="futsal">Futsal<span class="sp-ico material-symbols-outlined" aria-hidden="true">sports_soccer</span></a></li>
-        <li><a href="courts.html?sport=gfx" data-sport="gfx">GFX<span class="sp-ico material-symbols-outlined" aria-hidden="true">fitness_center</span></a></li>
-        <li><a href="courts.html?sport=handball" data-sport="handball">Handball<span class="sp-ico material-symbols-outlined" aria-hidden="true">sports_handball</span></a></li>
-        <li><a href="courts.html?sport=netball" data-sport="netball">Netball<span class="sp-ico material-symbols-outlined" aria-hidden="true">sports_basketball</span></a></li>
-        <li><a href="courts.html?sport=rugby" data-sport="rugby">Rugby<span class="sp-ico material-symbols-outlined" aria-hidden="true">sports_rugby</span></a></li>
-        <li><a href="courts.html?sport=volleyball" data-sport="volleyball">Volleyball<span class="sp-ico material-symbols-outlined" aria-hidden="true">sports_volleyball</span></a></li>
-        <li><a href="courts.html?sport=tennis" data-sport="tennis">Tennis<span class="sp-ico material-symbols-outlined" aria-hidden="true">sports_tennis</span></a></li>
-        <li><a href="courts.html?sport=table-tennis" data-sport="table-tennis">Table Tennis<span class="sp-ico material-symbols-outlined" aria-hidden="true">pickleball</span></a></li>
+      <!-- the live site's ten sports as an icon grid (option H, Ahmed 2026-11-19); each court count comes from f/courts-data.js -->
+      <ul class="sp-grid" aria-label="Sports at SFA Domes">
+        <li><a href="courts.html?sport=football" data-sport="football"><span class="ic" aria-hidden="true"><span class="msi">sports_soccer</span></span><span><b>Football</b><span class="cnt" data-courts="football"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
+        <li><a href="courts.html?sport=badminton" data-sport="badminton"><span class="ic" aria-hidden="true"><span class="mi" style="--m:url(f/ico-shuttlecock-white.svg)"></span></span><span><b>Badminton</b><span class="cnt" data-courts="badminton"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
+        <li><a href="courts.html?sport=basketball" data-sport="basketball"><span class="ic" aria-hidden="true"><span class="msi">sports_basketball</span></span><span><b>Basketball</b><span class="cnt" data-courts="basketball"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
+        <li><a href="courts.html?sport=futsal" data-sport="futsal"><span class="ic" aria-hidden="true"><span class="msi">sports_soccer</span></span><span><b>Futsal</b><span class="cnt" data-courts="futsal"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
+        <li><a href="courts.html?sport=handball" data-sport="handball"><span class="ic" aria-hidden="true"><span class="msi">sports_handball</span></span><span><b>Handball</b><span class="cnt" data-courts="handball"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
+        <li><a href="courts.html?sport=volleyball" data-sport="volleyball"><span class="ic" aria-hidden="true"><span class="msi">sports_volleyball</span></span><span><b>Volleyball</b><span class="cnt" data-courts="volleyball"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
+        <li><a href="courts.html?sport=tennis" data-sport="tennis"><span class="ic" aria-hidden="true"><span class="msi">sports_tennis</span></span><span><b>Tennis</b><span class="cnt" data-courts="tennis"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
+        <li><a href="courts.html?sport=rugby" data-sport="rugby"><span class="ic" aria-hidden="true"><span class="msi">sports_rugby</span></span><span><b>Rugby</b><span class="cnt" data-courts="rugby"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
+        <li><a href="courts.html?sport=padel" data-sport="padel"><span class="ic" aria-hidden="true"><span class="msi">sports_tennis</span></span><span><b>Padel</b><span class="cnt" data-courts="padel"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
+        <li><a href="courts.html?sport=other" data-sport="other"><span class="ic" aria-hidden="true"><span class="msi">exercise</span></span><span><b>Other sports</b><span class="cnt" data-courts="other"></span></span><span class="msi go" aria-hidden="true">arrow_forward</span></a></li>
       </ul>
     </div>
    </div>
   </section>
   <section class="pg" id="programs" aria-label="Programmes">
-    <div class="pg-row" id="pg-ladies">
-      <button class="pg-head" type="button" aria-expanded="false" aria-controls="pg-ladies-panel">
-        <span class="pg-title">Ladies hours</span>
-        <span class="pg-stat"><span class="pg-num"><b data-to="38">0</b><i class="pct">%</i></span><span class="pg-lbl">Increase in female participation</span></span>
-      </button>
-      <div class="pg-panel" id="pg-ladies-panel" role="region" aria-label="Ladies hours"><div>
-        <ul class="pg-cards">
-          <li class="pg-card" style="--k:0"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
-          <li class="pg-card" style="--k:1"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
-          <li class="pg-card" style="--k:2"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
-          <li class="pg-card" style="--k:3"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
-          <li class="pg-card" style="--k:4"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
-        </ul>
-        <a class="pg-all" href="ladies-hours.html">Book ladies hours<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
-      </div></div>
-    </div>
+    <!-- services in Ahmed's order (2026-11-19): Training programs, Matches, Ladies hours -->
     <div class="pg-row" id="pg-training">
       <button class="pg-head" type="button" aria-expanded="false" aria-controls="pg-training-panel">
         <span class="pg-title">Training programs</span>
@@ -1283,6 +1313,22 @@ html{scroll-padding-top:90px}
         <a class="pg-all" href="matches.html">See all open games<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
       </div></div>
     </div>
+    <div class="pg-row" id="pg-ladies">
+      <button class="pg-head" type="button" aria-expanded="false" aria-controls="pg-ladies-panel">
+        <span class="pg-title">Ladies hours</span>
+        <span class="pg-stat"><span class="pg-num"><b data-to="38">0</b><i class="pct">%</i></span><span class="pg-lbl">Increase in female participation</span></span>
+      </button>
+      <div class="pg-panel" id="pg-ladies-panel" role="region" aria-label="Ladies hours"><div>
+        <ul class="pg-cards">
+          <li class="pg-card" style="--k:0"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
+          <li class="pg-card" style="--k:1"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
+          <li class="pg-card" style="--k:2"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
+          <li class="pg-card" style="--k:3"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
+          <li class="pg-card" style="--k:4"><a href="ladies-hours.html"><div class="pg-media"><img src="f/card-placeholder.png" alt="" loading="lazy"></div><div class="pg-body"><h3 class="pg-name" title="Al Maqased International School">Al Maqased International School</h3><p class="pg-price"><small>From</small><span data-sar="210.75"><img src="f/sar.svg" alt="SAR" width="19" height="19">210.75</span></p></div></a></li>
+        </ul>
+        <a class="pg-all" href="ladies-hours.html">Book ladies hours<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+      </div></div>
+    </div>
   </section>
   <section class="vn" id="locations" aria-labelledby="vnTitle">
     <h2 class="vn-h" id="vnTitle">Domes location</h2>
@@ -1298,7 +1344,7 @@ html{scroll-padding-top:90px}
         <ul>
           <li class="vn-item is-open">
             <svg class="vn-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
-            <div class="vn-text"><span class="vn-name">SFA Domes Dammam</span><span class="vn-city">Dammam, Saudi Arabia · 4 courts · 5 fields</span></div>
+            <div class="vn-text"><span class="vn-name">SFA Domes Dammam</span><span class="vn-city">Dammam, Saudi Arabia · 10 sports · 28 courts</span></div>
             <a class="vn-btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=26.4047835,50.0250094" target="_blank" rel="noopener">Directions<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
           </li>
           <li class="vn-item is-soon">
@@ -1603,7 +1649,7 @@ document.getElementById('heroCue')?.addEventListener('click', () => scrollBy({ t
   });
 
   // each row's number counts up the first time that row itself comes into view
-  // (Matches sits below the open Ladies hours cards, so it plays when you scroll down to it)
+  // (the rows below the first, open one play when you scroll down to them)
   function countUp(el){
     const to = +el.dataset.to, dur = 1600, t0 = performance.now() + 150;
     if (reduce){ el.textContent = to; return; }
@@ -1657,92 +1703,11 @@ document.getElementById('heroCue')?.addEventListener('click', () => scrollBy({ t
 
 
 <script>
-/* ---------- Sports list: pinned on desktop, scrolling steps through each sport and shows its photo.
-   Motion follows React Bits LineSidebar: each row has an --effect value eased every frame (frame-rate independent
-   exponential smoothing) toward max(pointer proximity, active ? 1 : 0); the row slide is eased the same way. ---------- */
+/* ---------- Sports icon grid: each sport's court count, from f/courts-data.js (loaded further down), in the page's language ---------- */
 (() => {
-  const sec = document.getElementById('sports'), fig = document.getElementById('spPhoto'); if (!sec || !fig) return;
-  const imgs = [...fig.querySelectorAll('img[data-sport]')];
-  const list = sec.querySelector('.sp-list');
-  const links = [...list.querySelectorAll('a[data-sport]')];
-  const rows = links.map(a => a.parentElement);
-  const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const pinMQ = matchMedia('(min-width: 821px) and (min-height: 560px) and (prefers-reduced-motion: no-preference)');
-  const STEP = 30;                        // svh of scroll per sport while pinned
-  const HOLD = 60;                        // extra svh the last sport stays put before the section lets go
-  const RADIUS = 110;                     // px of pointer influence around a row
-  const TAU_FX = reduce ? 1 : 120;        // ms, row effect easing
-  const TAU_OFF = reduce ? 1 : 260;       // ms, row slide easing
-  const smooth = p => p * p * (3 - 2 * p);
-
-  let active = 0, curIdx = -1, pinned = false;
-  const prox = links.map(() => 0), fx = links.map(() => 0);
-  let offTarget = 0, off = 0, raf = null, last = 0;
-
-  function frame(now){
-    const dt = Math.min((now - last) / 1000, 0.05); last = now;
-    const kf = 1 - Math.exp(-dt / (TAU_FX / 1000)), ko = 1 - Math.exp(-dt / (TAU_OFF / 1000));
-    let moving = false;
-    for (let i = 0; i < links.length; i++){
-      const target = Math.max(prox[i], i === active ? 1 : 0);
-      let v = fx[i] + (target - fx[i]) * kf;
-      if (Math.abs(target - v) < 0.0015) v = target; else moving = true;
-      if (v !== fx[i]){ fx[i] = v; links[i].style.setProperty('--effect', v.toFixed(4)); }
-    }
-    let o = off + (offTarget - off) * ko;
-    if (Math.abs(offTarget - o) < 0.3) o = offTarget; else moving = true;
-    if (o !== off){ off = o; list.style.setProperty('--off', o.toFixed(2) + 'px'); }
-    raf = moving ? requestAnimationFrame(frame) : null;
-  }
-  function run(){ if (raf == null){ last = performance.now(); raf = requestAnimationFrame(frame); } }
-
-  function show(i){
-    active = i;
-    const key = links[i].dataset.sport;
-    imgs.forEach(im => im.classList.toggle('on', im.dataset.sport === key));
-    links.forEach((a, j) => a.classList.toggle('on', j === i));
-    run();
-  }
-  function keepInView(i){
-    if (!pinned){ offTarget = 0; return run(); }
-    const li = rows[i], max = list.scrollHeight - list.clientHeight;
-    offTarget = Math.min(max, Math.max(0, li.offsetTop - (list.clientHeight - li.offsetHeight) / 2));
-    run();
-  }
-
-  // pointer proximity (LineSidebar): rows near the cursor light up and slide, falling off smoothly
-  if (canHover){
-    list.addEventListener('pointermove', e => {
-      const y = e.clientY;
-      rows.forEach((li, i) => { const r = li.getBoundingClientRect(); prox[i] = smooth(Math.max(0, 1 - Math.abs(y - (r.top + r.height / 2)) / RADIUS)); });
-      run();
-    });
-    list.addEventListener('pointerleave', () => { prox.fill(0); run(); });
-  }
-  links.forEach((a, i) => {
-    a.addEventListener('mouseenter', () => show(i));
-    a.addEventListener('focus', () => show(i));
-    if (!canHover) a.addEventListener('click', e => { if (active !== i){ e.preventDefault(); show(i); } });
-  });
-
-  function setPin(){
-    pinned = pinMQ.matches;
-    sec.classList.toggle('pinned', pinned);
-    sec.style.height = pinned ? `calc(100svh + ${links.length * STEP + HOLD}svh)` : '';
-    curIdx = -1; keepInView(active); onScroll();
-  }
-  function onScroll(){
-    if (!pinned) return;
-    const r = sec.getBoundingClientRect(), travel = sec.offsetHeight - innerHeight;
-    const p = Math.min(1, Math.max(0, -r.top / travel));
-    const idx = Math.min(links.length - 1, Math.floor(p * (links.length * STEP + HOLD) / STEP));
-    if (idx === curIdx) return; curIdx = idx;
-    show(idx); keepInView(idx);
-  }
-  addEventListener('scroll', onScroll, { passive: true });
-  pinMQ.addEventListener ? pinMQ.addEventListener('change', setPin) : pinMQ.addListener(setPin);
-  show(0); setPin();
+  const fill = () => { const S = window.SFA_SPORTS, P = window.SFA_PREFS; if (!S || !P) return;
+    document.querySelectorAll('#sports [data-courts]').forEach(el => { const n = (S[el.dataset.courts] || { courts: [] }).courts.length; el.textContent = n === 1 ? P.t('1 court') : P.t('{n} courts', { n }); }); };
+  document.addEventListener('DOMContentLoaded', fill); addEventListener('sfa:prefs', fill);
 })();
 </script>
 
@@ -1761,8 +1726,8 @@ document.getElementById('heroCue')?.addEventListener('click', () => scrollBy({ t
 /* ---------- Sports section first view: photo wipe + zoom-out, list rows stagger in ---------- */
 (() => {
   const sec = document.getElementById('sports'); if (!sec) return;
-  sec.querySelectorAll('.sp-list li').forEach((li, i) => li.style.setProperty('--dl', (0.35 + i * 0.06).toFixed(2) + 's'));
-  const done = () => { sec.classList.add('sp-in'); setTimeout(() => sec.querySelectorAll('.sp-list li').forEach(li => li.style.removeProperty('--dl')), 2200); };
+  sec.querySelectorAll('.sp-grid li').forEach((li, i) => li.style.setProperty('--dl', (0.25 + i * 0.05).toFixed(2) + 's'));
+  const done = () => { sec.classList.add('sp-in'); setTimeout(() => sec.querySelectorAll('.sp-grid li').forEach(li => li.style.removeProperty('--dl')), 2200); };
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) { done(); return; }
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ done(); io.disconnect(); } }), {rootMargin: '0px 0px -35% 0px'});
   io.observe(sec);
@@ -1771,7 +1736,7 @@ document.getElementById('heroCue')?.addEventListener('click', () => scrollBy({ t
 
 <script>
 /* ---------- Programmes: arrives like the footer (orange section above sinks, blurs and fades to white
-   as the white section slides over it); scrolling on opens Ladies hours ---------- */
+   as the white section slides over it); scrolling on opens the first row (Training programs since 2026-11-19) ---------- */
 (() => {
   const sec = document.getElementById('programs'), prev = document.getElementById('sports'); if (!sec) return;
   const firstRow = sec.querySelector('.pg-row'), firstHead = firstRow.querySelector('.pg-head');
@@ -1785,7 +1750,7 @@ document.getElementById('heroCue')?.addEventListener('click', () => scrollBy({ t
       prev.style.transform = p ? `translate3d(0, ${(p * 30).toFixed(2)}vh, 0)` : '';
       veil.style.setProperty('--veil', p.toFixed(3));
     }
-    // once the rows have risen into the upper part of the screen, open Ladies hours (unless someone already picked a row)
+    // once the rows have risen into the upper part of the screen, open the first row (unless someone already picked a row)
     if (!opened && top < innerHeight * 0.3){
       opened = true;
       if (!sec.querySelector('.pg-row.open')) firstHead.dispatchEvent(new CustomEvent('pg-auto'));

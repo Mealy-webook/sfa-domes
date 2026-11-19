@@ -30,7 +30,7 @@
   function seed(){
     const S = W.SFA_DEMO_SEED || { users: {}, bookings: {}, ref: dk(new Date()) };
     const today = parse(dk(new Date())), off = Math.round((today - parse(S.ref)) / (7 * 864e5)) * 7, ms = off * 864e5;
-    const db = { v: 1, users: JSON.parse(JSON.stringify(S.users)), bookings: {}, session: S.session || null, out: false };
+    const db = { v: 2, users: JSON.parse(JSON.stringify(S.users)), bookings: {}, session: S.session || null, out: false };
     for (const [id, b0] of Object.entries(S.bookings)){
       const b = JSON.parse(JSON.stringify(b0)), o = b.order;
       (o.days || []).forEach(d => d.date = shiftKey(d.date, off));
@@ -45,6 +45,18 @@
   }
   let db = null;
   try { if (qs.get('demo-reset') === '1') localStorage.removeItem(KEY); db = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+  // v2 (2026-11-19): courts now match the live site (f/courts-data.js), so bookings saved in this browser before then move
+  // to the new court numbers instead of being dropped: football's old 7-a-side (5) is Court 7 (2) and old field 3 is Court 8;
+  // netball, GFX and table tennis are Other sports; multipurpose courts past the end land on the last one (Basketball: Court 1)
+  if (db && db.v === 1){
+    const N = { football: 6, basketball: 1, rugby: 1, padel: 2 }, GONE = ['netball', 'gfx', 'table-tennis'];
+    Object.values(db.bookings || {}).forEach(b => { const o = b.order; if (!o || !Number.isInteger(o.court)) return;
+      if (GONE.includes(o.sport)) o.sport = 'other';
+      if (o.sport === 'football') o.court = [0, 1, 5, 3, 4, 2][o.court] ?? 0;
+      else o.court = Math.min(o.court, (N[o.sport] || 3) - 1);
+      if (o.game){ const g = o.game.split('|'); g[0] = o.sport; g[1] = String(o.court); o.game = g.join('|'); } });
+    db.v = 2; try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {}
+  }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
   const ready = () => { if (!db) { db = seed(); save(); } };
 
@@ -71,10 +83,13 @@
   const demoUser = () => Object.values(db.users).find(u => u.demo) || Object.values(db.users)[0];
   function takenSlots(sport, court){
     const set = new Set(), courts = [court, ...(((W.SFA_LINKS[sport] || {})[court]) || [])];
-    for (const b of Object.values(db.bookings)) if (b.order.sport === sport && courts.includes(b.order.court) && holding(b))
+    for (const b of Object.values(db.bookings)) if (b.order.sport === sport && courts.includes(b.order.court) && holding(b) && !LADY_TICKETS(b.order))
       for (const d of b.order.days) for (const s of d.starts) set.add(`${d.date}|${s}`);
     return set;
   }
+  // ladies-hours tickets (as server.js): a ticket order doesn't hold the court; each session holds up to SFA_LADIES.capacity
+  const LADY_TICKETS = o => !!(o && o.ladies && o.tickets);
+  const ladiesHeld = (sport, date, start) => Object.values(db.bookings).reduce((n, b) => n + (LADY_TICKETS(b.order) && holding(b) && b.order.sport === sport && b.order.days[0].date === date && b.order.days[0].starts[0] === start ? b.order.tickets : 0), 0);
   const STALE_CHILD = 'That child is no longer in My children. Refresh the page to see your current list.';
   const cleanChild = c => ({ first: String(c.first || '').trim().replace(/\s+/g, ' '), last: String(c.last || '').trim().replace(/\s+/g, ' '), dob: String(c.dob || ''), gender: c.gender });
   function whichChild(x, user, on){
@@ -93,13 +108,16 @@
     const fail = msg => ({ error: msg }), SP = W.SFA_SPORTS, SCH = W.SFA_SCHEDULE;
     if (!order || typeof order !== 'object') return fail('No order.');
     const sport = SP[order.sport]; if (!sport) return fail('Unknown sport.');
+    if (LADY_TICKETS(order)){ order.court = W.SFA_LADIES.courts[0]; const d0 = (order.days || [])[0] || {};
+      const lc = W.SFA_LADIES_CHECK(order, ladiesHeld(order.sport, d0.date, (d0.starts || [])[0]), new Date()); if (lc.error) return lc;
+      order.tickets = lc.tickets; order.kit = lc.kit; order.ticketPrice = W.SFA_LADIES.ticket; order.kitPrice = W.SFA_PROGRAM_KIT.price; }
     const court = sport.courts[order.court]; if (!Number.isInteger(order.court) || !court) return fail('Unknown court.');
     if (!Array.isArray(order.days) || !order.days.length) return fail('Pick at least one slot.');
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const last = new Date(today); last.setDate(last.getDate() + SCH.RANGE_DAYS - 1);
     const now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), taken = takenSlots(order.sport, order.court), seen = new Set();
     let count = 0;
-    for (const d of order.days){
+    if (!LADY_TICKETS(order)) for (const d of order.days){
       if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date || '')) return fail('Bad date.');
       const date = parse(d.date);
       if (dk(date) !== d.date || date < today || date > last) return fail(`${d.date} can't be booked.`);
@@ -132,6 +150,7 @@
       order.bookingFor = { type: 'other', name, phone: bf.phone, email };
     }
     else return fail('Choose who the booking is for.');
+    if (LADY_TICKETS(order)) return { sport, court, count: order.tickets, amount: W.SFA_LADIES_PRICE(order.tickets, order.kit), tickets: true };
     const slotPrice = court[5] * SCH.SLOT / 60;
     return { sport, court, count, amount: Math.round(slotPrice * count * 100) / 100 };
   }
@@ -401,6 +420,7 @@
         return [200, { ok: true, left: total - x.checkins.length, total, name: x.name }];
       }
       case '/api/booked': return [200, [...takenSlots(q.get('sport'), +q.get('court'))]];
+      case '/api/ladies': { const out = {}; for (const b of Object.values(db.bookings)) if (LADY_TICKETS(b.order) && holding(b) && b.order.sport === q.get('sport')){ const k = `${b.order.days[0].date}|${b.order.days[0].starts[0]}`; out[k] = (out[k] || 0) + b.order.tickets; } return [200, out]; }
       case '/api/games': {
         const days = new Set(String(q.get('days') || '').split(',')), me = currentUser(), out = {};
         for (const b of Object.values(db.bookings)) if (b.order.kind === 'game' && holding(b) && days.has(b.order.days[0].date)){
@@ -438,7 +458,7 @@
         } else {
           const chk = checkOrder(order, user); if (chk.error) return [chk.status || 400, { error: chk.error }];
           amount = chk.amount;
-          { const q = withOffer('court', { sport: order.sport, court: order.court }, chk.count, chk.amount, chk.count); if (q.offer){ amount = q.amount; order.offer = q.offer; } }
+          if (!chk.tickets){ const q = withOffer('court', { sport: order.sport, court: order.court }, chk.count, chk.amount, chk.count); if (q.offer){ amount = q.amount; order.offer = q.offer; } }
           order.waiver = { acceptedBy: user.name, at: Date.now(), for: [order.bookingFor.type === 'me' ? user.name : order.bookingFor.name], guardian: order.bookingFor.type === 'child' };
         }
         db.bookings[cartId] = { cartId, status: 'pending', createdAt: Date.now(), amount, order, payer, userId: user.id, tranRef: 'TEST-' + hex(5).toUpperCase(), test: true };

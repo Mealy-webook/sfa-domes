@@ -468,6 +468,8 @@ button.who-opt:disabled small{color:var(--danger)}
 .ck-card .total strong{font:var(--ts-display-xs)}
 </style>
 <link rel="stylesheet" href="f/ui.css">
+<link rel="stylesheet" href="f/flow.css">
+<link rel="stylesheet" href="f/court-flow.css">
 </head>
 <body>
 <div data-site-nav data-focused data-back="index.html?from=courts#sports" data-back-label="Edit booking"></div>
@@ -557,12 +559,14 @@ button.who-opt:disabled small{color:var(--danger)}
   <a class="btn" href="index.html?from=courts#sports">Choose a sport</a>
 </div>
 
-<script src="f/site-nav.js"></script>
+<script src="f/flow.js"></script>
+<script src="f/site-nav.js"></script><script src="f/city.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
 <script src="f/games-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
+<script src="f/court-flow.js"></script>
 <script src="f/auth.js"></script>
 <script src="f/kid-pick.js"></script>
 <script src="f/checkout-delight.js" defer></script>
@@ -689,6 +693,8 @@ button.who-opt:disabled small{color:var(--danger)}
       $('ckOffers').innerHTML = window.SFA_OFFER_UI && ppl.length ? window.SFA_OFFER_UI.applied('game', item, ppl.length, g.price, base) : '';
       const focused = document.activeElement && pm.contains(document.activeElement) ? (document.activeElement.id ? '#' + document.activeElement.id : document.activeElement.dataset.gpPick ? `[data-gp-pick="${CSS.escape(document.activeElement.dataset.gpPick)}"]` : null) : null;
       pm.innerHTML = players(); if (focused) pm.querySelector(focused)?.focus();
+      const gb = pm.querySelector('#gpCard .gp-body'), gof = window.SFA_OFFER_UI ? window.SFA_OFFER_UI.block('game', item, ppl.length, g.price, base) : '';   // offers that count players show here (Ahmed, 2026-11-18)
+      if (gb && gof) gb.insertAdjacentHTML('beforeend', `<div class="ck-of">${gof}</div>`);
       $('total').innerHTML = !ppl.length ? '—' : amount ? (quote.offer ? `<s class="of-was">${money(base)}</s> ` : '') + money(amount) : t('Free of charge');
       $('charge').hidden = true;
       payLabel = `<span>${ppl.length && !amount ? t('Join for free') : ppl.length ? t('Pay {total}', { total: money(amount) }) : t("Choose who's playing")}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>`;
@@ -741,6 +747,11 @@ button.who-opt:disabled small{color:var(--danger)}
       e.target.closest('.bad')?.classList.remove('bad'); });
     pm.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.target.id === 'gpN' || e.target.id === 'gpP')){ e.preventDefault(); pm.querySelector('[data-gp-add]')?.click(); } });
 
+    // webook-style steps (f/flow.js): Who's playing → Review → Checkout
+    window.SFA_CK = { kind: 'game', steps: ['players', 'review', 'pay'], back: bookUrl,
+      validate: async step => { if (step === 'players' && !order.players.length){ pickErr = t("Choose who's playing"); summary(); $('gpCard')?.scrollIntoView({ block: 'center', behavior: 'smooth' }); return false; } return true; },
+      recap: () => [["Who's playing", (quote ? quote.people : []).map(x => esc(x.type === 'me' ? t('You') : x.name) + (x.type === 'guest' ? ` <small class="ln-mut">· ${t('Guest')}</small>` : '')).join(', ') || '—', 'players'],
+        ['When', `${P.date(toDate(g.date), 'full')} · <bdi>${P.time(g.start)}</bdi>`], ['Where', `${esc(t(c[0]))} · ${t('SFA Domes Dammam')}`]] };
     const gate = () => window.SFA_AUTH.require(t('Sign in to join a game.')).then(u => { if (!u) location.href = bookUrl; else { me = u; load(); } });
     summary(); gate(); addEventListener('sfa:auth', e => { if (!e.detail) gate(); });
     addEventListener('sfa:prefs', summary);
@@ -774,7 +785,7 @@ button.who-opt:disabled small{color:var(--danger)}
     const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
     const range = s => `<bdi>${P.time(s)}</bdi> – <bdi>${P.time(s + p.minutes)}</bdi>`;
     const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>';
-    const bookUrl = `program.html?p=${encodeURIComponent(order.program)}#book`;
+    const bookUrl = `program.html?p=${encodeURIComponent(order.program)}&book=1`;
     $('backLink').href = bookUrl;
     // breadcrumbs, as on every page below the top level (Ahmed, 2026-11-17: unify the site)
     $('ckCrumbs').innerHTML = `<a href="index.html">${t('Home')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="programs.html">${t('Training programs')}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><a href="${bookUrl}">${esc(tx(p.name))}</a><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><span>${t('Checkout')}</span>`;
@@ -819,7 +830,7 @@ button.who-opt:disabled small{color:var(--danger)}
     // summary card: what's booked and what it costs
     function summary(){
       const n = sessions().length, plan = renewing ? t('One month renewal · 20% off') : t({ trial: 'Free trial', month: 'One month subscription', month2: 'Two-month subscription', month3: 'Three-month subscription' }[order.plan]);
-      $('cSport').textContent = t(sp.name);
+      $('cSport').textContent = `${t(sp.name)} · ${t('Training program')}`;
       $('cName').textContent = tx(p.name);
       $('cSpecs').textContent = `${t('Ages {a}', { a: `⁦${p.ages}⁩` })} · ${tx(p.level)}`;
       $('cWhen').hidden = false; $('cWhen').innerHTML = `${P.date(toDate(order.start), 'full')} · ${range(order.time)}`;
@@ -865,11 +876,11 @@ button.who-opt:disabled small{color:var(--danger)}
       const row = (k, i) => `<li${i ? '' : ' class="on"'}><span class="pk-n">${i + 1}</span><span><b>${P.date(toDate(k), { weekday: 'long', day: 'numeric', month: 'long' })}</b><small>${range(order.time)}</small></span>${i ? '' : `<em>${t('First')}</em>`}</li>`;
       // Your sessions is hidden for now (Ahmed): the summary card still says when it starts and how many sessions. Set
       // SHOW_SESSIONS to bring the card (soonest first + the all-sessions popup) back.
-      main.innerHTML = (SHOW_SESSIONS ? `<section class="step panel ck-card" aria-labelledby="sesTitle"><div class="step-head ck-card-head pk-ses-head"><h2 id="sesTitle">${t('Your sessions')}</h2><a href="${bookUrl}">${t('Change')}</a></div>
+      main.innerHTML = (SHOW_SESSIONS ? `<section class="step panel ck-card" id="sesCard" aria-labelledby="sesTitle"><div class="step-head ck-card-head pk-ses-head"><h2 id="sesTitle">${t('Your sessions')}</h2><a href="${bookUrl}">${t('Change')}</a></div>
           <div class="pk-body"><ol class="pk-next" id="pkSes">${top.map(row).join('')}</ol>
           ${rest.length ? `<p class="pk-rest">${t('+ {n} more sessions until {d}', { n: rest.length, d: P.date(toDate(last), { weekday: 'short', day: 'numeric', month: 'short' }) })}</p><button type="button" class="pk-more" id="pkMore" aria-haspopup="dialog">${t('Show all {n} sessions', { n: list.length })}</button>` : ''}</div></section>` : '') + `
                 <section class="step panel ck-card" id="ppCard" aria-labelledby="ppTitle"><div class="step-head ck-card-head"><h2 id="ppTitle">${t('Participants')}</h2></div><div class="pk-body" id="ppBody"></div></section>
-        ${order.plan === 'trial' ? '' : `<section class="step panel ck-card" aria-labelledby="addTitle"><div class="step-head ck-card-head"><h2 id="addTitle">${t('Add-ons')}</h2></div><div class="pk-body" id="pkKit"></div></section>`}`;
+        ${order.plan === 'trial' ? '' : `<section class="step panel ck-card" id="addCard" aria-labelledby="addTitle"><div class="step-head ck-card-head"><h2 id="addTitle">${t('Add-ons')}</h2></div><div class="pk-body" id="pkKit"></div></section>`}`;
       ppCard();
       kitCard();
     }
@@ -899,7 +910,8 @@ button.who-opt:disabled small{color:var(--danger)}
           return `<li><button type="button" class="pp${r ? ' no' : ''}" role="checkbox" aria-checked="${ck}" data-pick="${esc(c.key)}"${off ? ' disabled' : ''}><span class="pp-av" aria-hidden="true">${esc(initials(c.name))}</span>
             <span class="pp-txt"><strong>${esc(c.name)}${c.you ? ` (${t('You')})` : ''}</strong><small>${!r && off ? t('Up to {n} people', { n: maxPick }) : meta(c)}</small></span><span class="pp-box" aria-hidden="true">${CHECK}</span></button></li>`; }).join('')}</ul>`}
         <button type="button" class="pp-addbtn" data-kadd aria-haspopup="dialog"${full ? ' disabled' : ''}>${PLUS}${t('Add a new child')}</button>
-        <p class="err" id="ppErr">${t('Choose at least one participant.')}</p>`;
+        <p class="err" id="ppErr">${t('Choose at least one participant.')}</p>
+        ${planPrice && window.SFA_OFFER_UI ? `<div class="ck-of">${window.SFA_OFFER_UI.block('program', { sport: p.sport, program: order.program }, picked().length, planPrice)}</div>` : ''}`;   // offers that count participants show here (Ahmed, 2026-11-18)
       if (focus) $('ppBody').querySelector(focus)?.focus({ preventScroll: true });
     }
     const toggle = key => { const on = order.people.places, i = on.indexOf(key);
@@ -994,6 +1006,17 @@ button.who-opt:disabled small{color:var(--danger)}
     addEventListener('sfa:auth', e => { me = e.detail; ppCard(); kitCard(); summary(); if (e.detail) loadKids(); });
     addEventListener('sfa:prefs', () => { $('doc-terms').innerHTML = `<ul>${window.SFA_PROGRAM_TERMS.map(x => `<li>${esc(tx(x))}</li>`).join('')}</ul>`; cards(); summary(); });
 
+    // step 3 of the program booking, Participants & add-ons (as for courts, Figma 142:9278; Ahmed 2026-11-18): the checkout
+    // header with Subscription → Date & time → Participants & add-ons → Checkout, a Back title (to step 2), participants,
+    // the Training Kit, terms and Pay
+    if (window.SFA_CF){
+      document.documentElement.classList.add('cf', 'cf-ck', 'cf-prog');
+      const closeUrl = `program.html?p=${encodeURIComponent(order.program)}`;
+      const hd = document.createElement('div'); hd.className = 'cf-root'; document.body.prepend(hd);
+      const h = document.querySelector('.ck-h');
+      const draw = () => { hd.innerHTML = window.SFA_CF.header(1, closeUrl, window.SFA_CF.PROGRAM_STEPS); h.innerHTML = window.SFA_CF.back(bookUrl); };
+      draw(); addEventListener('sfa:prefs', draw);
+    }
     const gate = () => window.SFA_AUTH.require(t('Sign in to book this program.')).then(u => { if (!u) location.href = bookUrl; });
     gate(); addEventListener('sfa:auth', e => { if (!e.detail) gate(); });
     $('pTerms').addEventListener('change', () => $('fTerms').classList.remove('bad'));
@@ -1032,7 +1055,12 @@ button.who-opt:disabled small{color:var(--danger)}
   const slotPrice = price * SLOT / 60;
   let count = 0, total = 0, full = 0, offer = null;
   // offers (f/offers-data.js): the best one for this many times comes off; the server charges the same
-  const recount = () => { count = order.days.reduce((a, d) => a + d.starts.length, 0); full = slotPrice * count;
+  // ladies hours as tickets (Ahmed, 2026-11-19; f/courts-data.js SFA_LADIES_CHECK): tickets × one price + the Training Kit, no offers
+  const LT = !!(order.ladies && order.tickets), LDY = window.SFA_LADIES, KIT = window.SFA_PROGRAM_KIT;
+  if (LT){ order.kit = order.kit || 0; }
+  let ltLeft = LDY.capacity;   // tickets still free in the session (read from the server below)
+  const recount = () => { if (LT){ count = order.tickets; full = total = window.SFA_LADIES_PRICE(order.tickets, order.kit); offer = null; return; }
+    count = order.days.reduce((a, d) => a + d.starts.length, 0); full = slotPrice * count;
     offer = window.SFA_OFFER_UI ? window.SFA_OFFER_UI.best('court', { sport: order.sport, court: order.court }, count, full) : null;
     total = offer ? Math.round((full - offer.save) * 100) / 100 : full; };
   recount();
@@ -1044,24 +1072,60 @@ button.who-opt:disabled small{color:var(--danger)}
   $('cImg').src = window.SFA_COURT_IMG(order.sport, court);
   let payLabel = '';
   function review(){
-    $('cSport').textContent = LADIES ? `${t(sport.name)} · ${t('Ladies hours')}` : t(sport.name);
-    $('cName').textContent = t(name);
-    $('cSpecs').textContent = [kind, surface, format, size].filter(Boolean).map(x => t(x)).join(' · ');
+    $('cSport').textContent = `${t(sport.name)} · ${t(LADIES ? 'Ladies hours' : 'SFA Domes Dammam')}`;   // as on the summary card in Figma 142:9278
+    $('cName').textContent = LT ? t('Courts 1 and 3') : t(name);
+    $('cSpecs').textContent = LT ? t('1.5-hour session') : [kind, surface, format, size].filter(Boolean).map(x => t(x)).join(' · ');
     // each time shows its own price and a remove (×); the last one left can't be removed, so checkout always has something to pay for
-    const x = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+    const x = '<img src="f/flow/close-sm.svg" width="10.8284" height="10.8284" alt="">';
+    if (LT){ const d = order.days[0];
+      $('days').innerHTML = `<li><b>${fmtDay(d.date)}</b><ul><li><span>${fmtSlot(d.starts[0])}</span></li></ul></li>
+        <li><b>${t('Tickets')}</b><ul><li><span>× ${order.tickets} ${t(order.tickets === 1 ? 'Ticket' : 'Tickets')}</span><span class="slot-p">${money(order.tickets * LDY.ticket)}</span></li></ul></li>`
+        + (order.kit ? `<li><b>${t('Add-ons')}</b><ul><li><span>× ${order.kit} ${esc(KIT.name[P.lang] || KIT.name.en)}</span><span class="slot-p">${money(order.kit * KIT.price)}</span><button class="rm-slot" type="button" data-lkrm="1" aria-label="${t('Remove {slot}', { slot: KIT.name[P.lang] || KIT.name.en })}" title="${t('Remove')}">${x}</button></li></ul></li>` : '');
+    } else
     $('days').innerHTML = order.days.map(d => `<li><b>${fmtDay(d.date)}</b><ul>${d.starts.map(s => `<li><span>${fmtSlot(s)}</span><span class="slot-p">${money(slotPrice)}</span>${count > 1 ? `<button class="rm-slot" type="button" data-date="${d.date}" data-s="${s}" aria-label="${t('Remove {slot}', { slot: `${fmtDay(d.date)} ${fmtSlot(s)}` })}" title="${t('Remove')}">${x}</button>` : ''}</li>`).join('')}</ul></li>`).join('');
-    $('ckOffers').innerHTML = window.SFA_OFFER_UI ? window.SFA_OFFER_UI.applied('court', { sport: order.sport, court: order.court }, count, slotPrice) : '';
+    $('ckOffers').innerHTML = LT ? '' : window.SFA_OFFER_UI ? window.SFA_OFFER_UI.applied('court', { sport: order.sport, court: order.court }, count, slotPrice) : '';
     $('total').innerHTML = (offer ? `<s class="of-was">${money(full)}</s> ` : '') + money(total);
     // prices may show in USD or AED; PayTabs always charges SAR, so say what will actually be charged
     const sar = P.currency === 'SAR';
     $('charge').hidden = sar;
     if (!sar) $('charge').innerHTML = t("You'll be charged {amount} in Saudi riyals.", { amount: `<span class="sfa-money"><span class="sfa-sar" role="img" aria-label="SAR"></span>${total.toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>` });
-    payLabel = `<span>${t('Pay {total}', { total: money(total) })}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>`;
+    payLabel = `<span>${t('Pay {total}', { total: money(total) })}</span><img class="cf-arr cf-flip" src="f/flow/arrow-right.svg" width="14.9142" height="14.4951" alt="">`;
     if (!$('payBtn').disabled) $('payBtn').innerHTML = payLabel;
+    if (LT) ladyCards();
   }
+  // ---- ladies tickets: how many (+/−, up to what's left in the session) and the Training Kit add-on, in the main column
+  const ladyBox = document.createElement('div'); ladyBox.id = 'ladyMain';
+  if (LT) document.querySelector('.ck-main').prepend(ladyBox);
+  const qty = (attr, n, min, max, label) => `<div class="pk-kq"><span class="pk-lbl" id="${attr}L">${t(label)}</span><span class="pk-qty" role="group" aria-labelledby="${attr}L"><button type="button" data-${attr}="-1" aria-label="${t('Fewer')}"${n <= min ? ' disabled' : ''}>−</button><output aria-live="polite">${n}</output><button type="button" data-${attr}="1" aria-label="${t('More')}"${n >= max ? ' disabled' : ''}>+</button></span></div>`;
+  function ladyCards(){
+    const n = order.tickets, k = order.kit, max = Math.max(1, Math.min(LDY.maxPerOrder, ltLeft));
+    ladyBox.innerHTML = `<section class="step panel ck-card" id="ltCard" aria-labelledby="ltH"><div class="step-head ck-card-head"><h2 id="ltH">${t('Tickets')}</h2><span class="gp-left">${ltLeft === 1 ? t('1 ticket left') : t('{n} tickets left', { n: ltLeft })}</span></div>
+        <div class="pk-body"><div class="pk-kit on"><span class="pk-ic" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M6 14h36v7a4 4 0 0 0 0 8v7H6v-7a4 4 0 0 0 0-8z"/><path d="M30 14v22" stroke-dasharray="3 3"/></svg></span>
+          <div><strong>${t('Ladies hours ticket')}</strong><p>${t('One woman or girl, one 1.5-hour session')}</p></div><span class="pk-pr">${money(LDY.ticket)} <small>${t('each')}</small></span>
+          ${qty('lt', n, 1, max, 'Tickets')}</div></div></section>
+      <section class="step panel ck-card" id="lkCard" aria-labelledby="lkH"><div class="step-head ck-card-head"><h2 id="lkH">${t('Add-ons')}</h2></div>
+        <div class="pk-body"><p class="pk-note">${t('Optional extras for your session.')}</p><div class="pk-kit${k ? ' on' : ''}"><span class="pk-ic" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M17 6h14l10 6-4 9-5-2v23H16V19l-5 2-4-9z"/><path d="M19 6a5 5 0 0 0 10 0"/></svg></span>
+          <div><strong>${esc(KIT.name[P.lang] || KIT.name.en)}</strong><p>${esc(KIT.items[P.lang] || KIT.items.en)}</p></div><span class="pk-pr">${money(KIT.price)} <small>${t('each')}</small></span>
+          ${qty('lk', k, 0, LDY.maxKit, 'Quantity')}</div></div></section>`;
+  }
+  const keepOrder = () => { try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (err) {} };
+  ladyBox.addEventListener('click', e => {
+    const b = e.target.closest('[data-lt],[data-lk]'); if (!b || b.disabled) return;
+    if (b.dataset.lt) order.tickets = Math.max(1, Math.min(LDY.maxPerOrder, ltLeft, order.tickets + +b.dataset.lt));
+    else order.kit = Math.max(0, Math.min(LDY.maxKit, order.kit + +b.dataset.lk));
+    keepOrder(); recount(); review();
+    const sel = b.dataset.lt ? `[data-lt="${b.dataset.lt}"]` : `[data-lk="${b.dataset.lk}"]`;
+    (ladyBox.querySelector(`${sel}:not(:disabled)`) || ladyBox.querySelector(b.dataset.lt ? '[data-lt]:not(:disabled)' : '[data-lk]:not(:disabled)'))?.focus();
+  });
+  if (LT) fetch(`/api/ladies?sport=${encodeURIComponent(order.sport)}`, { cache: 'no-store' }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(h => {
+    const d = order.days[0]; ltLeft = Math.max(0, LDY.capacity - (h[`${d.date}|${d.starts[0]}`] || 0));
+    if (ltLeft && order.tickets > ltLeft){ order.tickets = ltLeft; keepOrder(); recount(); }
+    review();
+  });
   review();
   // removing a time updates the saved order, so going back to the court page shows the same picks
   $('days').addEventListener('click', e => {
+    if (LT){ if (e.target.closest('[data-lkrm]')){ order.kit = 0; keepOrder(); recount(); review(); } return; }
     const b = e.target.closest('.rm-slot'); if (!b || count <= 1) return;
     const day = order.days.find(d => d.date === b.dataset.date); if (!day) return;
     day.starts = day.starts.filter(s => s !== +b.dataset.s);
@@ -1154,6 +1218,7 @@ button.who-opt:disabled small{color:var(--danger)}
   }));
   if (LADIES){
     $('ladyNote').hidden = false;
+    if (LT) $('ladyNote').textContent = t('Ladies hours: every ticket holder must be a woman or girl.');
     // For myself only when the account says female (My account → gender)
     const meOpt = document.querySelector('input[name="who"][value="me"]');
     const meCheck = u => { const no = !!u && u.gender !== 'female';
@@ -1191,6 +1256,22 @@ button.who-opt:disabled small{color:var(--danger)}
   fetch('/api/config').catch(() => showAlert('Payments need the SFA Domes server (<code>node server.js</code>).', true));
   addEventListener('sfa:prefs', () => { review(); });
 
+  // webook-style steps (f/flow.js): (Date & times on the court page) → Booking for → Review → Checkout
+  const forText = () => { const w = who(); if (w === 'me') return t('Myself');
+    if (w === 'other') return `${esc($('gName').value.trim() || '—')} <small class="ln-mut">· <bdi>+966 ${esc($('gPhone').value)}</bdi></small>`;
+    const c = ck.pick === 'once' ? ck.once : kidList.find(x => x.id === ck.pick); return c ? esc(c.name || [c.first, c.last].filter(Boolean).join(' ')) : '—'; };
+  // step 2 of the court booking, Details (Figma 142:9278, Ahmed 2026-11-18): the checkout header with the steps
+  // Date & time → Details → Checkout, a Back title (to step 1), the Booking for card, the terms and Pay; the summary card
+  // on the side. Checkout (step 3) is the payment page. f/court-flow.css.
+  if (window.SFA_CF){
+    document.documentElement.classList.add('cf', 'cf-ck');
+    const closeUrl = LADIES ? 'ladies-hours.html' : `court-details.html?sport=${encodeURIComponent(order.sport)}&court=${order.court}`;
+    const steps = LADIES ? window.SFA_CF.LADIES_STEPS : window.SFA_CF.STEPS;
+    const hd = document.createElement('div'); hd.className = 'cf-root'; hd.innerHTML = window.SFA_CF.header(1, closeUrl, steps); document.body.prepend(hd);
+    const h = document.querySelector('.ck-h'); h.innerHTML = window.SFA_CF.back(bookUrl);
+    addEventListener('sfa:prefs', () => { hd.innerHTML = window.SFA_CF.header(1, closeUrl, steps); h.innerHTML = window.SFA_CF.back(bookUrl); });
+  }
+
   // ---- pay: the server creates the PayTabs payment page and we go there
   $('payBtn').addEventListener('click', async () => {
     const bad = Object.keys(checks).filter(id => !checks[id]());
@@ -1218,6 +1299,49 @@ button.who-opt:disabled small{color:var(--danger)}
       btn.disabled = false; btn.innerHTML = payLabel;
     }
   });
+})();
+</script>
+<script>
+/* Checkout as steps (Ahmed, 2026-11-18: follow webook's booking journey; f/flow.js). Each branch above registers
+   window.SFA_CK { kind, steps, back, validate(step), recap() }. One step shows at a time; the step lives in the URL hash so
+   the browser's Back works; Continue checks the step before moving on; Review lists what you're booking, Checkout has
+   the payment method, the terms and Pay. */
+(() => {
+  const C = window.SFA_CK, F = window.SFA_FLOW, P = window.SFA_PREFS; if (!C || !F) return;
+  const $ = id => document.getElementById(id), t = P.t, html = document.documentElement, page = $('page'), main = page.querySelector('.ck-main');
+  html.classList.add('fl-ck');
+  const S = C.steps, kind = C.kind === 'program' ? 'program' : C.kind === 'game' ? 'game' : 'court';
+  const top = document.createElement('div'); top.className = 'fl-top'; page.prepend(top);
+  main.insertAdjacentHTML('afterbegin', `<section class="step panel ck-card" id="ckRecap" aria-labelledby="recapT"><div class="step-head ck-card-head"><h2 id="recapT"></h2></div><dl class="ck-recap" id="recapL"></dl></section>`);
+  page.querySelector('.confirm').insertAdjacentHTML('beforebegin', `<section class="step panel ck-card" id="ckPayM" aria-labelledby="pmT"><div class="step-head ck-card-head"><h2 id="pmT"></h2></div><div class="ck-pm" id="pmBox"></div></section>`);
+  page.querySelector('.confirm').insertAdjacentHTML('afterend', `<div class="fl-next" id="flNext"><div class="fl-next-t"><small id="flNextL"></small><strong id="flNextT"></strong></div><button type="button" class="btn" id="flGo"></button></div>`);
+  let cur = S.includes(location.hash.slice(1)) ? location.hash.slice(1) : S[0];
+  function paint(){
+    html.dataset.ckStep = cur;
+    const i = S.indexOf(cur), prev = S[i - 1];
+    top.innerHTML = F.header({ kind, step: cur, trial: C.trial, back: prev ? '#' + prev : C.back, backLabel: prev ? 'Back' : 'Back to the booking' });
+    $('recapT').textContent = t('What you’re booking');
+    $('recapL').innerHTML = (C.recap ? C.recap() : []).map(([k, v, edit]) => `<div class="ck-recap-row"><dt>${t(k)}</dt><dd>${v}</dd>${edit ? `<a href="#${edit}">${t('Change')}</a>` : ''}</div>`).join('');
+    $('pmT').textContent = t('Payment method');
+    $('pmBox').innerHTML = `<span class="dot" aria-hidden="true"></span><div><b>${t('Card')}</b><small>${t('Visa, Mastercard or mada, paid securely with PayTabs')}</small></div><div class="cards" aria-hidden="true"><span>VISA</span><span>MC</span><span>mada</span></div>`;
+    $('flNextL').textContent = t('Total'); $('flNextT').innerHTML = $('total').innerHTML;
+    $('flGo').innerHTML = `<span>${t(cur === 'review' ? 'Continue to payment' : 'Continue')}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M5 12h14m-6-7 7 7-7 7"/></svg>`;
+    document.title = `${F.label(cur)} · SFA Domes`;
+  }
+  new MutationObserver(() => { $('flNextT').innerHTML = $('total').innerHTML; if (cur === 'review') $('recapL').innerHTML = (C.recap ? C.recap() : []).map(([k, v, edit]) => `<div class="ck-recap-row"><dt>${t(k)}</dt><dd>${v}</dd>${edit ? `<a href="#${edit}">${t('Change')}</a>` : ''}</div>`).join(''); })
+    .observe($('total'), { childList: true, subtree: true, characterData: true });
+  const show = s => { cur = s; paint(); scrollTo({ top: 0, behavior: 'auto' }); top.querySelector('h1')?.setAttribute('tabindex', '-1'); top.querySelector('h1')?.focus({ preventScroll: true }); };
+  $('flGo').addEventListener('click', async () => {
+    const btn = $('flGo'); if (btn.disabled) return; btn.disabled = true;
+    try { if (!(await C.validate(cur))) return; } finally { btn.disabled = false; }
+    const nx = S[S.indexOf(cur) + 1]; if (!nx) return;
+    history.pushState(null, '', '#' + nx); show(nx);
+  });
+  addEventListener('hashchange', () => { const h = location.hash.slice(1); if (S.includes(h) && h !== cur) show(h); });
+  addEventListener('popstate', () => { const h = location.hash.slice(1) || S[0]; if (S.includes(h) && h !== cur) show(h); });
+  addEventListener('sfa:prefs', paint);
+  if (!location.hash) history.replaceState(null, '', '#' + cur);
+  paint();
 })();
 </script>
 </body>

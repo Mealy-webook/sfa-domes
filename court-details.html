@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="f/court-details.css">
 <link rel="stylesheet" href="f/kl.css">
 <link rel="stylesheet" href="f/ui.css">
+<link rel="stylesheet" href="f/flow.css">
+<link rel="stylesheet" href="f/court-flow.css">
 </head>
 <body class="v-q" data-go-always>
 <div data-site-nav></div>
@@ -169,7 +171,8 @@
   </div>
 </div>
 
-<script src="f/site-nav.js"></script>
+<script src="f/flow.js"></script>
+<script src="f/site-nav.js"></script><script src="f/city.js"></script>
 <script src="f/site-footer.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/i18n-ar.js"></script>
@@ -188,7 +191,7 @@
     $('klHoursTime').textContent = $('stHours').textContent;
     // You might also like: this sport's other courts, then one card per other sport (opens its courts list)
     const card = (href, img, eyebrow, title, sub, price) => `<li><a class="kl-mc" href="${href}"><span class="kl-mc-img"><img src="${img}" alt="" loading="lazy"></span>` +
-      `<span class="kl-mc-body"><small>${eyebrow}</small><b>${title}</b><span>${sub}</span><em><span>${t('From')}</span> ${P.money(price)} <span>${t('/ hr')}</span></em></span></a></li>`;
+      `<span class="kl-mc-body"><small>${eyebrow}</small><b>${title}</b><span>${sub}</span><em><span>${t('From')}</span> ${P.money(price * window.SFA_SCHEDULE.SLOT / 60)} <span>${t('/ session')}</span></em></span></a></li>`;
     const spec = c => [c[1], c[3]].filter(Boolean).map(t).join(' · ');
     $('moreRow').innerHTML = courts.map((c, i) => i === ci ? '' : card(`?sport=${cur}&court=${i}`, window.SFA_COURT_IMG(cur, c), t(S[cur].name), t(c[0]), spec(c), c[5])).join('') +
       Object.entries(S).filter(([k]) => k !== cur).map(([k, s]) => card(`courts.html?sport=${k}`, window.SFA_COURT_IMG(k, s.courts[0]), t('SFA Domes Dammam'), t(s.name), spec(s.courts[0]), Math.min(...s.courts.map(c => c[5])))).join('');
@@ -225,6 +228,8 @@
   addEventListener('DOMContentLoaded', spy);
 })();
 </script>
+<script src="f/share.js"></script>
 <script src="f/court-details.js"></script>
+<script src="f/court-flow.js"></script>
 </body>
 </html>

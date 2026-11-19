@@ -9,9 +9,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Tajawal:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="f/fonts.css">
 <link rel="stylesheet" href="f/colors.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball,woman&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300..700,0,0&icon_names=exercise,fitness_center,pickleball,sports_basketball,sports_handball,sports_rugby,sports_soccer,sports_tennis,sports_volleyball,woman&display=block">
 <style>
-/* Ladies hours: multipurpose Courts 1 and 2 kept for women and girls at set times (f/courts-data.js SFA_LADIES, a SAMPLE
+/* Ladies hours: multipurpose Courts 1 and 3 kept for women and girls at set times (f/courts-data.js SFA_LADIES, a SAMPLE
    schedule for now). The week at a glance, then book a whole court: sport → day → court and time → checkout, where only
    women and girls can be the players (checkout.html + server.js check it). Same hero as the sports page; DS tokens only;
    square corners; 4/8 spacing. */
@@ -124,33 +124,46 @@ body.has-picks main{padding-bottom:120px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 <link rel="stylesheet" href="f/ui.css">
+<link rel="stylesheet" href="f/flow.css">
+<link rel="stylesheet" href="f/court-flow.css">
 </head>
 <body>
 <div data-site-nav></div>
 <main id="page"></main>
 <div data-site-footer></div>
-<script src="f/site-nav.js"></script>
+<script src="f/flow.js"></script>
+<script src="f/site-nav.js"></script><script src="f/city.js"></script>
 <script src="f/site-footer.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
 <script src="f/i18n-ar.js"></script>
 <script src="f/prefs.js"></script>
+<script src="f/court-flow.js"></script>
 <script src="f/auth.js"></script>
 <script>
 (() => {
   const P = window.SFA_PREFS, t = P.t, S = window.SFA_SPORTS, SCH = window.SFA_SCHEDULE, L = window.SFA_LADIES;
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  const root = document.getElementById('page'), q = new URLSearchParams(location.search);
+  const q = new URLSearchParams(location.search);
+  let root = document.getElementById('page');
+  // a city without a dome open yet shows its 'opening soon' state instead of the listings (f/city.js, Ahmed 2026-11-19)
+  if (window.SFA_CITY && !window.SFA_CITY.open()){ const soon = () => { root.innerHTML = window.SFA_CITY.soonPage(t('Ladies hours')); document.title = `${t('Ladies hours')} · SFA Domes`; }; soon(); addEventListener('sfa:prefs', soon); return; }
+  // booking flow step 1 (Figma 142:9464, as for courts; Ahmed 2026-11-18 "match it"): checkout header, Back title, the
+  // "Select date & time" card (sport, month, the day's sessions under its week) and the summary card. f/court-flow.css
+  // Since 2026-11-19 ladies hours are sold as tickets (f/courts-data.js SFA_LADIES_CHECK): pick a session here; the
+  // number of tickets and the add-ons are step 2 (checkout.html, "Tickets & add-ons").
+  const CF = !!(window.SFA_FLOW && window.SFA_FLOW.on && window.SFA_CF);
+  if (CF){ document.documentElement.classList.add('cf'); const wrap = document.createElement('div'); wrap.className = 'cf-root'; wrap.innerHTML = '<div id="cfHd"></div><main class="cf-page" id="cfMain"></main>'; document.body.prepend(wrap); root = wrap.querySelector('#cfMain'); }
   const SPORTS = window.SFA_LADIES_SPORTS();
   const pad = n => String(n).padStart(2, '0'), dk = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const toDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
   const today = new Date(); today.setHours(0, 0, 0, 0);
   // every day with ladies hours in the booking range, on the same month calendar as court details (Ahmed, 2026-11-17)
   const DAYS = []; for (let i = 0; i < SCH.RANGE_DAYS; i++){ const d = new Date(today); d.setDate(d.getDate() + i); if (window.SFA_LADIES_WINDOWS(dk(d)).length) DAYS.push(dk(d)); }
-  const st = { sport: SPORTS.includes(q.get('sport')) ? q.get('sport') : 'basketball', day: DAYS[0], court: null, picks: new Set(), taken: {}, note: '', view: null };
+  const st = { sport: SPORTS.includes(q.get('sport')) ? q.get('sport') : 'basketball', day: DAYS[0], start: null, held: {}, note: '', view: null, keep: null };
   const monthOf = k => { const d = toDate(k); return new Date(d.getFullYear(), d.getMonth(), 1); };
   const firstView = monthOf(DAYS[0]), lastView = monthOf(DAYS[DAYS.length - 1]);
-  // the month calendar: days with a free ladies time open, the rest greyed
+  // the month calendar: days with a session that still has tickets open, the rest greyed
   function cal(){
     const v = st.view || (st.view = monthOf(st.day)), lead = v.getDay(), n = new Date(v.getFullYear(), v.getMonth() + 1, 0).getDate(), cells = Array(lead).fill(null);
     for (let d = 1; d <= n; d++) cells.push(new Date(v.getFullYear(), v.getMonth(), d));
@@ -164,15 +177,16 @@ body.has-picks main{padding-bottom:120px}
   const icon = sp => sp.img ? `<span class="mi" style="--m:url(${sp.img})"></span>` : `<span class="msi">${sp.icon}</span>`;
   const range = (a, b) => `<bdi>${P.time(a)}</bdi> – <bdi>${P.time(b)}</bdi>`;
   const now = () => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
-  const slotsOf = (ci, k) => SCH.startsFor(k).filter(s => window.SFA_IS_LADIES(st.sport, ci, k, s) && !(k === dk(today) && s <= now()));   // times already started today aren't shown
-  const isTaken = (ci, k, s) => (st.taken[ci] || new Set()).has(`${k}|${s}`) || window.SFA_IS_BOOKED(st.sport, ci, k, s);
-  const freeCount = k => L.courts.reduce((a, ci) => a + slotsOf(ci, k).filter(s => !isTaken(ci, k, s)).length, 0);
-  const price = ci => S[st.sport].courts[ci][5] * SCH.SLOT / 60;
+  // a day's sessions for the sport (times already started today aren't shown) and the tickets left in each
+  const sessionsOf = k => window.SFA_LADIES_SESSIONS(st.sport, k).filter(s => !(k === dk(today) && s <= now()));
+  const leftOf = (k, s) => Math.max(0, L.capacity - (st.held[`${k}|${s}`] || 0));
+  const freeCount = k => sessionsOf(k).filter(s => leftOf(k, s) > 0).length;
+  const leftText = n => !n ? t('Full') : n === 1 ? t('1 ticket left') : t('{n} tickets left', { n });
   const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>';
 
-  // paid bookings (server.js) for both ladies courts of this sport
-  async function loadTaken(){
-    await Promise.all(L.courts.map(async ci => { try { const r = await fetch(`/api/booked?sport=${encodeURIComponent(st.sport)}&court=${ci}`, { cache: 'no-store' }); st.taken[ci] = new Set(r.ok ? await r.json() : []); } catch (e) { st.taken[ci] = new Set(); } }));
+  // tickets held or paid per session of this sport (server.js /api/ladies)
+  async function loadHeld(){
+    try { const r = await fetch(`/api/ladies?sport=${encodeURIComponent(st.sport)}`, { cache: 'no-store' }); st.held = r.ok ? await r.json() : {}; } catch (e) { st.held = {}; }
   }
 
   function week(){
@@ -180,61 +194,108 @@ body.has-picks main{padding-bottom:120px}
     return `<ol class="week">${names.map((n, i) => { const w = L.hours[i];
       return `<li class="wd${i === today.getDay() ? ' today' : ''}"><b data-today="${t('Today')}">${n}</b>${w.length ? w.map(([a, b]) => `<span>${range(a, b)}</span>`).join('') : `<em>${t('No ladies hours')}</em>`}</li>`; }).join('')}</ol>`;
   }
+  // the chips follow the system's sport list (f/courts-data.js SFA_TOP_SPORTS, 2026-11-19); tickets are per sport, so
+  // "Other sports" opens a second row to choose volleyball, netball, GFX or table tennis
+  const TOPS = window.SFA_TOP_SPORTS(SPORTS), topOf = k => window.SFA_SPORT_GROUP(k) || k;
+  const chip = (x, sp, on) => `<button type="button" class="chip" data-sport="${x}" aria-pressed="${on}"><span aria-hidden="true">${icon(sp)}</span>${esc(t(sp.name))}</button>`;
+  const sportChips = cls => { const g = window.SFA_SPORT_GROUP(st.sport);
+    return `<div class="chips${cls ? ' ' + cls : ''}" role="group" aria-label="${t('Sport')}">${TOPS.map(x => chip(x, window.SFA_SPORT_INFO(x), x === topOf(st.sport))).join('')}</div>`
+      + (g ? `<div class="chips lf-sub${cls ? ' ' + cls : ''}" role="group" aria-label="${t(window.SFA_SPORT_GROUPS[g].name)}">${window.SFA_SPORT_MEMBERS(g).filter(x => SPORTS.includes(x)).map(x => chip(x, S[x], x === st.sport)).join('')}</div>` : ''); };
+  const sessionBtn = (k, s, withLeft) => { const left = leftOf(k, s), on = st.start === s;
+    return `<button type="button" class="slot" data-s="${s}" aria-pressed="${on}"${left ? '' : ' disabled'} aria-label="${P.time(s)} – ${P.time(s + SCH.SLOT)} · ${leftText(left)}">${withLeft ? `<b>${range(s, s + SCH.SLOT)}</b><small>${leftText(left)}</small>` : range(s, s + SCH.SLOT)}</button>`; };
+  // ---- flow step 1: the month with the chosen day's sessions folded out under its week
+  function cfCal(){
+    const v = st.view || (st.view = monthOf(st.day)), lead = v.getDay(), n = new Date(v.getFullYear(), v.getMonth() + 1, 0).getDate(), cells = Array(lead).fill(null);
+    for (let d = 1; d <= n; d++) cells.push(new Date(v.getFullYear(), v.getMonth(), d));
+    while (cells.length % 7) cells.push(null);
+    const k = st.day, I = window.SFA_CF.icon;
+    let html = [0, 1, 2, 3, 4, 5, 6].map(i => `<span class="cal-dow" aria-hidden="true">${new Date(2026, 0, 4 + i).toLocaleDateString(P.locale, { weekday: P.lang === 'ar' ? (innerWidth < 640 ? 'narrow' : 'long') : 'short' }).slice(0, P.lang === 'ar' ? 99 : 2)}</span>`).join('');
+    for (let w = 0; w < cells.length; w += 7){
+      const wk = cells.slice(w, w + 7);
+      html += wk.map(date => { if (!date) return '<span aria-hidden="true"></span>'; const dkey = dk(date), open = DAYS.includes(dkey) && freeCount(dkey) > 0;
+        return `<button type="button" class="day${dkey === k ? ' active' : ''}${dkey === k && st.start !== null ? ' picked' : ''}" data-day="${dkey}" aria-expanded="${dkey === k}"${open ? '' : ' disabled'} aria-label="${P.date(date, 'long')}">${date.getDate()}</button>`; }).join('');
+      if (wk.some(date => date && dk(date) === k)){ const list = sessionsOf(k);
+        html += `<div class="cal-times" role="region" aria-label="${t('Times for {date}', { date: P.date(toDate(k), 'long') })}"><div class="slots-head"><p class="slots-day">${P.date(toDate(k), 'long')}</p></div>
+          ${list.length ? `<div class="lf-court"><p class="lf-court-h">${t('Courts 1 and 3')} <small>· ${P.money(L.ticket)} ${t('/ ticket')}</small></p><div class="slots">${list.map(s => sessionBtn(k, s, false)).join('')}</div></div>` : ''}</div>`; }
+    }
+    return `${sportChips('lf-sports')}
+      <div class="cf-month"><p id="calMonth">${P.date(v, 'month')}</p><div class="cf-arrows"><button type="button" class="arrow" data-cal="-1" aria-label="${t('Previous month')}"${v <= firstView ? ' disabled' : ''}>${I('f/flow/cal-prev.svg', 8.66176, 14.4951, 'cf-flip')}</button><button type="button" class="arrow" data-cal="1" aria-label="${t('Next month')}"${v >= lastView ? ' disabled' : ''}>${I('f/flow/cal-next.svg', 7.82843, 12.8284, 'cf-flip')}</button></div></div>
+      <div id="calGrid">${html}</div>
+      <ul class="cf-key"><li><i class="sw pk"></i>${t('Has a session picked')}</li><li><i class="sw op"></i>${t('Open day')}</li></ul>`;
+  }
+  // the summary: the session picked, what one ticket costs and how many are left; tickets and add-ons come next
+  function cfSum(){
+    const sp = S[st.sport], c = sp.courts[L.courts[0]], I = window.SFA_CF.icon, s = st.start;
+    return `<div class="cf-photo"><img src="${window.SFA_COURT_IMG(st.sport, c)}" alt=""><span class="cf-scrim" aria-hidden="true"></span>
+        <div class="cf-ph-t"><small>${esc(t(sp.name))} · ${t('Ladies hours')}</small><b>${t('Courts 1 and 3')}</b></div></div>
+      <div class="cf-lines">${s !== null ? `<div class="cf-day"><p class="cf-date">${P.date(toDate(st.day), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</p><div class="cf-row"><span class="cf-time">${range(s, s + SCH.SLOT)}</span><span class="cf-p">${leftText(leftOf(st.day, s))}</span><button type="button" class="cf-rm" data-rm="1" aria-label="${t('Remove {slot}', { slot: `${P.time(s)} – ${P.time(s + SCH.SLOT)}` })}">${I('f/flow/close-sm.svg', 10.8284, 10.8284)}</button></div></div>`
+          : `<p class="cf-empty">${t('Pick a day, then a session.')}</p>`}</div>
+      <div class="cf-total"><span>${t('Per ticket')}</span><strong>${P.money(L.ticket)}</strong></div>
+      <div class="cf-go"><button type="button" class="cf-btn" id="cfGo"${s !== null ? '' : ' disabled'}>${t(s !== null ? 'Continue' : 'Pick a session')}</button></div>`;
+  }
   function booking(){
-    const sp = S[st.sport], k = st.day;
-    return `<div class="step"><h3><i>1</i>${t('Sport')}</h3><div class="chips" role="group" aria-label="${t('Sport')}">${SPORTS.map(x => `<button type="button" class="chip" data-sport="${x}" aria-pressed="${x === st.sport}"><span aria-hidden="true">${icon(S[x])}</span>${esc(t(S[x].name))}</button>`).join('')}</div></div>
+    if (CF) return cfCal();
+    const sp = S[st.sport], k = st.day, c = sp.courts[L.courts[0]], list = sessionsOf(k);
+    return `<div class="step"><h3><i>1</i>${t('Sport')}</h3>${sportChips()}</div>
       <div class="step"><h3><i>2</i>${t('Day')}</h3>${cal()}</div>
-      <div class="step"><h3><i>3</i>${t('Court and time')}</h3>${st.note ? `<p class="note" role="status">${esc(st.note)}</p>` : ''}
-        <div class="courts">${L.courts.map(ci => { const c = sp.courts[ci], list = slotsOf(ci, k);
-          return `<section class="ct" aria-labelledby="ct${ci}"><div class="ct-h"><img src="${window.SFA_COURT_IMG(st.sport, c)}" alt=""><div><strong id="ct${ci}">${esc(t(c[0]))}</strong><small>${[c[1], c[3]].filter(Boolean).map(v => esc(t(v))).join(' · ')} · ${P.money(c[5])} ${t('/ hr')}</small></div></div>
-            ${list.length ? `<div class="slots">${list.map(s => { const tk = isTaken(ci, k, s), on = st.court === ci && st.picks.has(s);
-              return `<button type="button" class="slot" data-ct="${ci}" data-s="${s}" aria-pressed="${on}"${tk ? ' disabled' : ''} aria-label="${esc(t(c[0]))} · ${P.time(s)} – ${P.time(s + SCH.SLOT)}${tk ? ' · ' + t('Booked') : ''}"><b>${range(s, s + SCH.SLOT)}</b><small>${tk ? t('Booked') : P.money(price(ci))}</small></button>`; }).join('')}</div>` : `<p class="none">${t('No ladies hours on this court that day.')}</p>`}</section>`; }).join('')}</div></div>`;
+      <div class="step"><h3><i>3</i>${t('Session')}</h3>${st.note ? `<p class="note" role="status">${esc(st.note)}</p>` : ''}
+        <section class="ct" aria-labelledby="ctH"><div class="ct-h"><img src="${window.SFA_COURT_IMG(st.sport, c)}" alt=""><div><strong id="ctH">${t('Courts 1 and 3')}</strong><small>${esc(t(sp.name))} · ${P.money(L.ticket)} ${t('/ ticket')}</small></div></div>
+          ${list.length ? `<div class="slots">${list.map(s => sessionBtn(k, s, true)).join('')}</div>` : `<p class="none">${t('No ladies hours for this sport that day.')}</p>`}</section></div>`;
   }
   function bar(){
     const b = document.getElementById('bar'); if (!b) return;
-    const n = st.picks.size; b.hidden = !n; if (!n){ document.body.classList.remove('has-picks'); return; }
-    const c = S[st.sport].courts[st.court], list = [...st.picks].sort((x, y) => x - y);
-    b.querySelector('.bar-t').innerHTML = `<small>${esc(t(S[st.sport].name))} · ${esc(t(c[0]))} · ${P.date(toDate(st.day), 'short')} · ${list.map(s => P.time(s)).join(', ')}</small><strong>${P.money(price(st.court) * n)}</strong>`;
-    b.querySelector('#go').innerHTML = `${t('Book · {total}', { total: P.money(price(st.court) * n) })}`;
-    document.body.classList.toggle('has-picks', !!n);
+    const on = st.start !== null; b.hidden = !on; document.body.classList.toggle('has-picks', on); if (!on) return;
+    b.querySelector('.bar-t').innerHTML = `<small>${esc(t(S[st.sport].name))} · ${P.date(toDate(st.day), 'short')} · ${P.time(st.start)} · ${leftText(leftOf(st.day, st.start))}</small><strong>${P.money(L.ticket)} <span class="bar-p">${t('/ ticket')}</span></strong>`;
+    b.querySelector('#go').innerHTML = `${t('Continue')}${ARROW}`;
   }
   function paint(focus){
     document.title = `${t('Ladies hours')} · SFA Domes`;
+    if (CF){
+      document.getElementById('cfHd').innerHTML = window.SFA_CF.header(0, 'ladies-hours.html', window.SFA_CF.LADIES_STEPS);
+      root.innerHTML = `<div class="cf-title">${window.SFA_CF.back('ladies-hours.html').replace('<span>', '<h1>').replace('</span>', '</h1>')}</div>
+        <div class="cf-cols"><section class="cf-card" aria-labelledby="cfH"><header class="cf-card-h"><h2 id="cfH">${t('Select date & time')}</h2>
+            <ul class="cf-legend"><li><i class="sw"></i>${t('Free')}</li><li><i class="sw pk"></i>${t('Picked')}</li><li><i class="sw bk"></i>${t('Full')}</li></ul></header>
+          <div class="cf-body" id="bookIn">${booking()}</div></section>
+          <div class="cf-side"><aside class="cf-sum" id="cfSum" aria-label="${t('Booking summary')}">${cfSum()}</aside></div></div>
+        <div class="bar" id="bar" hidden><div class="bar-in"><div class="bar-t"></div><button type="button" class="go" id="go"></button></div></div>`;
+      bar(); if (focus) root.querySelector(focus)?.focus({ preventScroll: true }); return;
+    }
     const SHOW_WEEK = false;
     root.innerHTML = `<section class="hero" aria-labelledby="h1"><div class="cap"><p class="eyebrow"><span class="ico" aria-hidden="true"><span class="msi">woman</span></span>${t('SFA Domes Dammam')}</p>
-        <h1 id="h1">${t('Ladies hours')}</h1><p class="sub">${t('Courts 1 and 2 are kept for women and girls at set times every week. Book a whole court for you and your friends, the same way as any court.')}</p>
-        ${L.sample ? `<span class="sample">${t('Sample schedule · the real times are coming')}</span>` : ''}</div></section>
+        <h1 id="h1">${t('Ladies hours')}</h1><p class="sub">${t('Courts 1 and 3 are kept for women and girls at set times every week. Pick a session and get a ticket for yourself and your friends.')}</p>
+        ${L.sample ? `<span class="sample">${t('Sample schedule and prices · the real ones are coming')}</span>` : ''}</div></section>
       <!-- "Every week" is hidden (Ahmed, 2026-11-17: "hide"); set SHOW_WEEK = true to bring it back -->
-      ${SHOW_WEEK ? `<section class="sec" aria-labelledby="wk"><div class="head"><h2 id="wk">${t('Every week')}</h2><span>${t('Courts 1 and 2')}</span></div>${week()}
-        <p class="where">${t('All indoor multipurpose sports: basketball, volleyball, badminton, tennis, netball, futsal, handball, GFX and table tennis.')}</p></section>` : ''}
-      <section class="sec" id="book" aria-labelledby="bk"><div class="head"><h2 id="bk">${t('Book a court')}</h2><span>${t('1.5 hrs per booking')}</span></div><div id="bookIn">${booking()}</div></section>
+      ${SHOW_WEEK ? `<section class="sec" aria-labelledby="wk"><div class="head"><h2 id="wk">${t('Every week')}</h2><span>${t('Courts 1 and 3')}</span></div>${week()}
+        <p class="where">${t('All indoor multipurpose sports: {list}.', { list: window.SFA_LADIES_SPORTS().map(k => t(S[k].name)).join(P.lang === 'ar' ? '، ' : ', ') })}</p></section>` : ''}
+      <section class="sec" id="book" aria-labelledby="bk"><div class="head"><h2 id="bk">${t('Book tickets')}</h2><span>${t('1.5-hour sessions')}</span></div><div id="bookIn">${booking()}</div></section>
       <div class="bar" id="bar" hidden><div class="bar-in"><div class="bar-t"></div><button type="button" class="go" id="go"></button></div></div>`;
     bar(); if (focus) root.querySelector(focus)?.focus({ preventScroll: true });
   }
-  const repaint = focus => { document.getElementById('bookIn').innerHTML = booking(); bar(); if (focus) root.querySelector(focus)?.focus({ preventScroll: true }); };
+  const repaint = focus => { document.getElementById('bookIn').innerHTML = booking(); if (CF) document.getElementById('cfSum').innerHTML = cfSum(); bar(); if (focus) root.querySelector(focus)?.focus({ preventScroll: true }); };
   root.addEventListener('click', async e => {
     const b = e.target.closest('button'); if (!b || b.disabled) return;
-    if (b.dataset.sport){ st.sport = b.dataset.sport; st.picks.clear(); st.court = null; st.note = ''; history.replaceState(null, '', `?sport=${st.sport}`); await loadTaken(); repaint(`[data-sport="${st.sport}"]`); }
-    else if (b.dataset.day){ st.day = b.dataset.day; st.picks.clear(); st.court = null; st.note = ''; repaint(`[data-day="${st.day}"]`); }
+    if (b.dataset.sport){ const gs = window.SFA_SPORT_GROUPS[b.dataset.sport]; if (gs && topOf(st.sport) === b.dataset.sport) return;
+      st.sport = gs ? gs.members.find(x => SPORTS.includes(x)) : b.dataset.sport; st.start = null; st.note = ''; history.replaceState(null, '', `?sport=${st.sport}${CF ? '&book=1' : ''}`); await loadHeld(); firstOpen(); repaint(`[data-sport="${st.sport}"]`); }
+    else if (b.dataset.day){ st.day = b.dataset.day; st.start = null; st.note = ''; repaint(`[data-day="${st.day}"]`); }
     else if (b.dataset.cal){ const v = st.view; st.view = new Date(v.getFullYear(), v.getMonth() + +b.dataset.cal, 1); repaint(`[data-cal="${b.dataset.cal}"]`); }
-    else if (b.dataset.s){ const ci = +b.dataset.ct, s = +b.dataset.s;
-      // one court per booking: a time on the other court starts again there
-      if (st.court !== null && st.court !== ci){ st.picks.clear(); st.note = t('Switched to {court}. One booking is for one court.', { court: t(S[st.sport].courts[ci][0]) }); } else st.note = '';
-      st.court = ci; st.picks.has(s) ? st.picks.delete(s) : st.picks.add(s); if (!st.picks.size) st.court = null;
-      repaint(`[data-ct="${ci}"][data-s="${s}"]`); }
-    else if (b.id === 'go'){
-      const order = { sport: st.sport, court: st.court, days: [{ date: st.day, starts: [...st.picks].sort((x, y) => x - y) }], ladies: true };
+    else if (b.dataset.s){ const s = +b.dataset.s; st.start = st.start === s ? null : s; st.note = ''; repaint(`[data-s="${s}"]`); }
+    else if (b.dataset.rm){ st.start = null; repaint(); }
+    else if (b.id === 'go' || b.id === 'cfGo'){
+      // the tickets and add-ons chosen before (back from checkout) stay, as long as they still fit the session
+      const k = st.keep || {}, left = leftOf(st.day, st.start);
+      const order = { sport: st.sport, court: L.courts[0], days: [{ date: st.day, starts: [st.start] }], ladies: true,
+        tickets: Math.max(1, Math.min(k.tickets || 1, left, L.maxPerOrder)), kit: Math.min(k.kit || 0, L.maxKit), bookingFor: k.bookingFor };
       try { sessionStorage.setItem('sfaOrder', JSON.stringify(order)); } catch (err) {}
       location.href = 'checkout.html';
     }
   });
-  // back from checkout: the picks come back
-  try { const o = JSON.parse(sessionStorage.getItem('sfaOrder') || 'null'); if (o && o.ladies && SPORTS.includes(o.sport) && DAYS.includes(o.days[0].date)){ st.sport = o.sport; st.day = o.days[0].date; st.court = o.court; o.days[0].starts.forEach(s => st.picks.add(s)); } } catch (e) {}
+  // back from checkout: the session comes back (an older whole-court ladies order brings back its first time)
+  try { const o = JSON.parse(sessionStorage.getItem('sfaOrder') || 'null'); if (o && o.ladies && SPORTS.includes(o.sport) && DAYS.includes(o.days[0].date)){ st.sport = o.sport; st.day = o.days[0].date; st.start = o.days[0].starts[0] ?? null; st.keep = o; st.view = monthOf(st.day); } } catch (e) {}
+  // open on the first day that still has a session with tickets (today is often over)
+  function firstOpen(){ if (st.start === null && !freeCount(st.day)){ const k = DAYS.find(d => freeCount(d) > 0); if (k){ st.day = k; st.view = monthOf(k); } } }
   paint();
-  // open on the first day that still has a free time (today is often full or over)
-  const firstOpen = () => { if (!st.picks.size && !freeCount(st.day)){ const k = DAYS.find(d => freeCount(d) > 0); if (k){ st.day = k; st.view = monthOf(k); } } };
   firstOpen();
-  loadTaken().then(() => { firstOpen(); repaint(); });
+  loadHeld().then(() => { if (st.start !== null && !leftOf(st.day, st.start)){ st.start = null; st.note = t('That session is now full. Pick another one.'); } firstOpen(); repaint(); });
   addEventListener('sfa:prefs', () => paint());
 })();
 </script>

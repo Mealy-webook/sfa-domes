@@ -23,9 +23,8 @@
   };
   window.SFA_GAME_WHO = { adults: { min: 18, max: 120, label: 'Adults (18+)' }, kids: { min: 6, max: 17, label: 'Kids 6–17' } };
   const H = s => window.SFA_HASH('game|' + s);
-  const courtsFor = sport => window.SFA_SPORTS[sport].courts.map((c, i) => i)
-    .filter(i => !(window.SFA_SPORTS[sport].area === 'mp' && window.SFA_LADIES.courts.includes(i)))   // not Courts 1 and 2 (ladies hours)
-    .filter(i => !(sport === 'football' && i === 5));                                                 // 5-a-side fields only
+  // every court of the sport except football's 7-a-side Court 7 (games are 5-a-side); ladies-hours times are skipped below
+  const courtsFor = sport => window.SFA_SPORTS[sport].courts.map((c, i) => i).filter(i => window.SFA_SPORTS[sport].courts[i][3] !== '7 v 7');
   const make = (sport, court, date, start) => {
     const g = window.SFA_GAME_SPORTS[sport], c = window.SFA_SPORTS[sport].courts[court], id = `${sport}|${court}|${date}|${start}`;
     // kids' games only in the earlier evening slots (before 7 PM), about half of them
@@ -41,7 +40,7 @@
       const starts = window.SFA_SCHEDULE.startsFor(date).filter(s => s >= 16 * 60);
       let n = 0;
       for (const s of starts) for (const ci of courtsFor(sport)){
-        if (n >= 2 || !window.SFA_IS_BOOKED(sport, ci, date, s) || H(`${sport}|${ci}|${date}|${s}`) > 0.35) continue;
+        if (n >= 2 || window.SFA_IS_LADIES(sport, ci, date, s) || !window.SFA_IS_BOOKED(sport, ci, date, s) || H(`${sport}|${ci}|${date}|${s}`) > 0.35) continue;
         if (out.some(g => g.sport === sport && g.start === s)) continue;
         out.push(make(sport, ci, date, s)); n++;
       }

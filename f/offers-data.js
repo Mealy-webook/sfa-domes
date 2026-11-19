@@ -57,7 +57,7 @@
     const extra = r2((b.amount || 0) + f.save - f.base), now = r2(base - (B ? B.save : 0) + extra);
     return Math.max(0, r2((b.amount || 0) - (b.refund || 0) - now));
   }
-  const UNIT = { court: ['time', 'times'], game: ['player', 'players'], program: ['participant', 'participants'] };
+  const UNIT = { court: ['time', 'times'], game: ['player', 'players'], program: ['subscription', 'subscriptions'] };   // programs count subscriptions, one per participant (Ahmed, 2026-11-19)
   function text(o, t, money, date){
     const u = UNIT[o.kind][1];
     const title = o.pct ? t(`{p}% off when you book {n} or more ${u}`, { p: o.pct, n: o.min }) : t(`Save up to {amount} when you book {n} or more ${u}`, { amount: money(o.upto), n: o.min });
@@ -72,7 +72,7 @@
     const P = () => W.SFA_PREFS, tt = (k, v) => P().t(k, v), money = x => P().money(x), date = d => P().date(d, { day: 'numeric', month: 'short' });
     const TAG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><path d="M7.5 8.5h.01"/></svg>';
     const OK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
-    const U1 = { court: 'time', game: 'player', program: 'participant' };
+    const U1 = { court: 'time', game: 'player', program: 'subscription' };
     const up = (kind, nx) => tt(`Add ${nx.need === 1 ? '1 more ' + U1[kind] : '{n} more ' + U1[kind] + 's'} to ${nx.o.pct ? 'get {p}% off' : 'save {amount}'}`, { n: nx.need, p: nx.o.pct, amount: money(nx.o.upto) });
     W.SFA_OFFER_UI = {
       // every offer running for this court / game / program; the one that applies to n tickets is marked, with a nudge

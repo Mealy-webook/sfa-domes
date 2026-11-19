@@ -20,12 +20,14 @@
     $('eyebrow').innerHTML = '<span class="ico" aria-hidden="true">' + (sport.img ? `<img src="${sport.img}" alt="">` : `<span class="msi">${sport.icon}</span>`) + `</span>${t(sport.name)} · ${t('SFA Domes Dammam')}`;
     $('courtName').textContent = t(name);
     $('heroSub').textContent = [kind, surface, format, size].filter(Boolean).map(x => t(x)).join(' · ');
-    $('heroPrice').innerHTML = `${P.money(price)} <small>${t('/ hr')}</small>`;   // price + unit, no From (Ahmed, 2026-11-17)
-    $('aboutLead').textContent = sport.area === 'field'
+    $('heroPrice').innerHTML = `${P.money(price * window.SFA_SCHEDULE.SLOT / 60)} <small>${t('/ session')}</small>`;   // price per 1.5-hour session (Ahmed, 2026-11-19), no From (2026-11-17)
+    $('aboutLead').textContent = sport.area === 'padel'   // padel courts are their own glass courts (sample data, 2026-11-19)
+      ? t('{court} is one of our {n} padel courts. Book a 1.5-hour slot and check in at the front desk.', { court: t(name), n: sport.courts.length })
+      : sport.area === 'field'
       ? (key === 'rugby'
-        ? t('Rugby is played on football fields F4 and F5 joined together, inside the SFA Domes Dammam dome. Book a 1.5-hour slot and check in at the front desk.')
-        : t('{court} is part of our 5 indoor football fields. Play 5-a-side on any field, or book F4 and F5 together for 7-a-side. Book a 1.5-hour slot and check in at the front desk.', { court: t(name) }))
-      : t('{court} is one of our 4 indoor multipurpose courts, set up for {sport}. Book a 1.5-hour slot and check in at the front desk.', { court: t(name), sport: t(sport.name) });
+        ? t('Rugby is played on football Court 7, inside the SFA Domes Dammam dome. Book a 1.5-hour slot and check in at the front desk.')
+        : t('{court} is one of our 6 indoor football courts. Play 5-a-side on Courts 5, 6, 7a, 7b and 8, or book Court 7 for 7-a-side. Book a 1.5-hour slot and check in at the front desk.', { court: t(name) }))
+      : t('{court} is an indoor multipurpose court, set up for {sport}. Book a 1.5-hour slot and check in at the front desk.', { court: t(name), sport: t(sport.name) });
     $('stType').textContent = t(kind);
     const [o, c] = window.SFA_SCHEDULE.HOURS[new Date().getDay()];
     $('stHours').textContent = `${P.time(o)} – ${P.time(c)}`;
@@ -43,9 +45,10 @@
   paint();
   addEventListener('sfa:prefs', paint);
 
-  // Share: the system share sheet where there is one, otherwise copy the page link
+  // Share: a menu of share options (f/share.js) where the page loads it; otherwise the system share sheet, or copy the link
   $('shareBtn').addEventListener('click', async () => {
     const url = location.origin + location.pathname + location.search, title = document.title;
+    if (window.SFA_SHARE){ window.SFA_SHARE.open($('shareBtn'), { title, url }); return; }
     if (navigator.share){ try { await navigator.share({ title, url }); } catch (e) {} return; }
     // clipboard API first; older browsers (or an unfocused page) fall back to a hidden field + copy command
     const legacy = () => { const f = document.createElement('textarea'); f.value = url; f.setAttribute('readonly', ''); f.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(f); f.select(); const ok = document.execCommand('copy'); f.remove(); return ok; };
@@ -120,7 +123,7 @@
     const groups = [['Morning', 0, 12 * 60], ['Afternoon', 12 * 60, 17 * 60], ['Evening', 17 * 60, Infinity]];
     let shown = 0;
     const slotBtn = s => {
-      // ladies hours (f/courts-data.js): women-only on Courts 1 and 2, booked from ladies-hours.html, so shown as taken here
+      // ladies hours (f/courts-data.js): women-only on Courts 1 and 3, booked from ladies-hours.html, so shown as taken here
       const lad = !!window.SFA_IS_LADIES?.(key, ci, k, s), bk = lad || isBooked(k, s), on = !!(set && set.has(s)), why = t(lad ? 'Ladies hours' : 'Booked');
       const cls = bk ? (lad ? ' ladies' : ' booked') : '';
       const attrs = `type="button" data-s="${s}" aria-pressed="${on}"${bk ? ' disabled aria-label="' + fmtSlot(s) + ' · ' + why + '"' : ''}`;
@@ -240,13 +243,13 @@
           <ul>${set.map(s => `<li>${fmtSlot(s)}</li>`).join('')}</ul></li>`;
       }).join('')}</ul>`;
     const hrs = n * SLOT / 60;
-    $('sumRows').innerHTML = `<dt>${t('Price')}</dt><dd>${money(price)} ${t('/ hr')} · ${money(SLOT_PRICE)} ${t('/ slot')}</dd><dt>${t('Play time')}</dt><dd>${n ? t('{h} hours', { h: hrs }) : '—'}</dd>`;
+    $('sumRows').innerHTML = `<dt>${t('Price')}</dt><dd>${money(SLOT_PRICE)} ${t('/ session')}</dd><dt>${t('Play time')}</dt><dd>${n ? t('{h} hours', { h: hrs }) : '—'}</dd>`;
     $('sumTotal').innerHTML = was + money(total);
-    $('goTotal').innerHTML = n || !goAlways ? was + money(total) : `${money(price)} <small class="go-from">${t('/ hr')}</small>`;
+    $('goTotal').innerHTML = n || !goAlways ? was + money(total) : `${money(SLOT_PRICE)} <small class="go-from">${t('/ session')}</small>`;
     $('goWhen').textContent = n ? counts(keys.length, n, hrs) : t('{name} · pick days and times', { name: t(name) });
     $('go').classList.toggle('on', n > 0 || goAlways); document.body.classList.toggle('has-picks', n > 0);
-    [$('bookBtn'), $('goBtn')].forEach(b => { b.disabled = !n; b.innerHTML = n ? `<span>${t('Book · {total}', { total: money(total) })}</span>` : t('Pick a time'); });
-    if (goAlways && !n){ $('goBtn').disabled = false; $('goBtn').innerHTML = `<span>${t('Book this court')}</span>`; }
+    [$('bookBtn'), $('goBtn')].forEach(b => { b.disabled = !n; b.innerHTML = n ? `<span>${t(window.SFA_FLOW && window.SFA_FLOW.on ? 'Continue · {total}' : 'Book · {total}', { total: money(total) })}</span>` : t('Pick a time'); });
+    if (goAlways && !n && !(window.SFA_FLOW && window.SFA_FLOW.on)){ $('goBtn').disabled = false; $('goBtn').innerHTML = `<span>${t('Book this court')}</span>`; }
     notify();
   }
   $('sumDays').addEventListener('click', e => {
@@ -272,7 +275,11 @@
   window.SFA_DETAILS = {
     key, court: ci, free, isBooked, isPast, startsFor, SLOT_PRICE,
     toggle(k, s){ if (!free(k, s) && !(picks.get(k) || new Set()).has(s)) return; toggleSlot(k, s); if (MODE === 'strip') renderStrip(); else renderCal(); summary(); },
-    open(k){ active = k; const d = fromKey(k); view = new Date(d.getFullYear(), d.getMonth(), 1); if (MODE === 'strip') renderStrip(true, true); else renderCal(true); }
+    open(k){ active = k; const d = fromKey(k); view = new Date(d.getFullYear(), d.getMonth(), 1); if (MODE === 'strip') renderStrip(true, true); else renderCal(true); },
+    // for the booking flow's summary card (f/court-flow.js): the picks, remove one time, go on to checkout
+    picks, sport, name, price, SLOT, fmtSlot, fromKey,
+    remove(k, s){ const set = picks.get(k); if (!set) return; set.delete(s); if (!set.size) picks.delete(k); if (MODE === 'strip') renderStrip(); else renderCal(); summary(); },
+    book
   };
   $('bookBtn').addEventListener('click', book);
   $('goBtn').addEventListener('click', book);

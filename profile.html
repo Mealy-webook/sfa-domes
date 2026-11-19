@@ -262,7 +262,7 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
 <dialog class="dlg" id="dlg" aria-labelledby="dlgH"></dialog>
 <div data-site-footer></div>
 
-<script src="f/site-nav.js"></script>
+<script src="f/site-nav.js"></script><script src="f/city.js"></script>
 <script src="f/site-footer.js"></script>
 <script src="f/courts-data.js"></script><script src="f/offers-data.js"></script>
 <script src="f/programs-data.js"></script>
@@ -290,8 +290,9 @@ html[lang=ar] .day span,html[lang=ar] .day small{text-transform:none}
     reload: async () => { const b = await fetch('/api/auth/bookings').then(x => x.json()).catch(() => ({})); bookings = b.bookings || bookings; paint(); } });
   const C = window.SFA_CHILD, LOCK = '<svg class="lk" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>';
   // booking types: courts, training programs, and any other kind the system adds (named from its key until it has a label)
-  const kindOf = b => b.order.kind || 'court';
-  const KINDS = { court: 'Courts', program: 'Training programs' };
+  // ladies-hours bookings (court-style orders with order.ladies) are a booking type of their own (Ahmed, 2026-11-19)
+  const kindOf = b => b.order.kind || (b.order.ladies ? 'ladies' : 'court');
+  const KINDS = { court: 'Courts', program: 'Training programs', game: 'Open games', ladies: 'Ladies hours' };
   const kindName = k => t(KINDS[k] || (k[0].toUpperCase() + k.slice(1).replace(/-/g, ' ')));
 
   const tab = () => { const h = location.hash.slice(1).split('/')[0]; return TABS.includes(h) ? h : 'tickets'; };

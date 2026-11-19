@@ -25,6 +25,8 @@
       return { sp, title, label: title, program: p, img: p.img || window.SFA_COURT_IMG(p.sport, sp.courts[p.court || 0]) };
     }
     const c = sp.courts[s.court];
+    // ladies-hours tickets (2026-11-19): a session on Courts 1 and 3, not a court of your own
+    if (b.order.ladies && b.order.tickets) return { sp, title: t('Courts 1 and 3'), label: `${t(sp.name)} · ${t('Ladies hours')}`, img: window.SFA_COURT_IMG(s.sport, c) };
     return { sp, title: t(c[0]), label: `${t(sp.name)} · ${t(c[0])}`, img: window.SFA_COURT_IMG(s.sport, c) };
   }
 
